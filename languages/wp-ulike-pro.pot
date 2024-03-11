@@ -1,0 +1,5286 @@
+# Copyright (C) 2024 TechnoWich
+# This file is distributed under the same license as the WP ULike Pro package.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP ULike Pro 1.8.4\n"
+"Report-Msgid-Bugs-To: https://wpulike.com\n"
+"POT-Creation-Date: 2024-01-16 11:26:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: WP ULike Team <info@wpulike.com>\n"
+"X-Generator: grunt-wp-i18n 1.0.3\n"
+
+#: admin/includes/admin-ajax.php:28 admin/includes/admin-ajax.php:56
+#: admin/includes/admin-ajax.php:95 admin/includes/admin-ajax.php:148
+#: admin/includes/admin-ajax.php:223 admin/includes/admin-ajax.php:247
+msgid "Something Wrong Happened!"
+msgstr ""
+
+#: admin/includes/admin-ajax.php:101
+msgid "Please select your target table."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:108
+msgid "No data found!"
+msgstr ""
+
+#: admin/includes/admin-ajax.php:170
+msgid "API keys successfully generated."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:189
+msgid "You do not have access."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:197
+msgid "Please enter required params."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:208
+msgid "Action not exist."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:216
+msgid "Mission Accomplished."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:237
+msgid "Token Error."
+msgstr ""
+
+#: admin/includes/admin-ajax.php:244
+msgid "Done."
+msgstr ""
+
+#: admin/includes/admin-hooks.php:58 admin/includes/admin-hooks.php:196
+#: admin/includes/classes/class-options-panel.php:202
+#: admin/includes/classes/class-options-panel.php:216
+#: admin/includes/classes/class-options-panel.php:287
+#: admin/includes/classes/class-options-panel.php:311
+#: admin/includes/classes/class-options-panel.php:2715
+#: admin/includes/classes/class-shortcoder.php:114
+#: admin/includes/classes/class-shortcoder.php:167
+#: admin/includes/classes/class-shortcoder.php:237
+#: admin/includes/classes/class-stats.php:424
+#: includes/elementor/widgets/most-liked-posts.php:493
+msgid "Dislike"
+msgstr ""
+
+#: admin/includes/admin-hooks.php:182
+msgid "Export Logs"
+msgstr ""
+
+#: admin/includes/admin-hooks.php:267
+msgid "Install Core Pages"
+msgstr ""
+
+#: admin/includes/admin-hooks.php:268
+msgid ""
+"WP ULike Pro needs to create several pages (User Profiles, Edit Account, "
+"Registration, Login, Password Reset) to function correctly."
+msgstr ""
+
+#: admin/includes/admin-hooks.php:273
+#: admin/includes/classes/class-options-panel.php:2529
+msgid "Create Pages"
+msgstr ""
+
+#: admin/includes/admin-hooks.php:279
+msgid "No thanks and never ask me again"
+msgstr ""
+
+#: admin/includes/classes/class-api.php:73
+#: admin/includes/classes/class-api.php:223
+msgid "HTTP Error"
+msgstr ""
+
+#: admin/includes/classes/class-api.php:78
+msgid "An error occurred, please try again"
+msgstr ""
+
+#: admin/includes/classes/class-api.php:211
+msgid "Another check is in progress."
+msgstr ""
+
+#: admin/includes/classes/class-api.php:236
+#. translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link
+#. opening tag, 4: Link closing tag.
+msgid ""
+"%1$sYou have no more activations left.%2$s %3$sPlease upgrade to a more "
+"advanced license%4$s (you'll only need to cover the difference)."
+msgstr ""
+
+#: admin/includes/classes/class-api.php:244
+#. translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link
+#. opening tag, 4: Link closing tag.
+msgid ""
+"%1$sOh no! Your WP ULike Pro license has expired.%2$s Want to keep creating "
+"better marketing and high-performing websites? Renew your subscription to "
+"regain access to all of the new pro features, templates, updates & more. "
+"%3$sRenew now%4$s"
+msgstr ""
+
+#: admin/includes/classes/class-api.php:250
+#: admin/includes/classes/class-license-activation.php:57
+msgid "Your license is missing. Please check your key again."
+msgstr ""
+
+#: admin/includes/classes/class-api.php:253
+#: admin/includes/classes/class-license.php:25
+#. translators: 1: Bold text opening tag, 2: Bold text closing tag.
+msgid ""
+"%1$sYour license key has been cancelled%2$s (most likely due to a refund "
+"request). Please consider acquiring a new license."
+msgstr ""
+
+#: admin/includes/classes/class-api.php:257
+msgid "Your license is invalid for this domain. Please check your key again."
+msgstr ""
+
+#: admin/includes/classes/class-api.php:267
+msgid ""
+"An error occurred. Please check your internet connection and try again. If "
+"the problem persists, contact our support."
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:28
+#: admin/includes/classes/class-meta-box.php:40
+msgid "Metabox Tools"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:35
+#: admin/includes/classes/class-meta-box.php:62
+#: includes/elementor/widgets/best-likers.php:101
+#: includes/elementor/widgets/counter.php:102
+#: includes/elementor/widgets/most-liked-activities.php:102
+#: includes/elementor/widgets/most-liked-comments.php:128
+#: includes/elementor/widgets/most-liked-posts.php:105
+#: includes/elementor/widgets/most-liked-topics.php:102
+#: includes/elementor/widgets/posts-button.php:102
+msgid "General"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:38
+#: admin/includes/classes/class-meta-box.php:65
+#: admin/includes/classes/class-shortcoder.php:45
+msgid "Display Button"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:40
+#: admin/includes/classes/class-meta-box.php:67
+msgid "Enable auto display if not activated in settings panel."
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:44
+#: admin/includes/classes/class-meta-box.php:71
+msgid "Button Template"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:47
+#: admin/includes/classes/class-meta-box.php:74
+#: admin/includes/classes/class-shortcoder.php:70
+msgid "Select a Template"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:48
+#: admin/includes/classes/class-meta-box.php:75
+#: admin/includes/classes/class-shortcoder.php:71
+msgid "Display online preview"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:48
+#: admin/includes/classes/class-meta-box.php:75
+#: admin/includes/classes/class-shortcoder.php:71
+msgid "Here"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:54
+#: admin/includes/classes/class-meta-box.php:81
+msgid "Button Position"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:58
+#: admin/includes/classes/class-meta-box.php:85
+msgid "Top of Content"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:59
+#: admin/includes/classes/class-meta-box.php:86
+msgid "Bottom of Content"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:60
+#: admin/includes/classes/class-meta-box.php:87
+msgid "Top and Bottom"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:65
+#: admin/includes/classes/class-meta-box.php:92
+msgid "Likes Counter Quantity"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:69
+#: admin/includes/classes/class-meta-box.php:96
+msgid "Likes"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:72
+#: admin/includes/classes/class-meta-box.php:99
+msgid "Dislikes Counter Quantity"
+msgstr ""
+
+#: admin/includes/classes/class-comment-meta-box.php:76
+#: admin/includes/classes/class-meta-box.php:103
+msgid "Dislikes"
+msgstr ""
+
+#: admin/includes/classes/class-license-activation.php:79
+msgid "License has been activated successfully."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:16
+msgid "Your License Has Expired"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:17
+msgid ""
+"Want to keep creating better marketing and high-performing websites? Renew "
+"your subscription to regain access to all of the new pro features, "
+"templates, updates & more"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:18
+#: admin/includes/classes/class-license.php:241
+msgid "Renew License"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:22
+msgid "Your License Is Inactive"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:29
+#: admin/includes/classes/class-license.php:165
+#: admin/includes/classes/class-license.php:265
+#: admin/includes/classes/class-meta-box.php:53
+#: admin/includes/classes/class-options-panel.php:2877
+#: admin/includes/templates/statistics.php:26
+#: includes/classes/class-admin-customizer.php:478
+msgid "Activate License"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:33
+msgid "License Invalid"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:36
+#. translators: 1: Bold text opening tag, 2: Bold text closing tag.
+msgid ""
+"%1$sYour license key doesn't match your current domain%2$s. This is most "
+"likely due to a change in the domain URL of your site (including HTTPS/SSL "
+"migration). Please deactivate the license and then reactivate it again."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:40
+#: admin/includes/classes/class-license.php:51
+msgid "Reactivate License"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:44
+msgid "License Mismatch"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:47
+#. translators: 1: Bold text opening tag, 2: Bold text closing tag.
+msgid ""
+"%1$sYour license key doesn't match your current domain%2$s. This is most "
+"likely due to a change in the domain URL. Please deactivate the license and "
+"then reactivate it again."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:91
+msgid "Please enter your license key."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WP ULike Pro"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:159
+msgid "Welcome to WP ULike PRO!"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:160
+msgid ""
+"Please activate your license to get automatic updates, premium support, and "
+"unlimited access to our pro features."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:201
+#: admin/includes/classes/class-license.php:246
+msgid "Remind Me Later"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:223
+msgid "Your License Will Expire in %s."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:224
+msgid ""
+"Your WP ULike Pro license is about to expire. Renew now and get updates, "
+"support, Pro templates for another year."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:229
+#. translators: %s: Renewal discount.
+msgid ""
+"Your WP ULike Pro license is about to expire. Renew now and get an "
+"exclusive, time-limited %s discount."
+msgstr ""
+
+#: admin/includes/classes/class-license.php:273
+msgid "License"
+msgstr ""
+
+#: admin/includes/classes/class-logs.php:283
+#: admin/includes/classes/class-stats.php:575
+msgid "Guest User"
+msgstr ""
+
+#: admin/includes/classes/class-logs.php:314
+msgid "Activity Permalink"
+msgstr ""
+
+#: admin/includes/classes/class-logs.php:332
+msgid "Not Found!"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:53
+#: admin/includes/classes/class-options-panel.php:2877
+#: admin/includes/templates/statistics.php:26
+#: includes/classes/class-admin-customizer.php:478
+msgid ""
+"Features of the Pro version are only available once you have registered "
+"your license. If you don't yet have a license key, get WP ULike Pro now."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:110
+msgid "Schema Generator"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:113
+msgid "Enable Schema"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:115
+msgid ""
+"Schema provides a collection of shared vocabularies webmasters can use to "
+"mark up their pages in ways that can be understood by the major search "
+"engines: Google, Microsoft, Yandex and Yahoo!"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:115
+msgid "More Information"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:119
+msgid "Schema Type"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:120
+msgid ""
+"The schemas are a set of types, each associated with a set of properties. "
+"The types are arranged in a hierarchy."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:128
+msgid "Book"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:129
+msgid "Course"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:130
+msgid "How-to"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:131
+msgid "Event"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:132
+msgid "Local Business"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:133
+msgid "Movie"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:134
+msgid "Product"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:136
+msgid "Software App"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:137
+msgid "CreativeWorkSeason"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:138
+msgid "CreativeWorkSeries"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:139
+msgid "Episode"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:140
+msgid "Game"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:141
+msgid "MediaObject"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:142
+msgid "MusicPlaylist"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:144
+msgid "Organization"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:146
+#: admin/includes/classes/class-meta-box.php:189
+#: admin/includes/classes/class-meta-box.php:303
+#: admin/includes/classes/class-meta-box.php:366
+msgid "Select an option"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:150
+#: admin/includes/classes/class-options-panel.php:1731
+#: admin/includes/classes/class-options-panel.php:1827
+#: admin/includes/classes/class-shortcoder.php:290
+#: admin/includes/classes/class-shortcoder.php:590
+#: admin/includes/classes/class-shortcoder.php:613
+#: includes/elementor/modules/query-control/controls/group-control-query.php:348
+#: includes/elementor/widgets/best-likers.php:366
+#: includes/elementor/widgets/most-liked-comments.php:354
+#: includes/elementor/widgets/most-liked-posts.php:970
+#: includes/elementor/widgets/most-liked-topics.php:386
+msgid "Title"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:151
+msgid "The name of the item. (Put it empty if you want to use post title)"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:157
+#: admin/includes/classes/class-shortcoder.php:291
+#: admin/includes/classes/class-shortcoder.php:595
+#: admin/includes/classes/class-shortcoder.php:618
+msgid "Description"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:163
+msgid "Name/Brand/Actor"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:169
+msgid "Author/Performer/Director"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:175
+msgid "Days of Week"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:193
+msgid "Opens"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:194
+msgid "The time the business location opens."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:201
+msgid "Closes"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:202
+msgid "The start date of a seasonal business closure."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:209
+msgid "Location Name"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:216
+#: admin/includes/classes/class-meta-box.php:222
+msgid "Street Address"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:228
+msgid "Address Locality"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:234
+msgid "Address Region"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:240
+msgid "Postal Code"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:246
+msgid "Address Country"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:252
+msgid "Telephone"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:258
+msgid "Price Range"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:264
+msgid "Start Date"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:270
+msgid "End Date"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:276
+msgid "Created/Published Date"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:282
+msgid "Price"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:289
+msgid "Price Curreny"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:295
+msgid "Availability"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:299
+msgid "InStock"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:300
+msgid "PreOrder"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:301
+msgid "SoldOut"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:307
+msgid "Valid Date"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:313
+#: admin/includes/classes/class-meta-box.php:451
+#: admin/includes/classes/class-meta-box.php:494
+msgid "Url"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:319
+msgid "SKU"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:320
+msgid "Merchant-specific identifier for product."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:326
+msgid "MPN"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:327
+msgid ""
+"Include all applicable global identifiers; these are described at "
+"schema.org/Product|true"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:333
+msgid "Application Category"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:341
+msgid "GameApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:342
+msgid "SocialNetworkingApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:343
+msgid "TravelApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:344
+msgid "ShoppingApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:345
+msgid "SportsApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:346
+msgid "LifestyleApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:347
+msgid "BusinessApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:348
+msgid "DesignApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:349
+msgid "DeveloperApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:350
+msgid "DriverApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:351
+msgid "EducationalApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:352
+msgid "HealthApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:353
+msgid "FinanceApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:354
+msgid "SecurityApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:355
+msgid "BrowserApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:356
+msgid "CommunicationApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:357
+msgid "DesktopEnhancementApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:358
+msgid "EntertainmentApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:359
+msgid "MultimediaApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:360
+msgid "HomeApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:361
+msgid "ReferenceApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:362
+msgid "UtilitiesApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:363
+msgid "MedicalApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:364
+msgid "OtherApplication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:370
+msgid "Operating System"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:376
+msgid "Software Version"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:382
+msgid "Is Accessible For Free?"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:383
+msgid "A flag to signal that the item, event, or place is accessible for free."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:389
+msgid "ISSN"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:390
+msgid ""
+"The International Standard Serial Number (ISSN) that identifies this serial "
+"publication. You can repeat this property to identify different formats of, "
+"or the linking ISSN (ISSN-L) for, this serial publication."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:396
+#: admin/includes/classes/class-meta-box.php:436
+msgid "Duration"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:397
+msgid ""
+"The duration of the item (movie, audio recording, event, etc.) in ISO 8601 "
+"date format."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:403
+msgid "Encoding Format"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:404
+msgid ""
+"In cases where a CreativeWork has several media type representations, "
+"encoding can be used to indicate each MediaObject alongside particular "
+"encodingFormat information. e.g. audio/mpeg"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:410
+msgid "Tracks Number"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:411
+msgid "The number of tracks in this album or playlist."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:417
+msgid "Image/Logo"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:426
+msgid "Traks"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:431
+msgid "Artist Name"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:441
+msgid "Album Name"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:446
+#: admin/includes/classes/class-meta-box.php:465
+#: admin/includes/classes/class-meta-box.php:478
+#: admin/includes/classes/class-meta-box.php:491
+#: admin/includes/classes/class-meta-box.php:608
+msgid "Name"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:460
+msgid "Supply"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:473
+msgid "Tool"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:486
+msgid "Steps"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:499
+#: admin/includes/classes/class-options-panel.php:1156
+#: admin/includes/classes/class-options-panel.php:1744
+#: admin/includes/classes/class-shortcoder.php:600
+#: includes/elementor/widgets/most-liked-posts.php:878
+msgid "Image"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:506
+msgid "Step List"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:511
+#: admin/includes/classes/class-options-panel.php:1438
+#: admin/includes/classes/class-options-panel.php:2631
+#: admin/includes/classes/class-shortcoder.php:694
+msgid "Text"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:520
+msgid "Image(s) List"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:523
+msgid "Add Image(s)"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:527
+msgid "Disable Star Ratings"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:529
+msgid ""
+"Star rating data is automatically added to the schema markup by calculating "
+"the number of likes and dislikes. You can disable it if you wish."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:534
+msgid "Enable Time Factor Calculation"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:536
+msgid ""
+"By default, the star rating value is calculated by counting the number of "
+"likes and dislikes. If you have disabled the dislike button, by activating "
+"this option, the star rating value will be calculated by considering the "
+"time factor on the number of likes."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:541
+msgid "Enable Custom Star Rating"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:543
+msgid ""
+"You can manually rate the post (Instead of our dynamic algorithms) by "
+"activating this option."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:548
+msgid "Rating Value"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:549
+#: admin/includes/classes/class-meta-box.php:621
+msgid "The rating for the content."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:549
+msgid ""
+"Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' "
+"(U+0039)) rather than superficially similiar Unicode symbols."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:549
+msgid ""
+"Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a "
+"decimal point. Avoid using these symbols as a readability separator."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:555
+msgid "Rating Count"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:556
+msgid "The count of total number of ratings."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:562
+msgid "Review Count"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:563
+msgid "The count of total number of reviews."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:569
+msgid "Worst Rating"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:570
+msgid ""
+"The lowest value allowed in this rating system. If worstRating is omitted, "
+"1 is assumed."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:576
+msgid "Best Rating"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:577
+msgid ""
+"The highest value allowed in this rating system. If bestRating is omitted, "
+"5 is assumed."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:584
+msgid "Enable Custom Reviews"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:586
+msgid "A review of an item - for example, of a restaurant, movie, or store."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:593
+msgid "Reviews"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:598
+msgid "Author Name"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:603
+msgid "Date of first publication"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:613
+msgid "Review Body"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:620
+msgid "Review Rating"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:629
+msgid "Enable Frequently Asked Question (FAQ)"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:636
+msgid "FAQ"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:641
+msgid "Question"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:647
+msgid "Answer"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:658
+msgid "Delete Data"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:664
+#: admin/includes/classes/class-options-panel.php:2181
+#: admin/includes/classes/class-options-panel.php:2265
+#: admin/includes/classes/class-options-panel.php:2349
+#: admin/includes/classes/class-options-panel.php:2422
+msgid "Delete All Logs"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:665
+#: admin/includes/classes/class-options-panel.php:2182
+#: admin/includes/classes/class-options-panel.php:2266
+#: admin/includes/classes/class-options-panel.php:2350
+#: admin/includes/classes/class-options-panel.php:2423
+msgid "Delete Records"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:666
+#: admin/includes/classes/class-options-panel.php:2183
+#: admin/includes/classes/class-options-panel.php:2267
+#: admin/includes/classes/class-options-panel.php:2351
+#: admin/includes/classes/class-options-panel.php:2424
+msgid "You Are About To Delete All Likes Logs. This Action Is Not Reversible."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:676
+#: admin/includes/classes/class-options-panel.php:2203
+#: admin/includes/classes/class-options-panel.php:2287
+#: admin/includes/classes/class-options-panel.php:2371
+#: admin/includes/classes/class-options-panel.php:2444
+msgid "Delete Meta Counter Values"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:677
+#: admin/includes/classes/class-options-panel.php:2204
+#: admin/includes/classes/class-options-panel.php:2288
+#: admin/includes/classes/class-options-panel.php:2372
+#: admin/includes/classes/class-options-panel.php:2445
+msgid "Delete Values"
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:678
+#: admin/includes/classes/class-options-panel.php:2205
+#: admin/includes/classes/class-options-panel.php:2289
+#: admin/includes/classes/class-options-panel.php:2373
+#: admin/includes/classes/class-options-panel.php:2446
+msgid ""
+"You Are About To Delete All Meta Counter Data. This Action Is Not "
+"Reversible."
+msgstr ""
+
+#: admin/includes/classes/class-meta-box.php:678
+msgid ""
+"After completing this operation, go to the \"Optimization\" section in the "
+"settings panel and delete all meta user status."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:110
+#: admin/includes/classes/class-options-panel.php:180
+msgid "Enable Standard Meta Data"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:111
+#: admin/includes/classes/class-options-panel.php:181
+msgid ""
+"By activating this option, the counter data is stored simultaneously in the "
+"standard meta table and you can use it to create custom queries."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:118
+msgid "Enable Attachments"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:119
+msgid ""
+"By activating this option, you can add voting buttons for image "
+"attachments. This option only works when you use WordPress +5.6 and also "
+"have the standard `wp_get_attachment_image` function in your theme."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:131
+msgid "Filter By Attachment ID"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:143
+msgid "class name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:146
+msgid "Filter By Class Name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:148
+msgid "Add attachment specified class names. (e.g. attachment-full)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:158
+msgid "image size"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:161
+msgid "Filter By Attachment Size"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:163
+msgid "Add attachment standard size. (e.g. large, thumbnail, etc.)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:208
+#: admin/includes/classes/class-options-panel.php:221
+#: admin/includes/classes/class-options-panel.php:298
+#: admin/includes/classes/class-options-panel.php:323
+#: admin/includes/classes/class-options-panel.php:2717
+#: admin/includes/classes/class-shortcoder.php:169
+#: admin/includes/classes/class-shortcoder.php:239
+msgid "Undislike"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:243
+msgid "Enable Shortcode Generator"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:244
+msgid "Comes with pre-built wp ulike shortcode editor to manage your content."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:249
+msgid "Display Stats Menu Capability"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:250
+#: admin/includes/classes/class-options-panel.php:259
+msgid "Manage users' access level to view this page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:258
+msgid "Display Logs Menu Capability"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:267
+msgid "Enable Meta Box"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:268
+msgid "Display meta box panel in selected post types."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:292
+#: admin/includes/classes/class-options-panel.php:303
+msgid "Button Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:316
+#: admin/includes/classes/class-options-panel.php:328
+msgid "Button Image"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:338
+msgid "Modal"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:343
+msgid "Pile + Modal"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:352
+msgid "Enable Percentage Values"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:364
+msgid "Modal Template"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:374
+#: includes/classes/class-options.php:376
+msgid "Likers"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:375
+msgid "Likers Modal Title"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:397
+msgid "Likers Modal Template"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:398
+msgid "Allowed Variables:"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:417
+msgid "Enable Serialize Data type"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:418
+msgid ""
+"By activating this option, the metabox information will be serialized and "
+"stored in a single row. This will lead to fewer records in the database and "
+"more performance. But if you are an old user, you probably need to use the "
+"options below to convert the old metaboxes to the new serialize structure."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:423
+msgid "Conversions"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:429
+msgid "Upgrade Metabox Values"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:430
+msgid "Merge Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:431
+msgid "Convert the old meta boxes to the new serialize structure."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:440
+msgid "Delete Old Post Meta"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:441
+#: admin/includes/classes/class-options-panel.php:2496
+#: admin/includes/classes/class-options-panel.php:2507
+msgid "Delete All Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:442
+msgid ""
+"Drop all unserialized meta box rows after upgrade to serialize structure. "
+"This Action Is Not Reversible."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:464
+#: includes/general-hooks.php:242 includes/general-hooks.php:258
+#: includes/general-hooks.php:266
+msgid "Sorry! You Disliked This."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:465
+msgid "Dislike Notice Message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:470
+#: includes/general-hooks.php:250
+msgid "Thanks! You Undisliked This."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:471
+msgid "Undislike Notice Message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:476
+#: includes/general-functions.php:373 includes/general-functions.php:598
+msgid "Dislike Button"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:477
+msgid "Dislike Button Aria Label"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:483
+msgid "Forms Notices"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:489
+#: includes/classes/class-login.php:106 includes/classes/class-password.php:84
+#: includes/classes/class-signup.php:126
+msgid "Please enter required fields."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:490
+msgid "Enter Required Fields"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:496
+#: includes/classes/class-avatar-controller.php:155
+#: includes/classes/class-forms-toggle.php:31
+#: includes/classes/class-likers.php:35 includes/classes/class-login.php:111
+#: includes/classes/class-logout.php:74 includes/classes/class-password.php:104
+#: includes/classes/class-password.php:179
+#: includes/classes/class-profile.php:104 includes/classes/class-signup.php:121
+#: includes/classes/class-two-factor-remove.php:32
+#: includes/classes/class-two-factor-validation.php:33
+msgid "Something went wrong. Please try again or contact the admin."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:497
+msgid "Permission Denied"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:503
+#: includes/classes/class-login.php:65
+msgid "Login successful."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:504
+msgid "Login Successful"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:510
+#: includes/classes/class-login.php:47 includes/general-hooks.php:760
+msgid "Invalid username or incorrect password!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:511
+msgid "Login Failed"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:517
+#: includes/classes/class-password.php:47
+msgid "Your password has been reset."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:518
+#: includes/classes/class-core-pages.php:31
+msgid "Password Reset"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:524
+#: includes/classes/class-password.php:88
+msgid "Oops! Password did not match! Try again."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:525
+msgid "Password Match"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:531
+#: includes/classes/class-password.php:127
+msgid "Enter a username or email address."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:532
+msgid "Empty Username"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:538
+#: includes/classes/class-password.php:131
+#: includes/classes/class-password.php:139
+msgid "There is no account with that username or email address."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:539
+msgid "Invalid Combo"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:545
+#: includes/classes/class-password.php:147
+msgid "The email could not be sent."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:546
+msgid "Email Error"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:552
+#: includes/classes/class-signup.php:50
+msgid "Error Occured please fill up the signup form carefully."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:553
+msgid "Fill Signup Form"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:559
+#: includes/classes/class-signup.php:62
+msgid "An error has occurred! Please try again later."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:560
+msgid "Error Occurred"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:566
+#: includes/classes/class-signup.php:81
+msgid "Signup successful."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:567
+msgid "Signup Sucess"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:573
+#: includes/classes/class-signup.php:130
+msgid "Registration is currently disabled."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:574
+msgid "Disabled Registration"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:580
+#: includes/classes/class-profile.php:99 includes/classes/class-signup.php:135
+msgid "Email address is not valid!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:581
+msgid "Invalid Email Address"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:587
+#: includes/classes/class-signup.php:140
+msgid "Sorry, that email address is already used!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:588
+msgid "Email Exist"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:594
+#: includes/classes/class-signup.php:145
+msgid "Sorry, that username is already used!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:595
+msgid "Username Exist"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:601
+msgid "Upload Avatar Labels"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:607
+#: public/templates/profile.php:254
+msgid "User Not Found!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:608
+msgid "User Not Found Message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:614
+#: includes/classes/class-options.php:470
+msgid "Upload"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:615
+msgid "Avatar Upload Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:621
+#: includes/classes/class-options.php:471
+msgid "Edit"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:622
+msgid "Avatar Edit Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:628
+#: admin/includes/templates/activities-logs.php:51
+#: admin/includes/templates/comments-logs.php:51
+#: admin/includes/templates/posts-logs.php:51
+#: admin/includes/templates/topics-logs.php:51
+#: includes/classes/class-options.php:472
+msgid "Delete"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:629
+msgid "Avatar Delete Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:635
+#: includes/classes/class-options.php:473
+msgid "Log Out"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:636
+msgid "Profile Log Out Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:643
+msgid "Login Form Labels"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:649
+#: admin/includes/classes/class-options-panel.php:650
+#: admin/includes/classes/class-options-panel.php:704
+#: admin/includes/classes/class-options-panel.php:705
+#: admin/includes/classes/class-options-panel.php:1579
+#: includes/managers/shortcodes.php:212 includes/managers/shortcodes.php:255
+msgid "Username"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:656
+#: admin/includes/classes/class-options-panel.php:657
+#: admin/includes/classes/class-options-panel.php:732
+#: admin/includes/classes/class-options-panel.php:733
+#: includes/managers/shortcodes.php:213 includes/managers/shortcodes.php:259
+msgid "Password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:663
+#: admin/includes/classes/class-options-panel.php:664
+#: includes/managers/shortcodes.php:214
+msgid "Remember Me"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:670
+#: admin/includes/classes/class-options-panel.php:671
+#: includes/managers/shortcodes.php:215
+msgid "Log in"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:677
+#: admin/includes/classes/class-options-panel.php:678
+#: includes/managers/shortcodes.php:216
+msgid "Forgot Password?"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:684
+#: admin/includes/classes/class-options-panel.php:685
+#: includes/managers/shortcodes.php:218
+msgid "Don't have an account?"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:691
+#: admin/includes/classes/class-options-panel.php:692
+#: includes/managers/shortcodes.php:219
+msgid "Create Account"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:698
+msgid "Signup Form Labels"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:711
+#: admin/includes/classes/class-options-panel.php:712
+#: admin/includes/classes/class-options-panel.php:850
+#: admin/includes/classes/class-options-panel.php:851
+#: includes/managers/shortcodes.php:256 includes/managers/shortcodes.php:333
+msgid "First Name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:718
+#: admin/includes/classes/class-options-panel.php:719
+#: admin/includes/classes/class-options-panel.php:857
+#: admin/includes/classes/class-options-panel.php:858
+#: includes/managers/shortcodes.php:257 includes/managers/shortcodes.php:334
+msgid "Last Name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:725
+#: admin/includes/classes/class-options-panel.php:726
+#: admin/includes/classes/class-options-panel.php:878
+#: admin/includes/classes/class-options-panel.php:879
+#: includes/managers/shortcodes.php:258 includes/managers/shortcodes.php:337
+msgid "Email Address"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:739
+#: admin/includes/classes/class-options-panel.php:740
+#: includes/managers/shortcodes.php:260
+msgid "Register"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:746
+#: admin/includes/classes/class-options-panel.php:747
+#: includes/managers/shortcodes.php:261
+msgid "Already have an account?"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:753
+#: admin/includes/classes/class-options-panel.php:754
+#: includes/managers/shortcodes.php:262
+msgid "Sign In"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:760
+msgid "Reset Password Form Labels"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:766
+#: includes/managers/shortcodes.php:297
+msgid "To reset your password, please enter your email address or username below"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:767
+msgid "To reset your password..."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:773
+#: admin/includes/classes/class-options-panel.php:774
+#: includes/managers/shortcodes.php:298
+msgid "Enter your new password below."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:780
+msgid ""
+"Check your e-mail address linked to the account for the confirmation link, "
+"including the spam or junk folder.\n"
+"            "
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:782
+msgid "Email Confirmation"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:788
+#: admin/includes/classes/class-options-panel.php:789
+#: includes/managers/shortcodes.php:299
+msgid "Username or Email"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:795
+#: admin/includes/classes/class-options-panel.php:796
+#: includes/managers/shortcodes.php:300
+msgid "New Password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:802
+#: admin/includes/classes/class-options-panel.php:803
+#: includes/managers/shortcodes.php:301
+msgid "Re-enter New Password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:809
+#: includes/classes/class-rewrite.php:155
+msgid ""
+"Your password reset link appears to be invalid. Please request a new link "
+"below."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:810
+msgid "Your password reset link appears to be invalid."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:816
+#: includes/classes/class-rewrite.php:158
+msgid "Your password reset link has expired. Please request a new link below."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:817
+msgid "Your password reset link has expired."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:823
+#: admin/includes/classes/class-options-panel.php:824
+#: includes/managers/shortcodes.php:302
+msgid "Get New Password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:830
+#: admin/includes/classes/class-options-panel.php:831
+#: includes/managers/shortcodes.php:303
+msgid "Reset password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:837
+#: admin/includes/classes/class-options-panel.php:838
+#: includes/managers/shortcodes.php:304
+msgid "Go to login page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:844
+msgid "Edit Account Form Labels"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:864
+#: admin/includes/classes/class-options-panel.php:865
+#: includes/managers/shortcodes.php:335
+msgid "Website"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:871
+#: admin/includes/classes/class-options-panel.php:872
+#: includes/managers/shortcodes.php:336
+msgid "Biographical Info"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:885
+#: admin/includes/classes/class-options-panel.php:886
+#: admin/includes/general-functions.php:712
+#: includes/managers/shortcodes.php:338
+msgid "Upload Avatar"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:892
+#: admin/includes/classes/class-options-panel.php:893
+#: includes/managers/shortcodes.php:339 includes/managers/shortcodes.php:495
+msgid "Submit"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:899
+#: includes/managers/shortcodes.php:340 includes/managers/shortcodes.php:499
+msgid "You don't have access to edit the information on this page!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:900
+msgid "You don't have access Message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:906
+msgid "Two Factor Notices"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:912
+#: includes/general-functions.php:1418
+msgid "Enter the six-digit code from the application"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:913
+msgid "Two Factor Title"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:919
+#: includes/classes/class-two-factor-validation.php:48
+#: includes/general-hooks.php:774
+msgid "The one-time password (TFA code) you entered was incorrect"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:920
+msgid "Incorrect one-time password message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:926
+msgid "Recaptcha Notices"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:932
+#: includes/general-hooks.php:691
+msgid "The secret parameter is missing."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:933
+msgid "Recaptcha Missing Secret."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:939
+#: includes/general-hooks.php:692
+msgid "The secret parameter is invalid or malformed."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:940
+msgid "Recaptcha Invalid Secret."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:946
+#: includes/general-hooks.php:693
+msgid "Please confirm you are not a robot"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:947
+msgid "Recaptcha Missing Input."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:953
+#: includes/general-hooks.php:694
+msgid "The response parameter is invalid or malformed."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:954
+msgid "Recaptcha Invalid Input."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:960
+#: includes/general-hooks.php:695
+msgid "The request is invalid or malformed."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:961
+msgid "Recaptcha Bad Request."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:967
+#: includes/general-hooks.php:696
+msgid ""
+"The response is no longer valid: either is too old or has been used "
+"previously."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:968
+msgid "The response is no longer valid."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:974
+#: admin/includes/classes/class-options-panel.php:975
+#: includes/general-hooks.php:697
+msgid "Undefined reCAPTCHA error."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:981
+#: admin/includes/classes/class-options-panel.php:982
+#: includes/general-hooks.php:698
+msgid "It is very likely a bot."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1003
+msgid ""
+"Warning: Please never cache pages \"Login\", \"Password Reset\", "
+"\"Register\", \"Edit Account\", \"User Profiles\". These pages may work "
+"wrong if cached."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1010
+msgid "Select Login Page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1016
+msgid "Login Redirect URL"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1022
+msgid "Logout Redirect URL"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1029
+msgid "Redirect WordPress Default Login"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1030
+msgid ""
+"You can easily replace default WordPress login page with your own custom "
+"login page."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1038
+msgid "Select Signup Page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1044
+msgid "Signup Redirect URL"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1051
+msgid "Enable Auto Login After Signup"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1059
+msgid "Select Reset Password Page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1067
+msgid "Select Edit Account Page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1078
+msgid "Logged In Message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1084
+msgid "Enable 2-factor Authentication"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1085
+msgid "Increase security for user accounts by using multiple authentication steps."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1086
+msgid ""
+"After activating this option, put the %s shortcode in the profile tabs or "
+"any another page."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1092
+msgid "Enable Google reCAPTCHA"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1093
+msgid ""
+"Turn on or off your Google reCAPTCHA on your site registration, login and "
+"reset password forms by default."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1099
+msgid "Enable Global reCAPTCHA Scripts"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1100
+msgid ""
+"Enable this option if you use the Recaptcha gobally on all pages. Like when "
+"you use it on Modal login forms."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1106
+msgid ""
+"Choose the type of reCAPTCHA for this site key. A site key only works with "
+"a single reCAPTCHA site type."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1108
+msgid "reCAPTCHA type"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1110
+msgid "reCAPTCHA v2"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1111
+msgid "reCAPTCHA v3"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1120
+#: admin/includes/classes/class-options-panel.php:1137
+msgid "Site Key"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1121
+#: admin/includes/classes/class-options-panel.php:1138
+msgid ""
+"You can register your site and generate a site key via <a "
+"href=\"https://www.google.com/recaptcha/\">Google reCAPTCHA</a>"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1127
+#: admin/includes/classes/class-options-panel.php:1144
+msgid "Secret Key"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1128
+#: admin/includes/classes/class-options-panel.php:1145
+msgid ""
+"Keep this a secret. You can get your secret key via <a "
+"href=\"https://www.google.com/recaptcha/\">Google reCAPTCHA</a>"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1152
+msgid "Type"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1153
+#: admin/includes/classes/class-options-panel.php:1257
+msgid "The type of reCAPTCHA to serve."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1155
+msgid "Audio"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1164
+msgid "Language"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1165
+msgid "Select the language to be used in your reCAPTCHA."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1244
+msgid "Theme"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1245
+msgid "Select a color theme of the widget."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1247
+msgid "Dark"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1248
+msgid "Light"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1256
+#: includes/classes/class-admin-customizer.php:453
+#: includes/elementor/widgets/counter.php:267
+#: includes/elementor/widgets/posts-button.php:317
+msgid "Size"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1259
+msgid "Compact"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1260
+#: includes/elementor/widgets/best-likers.php:379
+#: includes/elementor/widgets/best-likers.php:465
+#: includes/elementor/widgets/counter.php:211
+#: includes/elementor/widgets/most-liked-activities.php:411
+#: includes/elementor/widgets/most-liked-activities.php:559
+#: includes/elementor/widgets/most-liked-comments.php:367
+#: includes/elementor/widgets/most-liked-comments.php:585
+#: includes/elementor/widgets/most-liked-comments.php:733
+#: includes/elementor/widgets/most-liked-posts.php:797
+#: includes/elementor/widgets/most-liked-posts.php:921
+#: includes/elementor/widgets/most-liked-posts.php:980
+#: includes/elementor/widgets/most-liked-posts.php:1103
+#: includes/elementor/widgets/most-liked-posts.php:1245
+#: includes/elementor/widgets/most-liked-posts.php:1316
+#: includes/elementor/widgets/most-liked-topics.php:399
+#: includes/elementor/widgets/most-liked-topics.php:538
+#: includes/elementor/widgets/most-liked-topics.php:686
+msgid "Normal"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1283
+msgid ""
+"Enhance your user experience by integrating seamless social logins on your "
+"platform. Whether you prefer to auto-display login options or manually "
+"place them with our specialized following shortcode, this panel provides a "
+"streamlined configuration process to get you set up swiftly. Dive in and "
+"optimize your user onboarding today!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1290
+msgid "Enable Social Logins"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1295
+msgid "Social networks"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1301
+#: admin/includes/classes/class-options-panel.php:2588
+msgid "Network"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1305
+msgid "Facebook"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1306
+msgid "GitHub"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1307
+msgid "Google"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1308
+msgid "Twitter"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1309
+msgid "Amazon"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1310
+msgid "LinkedIn"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1311
+msgid "Apple"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1312
+msgid "WordPress"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1313
+msgid "Yahoo"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1314
+msgid "Slack"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1315
+msgid "Medium"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1316
+msgid "Dribbble"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1317
+msgid "Paypal"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1323
+msgid "Login Button Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1324
+msgid "Controls the text displayed on the login button."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1329
+msgid "Link Button Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1330
+msgid "Controls the text displayed on the link account button."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1335
+msgid "Client ID"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1336
+msgid "Your app ID"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1341
+msgid "Client Secret"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1342
+msgid "Your app secret"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1348
+msgid "Disable Social Connect"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1353
+#: admin/includes/classes/class-options-panel.php:1359
+#: admin/includes/classes/class-options-panel.php:1365
+#: admin/includes/classes/class-options-panel.php:1371
+#: admin/includes/classes/class-options-panel.php:1377
+#: admin/includes/classes/class-options-panel.php:1383
+#: admin/includes/classes/class-options-panel.php:1389
+#: admin/includes/classes/class-options-panel.php:1395
+#: admin/includes/classes/class-options-panel.php:1401
+#: admin/includes/classes/class-options-panel.php:1407
+#: admin/includes/classes/class-options-panel.php:1413
+#: admin/includes/classes/class-options-panel.php:1419
+#: admin/includes/classes/class-options-panel.php:1425
+msgid "The redirect URI is:"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1434
+#: admin/includes/classes/class-options-panel.php:2627
+#: admin/includes/classes/class-shortcoder.php:690
+msgid "View"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1436
+#: admin/includes/classes/class-options-panel.php:2629
+#: admin/includes/classes/class-shortcoder.php:692
+msgid "Icon & Text"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1437
+#: admin/includes/classes/class-options-panel.php:2630
+#: admin/includes/classes/class-shortcoder.php:693
+#: includes/classes/class-admin-customizer.php:430
+#: includes/elementor/widgets/counter.php:137
+#: includes/elementor/widgets/counter.php:191
+#: includes/elementor/widgets/posts-button.php:228
+msgid "Icon"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1446
+#: admin/includes/classes/class-options-panel.php:2638
+#: admin/includes/classes/class-shortcoder.php:701
+msgid "Skin"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1448
+#: admin/includes/classes/class-options-panel.php:2640
+#: admin/includes/classes/class-shortcoder.php:703
+msgid "Gradient"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1449
+#: admin/includes/classes/class-options-panel.php:2641
+#: admin/includes/classes/class-shortcoder.php:704
+msgid "Minimal"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1450
+#: admin/includes/classes/class-options-panel.php:2642
+#: admin/includes/classes/class-shortcoder.php:705
+msgid "Framed"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1451
+#: admin/includes/classes/class-options-panel.php:2643
+#: admin/includes/classes/class-shortcoder.php:706
+msgid "Boxed"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1452
+#: admin/includes/classes/class-options-panel.php:2644
+#: admin/includes/classes/class-shortcoder.php:707
+msgid "Flat"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1459
+#: admin/includes/classes/class-options-panel.php:2650
+#: admin/includes/classes/class-shortcoder.php:713
+msgid "Shape"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1462
+#: admin/includes/classes/class-options-panel.php:2653
+#: admin/includes/classes/class-shortcoder.php:716
+msgid "Square"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1463
+#: admin/includes/classes/class-options-panel.php:2654
+#: admin/includes/classes/class-shortcoder.php:717
+msgid "Rounded"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1464
+#: admin/includes/classes/class-options-panel.php:2655
+#: admin/includes/classes/class-shortcoder.php:718
+msgid "Circle"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1472
+#: admin/includes/classes/class-options-panel.php:2662
+#: admin/includes/classes/class-shortcoder.php:725
+#: includes/classes/class-admin-customizer.php:298
+#: includes/classes/class-admin-customizer.php:435
+#: includes/elementor/widgets/best-likers.php:386
+#: includes/elementor/widgets/best-likers.php:406
+#: includes/elementor/widgets/best-likers.php:472
+#: includes/elementor/widgets/best-likers.php:492
+#: includes/elementor/widgets/most-liked-activities.php:356
+#: includes/elementor/widgets/most-liked-activities.php:418
+#: includes/elementor/widgets/most-liked-activities.php:438
+#: includes/elementor/widgets/most-liked-activities.php:566
+#: includes/elementor/widgets/most-liked-activities.php:597
+#: includes/elementor/widgets/most-liked-activities.php:628
+#: includes/elementor/widgets/most-liked-comments.php:374
+#: includes/elementor/widgets/most-liked-comments.php:394
+#: includes/elementor/widgets/most-liked-comments.php:530
+#: includes/elementor/widgets/most-liked-comments.php:592
+#: includes/elementor/widgets/most-liked-comments.php:612
+#: includes/elementor/widgets/most-liked-comments.php:740
+#: includes/elementor/widgets/most-liked-comments.php:771
+#: includes/elementor/widgets/most-liked-comments.php:802
+#: includes/elementor/widgets/most-liked-posts.php:987
+#: includes/elementor/widgets/most-liked-posts.php:1007
+#: includes/elementor/widgets/most-liked-posts.php:1056
+#: includes/elementor/widgets/most-liked-posts.php:1110
+#: includes/elementor/widgets/most-liked-posts.php:1131
+#: includes/elementor/widgets/most-liked-posts.php:1252
+#: includes/elementor/widgets/most-liked-posts.php:1272
+#: includes/elementor/widgets/most-liked-posts.php:1323
+#: includes/elementor/widgets/most-liked-posts.php:1354
+#: includes/elementor/widgets/most-liked-posts.php:1385
+#: includes/elementor/widgets/most-liked-topics.php:406
+#: includes/elementor/widgets/most-liked-topics.php:426
+#: includes/elementor/widgets/most-liked-topics.php:483
+#: includes/elementor/widgets/most-liked-topics.php:545
+#: includes/elementor/widgets/most-liked-topics.php:565
+#: includes/elementor/widgets/most-liked-topics.php:693
+#: includes/elementor/widgets/most-liked-topics.php:724
+#: includes/elementor/widgets/most-liked-topics.php:755
+msgid "Color"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1474
+#: admin/includes/classes/class-options-panel.php:2664
+#: admin/includes/classes/class-shortcoder.php:727
+msgid "Official"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1475
+#: admin/includes/classes/class-options-panel.php:1724
+#: admin/includes/classes/class-options-panel.php:2665
+#: admin/includes/classes/class-shortcoder.php:728
+#: includes/elementor/modules/query-control/controls/group-control-query.php:295
+msgid "Custom"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1482
+#: includes/elementor/widgets/most-liked-posts.php:670
+msgid "Layout"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1489
+#: admin/includes/classes/class-options-panel.php:2689
+msgid "Auto Display"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1492
+#: admin/includes/classes/class-options-panel.php:2692
+#: includes/elementor/modules/query-control/controls/group-control-related.php:58
+msgid "None"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1493
+msgid "After Login Form"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1494
+msgid "Before Login Form"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1495
+#: admin/includes/classes/class-options-panel.php:2696
+msgid "Cutom Hook"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1502
+#: admin/includes/classes/class-options-panel.php:2702
+msgid "Enter Hook Name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1503
+#: admin/includes/classes/class-options-panel.php:2703
+msgid ""
+"Please enter your desired action name in this field so that the social "
+"buttons are automatically displayed there."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1514
+#: admin/includes/classes/class-options-panel.php:2675
+#: admin/includes/classes/class-shortcoder.php:675
+msgid "Before Content"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1524
+#: admin/includes/classes/class-options-panel.php:2684
+#: admin/includes/classes/class-shortcoder.php:684
+msgid "After Content"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1554
+#: includes/elementor/widgets/most-liked-posts.php:1234
+msgid "Read More"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1561
+msgid "Enable User Profiles"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1568
+msgid "Select Profile Page"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1576
+msgid ""
+"Here you can control the permalink structure of the user profile URL "
+"globally."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1577
+msgid "Profile Permalink Base"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1580
+msgid "First and Last Name with '.'"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1581
+msgid "First and Last Name with '-'"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1582
+msgid "First and Last Name with '+'"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1583
+msgid "User ID"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1591
+msgid "Redirect author page to their profile"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1598
+msgid "User Profile Access"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1600
+msgid "Everyone"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1601
+msgid "Logged In Users"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1609
+#: admin/includes/classes/class-options-panel.php:2015
+msgid "Custom Redirect URL"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1616
+#: admin/includes/classes/class-options-panel.php:1847
+msgid "Show only for profile owner"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1617
+msgid ""
+"Restrict access to profiles only for the account holder. (In case of "
+"discrepancies, users will be redirected to their own profile.)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1623
+msgid "Exclusive Roles"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1624
+msgid ""
+"Specify all user roles that can access the profile except the account "
+"holder."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1632
+msgid "Profile Appearance"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1636
+#: admin/includes/classes/class-options-panel.php:1901
+msgid "User Info"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1642
+msgid "Show user avatar"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1647
+msgid "Avatar image size"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1659
+msgid "Show user info section"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1665
+msgid "Show display name"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1672
+msgid "Show user description"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1679
+msgid "Show a custom message if user bio is empty"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1685
+msgid "Custom message"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1698
+#: admin/includes/classes/class-options-panel.php:1754
+msgid "Custom HTML"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1699
+msgid ""
+"A Custom HTML structure where you can display it at the bottom of the Info "
+"section. (This option also supports shortcode)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1705
+#: admin/includes/classes/class-options-panel.php:1917
+#: includes/classes/class-admin-customizer.php:110
+msgid "Badges"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1711
+msgid "Show badges section"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1716
+msgid "Add Profile Badges"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1721
+msgid "Badge Type"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1723
+#: includes/elementor/widgets/most-liked-posts.php:449
+#: includes/elementor/widgets/posts-button.php:211
+msgid "Default"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1738
+msgid "Subtitle"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1755
+msgid ""
+"A Custom HTML structure where you can display it as a badge item. (This "
+"option also supports shortcode)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1800
+#: includes/classes/class-admin-customizer.php:129
+msgid "Tabs"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1806
+msgid "Show tabs section"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1811
+msgid "Select Tabs Side"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1814
+#: admin/includes/templates/statistics.php:262
+msgid "Top"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1815
+#: includes/elementor/widgets/most-liked-activities.php:323
+#: includes/elementor/widgets/most-liked-comments.php:494
+#: includes/elementor/widgets/most-liked-posts.php:727
+#: includes/elementor/widgets/most-liked-topics.php:361
+msgid "Left"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1816
+#: includes/elementor/widgets/most-liked-activities.php:331
+#: includes/elementor/widgets/most-liked-comments.php:502
+#: includes/elementor/widgets/most-liked-posts.php:735
+#: includes/elementor/widgets/most-liked-topics.php:369
+msgid "Right"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1822
+msgid "Add Profile Tabs"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1832
+#: includes/elementor/widgets/most-liked-activities.php:348
+#: includes/elementor/widgets/most-liked-comments.php:519
+#: includes/elementor/widgets/most-liked-posts.php:962
+#: includes/elementor/widgets/most-liked-topics.php:472
+msgid "Content"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1834
+msgid "A simple HTML/Text structure where you can use different shortcodes."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1840
+msgid "Create Link Tab"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1841
+msgid "Using this option, you can add custom external link for profile nav tabs."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1865
+msgid "Appearance"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1869
+#: includes/classes/class-admin-customizer.php:220
+msgid "Wrapper"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1874
+msgid "Header column width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1880
+msgid "Tabs column width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1885
+msgid "Heading"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1890
+msgid "Header info width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1896
+msgid "Header badges width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1906
+msgid "Avatar column width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1912
+msgid "User info column width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1922
+msgid "Badge item width"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1939
+msgid "Enable Upload Local Avatar"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1945
+msgid ""
+"Do you want to use gravatars instead of the default plugin profile photo "
+"(If the user did not upload a custom profile photo / avatar)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1946
+msgid "Use Gravatars?"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1952
+msgid "Default Avatar"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1965
+msgid "Avatar Maximum File Size"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1975
+msgid "Avatar Maximum Width "
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1983
+msgid "Image Quality"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1984
+msgid ""
+"Quality is used to determine quality of image uploads, and ranges from 0 "
+"(worst quality, smaller file) to 100 (best quality, biggest file). The "
+"default range is 60."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:1994
+msgid "Enable Dashboard Limit Access"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2000
+msgid "Hide Admin Bar"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2006
+msgid "Dashboard User Access"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2007
+msgid "Dashboard access can be restricted to users of certain roles only."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2026
+msgid "Desktop"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2046
+msgid "Tablet"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2066
+msgid "Mobile"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2103
+msgid "Enable REST API"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2108
+msgid "Authentication Type"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2111
+msgid "User Login"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2112
+msgid "Custom Keys"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2119
+msgid "Access to readable routes"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2120
+#: admin/includes/classes/class-options-panel.php:2131
+msgid "Manage users' access level to REST API."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2130
+msgid "Access to writable routes"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2143
+msgid "Enable Auto User ID"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2175
+#: admin/includes/classes/class-options-panel.php:2729
+msgid "Posts"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2192
+#: admin/includes/classes/class-options-panel.php:2276
+#: admin/includes/classes/class-options-panel.php:2360
+#: admin/includes/classes/class-options-panel.php:2433
+msgid "Delete Orphaned Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2193
+#: admin/includes/classes/class-options-panel.php:2215
+#: admin/includes/classes/class-options-panel.php:2277
+#: admin/includes/classes/class-options-panel.php:2299
+#: admin/includes/classes/class-options-panel.php:2361
+#: admin/includes/classes/class-options-panel.php:2383
+#: admin/includes/classes/class-options-panel.php:2434
+#: admin/includes/classes/class-options-panel.php:2456
+#: admin/includes/classes/class-options-panel.php:2518
+msgid "Delete Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2194
+#: admin/includes/classes/class-options-panel.php:2278
+#: admin/includes/classes/class-options-panel.php:2362
+#: admin/includes/classes/class-options-panel.php:2435
+msgid ""
+"Drop all rows in the logs table where its related table row no longer "
+"exists. (Don't try this option if you're using custom IDs)"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2214
+#: admin/includes/classes/class-options-panel.php:2298
+#: admin/includes/classes/class-options-panel.php:2382
+#: admin/includes/classes/class-options-panel.php:2455
+msgid "Delete Dulicate Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2216
+#: admin/includes/classes/class-options-panel.php:2300
+#: admin/includes/classes/class-options-panel.php:2384
+#: admin/includes/classes/class-options-panel.php:2457
+msgid "Delete all duplicate rows generated by the spam users."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2225
+#: admin/includes/classes/class-options-panel.php:2309
+#: admin/includes/classes/class-options-panel.php:2393
+#: admin/includes/classes/class-options-panel.php:2466
+msgid "Optimize Table Overhead"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2226
+#: admin/includes/classes/class-options-panel.php:2310
+#: admin/includes/classes/class-options-panel.php:2394
+#: admin/includes/classes/class-options-panel.php:2467
+msgid "Optimize Table"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2227
+#: admin/includes/classes/class-options-panel.php:2311
+#: admin/includes/classes/class-options-panel.php:2395
+#: admin/includes/classes/class-options-panel.php:2468
+msgid ""
+"Overhead is a temporary disk space that is used by your database to store "
+"queries. Over time, a table’s overhead will increase."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2236
+#: admin/includes/classes/class-options-panel.php:2320
+msgid "Migrate Counter Metadata"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2237
+#: admin/includes/classes/class-options-panel.php:2321
+msgid "Migrate Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2238
+#: admin/includes/classes/class-options-panel.php:2322
+msgid "You are about to migrate counter values to wordpress meta table."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2247
+#: admin/includes/classes/class-options-panel.php:2331
+#: admin/includes/classes/class-options-panel.php:2404
+#: admin/includes/classes/class-options-panel.php:2477
+msgid "Reset Counter Values"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2248
+#: admin/includes/classes/class-options-panel.php:2332
+#: admin/includes/classes/class-options-panel.php:2405
+#: admin/includes/classes/class-options-panel.php:2478
+msgid "Reset Counter"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2249
+#: admin/includes/classes/class-options-panel.php:2333
+#: admin/includes/classes/class-options-panel.php:2406
+#: admin/includes/classes/class-options-panel.php:2479
+msgid "Reset all counters without affecting stats information."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2259
+#: admin/includes/classes/class-options-panel.php:2730
+msgid "Comments"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2343
+#: admin/includes/classes/class-stats.php:754
+#: includes/elementor/widgets/best-likers.php:203
+#: includes/elementor/widgets/most-liked-activities.php:707
+msgid "BuddyPress"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2416
+#: admin/includes/classes/class-stats.php:705
+#: includes/elementor/widgets/most-liked-topics.php:834
+msgid "bbPress"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2489
+msgid "Other cases"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2495
+msgid "Delete All Meta User Status"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2497
+msgid "You Are About To Delete All Meta User Status."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2506
+msgid "Delete All Meta Statistics Values"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2508
+msgid "You Are About To Delete All Meta Stats Values."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2517
+msgid "Delete Empty Post Meta Rows"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2519
+msgid "Drop all Metabox rows in the post meta table where its value is empty."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2528
+msgid "Create default pages"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2530
+msgid ""
+"This tool will install all the missing pages. Pages already defined and set "
+"up will not be replaced."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2539
+msgid "Delete default pages"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2540
+msgid "Delete Pages"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2541
+msgid "This tool will delete all the default pages"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2567
+msgid ""
+"You can create multiple share buttons as you wish and use them as "
+"shortocode or try auto display options. Just be sure to set the \"Slug\" "
+"option for each item. For example, if you want to use shortcode and set "
+"slug as \"single_share\", you can use the following shortcode to display "
+"social buttons:"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2573
+msgid "Add Share Items"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2578
+#: admin/includes/classes/class-shortcoder.php:579
+msgid "Slug"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2583
+msgid "Share Buttons "
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2592
+msgid "facebook"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2593
+msgid "linkedin"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2594
+msgid "twitter"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2595
+msgid "vkontakte"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2596
+msgid "odnoklassniki"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2597
+msgid "tumblr"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2598
+msgid "blogger"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2599
+msgid "pinterest"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2600
+msgid "digg"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2601
+msgid "evernote"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2602
+msgid "reddit"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2603
+msgid "delicious"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2604
+msgid "mix"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2605
+msgid "xing"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2606
+msgid "wordpress"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2607
+msgid "baidu"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2608
+msgid "renren"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2609
+msgid "weibo"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2610
+msgid "skype"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2611
+msgid "telegram"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2612
+msgid "whatsapp"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2613
+msgid "wechat"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2619
+#: includes/classes/class-admin-customizer.php:293
+msgid "Label"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2693
+msgid "After Button"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2694
+msgid "Before Button"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2695
+msgid "Modal After Vote"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2709
+msgid "Filter Status"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2710
+#: admin/includes/classes/class-options-panel.php:2725
+msgid "By selecting any type, you can disable adding share buttons in that area."
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2714
+#: admin/includes/classes/class-shortcoder.php:113
+#: admin/includes/classes/class-shortcoder.php:166
+#: admin/includes/classes/class-shortcoder.php:236
+#: admin/includes/classes/class-stats.php:412
+#: includes/elementor/widgets/counter.php:113
+#: includes/elementor/widgets/most-liked-posts.php:492
+msgid "Like"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2716
+#: admin/includes/classes/class-shortcoder.php:168
+#: admin/includes/classes/class-shortcoder.php:238
+msgid "Unlike"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2724
+msgid "Filter Types"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2731
+msgid "Activities"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2732
+msgid "Topics"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2756
+msgid "Emails"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2762
+msgid "You can use the following variables in all templates:"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2768
+msgid "Account Welcome Email"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2773
+#: admin/includes/classes/class-options-panel.php:2792
+#: admin/includes/classes/class-options-panel.php:2811
+msgid "Subject Line"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2774
+msgid "Welcome to {site_name}!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2780
+#: admin/includes/classes/class-options-panel.php:2799
+#: admin/includes/classes/class-options-panel.php:2818
+msgid "Message Body"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2787
+msgid "Password Reset Email"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2793
+msgid "Reset your password"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2806
+msgid "Password Changed Email"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2812
+msgid "Your {site_name} password has been changed!"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2825
+msgid "Admin E-mail Address"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2831
+msgid "Mail appears from"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2837
+msgid "Mail appears from address"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2844
+msgid "Use HTML for E-mails?"
+msgstr ""
+
+#: admin/includes/classes/class-options-panel.php:2866
+#: includes/classes/class-admin-customizer.php:483
+msgid "Backup"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:38
+#: includes/elementor/widgets/best-likers.php:311
+msgid "Avatar"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:47
+msgid "Rating"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:48
+msgid ""
+"If the local avatar is inappropriate for this site, Gravatar will be "
+"attempted."
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:50
+msgid "G &#8212; Suitable for all audiences"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:51
+msgid "PG &#8212; Possibly offensive, usually for audiences 13 and above"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:52
+msgid "R &#8212; Intended for adult audiences above 17"
+msgstr ""
+
+#: admin/includes/classes/class-profile-meta-box.php:53
+msgid "X &#8212; Even more mature than above"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:37
+#: admin/includes/classes/class-shortcoder.php:39
+msgid "WP ULike Shortcode"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:40
+msgid "WP ULike Shortcode Block"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:52
+#: admin/includes/classes/class-shortcoder.php:97
+msgid "Select content type"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:55
+#: admin/includes/classes/class-shortcoder.php:100
+#: admin/includes/classes/class-shortcoder.php:153
+#: admin/includes/classes/class-shortcoder.php:216
+msgid "Post"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:56
+#: admin/includes/classes/class-shortcoder.php:101
+#: admin/includes/classes/class-shortcoder.php:154
+#: admin/includes/classes/class-shortcoder.php:217
+msgid "Comment"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:57
+#: admin/includes/classes/class-shortcoder.php:102
+#: admin/includes/classes/class-shortcoder.php:155
+#: admin/includes/classes/class-shortcoder.php:218
+msgid "Activity"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:58
+#: admin/includes/classes/class-shortcoder.php:103
+#: admin/includes/classes/class-shortcoder.php:156
+#: admin/includes/classes/class-shortcoder.php:219
+msgid "Topic"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:64
+#: admin/includes/classes/class-shortcoder.php:91
+msgid "Enter Custom ID"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:79
+msgid "Wrapper Class"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:85
+msgid "Get Counter Value"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:110
+#: admin/includes/classes/class-shortcoder.php:163
+#: includes/elementor/widgets/most-liked-posts.php:487
+msgid "Select Status"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:121
+msgid "Display User Info"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:130
+#: admin/includes/classes/class-shortcoder.php:201
+#: admin/includes/classes/class-shortcoder.php:311
+msgid "Enter Custom User ID"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:131
+#: admin/includes/classes/class-shortcoder.php:202
+#: admin/includes/classes/class-shortcoder.php:312
+msgid "Select a user"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:132
+#: admin/includes/classes/class-shortcoder.php:203
+#: admin/includes/classes/class-shortcoder.php:313
+msgid "Don't use Custom ID for user profiles section."
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:138
+msgid "Select output type"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:141
+msgid "Data Counter"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:142
+msgid "Last Activity"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:143
+msgid "Last Status"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:150
+#: admin/includes/classes/class-shortcoder.php:214
+msgid "Select Table Type"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:176
+msgid "Before Text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:181
+msgid "After Text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:186
+#: admin/includes/classes/class-shortcoder.php:255
+msgid "Empty message Text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:192
+msgid "Get Items List"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:209
+msgid "Enable Anonymize User"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:225
+msgid "Select Post Type"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:233
+#: includes/elementor/widgets/counter.php:109
+msgid "Select status"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:245
+msgid "Display Popular Items"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:250
+#: includes/classes/class-mycred.php:254 includes/classes/class-mycred.php:287
+#: includes/classes/class-mycred.php:321 includes/classes/class-mycred.php:355
+msgid "Limit"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:260
+msgid "Desktop Column"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:268
+msgid "Tablet Column"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:276
+msgid "Mobile Column"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:284
+#: includes/elementor/modules/query-control/controls/group-control-query.php:157
+#: includes/elementor/modules/query-control/module.php:75
+msgid "Exclude"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:287
+msgid "Select options to hide in the list"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:289
+msgid "Thumbnail"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:292
+msgid "Date Info"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:293
+msgid "Author Info"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:294
+msgid "Likes/Dislikes Info"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:302
+#: includes/classes/class-core-pages.php:16
+msgid "User Profile"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:320
+msgid "Login Form"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:326
+#: admin/includes/classes/class-shortcoder.php:389
+#: admin/includes/classes/class-shortcoder.php:452
+#: admin/includes/classes/class-shortcoder.php:525
+msgid "Enter Form ID"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:332
+#: admin/includes/classes/class-shortcoder.php:395
+msgid "Username label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:337
+#: admin/includes/classes/class-shortcoder.php:400
+msgid "Password label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:342
+msgid "Remember Me label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:347
+#: admin/includes/classes/class-shortcoder.php:420
+#: admin/includes/classes/class-shortcoder.php:561
+#: admin/includes/classes/class-shortcoder.php:653
+msgid "Button label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:352
+msgid "Reset password text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:357
+msgid "Reset password URL"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:362
+msgid "Signup Message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:367
+msgid "Signup URL text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:372
+#: admin/includes/classes/class-shortcoder.php:435
+msgid "Redirect URL"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:377
+#: admin/includes/classes/class-shortcoder.php:440
+#: admin/includes/classes/class-shortcoder.php:513
+msgid "Enable AJAX Toggle"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:383
+msgid "Signup Form"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:405
+#: admin/includes/classes/class-shortcoder.php:531
+msgid "First name label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:410
+#: admin/includes/classes/class-shortcoder.php:536
+msgid "Last name label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:415
+#: admin/includes/classes/class-shortcoder.php:551
+msgid "Email label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:425
+msgid "Login Message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:430
+msgid "Login URL text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:446
+msgid "Reset Password Form"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:458
+msgid "Reset your password message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:463
+msgid "Enter new password message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:468
+msgid "Check your email message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:473
+msgid "Username or Email label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:478
+msgid "New password label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:483
+msgid "Re-enter new password label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:488
+msgid "Invalid key message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:493
+msgid "Expired key message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:498
+msgid "Get new password label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:503
+msgid "Reset password label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:508
+msgid "Go to login URL text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:519
+msgid "Edit Account Form"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:541
+msgid "Website label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:546
+msgid "Biographical info label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:556
+msgid "Upload avatar label"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:566
+#: admin/includes/classes/class-shortcoder.php:658
+msgid "Permission denied message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:573
+msgid "Share buttons"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:585
+msgid "URL"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:606
+msgid "Two factor setup"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:623
+msgid "Accounts Title"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:628
+msgid "App Name"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:633
+msgid "Ago text"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:638
+msgid "Limit accounts"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:643
+msgid "Limit message"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:648
+msgid "Qrcode image size"
+msgstr ""
+
+#: admin/includes/classes/class-shortcoder.php:664
+msgid "Social logins"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:198
+msgid "Growth ratings chart from"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:198
+msgid "To"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:247
+msgid "Like (Up Vote)"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:248
+msgid "Un-Like (Removed Up Vote)"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:249
+msgid "Dislike (Down Vote)"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:250
+msgid "Un-Dislike (Removed Down Vote)"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:400
+#: includes/elementor/modules/query-control/controls/group-control-query.php:289
+#: includes/elementor/widgets/best-likers.php:123
+#: includes/elementor/widgets/most-liked-activities.php:123
+#: includes/elementor/widgets/most-liked-comments.php:160
+#: includes/elementor/widgets/most-liked-posts.php:136
+#: includes/elementor/widgets/most-liked-topics.php:123
+msgid "All"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:436
+msgid "Un-Like"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:447
+msgid "Un-Dislike"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:569
+#: admin/includes/classes/class-stats.php:619
+#: admin/includes/classes/class-stats.php:669
+#: admin/includes/classes/class-stats.php:721
+#: admin/includes/classes/class-stats.php:776
+msgid "No results were found in"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:569
+#: admin/includes/classes/class-stats.php:619
+#: admin/includes/classes/class-stats.php:669
+#: admin/includes/classes/class-stats.php:721
+#: admin/includes/classes/class-stats.php:776
+msgid "period"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:685
+msgid "on"
+msgstr ""
+
+#: admin/includes/classes/class-stats.php:705
+#: admin/includes/classes/class-stats.php:754
+msgid "%s is Not Activated!"
+msgstr ""
+
+#: admin/includes/general-functions.php:77
+msgid ""
+"These API keys allow you to use the REST API to retrieve store data in JSON "
+"for external applications or devices."
+msgstr ""
+
+#: admin/includes/general-functions.php:78
+msgid "Generate New API Keys"
+msgstr ""
+
+#: admin/includes/general-functions.php:601
+msgid "All Times"
+msgstr ""
+
+#: admin/includes/templates/activities-logs.php:16
+msgid "Activities Vote Logs"
+msgstr ""
+
+#: admin/includes/templates/activities-logs.php:52
+#: admin/includes/templates/comments-logs.php:52
+#: admin/includes/templates/posts-logs.php:52
+#: admin/includes/templates/topics-logs.php:52
+msgid "Export CSV"
+msgstr ""
+
+#: admin/includes/templates/comments-logs.php:16
+msgid "Comments Vote Logs"
+msgstr ""
+
+#: admin/includes/templates/license.php:16
+msgid "License Settings"
+msgstr ""
+
+#: admin/includes/templates/license.php:22
+msgid "WP ULike Pro License"
+msgstr ""
+
+#: admin/includes/templates/license.php:27
+msgid ""
+"Enter your license key here, to activate WP ULike Pro, and get automatic "
+"updates, premium support, and unlimited access to the template library."
+msgstr ""
+
+#: admin/includes/templates/license.php:32
+#. translators: 1: Link opening tag, 2: Link closing tag.
+msgid "Log in to %1$syour account%2$s to get your license key."
+msgstr ""
+
+#: admin/includes/templates/license.php:39
+#. translators: 1: Link opening tag, 2: Link closing tag.
+msgid "If you don't yet have a license key, %1$sget WP ULike Pro now%2$s."
+msgstr ""
+
+#: admin/includes/templates/license.php:44
+msgid "Copy the license key from your account and paste it below."
+msgstr ""
+
+#: admin/includes/templates/license.php:49
+#: admin/includes/templates/license.php:61
+msgid "Your License Key"
+msgstr ""
+
+#: admin/includes/templates/license.php:51
+msgid "Please enter your license key here"
+msgstr ""
+
+#: admin/includes/templates/license.php:53
+msgid "Activate"
+msgstr ""
+
+#: admin/includes/templates/license.php:55
+msgid "Your license key should look something like this: %s"
+msgstr ""
+
+#: admin/includes/templates/license.php:65
+msgid "Deactivate"
+msgstr ""
+
+#: admin/includes/templates/license.php:68
+msgid "Status"
+msgstr ""
+
+#: admin/includes/templates/license.php:70
+msgid "Expired"
+msgstr ""
+
+#: admin/includes/templates/license.php:72
+msgid "Mismatch"
+msgstr ""
+
+#: admin/includes/templates/license.php:74
+msgid "Invalid"
+msgstr ""
+
+#: admin/includes/templates/license.php:76
+msgid "Disabled"
+msgstr ""
+
+#: admin/includes/templates/license.php:78
+msgid "Active"
+msgstr ""
+
+#: admin/includes/templates/license.php:83
+msgid ""
+"<strong>Your License Has Expired.</strong> <a href=\"%s\" "
+"target=\"_blank\">Renew your license today</a> to keep getting feature "
+"updates, premium support and unlimited access to the template library."
+msgstr ""
+
+#: admin/includes/templates/license.php:87
+#: admin/includes/templates/license.php:91
+msgid ""
+"<strong>Your license key doesn't match your current domain</strong>. This "
+"is most likely due to a change in the domain URL of your site (including "
+"HTTPS/SSL migration). Please deactivate the license and then reactivate it "
+"again."
+msgstr ""
+
+#: admin/includes/templates/posts-logs.php:16
+msgid "Posts Vote Logs"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:44
+msgid "No data found! This is because there is still no data in your database."
+msgstr ""
+
+#: admin/includes/templates/statistics.php:56
+msgid "WP ULike Statistics"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:72
+msgid "Total"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:89
+#: includes/elementor/widgets/best-likers.php:124
+#: includes/elementor/widgets/most-liked-activities.php:124
+#: includes/elementor/widgets/most-liked-comments.php:161
+#: includes/elementor/widgets/most-liked-posts.php:137
+#: includes/elementor/widgets/most-liked-topics.php:124
+msgid "Today"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:106
+#: includes/elementor/widgets/best-likers.php:125
+#: includes/elementor/widgets/most-liked-activities.php:125
+#: includes/elementor/widgets/most-liked-comments.php:162
+#: includes/elementor/widgets/most-liked-posts.php:138
+#: includes/elementor/widgets/most-liked-topics.php:125
+msgid "Yesterday"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:120
+msgid "Statistics"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:123
+msgid "View All Logs"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:132
+#: admin/includes/templates/statistics.php:232
+#: admin/includes/templates/statistics.php:269
+msgid "Select Date Range:"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:138
+msgid "Select Status:"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:157
+msgid "Weekly"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:168
+msgid "Monthly"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:179
+msgid "Yearly"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:190
+msgid "Totally"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:206
+msgid "Allocation Statistics"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:227
+msgid "Top Likers"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:227
+#: admin/includes/templates/statistics.php:262
+msgid "In"
+msgstr ""
+
+#: admin/includes/templates/statistics.php:276
+msgid "Select Post Type:"
+msgstr ""
+
+#: admin/includes/templates/topics-logs.php:16
+msgid "Topics Vote Logs"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:44
+#: includes/classes/class-admin-customizer.php:52
+#: includes/classes/class-admin-customizer.php:59
+msgid "Dislike Image"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:79
+msgid "Profile Template"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:83
+msgid "Header"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:88
+msgid "Name Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:95
+msgid "Desc Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:102
+msgid "Avatar Max/Min Size"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:115
+msgid "Title Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:122
+msgid "Subtitle Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:134
+msgid "Menu Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:141
+msgid "Menu Border"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:148
+msgid "Menu Border Active Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:156
+msgid "Menu Padding"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:164
+msgid "Left/Right Menu Default Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:172
+msgid "Left/Right Menu Active Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:181
+msgid "Content Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:188
+msgid "Content Border"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:195
+#: includes/elementor/widgets/most-liked-posts.php:772
+msgid "Content Padding"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:216
+msgid "Login & Signup Forms"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:225
+#: includes/classes/class-admin-customizer.php:264
+#: includes/classes/class-admin-customizer.php:318
+#: includes/classes/class-admin-customizer.php:398
+msgid "Typography"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:233
+#: includes/classes/class-admin-customizer.php:387
+msgid "Max Width"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:243
+msgid "Form Margin"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:251
+#: includes/elementor/widgets/most-liked-posts.php:901
+msgid "Spacing"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:259
+msgid "Inputs"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:271
+#: includes/classes/class-admin-customizer.php:413
+msgid "Border"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:278
+msgid "Border Hover Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:286
+#: includes/classes/class-admin-customizer.php:332
+#: includes/elementor/widgets/best-likers.php:280
+#: includes/elementor/widgets/counter.php:325
+#: includes/elementor/widgets/most-liked-activities.php:294
+#: includes/elementor/widgets/most-liked-activities.php:666
+#: includes/elementor/widgets/most-liked-comments.php:465
+#: includes/elementor/widgets/most-liked-comments.php:840
+#: includes/elementor/widgets/most-liked-posts.php:760
+#: includes/elementor/widgets/most-liked-posts.php:1423
+#: includes/elementor/widgets/most-liked-topics.php:332
+#: includes/elementor/widgets/most-liked-topics.php:793
+#: includes/elementor/widgets/posts-button.php:378
+#: includes/elementor/widgets/posts-button.php:408
+msgid "Padding"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:305
+msgid "Active Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:313
+#: includes/elementor/widgets/posts-button.php:392
+msgid "Button"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:325
+msgid "Hover Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:339
+msgid "Background Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:347
+msgid "Background Hover Color"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:356
+msgid "Loading Spinner"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:377
+msgid "Social Buttons"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:382
+msgid ""
+"If you are using official colors for social buttons, note that the color "
+"settings of this section will be overwritten on them."
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:405
+#: includes/elementor/widgets/most-liked-activities.php:577
+#: includes/elementor/widgets/most-liked-activities.php:608
+#: includes/elementor/widgets/most-liked-activities.php:639
+#: includes/elementor/widgets/most-liked-comments.php:751
+#: includes/elementor/widgets/most-liked-comments.php:782
+#: includes/elementor/widgets/most-liked-comments.php:813
+#: includes/elementor/widgets/most-liked-posts.php:821
+#: includes/elementor/widgets/most-liked-posts.php:857
+#: includes/elementor/widgets/most-liked-posts.php:1334
+#: includes/elementor/widgets/most-liked-posts.php:1365
+#: includes/elementor/widgets/most-liked-posts.php:1396
+#: includes/elementor/widgets/most-liked-topics.php:704
+#: includes/elementor/widgets/most-liked-topics.php:735
+#: includes/elementor/widgets/most-liked-topics.php:766
+msgid "Background"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:420
+msgid "Height"
+msgstr ""
+
+#: includes/classes/class-admin-customizer.php:442
+msgid "Width"
+msgstr ""
+
+#: includes/classes/class-avatar-controller.php:159
+msgid "Method Not found!"
+msgstr ""
+
+#: includes/classes/class-core-pages.php:21
+msgid "Login"
+msgstr ""
+
+#: includes/classes/class-core-pages.php:26
+msgid "Sign Up"
+msgstr ""
+
+#: includes/classes/class-core-pages.php:36
+msgid "Edit Account"
+msgstr ""
+
+#: includes/classes/class-likers.php:39
+msgid "Invalid item type."
+msgstr ""
+
+#: includes/classes/class-likers.php:48
+msgid "This item has not been liked by any user!"
+msgstr ""
+
+#: includes/classes/class-login.php:101 includes/classes/class-password.php:174
+#: includes/classes/class-profile.php:94 includes/classes/class-signup.php:116
+#: includes/classes/class-social-login.php:81
+msgid "It is not possible to perform this process in preview mode!"
+msgstr ""
+
+#: includes/classes/class-mycred.php:239
+msgid "Points for Disliking content"
+msgstr ""
+
+#: includes/classes/class-mycred.php:244 includes/classes/class-mycred.php:277
+#: includes/classes/class-mycred.php:310 includes/classes/class-mycred.php:344
+msgid "Points"
+msgstr ""
+
+#: includes/classes/class-mycred.php:248 includes/classes/class-mycred.php:281
+#: includes/classes/class-mycred.php:315 includes/classes/class-mycred.php:349
+msgid "Use zero to disable."
+msgstr ""
+
+#: includes/classes/class-mycred.php:261 includes/classes/class-mycred.php:294
+#: includes/classes/class-mycred.php:328 includes/classes/class-mycred.php:362
+msgid "Log template"
+msgstr ""
+
+#: includes/classes/class-mycred.php:264 includes/classes/class-mycred.php:297
+#: includes/classes/class-mycred.php:331 includes/classes/class-mycred.php:365
+msgid "required"
+msgstr ""
+
+#: includes/classes/class-mycred.php:272
+msgid "Points for Author Who Get Disliked"
+msgstr ""
+
+#: includes/classes/class-mycred.php:305
+msgid "Points for Undisliking content"
+msgstr ""
+
+#: includes/classes/class-mycred.php:339
+msgid "Points for Author Who Get Undisliked"
+msgstr ""
+
+#: includes/classes/class-mycred.php:373
+msgid "Limits"
+msgstr ""
+
+#: includes/classes/class-mycred.php:382
+msgid "%plural% is to be awarded even when item authors Like/Unlike their own item."
+msgstr ""
+
+#: includes/classes/class-password.php:52
+msgid ""
+"Check your e-mail address linked to the account for the confirmation link, "
+"including the spam or junk folder.\n"
+"\t\t\t\t"
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:72
+msgid "%s plugin has been disabled automatically due to following reason:"
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:95
+msgid "Note for admin"
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:221
+msgid ""
+"%s plugin is required in order to use this plugin. Please install and "
+"activate the plugin."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:231
+msgid "Install Plugin"
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:238
+msgid "Activate Plugin"
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:276
+msgid ""
+"The plugin requires %s plugin version %s or higher (current version is %s). "
+"Please update it to the latest version."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:356
+msgid ""
+"%s theme requires %s plugin version %s or higher in order to function "
+"property. Your current plugin version is %s, please update it to latest "
+"version."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:380
+msgid ""
+"The plugin requires %s theme version %s or higher in order to function "
+"property. Your current theme version is %s, please %s update to latest "
+"version %s."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:391
+msgid "%s path while checking the availability of theme not found."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:396
+msgid "%s function callback while checking the availability of theme not found."
+msgstr ""
+
+#: includes/classes/class-plugin-requirements.php:433
+msgid ""
+"PHP version %s or above is required for this plugin while your the current "
+"PHP version is %s."
+msgstr ""
+
+#: includes/classes/class-profile.php:59
+msgid "Profile data updated."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:201
+msgid "All information received successfully."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:205
+msgid "Votes list are empty."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:246
+msgid "Item information successfully obtained."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:250
+msgid "Item not found!"
+msgstr ""
+
+#: includes/classes/class-rest-api.php:300
+msgid "Item Inserted."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:308
+#: includes/classes/class-rest-api.php:348
+#: includes/classes/class-rest-api.php:402
+msgid "Something wrong happened!"
+msgstr ""
+
+#: includes/classes/class-rest-api.php:340
+#: includes/classes/class-rest-api.php:394
+msgid "Item Updated."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:433
+#: includes/classes/class-rest-api.php:465
+#: includes/classes/class-rest-api.php:499
+#: includes/classes/class-rest-api.php:527
+msgid "Ok, we found it."
+msgstr ""
+
+#: includes/classes/class-rest-api.php:438
+msgid "User status not found!"
+msgstr ""
+
+#: includes/classes/class-rest-api.php:470
+#: includes/classes/class-rest-api.php:504
+msgid "User data not found!"
+msgstr ""
+
+#: includes/classes/class-social-login.php:94
+#: includes/classes/class-social-login.php:104
+msgid "No provider class found!"
+msgstr ""
+
+#: includes/classes/class-social-login.php:112
+msgid "Provider authentication error"
+msgstr ""
+
+#: includes/classes/class-social-login.php:181
+msgid "No provider class found for %s"
+msgstr ""
+
+#: includes/classes/class-social-login.php:190
+msgid "%s returned an invalid user identifier."
+msgstr ""
+
+#: includes/classes/class-social-login.php:226
+msgid "This account is already linked to another user account."
+msgstr ""
+
+#: includes/classes/class-social-login.php:228
+msgid "A user account using the same email address as this account already exists."
+msgstr ""
+
+#: includes/classes/class-social-login.php:241
+msgid ""
+"Oops, it looks like you may already have an account&hellip; please log in "
+"to link your profile."
+msgstr ""
+
+#: includes/classes/class-social-login.php:327
+msgid "User"
+msgstr ""
+
+#: includes/classes/class-social-login.php:345
+msgid "ERROR"
+msgstr ""
+
+#: includes/classes/class-social-login.php:345
+msgid ""
+"Couldn&#8217;t register you&hellip; please contact us if you continue to "
+"have problems."
+msgstr ""
+
+#: includes/classes/class-two-factor-remove.php:40
+#: includes/classes/class-two-factor-validation.php:38
+#: includes/managers/shortcodes.php:482
+msgid "2-factor support is not enabled!"
+msgstr ""
+
+#: includes/classes/class-two-factor-remove.php:67
+msgid "2-factor account has been removed"
+msgstr ""
+
+#: includes/elementor/class-elements.php:230
+msgid "Element class \"%s\" not found."
+msgstr ""
+
+#: includes/elementor/class-elements.php:271
+msgid "Module class \"%s\" not found."
+msgstr ""
+
+#: includes/elementor/class-elements.php:364
+#: includes/elementor/class-elements.php:388
+#. translators: 1: Plugin name 2: PHP 3: Required PHP version
+msgid "\"%1$s\" requires \"%2$s\" version %3$s or greater."
+msgstr ""
+
+#: includes/elementor/class-elements.php:366
+msgid "Elementor"
+msgstr ""
+
+#: includes/elementor/class-elements.php:390
+msgid "PHP"
+msgstr ""
+
+#: includes/elementor/modules/common.php:63
+#: includes/elementor/modules/common.php:72
+msgid "Custom CSS"
+msgstr ""
+
+#: includes/elementor/modules/common.php:81
+msgid ""
+"Use \"selector\" to target wrapper element. Examples:<br>selector {color: "
+"red;} // For main element<br>selector .child-element {margin: 10px;} // For "
+"child element<br>.my-class {text-align: center;} // Or use any custom "
+"selector"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-posts.php:62
+#: includes/elementor/modules/query-control/controls/group-control-query.php:46
+msgid "Source"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-posts.php:67
+#: includes/elementor/modules/query-control/controls/group-control-query.php:75
+#: includes/elementor/modules/query-control/controls/group-control-query.php:189
+#: includes/elementor/modules/query-control/controls/group-control-related.php:71
+#: includes/elementor/modules/query-control/module.php:89
+msgid "Search & Select"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-posts.php:81
+#: includes/elementor/modules/query-control/controls/group-control-query.php:97
+#: includes/elementor/modules/query-control/controls/group-control-query.php:134
+#: includes/elementor/modules/query-control/controls/group-control-query.php:175
+#: includes/elementor/modules/query-control/controls/group-control-query.php:233
+msgid "Author"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-posts.php:112
+#: includes/elementor/modules/query-control/controls/group-control-query.php:49
+#: includes/elementor/modules/query-control/controls/group-control-query.php:173
+#: includes/elementor/modules/query-control/controls/group-control-related.php:59
+#: includes/elementor/modules/query-control/module.php:80
+msgid "Manual Selection"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-posts.php:113
+#: includes/elementor/modules/query-control/controls/group-control-query.php:50
+msgid "Current Query"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:64
+msgid "Include"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:92
+msgid "Include By"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:96
+#: includes/elementor/modules/query-control/controls/group-control-query.php:111
+#: includes/elementor/modules/query-control/controls/group-control-query.php:174
+#: includes/elementor/modules/query-control/controls/group-control-query.php:210
+#: includes/elementor/modules/query-control/controls/group-control-related.php:39
+msgid "Term"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:112
+msgid ""
+"Terms are items in a taxonomy. The available taxonomies are: Categories, "
+"Tags, Formats and custom taxonomies."
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:168
+msgid "Exclude By"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:172
+#: includes/elementor/modules/query-control/module.php:79
+msgid "Current Post"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:255
+#: includes/elementor/modules/query-control/module.php:106
+msgid "Avoid Duplicates"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:258
+msgid ""
+"Set to Yes to avoid duplicate posts from showing up. This only effects the "
+"frontend."
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:270
+msgid "Offset"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:279
+msgid "Use this setting to skip over posts (e.g. '2' to skip over 2 posts)."
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:285
+#: includes/elementor/modules/query-control/controls/group-control-query.php:347
+msgid "Date"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:290
+msgid "Past Day"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:291
+msgid "Past Week"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:292
+msgid "Past Month"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:293
+msgid "Past Quarter"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:294
+msgid "Past Year"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:309
+#: includes/elementor/widgets/counter.php:150
+msgid "Before"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:314
+#: includes/elementor/modules/query-control/controls/group-control-query.php:331
+msgid "Choose"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:322
+msgid ""
+"Setting a ‘Before’ date will show all the posts published until the chosen "
+"date (inclusive)."
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:326
+#: includes/elementor/widgets/counter.php:151
+msgid "After"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:339
+msgid ""
+"Setting an ‘After’ date will show all the posts published since the chosen "
+"date (inclusive)."
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:343
+msgid "Order By"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:349
+msgid "Menu Order"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:350
+msgid "Random"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:358
+msgid "Order"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:362
+msgid "ASC"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:363
+msgid "DESC"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:371
+msgid "Posts Per Page"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:380
+msgid "Ignore Sticky Posts"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:386
+msgid "Sticky-posts ordering is visible on frontend only"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:390
+msgid "Query ID"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-query.php:393
+msgid "Give your Query a custom unique id to allow server side filtering"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-related.php:30
+msgid "Related"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-related.php:55
+msgid "Fallback"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-related.php:60
+msgid "Recent Posts"
+msgstr ""
+
+#: includes/elementor/modules/query-control/controls/group-control-related.php:63
+msgid ""
+"Displayed if no relevant results are found. Manual selection display order "
+"is random"
+msgstr ""
+
+#: includes/elementor/modules/query-control/module.php:109
+msgid ""
+"Set to Yes to avoid duplicate posts from showing up on the page. This only "
+"affects the frontend."
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:53
+msgid "Best Likers"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:108
+msgid "Number of users"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:120
+#: includes/elementor/widgets/most-liked-activities.php:120
+#: includes/elementor/widgets/most-liked-comments.php:157
+#: includes/elementor/widgets/most-liked-posts.php:133
+#: includes/elementor/widgets/most-liked-topics.php:120
+msgid "Peroid Limit"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:126
+#: includes/elementor/widgets/most-liked-activities.php:126
+#: includes/elementor/widgets/most-liked-comments.php:163
+#: includes/elementor/widgets/most-liked-posts.php:139
+#: includes/elementor/widgets/most-liked-topics.php:126
+msgid "Week"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:127
+#: includes/elementor/widgets/most-liked-activities.php:127
+#: includes/elementor/widgets/most-liked-comments.php:164
+#: includes/elementor/widgets/most-liked-posts.php:140
+#: includes/elementor/widgets/most-liked-topics.php:127
+msgid "Month"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:128
+#: includes/elementor/widgets/most-liked-activities.php:128
+#: includes/elementor/widgets/most-liked-comments.php:165
+#: includes/elementor/widgets/most-liked-posts.php:141
+#: includes/elementor/widgets/most-liked-topics.php:128
+msgid "Year"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:129
+#: includes/elementor/widgets/most-liked-activities.php:129
+#: includes/elementor/widgets/most-liked-comments.php:166
+#: includes/elementor/widgets/most-liked-posts.php:142
+#: includes/elementor/widgets/most-liked-topics.php:129
+msgid "Last X Days"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:138
+#: includes/elementor/widgets/most-liked-activities.php:138
+#: includes/elementor/widgets/most-liked-comments.php:175
+#: includes/elementor/widgets/most-liked-posts.php:151
+#: includes/elementor/widgets/most-liked-topics.php:138
+msgid "Past Days Number"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:150
+msgid "Display avatar"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:152
+#: includes/elementor/widgets/best-likers.php:164
+#: includes/elementor/widgets/best-likers.php:176
+#: includes/elementor/widgets/best-likers.php:188
+#: includes/elementor/widgets/counter.php:164
+#: includes/elementor/widgets/most-liked-activities.php:151
+#: includes/elementor/widgets/most-liked-activities.php:176
+#: includes/elementor/widgets/most-liked-comments.php:189
+#: includes/elementor/widgets/most-liked-comments.php:224
+#: includes/elementor/widgets/most-liked-comments.php:236
+#: includes/elementor/widgets/most-liked-comments.php:261
+#: includes/elementor/widgets/most-liked-posts.php:165
+#: includes/elementor/widgets/most-liked-posts.php:248
+#: includes/elementor/widgets/most-liked-posts.php:283
+#: includes/elementor/widgets/most-liked-posts.php:308
+#: includes/elementor/widgets/most-liked-posts.php:320
+#: includes/elementor/widgets/most-liked-posts.php:336
+#: includes/elementor/widgets/most-liked-posts.php:351
+#: includes/elementor/widgets/most-liked-posts.php:366
+#: includes/elementor/widgets/most-liked-posts.php:381
+#: includes/elementor/widgets/most-liked-posts.php:393
+#: includes/elementor/widgets/most-liked-posts.php:418
+#: includes/elementor/widgets/most-liked-posts.php:433
+#: includes/elementor/widgets/most-liked-posts.php:505
+#: includes/elementor/widgets/most-liked-posts.php:518
+#: includes/elementor/widgets/most-liked-posts.php:630
+#: includes/elementor/widgets/most-liked-topics.php:152
+#: includes/elementor/widgets/most-liked-topics.php:187
+#: includes/elementor/widgets/most-liked-topics.php:199
+#: includes/elementor/widgets/most-liked-topics.php:224
+#: includes/elementor/widgets/posts-button.php:143
+#: includes/elementor/widgets/posts-button.php:170
+#: includes/elementor/widgets/posts-button.php:186
+#: includes/elementor/widgets/posts-button.php:198
+msgid "On"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:153
+#: includes/elementor/widgets/best-likers.php:165
+#: includes/elementor/widgets/best-likers.php:177
+#: includes/elementor/widgets/best-likers.php:189
+#: includes/elementor/widgets/counter.php:165
+#: includes/elementor/widgets/most-liked-activities.php:152
+#: includes/elementor/widgets/most-liked-activities.php:177
+#: includes/elementor/widgets/most-liked-comments.php:190
+#: includes/elementor/widgets/most-liked-comments.php:225
+#: includes/elementor/widgets/most-liked-comments.php:237
+#: includes/elementor/widgets/most-liked-comments.php:262
+#: includes/elementor/widgets/most-liked-posts.php:166
+#: includes/elementor/widgets/most-liked-posts.php:249
+#: includes/elementor/widgets/most-liked-posts.php:284
+#: includes/elementor/widgets/most-liked-posts.php:309
+#: includes/elementor/widgets/most-liked-posts.php:321
+#: includes/elementor/widgets/most-liked-posts.php:337
+#: includes/elementor/widgets/most-liked-posts.php:352
+#: includes/elementor/widgets/most-liked-posts.php:367
+#: includes/elementor/widgets/most-liked-posts.php:382
+#: includes/elementor/widgets/most-liked-posts.php:394
+#: includes/elementor/widgets/most-liked-posts.php:419
+#: includes/elementor/widgets/most-liked-posts.php:434
+#: includes/elementor/widgets/most-liked-posts.php:506
+#: includes/elementor/widgets/most-liked-posts.php:519
+#: includes/elementor/widgets/most-liked-posts.php:631
+#: includes/elementor/widgets/most-liked-topics.php:153
+#: includes/elementor/widgets/most-liked-topics.php:188
+#: includes/elementor/widgets/most-liked-topics.php:200
+#: includes/elementor/widgets/most-liked-topics.php:225
+#: includes/elementor/widgets/posts-button.php:144
+#: includes/elementor/widgets/posts-button.php:171
+#: includes/elementor/widgets/posts-button.php:187
+#: includes/elementor/widgets/posts-button.php:199
+msgid "Off"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:162
+msgid "Display name"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:174
+msgid "Display meta"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:186
+msgid "Display user profile"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:198
+msgid "Profile URL type"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:201
+msgid "Default "
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:202
+msgid "Author Page"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:204
+msgid "Ultimate Member"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:222
+#: includes/elementor/widgets/most-liked-activities.php:216
+#: includes/elementor/widgets/most-liked-comments.php:301
+#: includes/elementor/widgets/most-liked-topics.php:264
+msgid "Custom Text"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:229
+#: includes/elementor/widgets/most-liked-activities.php:223
+#: includes/elementor/widgets/most-liked-comments.php:308
+#: includes/elementor/widgets/most-liked-posts.php:541
+#: includes/elementor/widgets/most-liked-topics.php:271
+msgid "Not Found Text"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:232
+#: includes/elementor/widgets/best-likers.php:242
+#: includes/elementor/widgets/most-liked-activities.php:226
+#: includes/elementor/widgets/most-liked-activities.php:236
+#: includes/elementor/widgets/most-liked-activities.php:246
+#: includes/elementor/widgets/most-liked-activities.php:256
+#: includes/elementor/widgets/most-liked-comments.php:311
+#: includes/elementor/widgets/most-liked-comments.php:321
+#: includes/elementor/widgets/most-liked-comments.php:331
+#: includes/elementor/widgets/most-liked-comments.php:341
+#: includes/elementor/widgets/most-liked-posts.php:544
+#: includes/elementor/widgets/most-liked-posts.php:554
+#: includes/elementor/widgets/most-liked-posts.php:564
+#: includes/elementor/widgets/most-liked-posts.php:574
+#: includes/elementor/widgets/most-liked-topics.php:274
+#: includes/elementor/widgets/most-liked-topics.php:284
+#: includes/elementor/widgets/most-liked-topics.php:294
+msgid "Type your text here"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:239
+#: includes/elementor/widgets/most-liked-activities.php:243
+#: includes/elementor/widgets/most-liked-comments.php:328
+#: includes/elementor/widgets/most-liked-posts.php:561
+#: includes/elementor/widgets/most-liked-topics.php:291
+msgid "Ago Text"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:255
+#: includes/elementor/widgets/most-liked-activities.php:269
+#: includes/elementor/widgets/most-liked-comments.php:440
+#: includes/elementor/widgets/most-liked-topics.php:307
+msgid "Items"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:292
+#: includes/elementor/widgets/most-liked-activities.php:306
+#: includes/elementor/widgets/most-liked-activities.php:654
+#: includes/elementor/widgets/most-liked-comments.php:477
+#: includes/elementor/widgets/most-liked-comments.php:828
+#: includes/elementor/widgets/most-liked-posts.php:784
+#: includes/elementor/widgets/most-liked-posts.php:1411
+#: includes/elementor/widgets/most-liked-topics.php:344
+#: includes/elementor/widgets/most-liked-topics.php:781
+#: includes/elementor/widgets/posts-button.php:420
+msgid "Margin"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:322
+msgid "Avatar size"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:339
+msgid "Avatar radius"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:399
+#: includes/elementor/widgets/best-likers.php:485
+#: includes/elementor/widgets/counter.php:238
+#: includes/elementor/widgets/most-liked-activities.php:431
+#: includes/elementor/widgets/most-liked-activities.php:590
+#: includes/elementor/widgets/most-liked-comments.php:387
+#: includes/elementor/widgets/most-liked-comments.php:605
+#: includes/elementor/widgets/most-liked-comments.php:764
+#: includes/elementor/widgets/most-liked-posts.php:833
+#: includes/elementor/widgets/most-liked-posts.php:937
+#: includes/elementor/widgets/most-liked-posts.php:1000
+#: includes/elementor/widgets/most-liked-posts.php:1124
+#: includes/elementor/widgets/most-liked-posts.php:1265
+#: includes/elementor/widgets/most-liked-posts.php:1347
+#: includes/elementor/widgets/most-liked-topics.php:419
+#: includes/elementor/widgets/most-liked-topics.php:558
+#: includes/elementor/widgets/most-liked-topics.php:717
+msgid "Hover"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:430
+#: includes/elementor/widgets/most-liked-activities.php:376
+#: includes/elementor/widgets/most-liked-activities.php:462
+#: includes/elementor/widgets/most-liked-comments.php:418
+#: includes/elementor/widgets/most-liked-comments.php:550
+#: includes/elementor/widgets/most-liked-comments.php:636
+#: includes/elementor/widgets/most-liked-posts.php:1031
+#: includes/elementor/widgets/most-liked-posts.php:1076
+#: includes/elementor/widgets/most-liked-posts.php:1156
+#: includes/elementor/widgets/most-liked-topics.php:450
+#: includes/elementor/widgets/most-liked-topics.php:503
+#: includes/elementor/widgets/most-liked-topics.php:589
+msgid "Bottom space"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:452
+#: includes/elementor/widgets/most-liked-activities.php:398
+#: includes/elementor/widgets/most-liked-comments.php:572
+#: includes/elementor/widgets/most-liked-topics.php:525
+msgid "Meta Info"
+msgstr ""
+
+#: includes/elementor/widgets/best-likers.php:516
+#: includes/elementor/widgets/most-liked-activities.php:478
+#: includes/elementor/widgets/most-liked-comments.php:652
+#: includes/elementor/widgets/most-liked-posts.php:1172
+#: includes/elementor/widgets/most-liked-topics.php:605
+msgid "Space between metas"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:54
+msgid "Like/Dislike Counter"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:114
+msgid "DisLike"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:146
+msgid "Icon Position"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:162
+#: includes/elementor/widgets/posts-button.php:141
+msgid "Enable Custom ID"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:174
+#: includes/elementor/widgets/posts-button.php:153
+msgid "Enter a Post ID"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:175
+#: includes/elementor/widgets/posts-button.php:154
+msgid ""
+"You can set a custom id instead of our automattic get id function to make "
+"multiple buttons in a page."
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:218
+#: includes/elementor/widgets/counter.php:245
+#: includes/elementor/widgets/posts-button.php:260
+#: includes/elementor/widgets/posts-button.php:287
+msgid "Primary Color"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:284
+#: includes/elementor/widgets/posts-button.php:334
+msgid "Rotate"
+msgstr ""
+
+#: includes/elementor/widgets/counter.php:308
+#: includes/elementor/widgets/posts-button.php:358
+msgid "Counter"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:54
+msgid "Top Activities"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:109
+#: includes/elementor/widgets/most-liked-comments.php:146
+#: includes/elementor/widgets/most-liked-topics.php:109
+msgid "Number of items"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:149
+#: includes/elementor/widgets/most-liked-comments.php:234
+#: includes/elementor/widgets/most-liked-posts.php:306
+#: includes/elementor/widgets/most-liked-topics.php:197
+msgid "Display info"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:167
+#: includes/elementor/widgets/most-liked-activities.php:546
+#: includes/elementor/widgets/most-liked-comments.php:252
+#: includes/elementor/widgets/most-liked-comments.php:720
+#: includes/elementor/widgets/most-liked-posts.php:621
+#: includes/elementor/widgets/most-liked-posts.php:1303
+#: includes/elementor/widgets/most-liked-topics.php:215
+#: includes/elementor/widgets/most-liked-topics.php:673
+msgid "Pagination"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:174
+#: includes/elementor/widgets/most-liked-comments.php:259
+#: includes/elementor/widgets/most-liked-posts.php:628
+#: includes/elementor/widgets/most-liked-topics.php:222
+msgid "Enable Pagination"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:186
+#: includes/elementor/widgets/most-liked-comments.php:271
+#: includes/elementor/widgets/most-liked-posts.php:640
+#: includes/elementor/widgets/most-liked-topics.php:234
+msgid "Previous Text"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:198
+#: includes/elementor/widgets/most-liked-comments.php:283
+#: includes/elementor/widgets/most-liked-posts.php:652
+#: includes/elementor/widgets/most-liked-topics.php:246
+msgid "Next Text"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:233
+#: includes/elementor/widgets/most-liked-comments.php:318
+#: includes/elementor/widgets/most-liked-posts.php:551
+#: includes/elementor/widgets/most-liked-topics.php:281
+msgid "By Text"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:253
+#: includes/elementor/widgets/most-liked-comments.php:338
+msgid "Visit Text"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:318
+#: includes/elementor/widgets/most-liked-comments.php:489
+#: includes/elementor/widgets/most-liked-posts.php:722
+#: includes/elementor/widgets/most-liked-topics.php:356
+msgid "Alignment"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:327
+#: includes/elementor/widgets/most-liked-comments.php:498
+#: includes/elementor/widgets/most-liked-posts.php:731
+#: includes/elementor/widgets/most-liked-topics.php:365
+msgid "Center"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:495
+#: includes/elementor/widgets/most-liked-comments.php:669
+#: includes/elementor/widgets/most-liked-posts.php:1189
+#: includes/elementor/widgets/most-liked-topics.php:622
+msgid "Date Icon"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:506
+#: includes/elementor/widgets/most-liked-comments.php:680
+#: includes/elementor/widgets/most-liked-posts.php:1200
+#: includes/elementor/widgets/most-liked-topics.php:633
+msgid "User Icon"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:517
+#: includes/elementor/widgets/most-liked-comments.php:691
+#: includes/elementor/widgets/most-liked-posts.php:1211
+#: includes/elementor/widgets/most-liked-topics.php:644
+#: includes/elementor/widgets/posts-button.php:119
+msgid "Like Icon"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:528
+#: includes/elementor/widgets/most-liked-comments.php:702
+#: includes/elementor/widgets/most-liked-posts.php:1222
+#: includes/elementor/widgets/most-liked-topics.php:655
+#: includes/elementor/widgets/posts-button.php:130
+msgid "Dislike Icon"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-activities.php:621
+#: includes/elementor/widgets/most-liked-comments.php:795
+#: includes/elementor/widgets/most-liked-posts.php:1378
+#: includes/elementor/widgets/most-liked-topics.php:748
+msgid "Current"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:54
+msgid "Top Comments"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:83
+msgid "All Post Types"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:135
+msgid "Post Types"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:187
+#: includes/elementor/widgets/most-liked-posts.php:246
+#: includes/elementor/widgets/most-liked-topics.php:150
+msgid "Display title"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:199
+#: includes/elementor/widgets/most-liked-posts.php:258
+#: includes/elementor/widgets/most-liked-topics.php:162
+msgid "Title Tag"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-comments.php:222
+#: includes/elementor/widgets/most-liked-posts.php:281
+#: includes/elementor/widgets/most-liked-topics.php:185
+msgid "Display content"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:57
+msgid "Top Posts"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:112
+msgid "Columns"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:163
+msgid "Display thumbnail"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:187
+msgid "Image Ratio"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:209
+msgid "Image Width"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:293
+msgid "Content Length"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:318
+msgid "Display Date"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:334
+msgid "Display Human Time Format"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:349
+msgid "Display Author"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:364
+msgid "Display Votes"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:379
+msgid "Display readmore"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:391
+msgid "Display CTA Button"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:403
+#: includes/elementor/widgets/posts-button.php:109
+msgid "Template"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:416
+#: includes/elementor/widgets/posts-button.php:184
+msgid "Display Counter"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:431
+#: includes/elementor/widgets/posts-button.php:196
+msgid "Display Likers Box"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:446
+#: includes/elementor/widgets/posts-button.php:208
+msgid "Likers Display"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:450
+#: includes/elementor/widgets/posts-button.php:212
+msgid "Popover"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:451
+#: includes/elementor/widgets/posts-button.php:213
+msgid "Pile Modal"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:469
+msgid "Query"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:502
+msgid "Force Default Query"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:503
+msgid "Force default query results without dependence on ulike results."
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:515
+msgid "Enable Normal Query"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:516
+msgid "Display posts even if they have no log. (like/dislike)"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:534
+msgid "Custom Content"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:571
+msgid "Readmore Text"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:581
+msgid "Custom Heading Content"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:582
+#: includes/elementor/widgets/most-liked-posts.php:594
+#: includes/elementor/widgets/most-liked-posts.php:605
+msgid ""
+"A Custom HTML structure where you can display it at the item box wrapper. "
+"(This option also supports shortcode)"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:593
+msgid "Custom Inner Content"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:604
+msgid "Custom Footer Content"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:678
+msgid "Columns Gap"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:700
+msgid "Rows Gap"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:752
+msgid "Box"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:889
+#: includes/elementor/widgets/posts-button.php:432
+msgid "Border Radius"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:1047
+msgid "Excerpt"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-posts.php:1092
+msgid "Meta"
+msgstr ""
+
+#: includes/elementor/widgets/most-liked-topics.php:54
+msgid "Top Topics"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:54
+#: includes/general-functions.php:353 includes/general-functions.php:457
+#: includes/general-functions.php:506 includes/general-functions.php:575
+msgid "Like Button"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:167
+msgid "Enable Custom Dynamic ID"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:168
+msgid ""
+"By activating this option, the IDs of the buttons are created dynamically "
+"according to the Item ID set."
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:253
+msgid "Not Liked"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:280
+msgid "Liked"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:305
+msgid "Hover Animation"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:444
+msgid "Icon Width"
+msgstr ""
+
+#: includes/elementor/widgets/posts-button.php:455
+msgid "Icon Height"
+msgstr ""
+
+#: includes/general-functions.php:702
+msgid "\"%s\" Plugin is Not Activated!"
+msgstr ""
+
+#: includes/general-functions.php:705
+msgid "In order to use this element, you need to install and activate this plugin."
+msgstr ""
+
+#: includes/general-hooks.php:16
+msgid "Simple Up/Down Vote"
+msgstr ""
+
+#: includes/general-hooks.php:23
+msgid "Book Heart"
+msgstr ""
+
+#: includes/general-hooks.php:30
+msgid "Check Mark"
+msgstr ""
+
+#: includes/general-hooks.php:37
+msgid "Voter Thumb"
+msgstr ""
+
+#: includes/general-hooks.php:44
+msgid "Check Vote"
+msgstr ""
+
+#: includes/general-hooks.php:51
+msgid "Broken Heart"
+msgstr ""
+
+#: includes/general-hooks.php:58
+msgid "Positive/Negative Circles"
+msgstr ""
+
+#: includes/general-hooks.php:65
+msgid "FeedBack"
+msgstr ""
+
+#: includes/general-hooks.php:72
+msgid "Rating Face"
+msgstr ""
+
+#: includes/general-hooks.php:79
+msgid "Rating Boy"
+msgstr ""
+
+#: includes/general-hooks.php:86
+msgid "Rating Girl"
+msgstr ""
+
+#: includes/general-hooks.php:94
+msgid "Up/Down Votes"
+msgstr ""
+
+#: includes/general-hooks.php:101
+msgid "Star Thumb"
+msgstr ""
+
+#: includes/general-hooks.php:108
+msgid "Arrow Votings"
+msgstr ""
+
+#: includes/general-hooks.php:115
+msgid "Minimal Votings"
+msgstr ""
+
+#: includes/general-hooks.php:122
+msgid "Badge Thumb"
+msgstr ""
+
+#: includes/general-hooks.php:129
+msgid "Fave Star"
+msgstr ""
+
+#: includes/general-hooks.php:135
+msgid "Pin Button"
+msgstr ""
+
+#: includes/general-hooks.php:142
+msgid "Clapping Button"
+msgstr ""
+
+#: includes/general-hooks.php:148
+msgid "Smiley Switch button"
+msgstr ""
+
+#: includes/general-hooks.php:409
+msgid "ULike ᴾᴿᴼ"
+msgstr ""
+
+#: includes/general-hooks.php:860
+msgid "Points for dis-liking content"
+msgstr ""
+
+#: includes/general-hooks.php:861
+msgid ""
+"This hook award / deducts points from users who Dislike/Undislike any "
+"content of WordPress, bbPress, BuddyPress & ..."
+msgstr ""
+
+#: includes/general-hooks.php:877 includes/general-hooks.php:878
+msgid "Disliking Content"
+msgstr ""
+
+#: includes/general-hooks.php:879 includes/general-hooks.php:880
+msgid "Undisliking Content"
+msgstr ""
+
+#: includes/managers/shortcodes.php:168 public/templates/content.php:67
+msgid "No Results Found!"
+msgstr ""
+
+#: includes/managers/shortcodes.php:392
+msgid "Please select a slug for social share!"
+msgstr ""
+
+#: includes/managers/shortcodes.php:398 includes/managers/shortcodes.php:404
+msgid "Social network are empty! Please check your configurations."
+msgstr ""
+
+#: includes/managers/shortcodes.php:486
+msgid "Google Authenticator"
+msgstr ""
+
+#: includes/managers/shortcodes.php:490
+msgid "Setup 2-factor Authentication"
+msgstr ""
+
+#: includes/managers/shortcodes.php:492
+msgid "Usable authentication accounts"
+msgstr ""
+
+#: includes/managers/shortcodes.php:493
+msgid "Authenticator app"
+msgstr ""
+
+#: includes/managers/shortcodes.php:494
+msgid "ago"
+msgstr ""
+
+#: includes/managers/shortcodes.php:498
+msgid ""
+"You have reached the limit for requesting authentication acccounts for this "
+"user. If you want to update your authentication account, try to remove some "
+"of the following apps."
+msgstr ""
+
+#: public/templates/content.php:61
+msgid "Template type not exist!"
+msgstr ""
+
+#: public/templates/notices/error.php:20
+msgid "The following problems were found:"
+msgstr ""
+
+#: public/templates/profile.php:241
+msgid "This tab is looking a little empty!"
+msgstr ""
+
+#: wp-ulike-pro.php:109
+msgid "You're not using WP ULike Pro yet!"
+msgstr ""
+
+#: wp-ulike-pro.php:110
+msgid ""
+"Activate the WP ULike plugin to start using all of WP ULike Pro plugin's "
+"features."
+msgstr ""
+
+#: wp-ulike-pro.php:111
+msgid "Activate Now"
+msgstr ""
+
+#: wp-ulike-pro.php:119
+msgid "WP ULike Pro plugin requires installing the WP ULike plugin"
+msgstr ""
+
+#: wp-ulike-pro.php:120
+msgid "Install and activate the WP ULike plugin to access all the Pro features."
+msgstr ""
+
+#: wp-ulike-pro.php:121
+msgid "Install Now"
+msgstr ""
+
+#: wp-ulike-pro.php:137
+#. translators: 1: Title opening tag, 2: Title closing tag
+msgid ""
+"%1$sWP ULike Pro requires newer version of the WP ULike plugin%2$s Update "
+"the WP ULike plugin to reactivate the WP ULike Pro plugin."
+msgstr ""
+
+#: wp-ulike-pro.php:141 wp-ulike-pro.php:160
+msgid "Update Now"
+msgstr ""
+
+#: wp-ulike-pro.php:156
+#. translators: 1: Title opening tag, 2: Title closing tag
+msgid ""
+"%1$sDon’t miss out on the new version of WP ULike%2$s Update to the latest "
+"version of WP ULike to enjoy new features, better performance and "
+"compatibility."
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid ""
+"https://wpulike.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_"
+"medium=wp-dash"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"WP ULike PRO is the most powerful web marketing toolkit plugin in the "
+"world. It will instantly boost your on-page SEO, help to find out your best "
+"content and analyze your website based on user votes. No coding skills "
+"needed."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "TechnoWich"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid ""
+"https://technowich.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_"
+"medium=wp-dash"
+msgstr ""
