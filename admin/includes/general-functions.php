@@ -307,12 +307,22 @@ function wp_ulike_pro_migrate_metadata( $type ) {
     }
 
     // Update metadata
+    $net_votes = [];
     foreach ( $result as $key => $value ) {
         if( get_post_type( $value->item_id ) ){
             $status     = str_replace( $meta_key, '', $value->meta_key);
             $quantity   = wp_ulike_pro_get_counter_quantity( $value->item_id, $status, $type );
             $meta_value = (int) $value->meta_value + (int) $quantity;
             update_metadata( $type, $value->item_id, $status . '_amount' , $meta_value );
+            // save net_votes for another migrate
+            $net_votes[ $value->item_id ][$status] = $meta_value;
+        }
+    }
+
+    if( ! empty( $net_votes ) ){
+        foreach ($net_votes as $item_id => $args) {
+            $net_votes_val = ! empty( $args['dislike'] ) ? ( $args['like'] - $args['dislike'] ) : $args['like'];
+            update_metadata( $type, $item_id, 'net_votes' , $net_votes_val );
         }
     }
 

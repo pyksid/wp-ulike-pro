@@ -33,7 +33,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-username" class="ulp-floating-input" name="username" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" required autocomplete="username" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" autocapitalize="off" autocomplete="username" required />
                     <label for="ulp-username" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>">
                         <span
@@ -45,7 +45,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-password" type="password" class="ulp-floating-input" name="password" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" required autocomplete="current-password"/>
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="current-password"/>
                     <label for="ulp-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>">
                         <span
@@ -66,7 +66,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-6 ulp-flex-col-md-6 ulp-flex-col-xs-12">
                 <div class="ulp-flex ulp-flex-end-md ulp-flex-center-xs">
                     <a
-                        <?php echo ! empty( $wp_ulike_form_args->ajax_toggle ) ? 'data-form-toggle="reset-password"' : ''; ?> href="<?php echo esc_url( $wp_ulike_form_args->reset_url ); ?>"><?php echo esc_html( $wp_ulike_form_args->reset_password ); ?></a>
+                        <?php echo wp_ulike_is_true( $wp_ulike_form_args->ajax_toggle ) ? 'data-form-toggle="reset-password"' : ''; ?> href="<?php echo esc_url( $wp_ulike_form_args->reset_url ); ?>"><?php echo esc_html( $wp_ulike_form_args->reset_password ); ?></a>
                 </div>
             </div>
 

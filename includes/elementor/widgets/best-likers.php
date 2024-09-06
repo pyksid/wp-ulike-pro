@@ -584,14 +584,14 @@ class BestLikers extends Widget_Base {
                     break;
 
                 case 'buddypress':
-                    $profile_url = function_exists('bp_core_get_user_domain') ? bp_core_get_user_domain( $user->user_id ) : '';
+                    $profile_url = function_exists('bp_members_get_user_url') ? bp_members_get_user_url( $user->user_id ) : '';
                     break;
             }
 
             if ( ! empty( $profile_url  ) ) {
-                $profile_url = sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $profile_url), $user_info->display_name  );
+                $profile_url = sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $profile_url), esc_attr( $user_info->display_name )  );
             } else {
-                $profile_url = $user_info->display_name;
+                $profile_url = esc_attr( $user_info->display_name ) ;
             }
         ?>
 <div id="wp-ulike-user-<?php echo esc_attr( $user->user_id ); ?>" class="wp-ulike-user">

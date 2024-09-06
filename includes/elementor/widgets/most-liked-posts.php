@@ -1566,7 +1566,7 @@ class MostLikedPosts extends Widget_Base {
                             if( wp_ulike_is_true( $settings['display_human_time_diff'] ) ){
                                 echo human_time_diff( $get_the_date ) . ' ' . $settings['ago_text'];
                             } else {
-                                echo date_i18n( get_option('date_format'), $get_the_date );
+                                echo wp_date( get_option('date_format'), $get_the_date );
                             }
                             ?>
                         </div>

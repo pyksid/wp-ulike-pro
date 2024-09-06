@@ -33,7 +33,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-username" class="ulp-floating-input" name="username" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" required autocomplete="username" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" autocapitalize="off" autocomplete="username" required />
                     <label for="ulp-username" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>">
                         <span
@@ -79,7 +79,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-password" type="password" class="ulp-floating-input" name="password" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" required autocomplete="new-password" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="new-password" />
                     <label for="ulp-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>">
                         <span

@@ -32,7 +32,7 @@ if ( $wp_ulike_query ) {
             <?php if ( ! in_array( 'date', $exclude_display ) ) : ?>
             <div class="wp-ulike-entry-date">
                 <i class="ulp-icon-clock"></i>
-                <span><?php echo date_i18n( get_option( 'date_format', 'F j, Y' ), strtotime( $activity->date_recorded ) ); ?></span>
+                <span><?php echo wp_date( get_option( 'date_format', 'F j, Y' ), strtotime( $activity->date_recorded ) ); ?></span>
             </div>
             <?php endif; ?>
             <?php if ( ! in_array( 'author', $exclude_display ) ) : ?>

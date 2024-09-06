@@ -129,7 +129,7 @@ function  wp_ulike_pro_user_info_shortcode( $atts ){
 
             switch ($type) {
                 case 'last_activity':
-                    $date_i18n = date_i18n( 'Y-m-d H:i:s', $max_date );
+                    $date_i18n = wp_date( 'Y-m-d H:i:s', $max_date );
                     $result    = human_time_diff( strtotime( $date_i18n ) );
                     break;
 

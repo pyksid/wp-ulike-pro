@@ -347,7 +347,7 @@ final class Elements {
      */
     public function editor_scripts() {
         // Elementor Custom Scripts
-        wp_enqueue_script( 'wp-ulike-elementor-editor', WP_ULIKE_PRO_ADMIN_URL . '/assets/js/elementor/editor.js', array('jquery'), WP_ULIKE_PRO_VERSION );
+        wp_enqueue_script( 'wp-ulike-elementor-editor', WP_ULIKE_PRO_ADMIN_URL . '/assets/js/elementor/editor.js', array('jquery'), WP_ULIKE_PRO_VERSION, true );
     }
 
     /**

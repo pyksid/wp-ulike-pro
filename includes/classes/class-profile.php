@@ -15,9 +15,9 @@ final class WP_Ulike_Pro_Profile extends wp_ulike_ajax_listener_base {
 	 */
 	private function setFormData(){
 		$this->data['security']    = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : NULL;
-		$this->data['first_name']  = isset( $_POST['firstname'] ) ? sanitize_user( $_POST['firstname'] ) : NULL;
-		$this->data['last_name']   = isset( $_POST['lastname'] ) ? sanitize_user( $_POST['lastname'] ) : NULL;
-		$this->data['user_email']  = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : NULL;
+		$this->data['first_name']  = isset( $_POST['firstname'] ) ? sanitize_text_field( $_POST['firstname'] ) : NULL;
+		$this->data['last_name']   = isset( $_POST['lastname'] ) ? sanitize_text_field( $_POST['lastname'] ) : NULL;
+		$this->data['user_email']  = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : NULL;
 		$this->data['user_url']    = isset( $_POST['website'] ) ? sanitize_text_field( $_POST['website'] ) : NULL;
 		$this->data['description'] = isset( $_POST['bio'] ) ? sanitize_text_field( $_POST['bio'] ) : NULL;
 		// Set form ID for action usage

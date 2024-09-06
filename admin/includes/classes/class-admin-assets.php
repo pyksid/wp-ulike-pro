@@ -75,13 +75,32 @@ class WP_Ulike_Pro_Admin_Assets {
             return;
         }
 
-        // Enqueue third-party styles
-        wp_enqueue_style(
-            'wp-ulike-pro-admin-plugins',
-            WP_ULIKE_PRO_ADMIN_URL . '/assets/css/plugins.css',
-            array(),
-            WP_ULIKE_PRO_VERSION
-        );
+        // stats react panel
+        if ( preg_match("/(statistics)/i", $hook ) ) {
+            $manifest_path = WP_ULIKE_PRO_ADMIN_DIR . '/includes/statistics/asset-manifest.json';
+
+            if (!file_exists($manifest_path)) {
+                return;
+            }
+
+            $manifest = json_decode(file_get_contents($manifest_path), true);
+
+            if (!$manifest) {
+                return;
+            }
+
+            // Enqueue the CSS file
+            if (isset($manifest['files']['main.css'])) {
+                $css_file = WP_ULIKE_PRO_ADMIN_URL . '/includes/statistics' . $manifest['files']['main.css'];
+                wp_enqueue_style('wp_ulike_pro_admin_react', $css_file);
+            }
+
+            // Enqueue the JS file
+            if (isset($manifest['files']['main.js'])) {
+                $js_file = WP_ULIKE_PRO_ADMIN_URL . '/includes/statistics' . $manifest['files']['main.js'];
+                wp_enqueue_script('wp_ulike_pro_admin_react', $js_file, array(), null, true);
+            }
+        }
 
         // Enqueue third-party styles
         wp_enqueue_style(
@@ -93,18 +112,9 @@ class WP_Ulike_Pro_Admin_Assets {
 
         // Enqueue admin scripts
         wp_enqueue_script(
-            'wp_ulike_pro_admin_plugins',
-            WP_ULIKE_PRO_ADMIN_URL . '/assets/js/plugins.js',
-            array( 'wp_ulike_admin_plugins' ),
-            WP_ULIKE_PRO_VERSION,
-            true
-        );
-
-        // Enqueue admin scripts
-        wp_enqueue_script(
             'wp_ulike_pro_admin_scripts',
             WP_ULIKE_PRO_ADMIN_URL . '/assets/js/scripts.js',
-            array( 'wp_ulike_pro_admin_plugins' ),
+            array(),
             WP_ULIKE_PRO_VERSION,
             true
         );

@@ -58,7 +58,7 @@ class WP_Ulike_Pro_Avatar {
 		// Fetch local avatar from meta and make sure it's properly set.
 		$avatar_data = get_user_meta( $user_id, 'ulp_avatar_data', true );
 		// Return avatar upload box
-		return sprintf('<input class="ulp_avatar_upload_field" type="file" name="files" data-fileuploader-default="%s" data-fileuploader-files=\'%s\'>', $avatar_url, ! empty( $avatar_data ) ? json_encode( array ( $avatar_data ) ) : '');
+		return sprintf('<input class="ulp_avatar_upload_field" type="file" name="files" data-fileuploader-default="%s" data-fileuploader-files=\'%s\'>', $avatar_url, ! empty( $avatar_data ) ? wp_json_encode( array ( $avatar_data ) ) : '');
 	}
 
 	/**

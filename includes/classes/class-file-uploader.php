@@ -631,7 +631,7 @@ class WP_Ulike_Pro_File_Uploader {
 							$file['type'] = $chunk['type'];
 							$file['size'] = $chunk['size'];
 						} else {
-							echo json_encode(array(
+							echo wp_json_encode(array(
 								'fileuploader' => array(
 									'temp_name' => $chunk['temp_name']
 								)
@@ -953,7 +953,7 @@ class WP_Ulike_Pro_File_Uploader {
 						break;
 					case 'files':
 						$value = array_values($value);
-						$attributes['data-fileuploader-' . $key] = json_encode($value);
+						$attributes['data-fileuploader-' . $key] = wp_json_encode($value);
 						break;
 				}
 			}

@@ -14,16 +14,16 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['username']  = isset( $_POST['username'] ) ? sanitize_user( $_POST['username'] ) : NULL;
-		$this->data['firstname'] = isset( $_POST['firstname'] ) ? sanitize_text_field( $_POST['firstname'] ) : NULL;
-		$this->data['lastname']  = isset( $_POST['lastname'] ) ? sanitize_text_field( $_POST['lastname'] ) : NULL;
-		$this->data['email']     = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : NULL;
-		$this->data['password']  = isset( $_POST['password'] ) ? sanitize_text_field( $_POST['password'] ) : NULL;
-		$this->data['security']  = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : NULL;
+		$this->data['username']  = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : NULL;
+		$this->data['firstname'] = isset( $_POST['firstname'] ) ? sanitize_text_field( wp_unslash( $_POST['firstname'] ) ) : NULL;
+		$this->data['lastname']  = isset( $_POST['lastname'] ) ? sanitize_text_field( wp_unslash( $_POST['lastname'] ) ) : NULL;
+		$this->data['email']     = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : NULL;
+		$this->data['password']  = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : NULL;
+		$this->data['security']  = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : NULL;
 		// Set form ID for action usage
-		$this->data['_form_id']  = isset( $_POST['_form_id'] ) ? sanitize_text_field ( $_POST['_form_id'] ) : 1;
+		$this->data['_form_id']  = isset( $_POST['_form_id'] ) ? sanitize_text_field ( wp_unslash( $_POST['_form_id'] ) ) : 1;
 		// Custom redirect url
-		$this->data['_redirect_to']  = isset( $_POST['_redirect_to'] ) ? esc_url( $_POST['_redirect_to'] ) : NULL;
+		$this->data['_redirect_to']  = isset( $_POST['_redirect_to'] ) ? esc_url( wp_unslash(  $_POST['_redirect_to'] ) ) : NULL;
 	}
 
 	/**
@@ -44,29 +44,53 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 				'first_name' => $this->data['firstname'],
 				'last_name'  => $this->data['lastname']
 			);
+
+			if( WP_Ulike_Pro_Options::isEmailVerifyEnabled() ){
+				$userdata['role'] = 'pending';
+			}
+
 			$user_id = wp_insert_user( $userdata );
 
             if ( is_wp_error( $user_id ) ) {
-                throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'fill_signup_form', esc_html__( 'Error Occured please fill up the signup form carefully.', WP_ULIKE_PRO_DOMAIN ) ) );
+                throw new \Exception( wp_ulike_pro_clean_tags( $user_id->get_error_message() ) );
             }
 
-			if( WP_Ulike_Pro_Options::checkAutoLogin() ){
-				$creds = array(
-					'user_login'    => $this->data['username'],
-					'user_password' => $this->data['password'],
-					'remember'      => false
-				);
-				$user = wp_signon( $creds, false );
+			$mail = new WP_Ulike_Pro_Mail();
 
-				if ( is_wp_error( $user ) ) {
-					throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'error_occurred', esc_html__( 'An error has occurred! Please try again later.', WP_ULIKE_PRO_DOMAIN ) ) );
+			$message = '';
+
+			if( WP_Ulike_Pro_Options::isEmailVerifyEnabled() ){
+				// Save verification key in user meta
+				update_user_meta( $user_id, 'ulp_email_verification_key', wp_generate_password( 20, false ) );
+				// Send verification email
+				$mail->send( $this->data['email'], 'checkmail', array( 'user_id' => $user_id ) );
+				// message
+				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'email_verification', esc_html__( 'Please check your email to activate your account.', WP_ULIKE_PRO_DOMAIN ) );
+			} else {
+				// auto login
+				if( WP_Ulike_Pro_Options::checkAutoLogin() ){
+					$creds = array(
+						'user_login'    => $this->data['username'],
+						'user_password' => $this->data['password'],
+						'remember'      => false
+					);
+					$user = wp_signon( $creds, false );
+
+					if ( is_wp_error( $user ) ) {
+						throw new \Exception( wp_ulike_pro_clean_tags( $user->get_error_message() ) );
+					}
+
+					wp_set_current_user( $user->ID );
+
+					// redirect to a page
+					$this->data['_redirect_to'] = WP_Ulike_Pro_Options::isProfileVisible() ? wp_ulike_pro_get_user_profile_permalink( $user->ID ) : home_url();
 				}
 
-				wp_set_current_user( $user->ID );
-			}
+				$mail->send( $this->data['email'], 'welcome', array( 'user_id' => $user_id ) );
 
-			$mail = new WP_Ulike_Pro_Mail();
-			$mail->send( $this->data['email'], 'welcome', array( 'user_id' => $user_id ) );
+				// message
+				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', esc_html__( 'Signup successful.', WP_ULIKE_PRO_DOMAIN ) );
+			}
 
 			// Add user id param for use in after action hook
 			$this->data['user_id']  = $user_id;
@@ -78,7 +102,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
             $this->afterAction();
 
 			$this->response( array(
-                'message'  => WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', esc_html__( 'Signup successful.', WP_ULIKE_PRO_DOMAIN ) ),
+                'message'  => $message,
                 'status'   => 'success',
                 'redirect' => esc_url( $this->data['_redirect_to'] )
             ) );

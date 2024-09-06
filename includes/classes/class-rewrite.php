@@ -50,6 +50,7 @@ class WP_Ulike_Pro_Rewrite {
 		add_action( 'template_redirect', array( &$this, 'account_redirect'     ), 1000 );
 		add_action( 'template_redirect', array( &$this, 'logout_redirect'      ), 1000 );
 		add_action( 'template_redirect', array( &$this, 'change_password'      ), 1000 );
+		add_action( 'template_redirect', array( &$this, 'email_verification'   ), 1000 );
 	}
 
 	/**
@@ -168,6 +169,50 @@ class WP_Ulike_Pro_Rewrite {
 				wp_redirect( add_query_arg( array( 'action' => 'lostpassword' ), $url )  );
 				exit;
 			}
+		}
+	}
+
+	/**
+	 * email verification redirect link
+	 *
+	 * @return void
+	 */
+	function email_verification(){
+		// Prepare site for reset password
+		if ( WP_Ulike_Pro_Options::isCorePage( '', ['signup', 'login'] ) && isset( $_REQUEST['action'] ) && sanitize_key( $_REQUEST['action'] ) == 'checkmail' ) {
+
+			// Sanitize and retrieve the parameters from the URL
+			$key     = sanitize_text_field($_GET['key']);
+			$user_id = intval($_GET['login']);
+
+			// Verify the key and user ID
+			$saved_key = get_user_meta($user_id, 'ulp_email_verification_key', true);
+
+			if ($key === $saved_key) {
+				// Key matches, update user role to a non-pending role
+				$user = new WP_User($user_id);
+				$user->remove_role('pending'); // Remove the 'pending' role
+
+				// Retrieve the default user registration role
+				$default_role = get_option('default_role', 'subscriber'); // Fallback to 'subscriber' if not set
+
+				// Add the default role to the user
+				$user->add_role($default_role);
+
+				// Optionally, delete the verification key after successful verification
+				delete_user_meta($user_id, 'ulp_email_verification_key');
+
+				$mail = new WP_Ulike_Pro_Mail();
+				$mail->send( $user->user_email, 'approved', array( 'user_id' => $user_id ) );
+
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'success_verification_notice', esc_html__( 'Your email has been successfully verified. You can now log in.', WP_ULIKE_PRO_DOMAIN ) ), 'success' );
+			} else {
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+			}
+
+			// Handle invalid key
+			wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
+			exit;
 		}
 	}
 

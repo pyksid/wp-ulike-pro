@@ -301,7 +301,21 @@ class WP_Ulike_Pro_Permalinks {
 		$url = WP_Ulike_Pro_Options::getResetPasswordPageUrl();
 		$url = add_query_arg( array( 'action' => 'changepassword', 'key' => $key, 'login' => $user_data->user_login ), $url );
 
-		return $url;
+		return esc_url( $url );
+	}
+
+	/**
+	 * Get Reset URL
+	 *
+	 * @return bool|string
+	 */
+	public static function account_activation_url( $user_id ) {
+		// new reset password key via WP native field
+		$key = get_user_meta( $user_id, 'ulp_email_verification_key', true );
+		$url = WP_Ulike_Pro_Options::getLoginPageUrl();
+		$url = add_query_arg( array( 'action' => 'checkmail', 'key' => $key, 'login' => $user_id ), $url );
+
+		return esc_url( $url );
 	}
 
 	/**

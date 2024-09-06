@@ -287,6 +287,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
             $messsage =  '<div class="ulp-avatar"><img src="{avatar_url}"></div> <span>Logged in as {display_name}. (<a href="{profile_url}">Profile</a>) (<a href="{logout_url}">Logout</a>)</span>';
         }
 
+		$messsage = wp_ulike_kses( $messsage );
+
 		$tags = new WP_Ulike_Pro_Convert_Tags( array( 'user_id' => $current_user->ID ) );
 
         return sprintf( '<div class="ulp-flex ulp-flex-center-xs"><div class="ulp-logged-in-message">%s</div></div>', $tags->convert( $messsage ) );
@@ -359,7 +361,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return boolean
 	 */
 	public static function getRequireModalTemplate( $typeName ){
-		return do_shortcode( self::getOption( self::getSettingKey( $typeName ) . '|modal_template', '' ) );
+		$template = self::getOption( self::getSettingKey( $typeName ) . '|modal_template', '' );
+		return do_shortcode( wp_ulike_kses( $template ) );
 	}
 
 	/**
@@ -368,7 +371,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return boolean
 	 */
 	public static function getLikersModalTemplate( $typeName ){
-		return do_shortcode( self::getOption( self::getSettingKey( $typeName ) . '|likers_modal_template', '' ) );
+		$template = self::getOption( self::getSettingKey( $typeName ) . '|likers_modal_template', '' );
+		return do_shortcode( wp_ulike_kses( $template ) );
 	}
 	/**
 	 * Get  template
@@ -557,6 +561,15 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
         }
 
 		return false;
+	}
+
+	/**
+	 * Check email verify status
+	 *
+	 * @return boolean
+	 */
+	public static function isEmailVerifyEnabled(){
+		return self::getOption( 'signup_status', 'approved' ) == 'checkmail';
 	}
 
 }

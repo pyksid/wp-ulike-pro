@@ -62,6 +62,11 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 
 			if ( in_array( $this->data['method'], array( 'upload','edit' ) ) ) {
 
+				// make sure upload dir exists
+				if ( ! is_dir( $this->data['configs']['uploadDir'] ) ) {
+					wp_mkdir_p( $this->data['configs']['uploadDir'] );
+				}
+
 				// Set name
 				if( ! empty( $this->data['name'] ) && $this->data['method'] == 'edit' ){
 					$name = str_replace (array('/', '\\'), '', $this->data['name'] );

@@ -27,7 +27,8 @@ class WP_Ulike_Pro_Mail {
 
     function prepare_tags( $args ){
         $extra_vars = apply_filters( 'wp_ulike_pro_mail_extra_vars', array(
-            '{password_reset_link}' => ! empty( $args['user_id'] ) ? WP_Ulike_Pro_Permalinks::reset_url( $args['user_id'] ) : '#'
+            '{password_reset_link}'     => ! empty( $args['user_id'] ) ? WP_Ulike_Pro_Permalinks::reset_url( $args['user_id'] ) : '#',
+            '{account_activation_link}' => ! empty( $args['user_id'] ) ? WP_Ulike_Pro_Permalinks::account_activation_url( $args['user_id'] ) : '#'
         ), $args );
 
         $this->convert_tags = new WP_Ulike_Pro_Convert_Tags( $args, $extra_vars );

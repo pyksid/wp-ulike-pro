@@ -25,18 +25,6 @@ function wp_ulike_pro_upgrade_statistics_admin_menu( $submenus ){
         if( isset( $submenus['statistics'] ) ){
             $submenus['statistics']['path'] = WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/statistics.php';
         }
-        if( isset( $submenus['posts_logs'] ) ){
-            $submenus['posts_logs']['path'] = WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/posts-logs.php';
-        }
-        if( isset( $submenus['comments_logs'] ) ){
-            $submenus['comments_logs']['path'] = WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/comments-logs.php';
-        }
-        if( isset( $submenus['topics_logs'] ) ){
-            $submenus['topics_logs']['path'] = WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/topics-logs.php';
-        }
-        if( isset( $submenus['activities_logs'] ) ){
-            $submenus['activities_logs']['path'] = WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/activities-logs.php';
-        }
     }
 
 	return $submenus;

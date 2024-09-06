@@ -1158,7 +1158,6 @@ function wp_ulike_pro_get_posts_query( $args ){
 		"limit"      => 10
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
-
 	if( $parsed_args['type'] === 'topic' ){
 		// Get bbpress post types
 		$parsed_args['rel_type'] =  array( 'topic', 'reply' );
@@ -1173,11 +1172,11 @@ function wp_ulike_pro_get_posts_query( $args ){
 		) );
 	}
 
-	$get_items  = $parsed_args['is_popular'] ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	$get_items  = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
 
 	$query_args = array(
 		'post_type'      => $parsed_args['rel_type'],
-		'post_status'    => array('publish', 'inherit'),
+		'post_status'    => array('publish', 'inherit', 'private'),
 		'posts_per_page' => $parsed_args['limit']
 	);
 
@@ -1223,7 +1222,7 @@ function wp_ulike_pro_get_comments_query( $args ){
 		) );
 	}
 
-	$get_items  = $parsed_args['is_popular'] ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	$get_items  = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
 
 	if( empty( $get_items ) ){
 		return false;
@@ -1247,6 +1246,10 @@ function wp_ulike_pro_get_comments_query( $args ){
  * @return array
  */
 function wp_ulike_pro_get_activity_query( $args ){
+	// check buddypress activation
+	if( ! defined( 'BP_VERSION' ) ) {
+		return false;
+	}
 
 	//Main data
 	$defaults = array(
@@ -1261,7 +1264,7 @@ function wp_ulike_pro_get_activity_query( $args ){
 		"limit"      => 10
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
-	$get_items   = $parsed_args['is_popular'] ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	$get_items   = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
 
 	if( empty( $get_items ) ){
 		return false;
@@ -1829,4 +1832,14 @@ function wp_ulike_pro_social_login_auto_display(){
 			}
 			break;
 	}
+}
+
+/**
+ * remove all HTML tags and their contents
+ *
+ * @param string $message
+ * @return string
+ */
+function wp_ulike_pro_clean_tags($message) {
+    return ! empty( $message ) ? preg_replace('/<[^>]*>(.*?)<\/[^>]*>/', '', $message) : '';
 }

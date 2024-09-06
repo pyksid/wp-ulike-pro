@@ -380,7 +380,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 			$results = $this->select_data( $table );
 			// Create chart dataset
 			foreach( $results as $result ){
-				$output['label'][] = date_i18n( "M j, Y", strtotime( $result->labels ) );
+				$output['label'][] = wp_date( "M j, Y", strtotime( $result->labels ) );
 				$output['data'][]  = $result->counts;
 			}
 
@@ -575,7 +575,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 			foreach ( $top_likers as $user ) {
 				$user_ID  = stripslashes( $user->user_id );
 				$userdata = get_userdata( $user_ID );
-				$username = empty( $userdata ) ? esc_html__('Guest User',WP_ULIKE_PRO_DOMAIN) : $userdata->display_name;
+				$username = empty( $userdata ) ? esc_html__('Guest User',WP_ULIKE_PRO_DOMAIN) : esc_attr(  $userdata->display_name );
 
 				$result  .= '
 	            <div class="wp-ulike-flex wp-ulike-users-list">

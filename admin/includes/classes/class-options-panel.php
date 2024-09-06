@@ -571,6 +571,34 @@ class WP_Ulike_Pro_Options_Panel {
         );
 
         $options[] = array(
+            'id'      => 'email_verification_notice',
+            'type'    => 'text',
+            'default' => esc_html__( 'Please check your email to activate your account.', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Email Verification Required', WP_ULIKE_PRO_DOMAIN )
+        );
+
+        $options[] = array(
+            'id'      => 'success_verification_notice',
+            'type'    => 'text',
+            'default' => esc_html__( 'Your email has been successfully verified. You can now log in.', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Email Successfully Verified', WP_ULIKE_PRO_DOMAIN )
+        );
+
+        $options[] = array(
+            'id'      => 'failed_verification_notice',
+            'type'    => 'text',
+            'default' => esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Email Verification Failed', WP_ULIKE_PRO_DOMAIN )
+        );
+
+        $options[] = array(
+            'id'      => 'account_not_verified_notice',
+            'type'    => 'text',
+            'default' => esc_html__( 'Your account is not yet verified. Please check your email for the verification link.', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Account Not Verified', WP_ULIKE_PRO_DOMAIN )
+        );
+
+        $options[] = array(
             'id'      => 'disabled_registration_notice',
             'type'    => 'text',
             'default' => esc_html__( 'Registration is currently disabled.', WP_ULIKE_PRO_DOMAIN ),
@@ -1048,11 +1076,25 @@ class WP_Ulike_Pro_Options_Panel {
                 'dependency' => array( 'signup_core_page', '!=', '' )
             ),
             array(
+                'id'      => 'signup_status',
+                'type'    => 'select',
+                'title'   => esc_html__('Signup Status', WP_ULIKE_PRO_DOMAIN),
+                'default' => 'approved',
+                'options' => [
+                    'approved'	=> __( 'Auto Approve', WP_ULIKE_PRO_DOMAIN ),
+                    'checkmail' => __( 'Require Email Activation', WP_ULIKE_PRO_DOMAIN )
+                ],
+                'dependency' => array( 'signup_core_page', '!=', '' )
+            ),
+            array(
                 'id'         => 'signup_enable_auto_login',
                 'type'       => 'switcher',
                 'default'    => false,
                 'title'      => esc_html__('Enable Auto Login After Signup', WP_ULIKE_PRO_DOMAIN),
-                'dependency' => array( 'signup_core_page', '!=', '' )
+                'dependency' => array(
+                    array( 'signup_core_page', '!=', '' ),
+                    array( 'signup_status', '==', 'approved' )
+                ),
             ),
             array(
                 'id'      => 'reset_password_core_page',
@@ -2763,7 +2805,7 @@ class WP_Ulike_Pro_Options_Panel {
                     'type'    => 'submessage',
                     'style'   => 'info',
                     'content' => esc_html__('You can use the following variables in all templates:', WP_ULIKE_PRO_DOMAIN) .
-                    '<br><br><code>{site_url}</code> <code>{site_name}</code> <code>{admin_email}</code> <code>{login_url}</code> <code>{profile_url}</code> <code>{logout_url}</code> <code>{display_name}</code> <code>{first_name}</code> <code>{last_name}</code> <code>{username}</code> <code>{email}</code> <code>{password_reset_link}</code>'
+                    '<br><br><code>{site_url}</code> <code>{site_name}</code> <code>{admin_email}</code> <code>{login_url}</code> <code>{profile_url}</code> <code>{logout_url}</code> <code>{display_name}</code> <code>{first_name}</code> <code>{last_name}</code> <code>{username}</code> <code>{email}</code> <code>{password_reset_link}</code> <code>{account_activation_link}</code>'
                 ),
                 array(
                     'id'     => 'welcome_email',
@@ -2819,6 +2861,44 @@ class WP_Ulike_Pro_Options_Panel {
                             'type'    => 'wp_editor',
                             'default' => WP_Ulike_Pro_Mail::get_template( 'change-password' ),
                             'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN),
+                        ),
+                    ),
+                ),
+                array(
+                    'id'     => 'checkmail_email',
+                    'type'   => 'fieldset',
+                    'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
+                    'fields' => array(
+                        array(
+                            'id'      => 'subject',
+                            'type'    => 'text',
+                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                            'default' => esc_html__( 'Please activate your account',WP_ULIKE_PRO_DOMAIN),
+                        ),
+                        array(
+                            'id'      => 'body',
+                            'type'    => 'wp_editor',
+                            'default' => WP_Ulike_Pro_Mail::get_template( 'checkmail' ),
+                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
+                        ),
+                    ),
+                ),
+                array(
+                    'id'     => 'approved_email',
+                    'type'   => 'fieldset',
+                    'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
+                    'fields' => array(
+                        array(
+                            'id'      => 'subject',
+                            'type'    => 'text',
+                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                            'default' => esc_html__( 'Your account at {site_name} is now active',WP_ULIKE_PRO_DOMAIN),
+                        ),
+                        array(
+                            'id'      => 'body',
+                            'type'    => 'wp_editor',
+                            'default' => WP_Ulike_Pro_Mail::get_template( 'approved' ),
+                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
                         ),
                     ),
                 ),

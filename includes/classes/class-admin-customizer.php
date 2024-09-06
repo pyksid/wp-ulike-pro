@@ -2,15 +2,12 @@
 
 class WP_Ulike_Pro_Admin_Customizer {
 
-    protected $has_permission;
-
     protected $option_domain = 'wp_ulike_customize';
 
     /**
      * __construct
      */
     function __construct() {
-        $this->has_permission = WP_Ulike_Pro_API::has_permission();
         // Init Hook
         $this->init();
     }
@@ -472,16 +469,12 @@ class WP_Ulike_Pro_Admin_Customizer {
             return;
         }
 
-        $backup_option = ! $this->has_permission ? array(
-            'type'    => 'notice',
-            'style'   => 'danger',
-            'content' => sprintf( '<p>%s</p><a class="button" href="%s">%s</a>', esc_html__( 'Features of the Pro version are only available once you have registered your license. If you don\'t yet have a license key, get WP ULike Pro now.' , WP_ULIKE_PRO_DOMAIN ), self_admin_url( 'admin.php?page=wp-ulike-pro-license' ), esc_html__( 'Activate License', WP_ULIKE_PRO_DOMAIN ) ),
-        ) : array( 'type' => 'backup' );
-
         ULF::createSection( $this->option_domain, array(
             'parent' => WP_ULIKE_SLUG,
             'title'  => esc_html__( 'Backup',WP_ULIKE_PRO_DOMAIN),
-            'fields' => array( $backup_option )
+            'fields' => array(
+                array( 'type' => 'backup' )
+             )
         ) );
     }
 

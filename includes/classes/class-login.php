@@ -14,14 +14,14 @@ final class WP_Ulike_Pro_Login extends wp_ulike_ajax_listener_base {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['username'] = isset( $_POST['username'] ) ? sanitize_user( $_POST['username'] ) : NULL;
-		$this->data['password'] = isset( $_POST['password'] ) ? sanitize_text_field( $_POST['password'] ) : NULL;
-		$this->data['security'] = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : NULL;
+		$this->data['username'] = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : NULL;
+		$this->data['password'] = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : NULL;
+		$this->data['security'] = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : NULL;
 		$this->data['remember'] = empty( $_POST['remember'] ) ? false : true;
 		// Set form ID for action usage
-		$this->data['_form_id'] = isset( $_POST['_form_id'] ) ? sanitize_text_field ( $_POST['_form_id'] ) : 1;
+		$this->data['_form_id'] = isset( $_POST['_form_id'] ) ? sanitize_text_field ( wp_unslash( $_POST['_form_id'] ) ) : 1;
 		// Custom redirect url
-		$this->data['_redirect_to'] = isset( $_POST['_redirect_to'] ) ? esc_url( $_POST['_redirect_to'] ) : NULL;
+		$this->data['_redirect_to'] = isset( $_POST['_redirect_to'] ) ? esc_url( wp_unslash( $_POST['_redirect_to'] ) ) : NULL;
 	}
 
 	/**
@@ -44,7 +44,7 @@ final class WP_Ulike_Pro_Login extends wp_ulike_ajax_listener_base {
             $user = wp_signon( $creds );
 
             if ( is_wp_error( $user ) ) {
-                throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'login_failed', esc_html__( 'Invalid username or incorrect password!', WP_ULIKE_PRO_DOMAIN ) ) );
+                throw new \Exception( wp_ulike_pro_clean_tags( $user->get_error_message() ) );
             }
 
 			wp_set_current_user( $user->ID );

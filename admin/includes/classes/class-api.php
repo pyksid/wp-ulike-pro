@@ -68,13 +68,8 @@ class WP_Ulike_Pro_API {
 			return $response;
 		}
 
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( 200 !== (int) $response_code ) {
-			return new \WP_Error( $response_code, esc_html__( 'HTTP Error', WP_ULIKE_PRO_DOMAIN ) );
-		}
-
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( empty( $data ) || ! is_array( $data ) || ! isset( $data['code'] ) || $data['code'] !== 'success' || empty( $data['data'] ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return new \WP_Error( 'no_json', esc_html__( 'An error occurred, please try again', WP_ULIKE_PRO_DOMAIN ) );
 		}
 
@@ -106,7 +101,7 @@ class WP_Ulike_Pro_API {
 	public static function set_transient( $cache_key, $value, $expiration = '+12 hours' ) {
 		$data = [
 			'timeout' => strtotime( $expiration, current_time( 'timestamp' ) ),
-			'value'   => json_encode( $value )
+			'value'   => wp_json_encode( $value )
 		];
 
 		$updated = update_option( $cache_key, $data, false );
@@ -154,6 +149,7 @@ class WP_Ulike_Pro_API {
 	}
 
 	public static function get_license_data( $force_request = false ) {
+
 		$license_data_error = [
 			'success'          => false,
 			'license'          => 'http_error',
@@ -164,6 +160,7 @@ class WP_Ulike_Pro_API {
 		];
 
 		$license_key = WP_Ulike_Pro_License::get_license_key();
+
 		if ( empty( $license_key ) ) {
 			return $license_data_error;
 		}
@@ -177,12 +174,16 @@ class WP_Ulike_Pro_API {
 			];
 
 			if ( self::is_request_running( 'get_license_data' ) ) {
+				if ( false !== $license_data ) {
+					return $license_data;
+				}
+
 				return $license_data_error;
 			}
 
 			$license_data = self::remote_post( $body_args );
 
-			if ( is_wp_error( $license_data ) ) {
+			if ( is_wp_error( $license_data ) || ! isset( $license_data['success'] ) ) {
 				$license_data = self::get_transient( 'wp_ulike_pro_license_data_fallback' );
 				if ( false === $license_data ) {
 					$license_data = $license_data_error;
@@ -277,6 +278,11 @@ class WP_Ulike_Pro_API {
 	}
 
 	public static function has_permission() {
+		// make sure to not check permisson on front-end
+		if( ! is_admin() || wp_doing_ajax() ){
+			return true;
+		}
+
 		$license_data = self::get_license_data();
 
 		return in_array( $license_data['license'], [ self::STATUS_VALID, self::STATUS_EXPIRED ] );

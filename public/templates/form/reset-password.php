@@ -46,7 +46,7 @@ if ( $action == 'changepassword' ) {
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-new-password" type="password" class="ulp-floating-input" name="newpassword"
-                        type="text" placeholder="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>" required autocomplete="new-password" />
+                        type="text" placeholder="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>" spellcheck="false" required autocomplete="new-password" />
                     <label for="ulp-new-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>">
                         <span
@@ -58,7 +58,7 @@ if ( $action == 'changepassword' ) {
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-re-password" type="password" class="ulp-floating-input" name="repassword" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->re_new_pass ); ?>" required autocomplete="new-password" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->re_new_pass ); ?>" spellcheck="false" required autocomplete="new-password" />
                     <label for="ulp-re-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->re_new_pass ); ?>">
                         <span
@@ -81,7 +81,7 @@ if ( $action == 'changepassword' ) {
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-username" class="ulp-floating-input" name="username" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" required autocomplete="username" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>" autocapitalize="off" autocomplete="username" required />
                     <label for="ulp-username" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->username ); ?>">
                         <span

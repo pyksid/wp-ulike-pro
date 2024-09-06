@@ -9,13 +9,13 @@
  *
  * Plugin Name:       WP ULike Pro
  * Plugin URI:        https://wpulike.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
- * Description:       WP ULike PRO is the most powerful web marketing toolkit plugin in the world. It will instantly boost your on-page SEO, help to find out your best content and analyze your website based on user votes. No coding skills needed.
- * Version:           1.8.4
+ * Description:       WP ULike PRO is a cutting-edge web marketing toolkit that supercharges your site's engagement and analytics capabilities. Instantly elevate your on-page SEO, identify your top-performing content, and gain valuable insights through user votes. With no coding required, it’s easy to integrate and use, making it perfect for boosting interaction and optimizing your site's performance.
+ * Version:           1.8.7
  * Author:            TechnoWich
  * Author URI:        https://technowich.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain:       wp-ulike-pro
  * Domain Path:       /languages/
- * Tested up to: 	  6.4
+ * Tested up to: 	  6.6.1
 */
 
 // If this file is called directly, abort.
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define path and text domain
-define( 'WP_ULIKE_PRO_VERSION'      , '1.8.4'   );
+define( 'WP_ULIKE_PRO_VERSION'      , '1.8.7'   );
 define( 'WP_ULIKE_PRO_DB_VERSION'   , '1.0.1' 	);
 define( 'WP_ULIKE_PRO__FILE__'      , __FILE__  );
 
@@ -64,14 +64,14 @@ function wp_ulike_pro_load_plugin() {
 		return;
 	}
 
-	$version_required = '4.6.9';
+	$version_required = '4.7.4';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_required, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_fail_load_out_of_date' );
 
 		return;
 	}
 
-	$version_recommendation = '4.6.9';
+	$version_recommendation = '4.7.4';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_recommendation, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_admin_notice_upgrade_recommendation' );
 	}

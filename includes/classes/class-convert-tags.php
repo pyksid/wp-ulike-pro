@@ -50,15 +50,15 @@ class WP_Ulike_Pro_Convert_Tags {
 
         if( $userdata ){
             $this->vars['{user_id}']      = $user_id;
-            $this->vars['{display_name}'] = $userdata->display_name;
-            $this->vars['{first_name}']   = $userdata->first_name;
-            $this->vars['{last_name}']    = $userdata->last_name;
+            $this->vars['{display_name}'] = esc_attr( $userdata->display_name );
+            $this->vars['{first_name}']   = esc_attr( $userdata->first_name );
+            $this->vars['{last_name}']    = esc_attr( $userdata->last_name );
             $this->vars['{username}']     = $userdata->user_login;
             $this->vars['{avatar_url}']   = get_avatar_url( $userdata->user_email );
             $this->vars['{email}']        = $userdata->user_email;
 
             $this->vars['{up_profile_url}'] = wp_ulike_pro_get_user_profile_permalink( $user_id );
-            $this->vars['{bp_profile_url}'] = function_exists('bp_core_get_user_domain') ? bp_core_get_user_domain( $user_id ) : '#';
+            $this->vars['{bp_profile_url}'] = function_exists('bp_members_get_user_url') ? bp_members_get_user_url( $user_id ) : '#';
             $this->vars['{um_profile_url}'] = function_exists('um_user_profile_url') ?  um_user_profile_url( $user_id ) : '#';
         }
 

@@ -148,6 +148,10 @@
       <key name="fill_signup_form_notice"/>
       <key name="error_occurred_notice"/>
       <key name="signup_success_notice"/>
+      <key name="email_verification_notice"/>
+      <key name="success_verification_notice"/>
+      <key name="failed_verification_notice"/>
+      <key name="account_not_verified_notice"/>
       <key name="disabled_registration_notice"/>
       <key name="invalid_email_notice"/>
       <key name="email_exist_notice"/>
@@ -211,6 +215,14 @@
         <key name="body"/>
       </key>
       <key name="change_password_email">
+        <key name="subject"/>
+        <key name="body"/>
+      </key>
+      <key name="checkmail_email">
+        <key name="subject"/>
+        <key name="body"/>
+      </key>
+      <key name="approved_email">
         <key name="subject"/>
         <key name="body"/>
       </key>

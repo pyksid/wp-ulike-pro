@@ -18,77 +18,77 @@ function wp_ulike_pro_register_templates( $templates ){
     $templates['wp-ulike-pro-default'] = array(
         'name'                  => esc_html__('Simple Up/Down Vote', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_default_up_down_voting_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/default.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/default.svg'),
         'is_text_support'       => true,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-pro-book-heart'] = array(
         'name'                  => esc_html__('Book Heart', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_bookheart_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/bookHeart.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/bookHeart.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-pro-checkmark'] = array(
         'name'                  => esc_html__('Check Mark', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_checkmark_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkMark.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkMark.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-pro-voters'] = array(
         'name'                  => esc_html__('Voter Thumb', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_voters_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/voters.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/voters.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-pro-check-like'] = array(
         'name'                  => esc_html__('Check Vote', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_checkvote_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkVote.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkVote.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-pro-broken-heart'] = array(
         'name'                  => esc_html__('Broken Heart', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_brokenheart_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/brokenHeart.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/brokenHeart.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-positive-negative'] = array(
         'name'                  => esc_html__('Positive/Negative Circles', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_positivecircle_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/posNeg.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/posNeg.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-feedback'] = array(
         'name'                  => esc_html__('FeedBack', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_feedback_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/feedback.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/feedback.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-rating-face'] = array(
         'name'                  => esc_html__('Rating Face', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_rating_face_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingFace.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingFace.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-rating-boy'] = array(
         'name'                  => esc_html__('Rating Boy', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_rating_boy_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingBoy.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingBoy.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-rating-girl'] = array(
         'name'                  => esc_html__('Rating Girl', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_rating_girl_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingGirl.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingGirl.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
 
@@ -96,76 +96,65 @@ function wp_ulike_pro_register_templates( $templates ){
     $templates['wp-ulike-stack-votings'] = array(
         'name'            => esc_html__('Up/Down Votes', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_stack_votings_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/stackVotings.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/stackVotings.svg'),
         'is_text_support' => false,
         'has_subtotal'    => true
     );
     $templates['wp-ulike-star-thumb'] = array(
         'name'            => esc_html__('Star Thumb', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_star_thumb_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/starThumb.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/starThumb.svg'),
         'is_text_support' => false,
         'has_subtotal'    => true
     );
     $templates['wp-ulike-arrow-votings'] = array(
         'name'            => esc_html__('Arrow Votings', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_arrow_votings_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/arrowVotings.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/arrowVotings.svg'),
         'is_text_support' => false,
         'has_subtotal'    => true
     );
     $templates['wp-ulike-minimal-votings'] = array(
         'name'            => esc_html__('Minimal Votings', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_minimal_votings_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/minimalVotings.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/minimalVotings.svg'),
         'is_text_support' => false,
         'has_subtotal'    => true
     );
     $templates['wp-ulike-badge-thumb'] = array(
         'name'                  => esc_html__('Badge Thumb', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_badge_thumb_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/badgeThumb.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/badgeThumb.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-fave-star'] = array(
         'name'            => esc_html__('Fave Star', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_fave_star_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/faveStar.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/faveStar.svg'),
         'is_text_support' => false
     );
     $templates['wp-ulike-pin'] = array(
         'name'                  => esc_html__('Pin Button', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_pin_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/pin.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/pin.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
     $templates['wp-ulike-clapping'] = array(
         'name'            => esc_html__('Clapping Button', WP_ULIKE_PRO_DOMAIN),
         'callback'        => 'wp_ulike_pro_clapping_template',
-        'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/clapping.svg',
+        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/clapping.svg'),
         'is_text_support' => false
     );
     $templates['wp-ulike-smiley-switch'] = array(
         'name'                  => esc_html__('Smiley Switch button', WP_ULIKE_PRO_DOMAIN),
         'callback'              => 'wp_ulike_pro_smiley_switch_template',
-        'symbol'                => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/smileySwitch.svg',
+        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/smileySwitch.svg'),
         'is_text_support'       => false,
         'is_percentage_support' => true
     );
-    // $templates['wp-ulike-machine'] = array(
-    //     'name'            => esc_html__('Machine', WP_ULIKE_PRO_DOMAIN),
-    //     'callback'        => 'wp_ulike_pro_machine_template',
-    //     'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/machine.svg',
-    //     'is_text_support' => false
-    // );
-    // $templates['wp-ulike-snowman'] = array(
-    //     'name'            => esc_html__('Snowman', WP_ULIKE_PRO_DOMAIN),
-    //     'callback'        => 'wp_ulike_pro_snowman_template',
-    //     'symbol'          => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/snowman.svg',
-    //     'is_text_support' => false
-    // );
+
     return $templates;
 }
 add_filter( 'wp_ulike_add_templates_list', 'wp_ulike_pro_register_templates', 10, 1 );
@@ -181,7 +170,7 @@ function wp_ulike_pro_upgrade_templates_args( $info, $args, $temp_list ){
 
     if( isset( $info['user_status'] ) ){
         $prefix = in_array( $info['status'], array( 2, 4 ) ) && strpos( $info['user_status'], 'dis') === 0  ? 'un' : '';
-        $info['dis_button_text']   = wp_ulike_get_button_text( $prefix . 'dislike' );
+        $info['dis_button_text']   = wp_ulike_setting_repo::getButtonText( $args['type'], $prefix . 'dislike' );
     }
 
     $info['pro_button_class']  = wp_ulike_pro_generate_button_classes( $args, $info, $temp_list );
@@ -504,6 +493,21 @@ function wp_ulike_pro_general_hooks_init(){
         wp_ulike_pro_social_login_auto_display();
     }
 
+
+    if( WP_Ulike_Pro_Options::isEmailVerifyEnabled() ){
+        // Add the "Pending" role with no capabilities
+        add_role(
+            'pending',
+            esc_html__('Pending', WP_ULIKE_PRO_DOMAIN),
+            array(
+                'read'          => false,
+                'edit_posts'    => false,
+                'delete_posts'  => false,
+                'publish_posts' => false,
+            )
+        );
+    }
+
 }
 add_action( 'init', 'wp_ulike_pro_general_hooks_init' );
 
@@ -663,7 +667,7 @@ function wp_ulike_pro_forms_add_recaptcha( $type, $args ){
 			$attrs = '';
 			foreach( $options as $att => $value ) {
 				if( $value ) {
-					$attrs .= " {$att}=\"{$value}\" ";
+                    $attrs .= ' ' . sanitize_key( $att ) . '="' . esc_attr( $value ) . '" ';
 				}
 			}
         ?>
@@ -817,7 +821,7 @@ function wp_ulike_pro_forms_end_hook( $type, $args ){
                 ?>
 <div class="ulp-flex-col-xl-12 ulp-helper ulp-flex-col-md-12 ulp-flex-col-xs-12">
     <div class="ulp-flex ulp-flex-center-xs">
-        <span><?php echo sprintf( '%s <a %s href="%s">%s</a>', $args->signup_message, ! empty( $args->ajax_toggle ) ? 'data-form-toggle="signup"' : '',  WP_Ulike_Pro_Options::getSignUpPageUrl(), $args->signup_text ); ?></span>
+        <span><?php echo sprintf( '%s <a %s href="%s">%s</a>', $args->signup_message, wp_ulike_is_true( $args->ajax_toggle ) ? 'data-form-toggle="signup"' : '',  WP_Ulike_Pro_Options::getSignUpPageUrl(), $args->signup_text ); ?></span>
     </div>
 </div>
 <?php
@@ -829,7 +833,7 @@ function wp_ulike_pro_forms_end_hook( $type, $args ){
                 ?>
 <div class="ulp-flex-col-xl-12 ulp-helper ulp-flex-col-md-12 ulp-flex-col-xs-12">
     <div class="ulp-flex ulp-flex-center-xs">
-        <span><?php echo sprintf( '%s <a %s href="%s">%s</a>', $args->login_message, ! empty( $args->ajax_toggle ) ? 'data-form-toggle="login"' : '', WP_Ulike_Pro_Permalinks::get_login_url(), $args->login_text ); ?></span>
+        <span><?php echo sprintf( '%s <a %s href="%s">%s</a>', $args->login_message, wp_ulike_is_true( $args->ajax_toggle ) ? 'data-form-toggle="login"' : '', WP_Ulike_Pro_Permalinks::get_login_url(), $args->login_text ); ?></span>
     </div>
 </div>
 <?php
@@ -840,7 +844,7 @@ function wp_ulike_pro_forms_end_hook( $type, $args ){
                 ?>
 <div class="ulp-flex-col-xl-12 ulp-helper ulp-flex-col-md-12 ulp-flex-col-xs-12">
     <div class="ulp-flex ulp-flex-center-xs">
-        <span><?php echo sprintf( '<a %s href="%s">&larr;  %s</a>', ! empty( $args->ajax_toggle ) ? 'data-form-toggle="login"' : '', WP_Ulike_Pro_Permalinks::get_login_url(), $args->login_message ); ?></span>
+        <span><?php echo sprintf( '<a %s href="%s">&larr;  %s</a>', wp_ulike_is_true( $args->ajax_toggle ) ? 'data-form-toggle="login"' : '', WP_Ulike_Pro_Permalinks::get_login_url(), $args->login_message ); ?></span>
     </div>
 </div>
 <?php
@@ -961,7 +965,7 @@ function wp_ulike_pro_add_pile_up_likers_template( $template, $get_users, $item_
                 continue;
             }
 
-            $user_list .= sprintf( '<img src="%1$s" class="ulp-img-icon" title="%2$s" alt="%2$s" width="%3$d" height="%3$d"/>', get_avatar_url( $user_info->user_email, [ 'size' => $args['avatar_size'] ] ), $user_info->display_name, $args['avatar_size'] );
+            $user_list .= sprintf( '<img src="%1$s" class="ulp-img-icon" title="%2$s" alt="%2$s" width="%3$d" height="%3$d"/>', get_avatar_url( $user_info->user_email, [ 'size' => $args['avatar_size'] ] ), esc_attr($user_info->display_name), $args['avatar_size'] );
         }
 
         // Add more icon
@@ -1022,6 +1026,30 @@ function wp_ulike_pro_on_profile_update( $user_id ) {
     $user->generate_profile_slug( $user_id, true );
 }
 add_action( 'profile_update', 'wp_ulike_pro_on_profile_update', 10, 1 ); // user_id and old_user_data
+
+
+/**
+ * Add a filter to prevent users with the "Pending" role from logging in.
+ *
+ * @param object $user
+ * @param string $password
+ * @return object
+ */
+function check_pending_user_status($user, $password) {
+    // Check if user exists and has 'pending' role
+    if (isset($user->ID)) {
+        $roles = $user->roles;
+        if (in_array('pending', $roles)) {
+            // If the user has a 'pending' role, return an error
+            return new WP_Error('pending_account', WP_Ulike_Pro_Options::getNoticeMessage( 'account_not_verified_notice', esc_html__( 'Your account is not yet verified. Please check your email for the verification link.', WP_ULIKE_PRO_DOMAIN ) ) );
+        }
+    }
+
+    // Proceed with the default authentication process if no issues
+    return $user;
+}
+add_filter('wp_authenticate_user', 'check_pending_user_status', 10, 2);
+
 
 /**
  * change wordpress custom login url

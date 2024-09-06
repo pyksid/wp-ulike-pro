@@ -40,15 +40,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 		 * @return object
 		 */
 		public function get_results(){
-			$table = esc_sql( $this->wpdb->prefix . $this->table );
-			$paged = ( $this->page - 1 ) * $this->per_page;
+			$table     = esc_sql( $this->wpdb->prefix . $this->table );
+			$paged     = ( $this->page - 1 ) * $this->per_page;
 			$orderBy   = $this->sort['field'];
 			$orderType = $this->sort['type'];
 			$serachBy  = $this->generate_search_condition( $this->search );
 
-			return $this->wpdb->get_results(
-				$this->wpdb->prepare( "SELECT * FROM {$table} $serachBy ORDER BY {$orderBy} {$orderType} LIMIT {$paged}, {$this->per_page}" )
-			);
+			return $this->wpdb->get_results( "SELECT * FROM {$table} $serachBy ORDER BY {$orderBy} {$orderType} LIMIT {$paged}, {$this->per_page}" );
 		}
 
 		/**
@@ -91,7 +89,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 		 */
 		private function generate_search_condition( $search ){
 			$output = 'WHERE 1';
-			$search = normalize_whitespace( $search );
+			$search = normalize_whitespace( esc_sql( $search ) );
 
 			if( ! empty( $search ) ){
 				switch ( $this->table ) {
@@ -105,15 +103,18 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 						break;
 
 					case 'ulike_activities':
+						// check buddypress activation
+						if( ! function_exists('is_buddypress') ){
+							break;
+						}
 						if ( is_multisite() ) {
 							$bp_prefix = 'base_prefix';
 						} else {
 							$bp_prefix = 'prefix';
 						}
-
 						$output  = sprintf( '
 						WHERE Concat(`activity_id`, " ", `status`, " ", `ip`, " ", `date_time` ) like "%1$s" OR `activity_id` IN
-						(SELECT id FROM `%2$sbp_activity` WHERE `id` LIKE "%1$s") OR `user_id` IN
+						(SELECT id FROM `%2$sbp_activity` WHERE `content` LIKE "%1$s" ) OR `user_id` IN
 						(SELECT ID FROM `%3$s` WHERE `user_login` LIKE "%1$s")'
 						, '%' . $search . '%', $this->wpdb->$bp_prefix, $this->wpdb->users
 						);
@@ -150,15 +151,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 		 */
 		public function delete_rows( $items ){
 			$table = esc_sql( $this->wpdb->prefix . $this->table );
-			$selectedIds = array();
 
-			foreach ($items as $key => $item) {
-				if( ! empty( $item['id'] ) ){
-					$selectedIds[] = $item['id'];
-				}
-			}
-			if( ! empty( $selectedIds ) ){
-				$selectedIds = implode( ',', array_map( 'absint', $selectedIds ) );
+			if( ! empty( $items ) ){
+				$selectedIds = implode( ',', array_map( 'absint', $items ) );
 				$this->wpdb->query( "DELETE FROM $table WHERE ID IN($selectedIds)" );
 			}
 		}
@@ -171,28 +166,20 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 		private function get_total_records(){
 			$table  = esc_sql( $this->wpdb->prefix . $this->table );
 			$search = $this->generate_search_condition( $this->search );
-			return $this->wpdb->get_var( "SELECT COUNT(*) FROM `$table` $search" );
+			return (int) $this->wpdb->get_var( "SELECT COUNT(*) FROM `$table` $search" );
 		}
 
 		/**
 		 * Get response in JSON
 		 *
-		 * @param integer $page
-		 * @param integer $per_page
-		 * @param array $sort
-		 * @param string $search
 		 * @return string
 		 */
-		public function get_rows( $page, $per_page, $sort, $search ){
-			$this->page     = esc_sql( $page );
-			$this->per_page = esc_sql( $per_page );
-			$this->sort     = esc_sql( $sort );
-			$this->search   = esc_sql( $search );
+		public function get_rows(){
 			$records = $this->get_trnasformed_rows();
-			return json_encode( array(
+			return array(
 				'rows'         => $records,
 				'totalRecords' => $this->get_total_records()
-			) );
+			);
 		}
 
 		/**
@@ -275,15 +262,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 		private function get_formatted_data( $dataset ){
 			$output = $dataset;
 
+			if( empty( $output ) ){
+				return [];
+			}
+
 			foreach ($dataset as $key => $row) {
 				if( isset( $row->date_time ) ){
-					$output[$key]->date_time = wp_ulike_date_i18n( $row->date_time );
+					$output[$key]->date_time = wp_date( 'Y-m-d H:i:s', strtotime( $row->date_time ) );
 				}
 				if( isset( $row->user_id ) ){
 					if( NULL != ( $user_info = get_userdata( $row->user_id ) ) ){
-						$output[$key]->user_id = get_avatar( $user_info->user_email, 16, '' , 'avatar') . '<em> @' . $user_info->user_login . '</em>';
+						$output[$key]->user_id = '@' . $user_info->user_login;
 					} else {
-						$output[$key]->user_id = '<em> #'. esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN ) .'</em>';
+						$output[$key]->user_id = '#'. esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN );
 					}
 				}
 				if( isset( $row->post_id ) ){
@@ -330,14 +321,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 				if( isset( $row->comment_id ) ){
 					if( NULL != ( $comment = get_comment( $row->comment_id ) ) ){
 						$output[$key]->comment_author  = $comment->comment_author;
-						$output[$key]->comment_content = sprintf( "<a href='%s'> %s </a>" , esc_url( get_comment_link( $comment ) ), $comment->comment_content );
+						$output[$key]->comment_content = sprintf( "<a href='%s'> %s </a>" , esc_url( get_comment_link( $comment ) ), wp_strip_all_tags( $comment->comment_content ) );
 					} else {
 						$output[$key]->comment_author  = $output[$key]->comment_content = esc_html__( 'Not Found!', WP_ULIKE_PRO_DOMAIN );
 					}
 				}
 			}
 
-			return apply_filters( 'wp_ulike_pro_get_trnasformed_rows', $output );
+			return apply_filters( 'wp_ulike_get_trnasformed_rows', $output );
 		}
 
 	}
