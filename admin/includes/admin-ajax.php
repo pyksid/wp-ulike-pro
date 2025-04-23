@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -138,7 +138,7 @@ add_action( 'wp_ajax_wp_ulike_pro_install_core_pages', 'wp_ulike_pro_install_cor
  * @return void
  */
 function wp_ulike_pro_history_api(){
-	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) ){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN )  ){
 		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
 	}
 
@@ -181,7 +181,7 @@ add_action('wp_ajax_wp_ulike_pro_history_api','wp_ulike_pro_history_api');
  * @return void
  */
 function wp_ulike_pro_custom_datasets_api(){
-	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) ){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
 		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
 	}
 
@@ -197,13 +197,41 @@ function wp_ulike_pro_custom_datasets_api(){
 }
 add_action('wp_ajax_wp_ulike_pro_custom_datasets_api','wp_ulike_pro_custom_datasets_api');
 
+
+/**
+ * Get charts data api
+ *
+ * @return void
+ */
+function wp_ulike_pro_custom_country_codes_api(){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$status     = isset( $_GET['status'] ) ? $_GET['status'] : [];
+	$start_date = isset( $_GET['start_date'] ) ? $_GET['start_date'] : '';
+	$end_date   = isset( $_GET['end_date'] ) ? $_GET['end_date'] : '';
+
+	$date_range = ! empty( $start_date ) ? [
+		'start' => $start_date,
+		'end'   => $end_date
+	] : NULL;
+
+
+	$instance = WP_Ulike_Pro_Stats_V2::get_instance();
+	$output   = $instance->count_country_codes( $date_range, $status );
+
+    return wp_send_json($output);
+}
+add_action('wp_ajax_wp_ulike_pro_custom_country_codes_api','wp_ulike_pro_custom_country_codes_api');
+
 /**
  * Top items API
  *
  * @return void
  */
 function wp_ulike_pro_tops_api(){
-	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) ){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
 		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
 	}
 
@@ -248,7 +276,7 @@ add_action('wp_ajax_wp_ulike_pro_tops_api','wp_ulike_pro_tops_api');
  * @return void
  */
 function wp_ulike_pro_stats_api(){
-	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) ){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN )  ){
 		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
 	}
 

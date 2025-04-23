@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -353,7 +353,7 @@ function wp_ulike_pro_default_global_template( array $wp_ulike_template, $templa
 <div class="wpulike wpulike-<?php echo $template_name; ?> <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
     <div class="<?php echo $pro_general_class['up']; ?>">
         <button type="button"
-            aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button',WP_ULIKE_PRO_DOMAIN) ) ?>"
+            aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel();  ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-factor="up"
             data-ulike-nonce="<?php echo wp_create_nonce( $type . $ID ); ?>" data-ulike-type="<?php echo $type; ?>"
             data-ulike-template="<?php echo $style; ?>" data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -373,7 +373,7 @@ function wp_ulike_pro_default_global_template( array $wp_ulike_template, $templa
     </div>
     <div class="<?php echo $pro_general_class['down']; ?>">
         <button type="button"
-            aria-label="<?php echo wp_ulike_get_option( 'dislike_button_aria_label', esc_html__( 'Dislike Button',WP_ULIKE_PRO_DOMAIN) ) ?>"
+            aria-label="<?php echo WP_Ulike_Pro_Options::getDislikeAriaLabel(); ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-factor="down"
             data-ulike-nonce="<?php echo wp_create_nonce( $type . $ID ); ?>" data-ulike-type="<?php echo $type; ?>"
             data-ulike-template="<?php echo $style; ?>" data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -457,7 +457,7 @@ function wp_ulike_pro_fave_star_template( array $wp_ulike_template ){
 <div class="wpulike wpulike-fave-star <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
     <div class="<?php echo $general_class; ?>">
         <button type="button"
-            aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button', WP_ULIKE_PRO_DOMAIN) ) ?>"
+            aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel();  ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-nonce="<?php echo wp_create_nonce( $type  . $ID ); ?>"
             data-ulike-type="<?php echo $type; ?>" data-ulike-template="<?php echo $style; ?>"
             data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -506,7 +506,7 @@ function wp_ulike_pro_clapping_template( array $wp_ulike_template ){
 <div class="wpulike wpulike-clapping <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
     <div class="<?php echo $general_class; ?>">
         <button type="button"
-            aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button', WP_ULIKE_PRO_DOMAIN) ) ?>"
+            aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel();  ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-nonce="<?php echo wp_create_nonce( $type  . $ID ); ?>"
             data-ulike-type="<?php echo $type; ?>" data-ulike-template="<?php echo $style; ?>"
             data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -575,7 +575,7 @@ function wp_ulike_pro_default_total_template( array $wp_ulike_template, $templat
 <div class="wpulike wpulike-<?php echo $template_name; ?> <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
     <div class="<?php echo $pro_general_class['sub']; ?>">
         <button type="button"
-            aria-label="<?php echo esc_attr( wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button',WP_ULIKE_PRO_DOMAIN) ) ); ?>"
+            aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel(); ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-factor="up" data-ulike-is-total="1"
             data-ulike-nonce="<?php echo wp_create_nonce( $type . $ID ); ?>" data-ulike-type="<?php echo $type; ?>"
             data-ulike-template="<?php echo $style; ?>" data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -598,7 +598,7 @@ function wp_ulike_pro_default_total_template( array $wp_ulike_template, $templat
 				do_action( 'wp_ulike_after_up_vote_button', $wp_ulike_template );
 			?>
         <button type="button"
-            aria-label="<?php echo esc_attr( wp_ulike_get_option( 'dislike_button_aria_label', esc_html__( 'Dislike Button',WP_ULIKE_PRO_DOMAIN) ) ); ?>"
+            aria-label="<?php echo WP_Ulike_Pro_Options::getDislikeAriaLabel(); ?>"
             data-ulike-id="<?php echo $ID; ?>" data-ulike-factor="down" data-ulike-is-total="1"
             data-ulike-nonce="<?php echo wp_create_nonce( $type . $ID ); ?>" data-ulike-type="<?php echo $type; ?>"
             data-ulike-template="<?php echo $style; ?>" data-ulike-display-likers="<?php echo $display_likers; ?>"
@@ -757,7 +757,7 @@ function wp_ulike_pro_get_public_post_types( $args = array()  ) {
  * @return string|array
  */
 function wp_ulike_pro_get_metabox_value( $meta_name, $post_ID = '' ){
-	$post_ID      = empty( $post_ID ) ? get_the_ID() : $post_ID;
+	$post_ID      = wp_ulike_get_the_id( empty( $post_ID ) ? get_the_ID() : $post_ID );
 	$meta_value   = NULL;
 	$is_serialize = wp_ulike_get_option( 'enable_serialize', false );
 
@@ -861,6 +861,8 @@ function wp_ulike_pro_is_profile_page( $target_id = '', $current_page_id = '' ){
 	if( empty( $current_page_id ) ){
 		$current_page_id = get_queried_object_id();
 	}
+
+	$current_page_id = wp_ulike_get_the_id( $current_page_id );
 
 	return is_page( $profiles_core_page ) && $profiles_core_page == $current_page_id;
 }
@@ -1535,7 +1537,7 @@ function wp_ulike_pro_get_social_logins( $args = array() ){
 
 	<div class="ulp-social-item ulp-flex-center-xs ulp-flex-col-xl-<?php echo esc_attr( $width['desktop'] ); ?> ulp-flex-col-md-<?php echo esc_attr( $width['tablet'] ); ?> ulp-flex-col-xs-<?php echo esc_attr( $width['mobile'] ); ?>">
 		<a class="ulp-share-btn ulp-social-btn ulp-share-<?php echo esc_attr( $name ); ?>"
-			href="<?php echo $url; ?>">
+			href="<?php echo esc_url( $url ); ?>">
 			<?php if( in_array( $view, array( 'icon_text', 'icon' ) ) ): ?>
 			<span class="ulp-share-btn-icon">
 				<i class="ulp-icon-<?php echo esc_attr( $name ); ?>"></i>
@@ -1842,4 +1844,146 @@ function wp_ulike_pro_social_login_auto_display(){
  */
 function wp_ulike_pro_clean_tags($message) {
     return ! empty( $message ) ? preg_replace('/<[^>]*>(.*?)<\/[^>]*>/', '', $message) : '';
+}
+
+
+/**
+ * Get the country code based on the user's IP address.
+ *
+ * @param string $ip_address
+ * @return string|null
+ */
+function wp_ulike_pro_get_country_code_from_ip( $ip_address ) {
+    try {
+        // Define the path to the GeoLite2 Country database
+        $geoip_db_path = WP_ULIKE_PRO_ADMIN_DIR . '/assets/data/GeoLite2-Country.mmdb';
+
+        // Check if the file exists
+        if (!file_exists($geoip_db_path)) {
+            throw new Exception("GeoLite2 Country database not found.");
+        }
+
+        // Create a GeoIP2 Reader instance
+        $reader = new \GeoIp2\Database\Reader($geoip_db_path);
+
+        // Get the country information
+        $record = $reader->country($ip_address);
+
+        // Return the country code
+        return $record->country->isoCode;
+    } catch (Exception $e) {
+        // Return null in case of an error
+        return null;
+    }
+}
+
+/**
+ * Get the device type based on the user agent.
+ *
+ * @return string
+ */
+function wp_ulike_pro_get_device_info($userAgent = null) {
+    // Use the current HTTP_USER_AGENT if none is provided
+    if (!$userAgent) {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    }
+
+    $browser = new WhichBrowser\Parser($userAgent);
+
+    // Determine the device type
+    $deviceType = 'desktop'; // Default to desktop
+
+    if ($browser->device->type) {
+        $deviceType = strtolower($browser->device->type);
+    }
+
+    return [
+        'device'  => $deviceType,
+        'os'      => $browser->os->toString(),
+        'browser' => $browser->browser->toString(),
+    ];
+}
+
+
+if( ! function_exists( 'wp_ulike_pro_get_user_latest_activity' ) ) {
+	/**
+	 * Get user latest activity details for each item
+	 *
+	 * @param integer $item_id
+	 * @param integer $user_id
+	 * @param string $type
+	 * @return array|null
+	 */
+	function wp_ulike_pro_get_user_latest_activity( $item_id, $user_id, $type ) {
+		global $wpdb;
+
+		$settings    = new wp_ulike_setting_type( $type );
+		$table_name  = $wpdb->prefix . $settings->getTableName();
+		$column_name = $settings->getColumnName();
+
+		$query  = $wpdb->prepare( "
+				SELECT `date_time`, `status`, `country_code`, `device`
+				FROM `{$table_name}`
+				WHERE `{$column_name}` = %s
+				AND `user_id` = %d
+				ORDER BY id DESC LIMIT 1
+			",
+			$item_id,
+			$user_id
+		);
+
+		$result = $wpdb->get_row( $query, ARRAY_A );
+
+		if( ! empty( $result['date_time'] ) ){
+			$result['date_time'] = wp_ulike_date_i18n( $result['date_time'] );
+		}
+
+		return $result;
+	}
+}
+
+if( ! function_exists( 'wp_ulike_pro_get_latest_user_activity_date' ) ) {
+	/**
+	 * Get the latest activity date for a given user across multiple WP ULike tables.
+	 *
+	 * This function queries the `wp_ulike`, `wp_ulike_forums`, `wp_ulike_comments`,
+	 * and `wp_ulike_activities` tables to find the most recent activity timestamp
+	 * for a given user ID. It uses efficient subqueries with `MAX(date_time)` and
+	 * `GREATEST()` to determine the latest activity while ensuring optimal performance.
+	 *
+	 * The result is cached using the WordPress object cache for 5 minutes (300 seconds)
+	 * to reduce database load on repeated requests.
+	 *
+	 * @param int $user_id The user ID to check for activity.
+	 * @return string|null The latest activity timestamp in 'Y-m-d H:i:s' format, or null if no activity is found.
+	 */
+	function wp_ulike_pro_get_latest_user_activity_date( $user_id ) {
+		global $wpdb;
+
+		// Use a unique cache key based on the user ID.
+		$cache_key = 'latest_activity_' . $user_id;
+		$latest_date = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
+		if ( false !== $latest_date ) {
+			return $latest_date;
+		}
+
+		// Use subqueries to get the max date from each table.
+		// COALESCE ensures that if one table returns NULL (no rows), we substitute a base value.
+		$query = "
+			SELECT GREATEST(
+				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike WHERE user_id = %d), '0000-00-00 00:00:00'),
+				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_forums WHERE user_id = %d), '0000-00-00 00:00:00'),
+				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_comments WHERE user_id = %d), '0000-00-00 00:00:00'),
+				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_activities WHERE user_id = %d), '0000-00-00 00:00:00')
+			) AS latest_activity_date
+		";
+
+		// Prepare and execute the query.
+		$latest_date = $wpdb->get_var( $wpdb->prepare( $query, $user_id, $user_id, $user_id, $user_id ) );
+
+		// Cache the result for 5 minutes (300 seconds).
+		wp_cache_set( $cache_key, $latest_date, WP_ULIKE_PRO_DOMAIN, 300 );
+
+		return $latest_date;
+	}
 }

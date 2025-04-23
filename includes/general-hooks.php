@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -552,7 +552,7 @@ function wp_ulike_pro_update_the_content( $current_content, $post_content ){
     if( WpUlikeInit::is_frontend() && wp_ulike_is_true( wp_ulike_pro_get_metabox_value( 'auto_display' ) ) && in_the_loop() && is_main_query() && is_singular() ){
 
         // exclude to display like button on other pages
-        if( is_page() && get_the_ID() != get_queried_object_id()  ){
+        if( is_page() && wp_ulike_get_the_id() != get_queried_object_id()  ){
             return $current_content;
         }
 
@@ -655,7 +655,7 @@ function wp_ulike_pro_forms_add_recaptcha( $type, $args ){
         if( wp_ulike_get_option( 'recaptcha_version' ) === 'v3' ) {
         ?>
 <div class="ulp-recaptcha-field ulp-google-recaptcha" id="ulp-recaptcha-<?php echo esc_attr( $type . '-' . $args->form_id );?>"
-    data-mode="<?php echo preg_replace("/[^A-Za-z0-9 ]/", '', $type); ?>"></div>
+    data-mode="<?php echo preg_replace("/[^A-Za-z0-9 ]/", '', esc_attr( $type ) ); ?>"></div>
 <?php
         } else {
 			$options = array(
@@ -1050,6 +1050,89 @@ function check_pending_user_status($user, $password) {
 }
 add_filter('wp_authenticate_user', 'check_pending_user_status', 10, 2);
 
+/**
+ * Localize rewrite rules to support wpml
+ *
+ * @param array $rules
+ * @return array
+ */
+function wp_ulike_localize_rewrite_rules( $rules ){
+    if ( wp_ulike_is_wpml_active() && wp_ulike_setting_repo::isWpmlSynchronizationOn() ) {
+        $current_language = apply_filters( 'wpml_current_language', null );
+
+        foreach ( $rules as $key => $value ) {
+            // Check if 'lang' is already present in the value
+            if ( strpos( $value, 'lang=' ) === false ) {
+                // Append the lang parameter to the existing query string
+                $rules[$key] = $value . '&lang=' . $current_language;
+            }
+        }
+    }
+
+    return $rules;
+}
+add_filter( 'wp_ulike_pro_rewrite_rules', 'wp_ulike_localize_rewrite_rules', 10, 1 );
+
+
+/**
+ * Processes and updates the location (country code) and device type data
+ * based on the user's IP address and device information. This method is
+ * triggered on both the 'wp_ulike_data_inserted' and 'wp_ulike_data_updated' actions.
+ *
+ * It uses a geo-location service to determine the user's country code from the
+ * IP address and a device detection library to determine whether the user is
+ * using a mobile, tablet, or desktop device. These values are then stored in
+ * the respective columns (`country_code` and `device_type`) of the `ulike` table.
+ *
+ * @param array $data The data passed by the action hook, including:
+ * - 'item_id'        => The ID of the item being inserted or updated.
+ * - 'table'          => The table name where the data insert or update occurred.
+ * - 'related_column' => The column name related to the insert or update action.
+ * - 'type'           => The type of the item being inserted or updated.
+ * - 'user_id'        => The ID of the user who performed the action.
+ * - 'status'         => The status of the action (e.g., like, dislike).
+ * - 'ip'             => The IP address of the user performing the action.
+ *
+ * The method updates the 'country_code' and 'device_type' columns in the
+ * database for the specified item, adding the following information:
+ * - Country code determined by the user's IP address (e.g., 'US', 'GB').
+ * - Device type based on the user's device.
+ *
+ * @return void
+ */
+function wp_ulike_pro_process_and_update_location_and_device_data( $data ) {
+    global $wpdb;
+
+    // Extract necessary data
+    $table          = $data['table'];
+    $item_id        = $data['item_id'];
+    $related_column = $data['related_column'];
+    $user_id        = $data['user_id'];
+    $ip_address     = $data['ip'];
+
+    // 1. Get the country code using the IP address
+    $country_code = wp_ulike_pro_get_country_code_from_ip( $ip_address );
+
+    // 2. Get the device info based on the user agent
+    $device_info = wp_ulike_pro_get_device_info();
+
+    // 3. Update the database with the new country code and device type
+    $wpdb->update(
+        $table,
+        array(
+            'country_code' => $country_code,
+            'device'       => $device_info['device'] ?? NULL,
+            'os'           => $device_info['os'] ?? NULL,
+            'browser'      => $device_info['browser'] ?? NULL,
+        ),
+        array(
+            $related_column => $item_id,
+            'user_id'       => $user_id,
+        )
+    );
+}
+add_action( 'wp_ulike_data_inserted', 'wp_ulike_pro_process_and_update_location_and_device_data', 10, 1 );
+add_action( 'wp_ulike_data_updated', 'wp_ulike_pro_process_and_update_location_and_device_data', 10, 1 );
 
 /**
  * change wordpress custom login url

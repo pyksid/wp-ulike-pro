@@ -94,10 +94,6 @@ class WP_Ulike_Pro_Update_Prepare {
 			$_transient_data = new \stdClass();
 		}
 
-		if ( empty( $_transient_data->checked ) ) {
-			return $_transient_data;
-		}
-
 		$version_info = WP_Ulike_Pro_API::get_version( false /* Use Cache */ );
 
 		if ( is_wp_error( $version_info ) ) {
@@ -145,10 +141,6 @@ class WP_Ulike_Pro_Update_Prepare {
 			$_transient_data = new \stdClass();
 		}
 
-		if ( 'plugins.php' === $pagenow && is_multisite() ) {
-			return $_transient_data;
-		}
-
 		return $this->check_transient_data( $_transient_data );
 	}
 
@@ -174,7 +166,7 @@ class WP_Ulike_Pro_Update_Prepare {
 
 			$api_request_transient = new \stdClass();
 
-			$api_request_transient->name          = WP_ULIKE_PRO_NAME;
+			$api_request_transient->name          = esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN );
 			$api_request_transient->slug          = $this->plugin_slug;
 			$api_request_transient->author        = '<a href="https://wpulike.com/?utm_source=wp-dash&utm_medium=plugin-uri&utm_campaign=api">wpulike.com</a>';
 			$api_request_transient->homepage      = 'https://wpulike.com/?utm_source=wp-dash&utm_medium=plugin-uri&utm_campaign=api';

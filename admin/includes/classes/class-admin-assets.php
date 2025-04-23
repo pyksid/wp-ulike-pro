@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -100,6 +100,12 @@ class WP_Ulike_Pro_Admin_Assets {
                 $js_file = WP_ULIKE_PRO_ADMIN_URL . '/includes/statistics' . $manifest['files']['main.js'];
                 wp_enqueue_script('wp_ulike_pro_admin_react', $js_file, array(), null, true);
             }
+
+            // Pass the app config to the frontend
+            wp_localize_script( 'wp_ulike_pro_admin_react', 'StatsAppConfig', array(
+                'nonce'    => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
+                'worldSvg' => WP_ULIKE_PRO_ADMIN_URL . '/assets/img/world.svg',
+            ));
         }
 
         // Enqueue third-party styles

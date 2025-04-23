@@ -3,7 +3,7 @@
  * Class for statistics v2 process
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -97,9 +97,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		// Get reports data
 		private function get_reports() {
 			return array(
-				'monthly_data'    => $this->get_aggregated_data_by_month(),
-				'daily_data'      => $this->get_aggregated_data_by_date(),
-				'user_statistics' => $this->get_voting_statistics_by_user_type(),
+				'monthly_data'  => $this->get_aggregated_data_by_month(),
+				'daily_data'    => $this->get_aggregated_data_by_date(),
+				'device_types'  => $this->count_device_types(),
+				'country_codes' => $this->count_country_codes(),
 			);
 		}
 
@@ -108,6 +109,16 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			$datasets = array();
 
 			foreach ($tables as $type => $table) {
+				// check bbpress installation status
+				if( ! function_exists( 'is_bbpress' ) && $type === 'topics' ) {
+					continue;
+				}
+
+				// check buddpress installation status
+				if( ! defined( 'BP_VERSION' ) && $type === 'activities' ) {
+					continue;
+				}
+
 				$datasets[$type] = $this->get_dataset( $table );
 			}
 
@@ -169,106 +180,132 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		}
 
 		/**
-		 * Select charts data
+		 * Select charts data.
 		 *
 		 * @param string $table
-		 * @return void
+		 * @return array
 		 */
-		public function select_charts_data( $table ){
-
+		public function select_charts_data( $table ) {
 			$output = array();
 			$table  = $this->wpdb->prefix . $table;
-			$range  = $this->getMySqlDateRange();
 
-			if( empty( $this->selectedStatus ) ){
+			// Generate a unique cache key based on table, status, and date range
+			$cache_key = 'charts_data_' . md5( $table . serialize( $this->selectedStatus ) . serialize( $this->dateRange ) );
+			$cached    = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
+			if ( false !== $cached ) {
+				return $cached;
+			}
+
+			$range = $this->getMySqlDateRange( $table );
+
+			if ( empty( $this->selectedStatus ) ) {
 				$dataInfo = $this->wpdb->get_results( "
 					SELECT DATE(`date_time`) AS labels,
-					COUNT(`date_time`) AS counts
+						COUNT(`date_time`) AS counts
 					FROM `$table`
 					WHERE $range
-					GROUP BY labels ORDER BY labels ASC",
-				);
+					GROUP BY labels
+					ORDER BY labels ASC
+				" );
 
-				if( $dataInfo ){
-					foreach( $dataInfo as $result ){
-						if( isset( $result->labels ) & isset( $result->counts ) ){
-							$output[]= [
+				if ( $dataInfo ) {
+					foreach ( $dataInfo as $result ) {
+						if ( isset( $result->labels ) && isset( $result->counts ) ) {
+							$output[] = [
 								'date'  => wp_date( "Y-m-d", strtotime( $result->labels ) ),
 								'total' => (int) $result->counts
 							];
 						}
 					}
 				}
-
 			} else {
-
-				$db = $this->wpdb;
-				$selectedStatus = array_map(function($status) use ($db) {
-					return $db->prepare('%s', $status);
-				}, $this->selectedStatus);
+				// Prepare each status safely.
+				$selectedStatus = array();
+				foreach ( $this->selectedStatus as $status ) {
+					$selectedStatus[] = $this->wpdb->prepare( '%s', $status );
+				}
 
 				$dataInfo = $this->wpdb->get_results( "
 					SELECT DATE(`date_time`) AS labels,
-					status,
-					COUNT(`date_time`) AS counts
+						status,
+						COUNT(`date_time`) AS counts
 					FROM `$table`
 					WHERE $range
-					AND `status` IN (" . implode(',', $selectedStatus) . ")
-					GROUP BY
-						labels,
-						status
-					ORDER BY
-						labels, status ASC;"
-				);
+					AND `status` IN (" . implode( ',', $selectedStatus ) . ")
+					GROUP BY labels, status
+					ORDER BY labels, status ASC;
+				" );
 
-				foreach( $dataInfo as $row ){
+				foreach ( $dataInfo as $row ) {
 					$date   = $row->labels;
 					$status = $row->status;
 					$count  = $row->counts;
 
-					if (!isset($output[$date])) {
-						$output[$date] = ['date' => $date];
+					if ( ! isset( $output[ $date ] ) ) {
+						$output[ $date ] = [ 'date' => $date ];
 					}
-
-					$output[$date][$status] = (int) $count;
+					$output[ $date ][ $status ] = (int) $count;
 				}
 
-				if( ! empty( $output ) ){
-					$output = array_values($output);
-
-					if( ! empty( $output ) ){
-						foreach ($output as $key => $args) {
-							foreach ($this->selectedStatus as $sv) {
-								if( ! isset( $args[$sv] ) ){
-									$output[$key][$sv] = 0;
+				if ( ! empty( $output ) ) {
+					$output = array_values( $output );
+					if ( ! empty( $output ) ) {
+						foreach ( $output as $key => $args ) {
+							foreach ( $this->selectedStatus as $sv ) {
+								if ( ! isset( $args[ $sv ] ) ) {
+									$output[ $key ][ $sv ] = 0;
 								}
 							}
 						}
 					}
 				}
-
 			}
 
+			// Cache the result for 10 seconds to keep data nearly real-time
+			wp_cache_set( $cache_key, $output, WP_ULIKE_PRO_DOMAIN, 10 );
 			return $output;
 		}
 
-
 		/**
-		 * Get mysql date range format
+		 * Get MySQL date range format.
 		 *
+		 * @param string $table
 		 * @return string
 		 */
-		private function getMySqlDateRange(){
-			if( empty( $this->dateRange ) ){
-				return '`date_time` >= NOW() - INTERVAL 30 DAY';
+		private function getMySqlDateRange( $table ) {
+			$table = esc_sql( $table );
+
+			// Return early if date range is set
+			if ( ! empty( $this->dateRange ) ) {
+				$start = $this->dateRange['start'];
+				$end = $this->dateRange['end'];
+
+				return $start === $end
+					? sprintf( "DATE(`date_time`) = '%s'", $start )
+					: sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $start, $end );
 			}
 
-			if( $this->dateRange['start'] === $this->dateRange['end'] ){
-				return sprintf( 'DATE(`date_time`) = \'%s\'', $this->dateRange['start'] );
+			// Cache for the latest date query
+			$cache_key = 'latest_date_' . $table;
+			$latest_date = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
+
+			if ( false === $latest_date ) {
+				$latest_date = $this->wpdb->get_var( "SELECT MAX(date_time) FROM `$table`" );
+				wp_cache_set( $cache_key, $latest_date, WP_ULIKE_PRO_DOMAIN, 10 );
 			}
 
-			return sprintf( 'DATE(`date_time`) >= \'%s\' AND DATE(`date_time`) <= \'%s\'', $this->dateRange['start'], $this->dateRange['end'] );
+			if( empty( $latest_date ) ){
+				$latest_date = current_time( 'mysql' );
+			}
+
+			// Calculate the 30 days range
+			$latest_date_timestamp = strtotime( $latest_date );
+			$date_30_days_before   = date( 'Y-m-d', $latest_date_timestamp - DAY_IN_SECONDS * 30 );
+			$latest_date           = date( 'Y-m-d', $latest_date_timestamp );
+
+			return sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $date_30_days_before, $latest_date );
 		}
+
 
 		/**
 		 * Set date range with our format
@@ -277,12 +314,15 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		 * @return void
 		 */
 		private function setDateRange( $rawDate ){
-			if( empty( $rawDate ) || empty( $rawDate['start'] ) ){
-				$this->dateRange = array();
+			if ( empty( $rawDate['start'] ) ) {
+				$this->dateRange = [];
 				return;
 			}
+
 			$this->dateRange['start'] = date( "Y-m-d", strtotime( $rawDate['start'] ) );
-			$this->dateRange['end']   = isset( $rawDate['end'] ) ? date( "Y-m-d", strtotime( $rawDate['end'] ) ) : $this->dateRange['start'];
+			$this->dateRange['end'] = !empty( $rawDate['end'] )
+				? date( "Y-m-d", strtotime( $rawDate['end'] ) )
+				: $this->dateRange['start'];
 		}
 
 
@@ -293,26 +333,21 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		 */
 		public function select_data( $table ){
 
+			$table_name = "{$this->wpdb->prefix}{$table}";
 			$data_limit = apply_filters( 'wp_ulike_stats_data_limit', 30 );
-
-			// Fetch the most recent date_time from the table
-			$latest_date = $this->wpdb->get_var( "
-				SELECT MAX(date_time) FROM `{$this->wpdb->prefix}{$table}`
-			");
+			$date_range = $this->getMySqlDateRange( $table_name );
 
 			// Prepare the main query with the fetched latest date
 			$query  = $this->wpdb->prepare( "
 				SELECT DATE(date_time) AS labels,
 				count(date_time) AS counts
-				FROM `{$this->wpdb->prefix}{$table}`
-				WHERE DATEDIFF(%s, date_time) <= 30
+				FROM `$table_name`
+				WHERE $date_range
 				GROUP BY labels
 				ORDER BY labels ASC
 				LIMIT %d",
-				$latest_date,
 				$data_limit
 			);
-
 			$result = $this->wpdb->get_results( $query );
 
 			if( empty( $result ) ) {
@@ -344,6 +379,17 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			$count_logs = array();
 
 			foreach ($tables as $type => $table) {
+
+				// check bbpress installation status
+				if( ! function_exists( 'is_bbpress' ) && $type === 'topics' ) {
+					continue;
+				}
+
+				// check buddpress installation status
+				if( ! defined( 'BP_VERSION' ) && $type === 'activities' ) {
+					continue;
+				}
+
 				$count_logs[$type] = array(
 					'week'       => $this->count_logs(array("table" => $table, "date" => 'week')),
 					'last_week'  => $this->count_logs(array("table" => $table, "date" => 'last_week')),
@@ -376,7 +422,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			// Extract variables
 			extract( $parsed_args );
 
-			$cache_key = sanitize_key( sprintf( 'count_logs_for_%s_table_in_%s_daterange', $table, $date ) );
+			$cache_key = sanitize_key( sprintf( 'count_logs_for_%s_table_in_%s_daterange', $table, is_array($date) ? implode('_', $date) : $date ) );
 
 			if( $date === 'all' ){
 				$count_all_logs = wp_ulike_get_meta_data( 1, 'statistics', $cache_key, true );
@@ -393,7 +439,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 				$query .= wp_ulike_get_period_limit_sql( $date );
 
 				$counter_value = $this->wpdb->get_var( $query );
-				wp_cache_set( $cache_key, $counter_value, WP_ULIKE_PRO_DOMAIN );
+				wp_cache_set( $cache_key, $counter_value, WP_ULIKE_PRO_DOMAIN, 10 );
 			}
 
 			if( $date === 'all' ){
@@ -404,37 +450,38 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		}
 
 		/**
-		 * Get top items list
+		 * Count engaged users by table
 		 *
+		 * @param array $args
 		 * @return void
 		 */
-		private function get_top_items() {
-			$tables = $this->get_tables();
-			$top_items = array();
+		public function count_total_interactions( $args = array() ){
+			//Main Data
+			$defaults  = array(
+				"table" => 'ulike',
+				"date"  => 'all'
+			);
 
-			$top_items['post']      = $this->get_top( [
-				"type" => 'post', "rel_type" => '', "status" => ['like','dislike'], 'period' => NULL
-			], NULL );
+			$parsed_args = wp_parse_args( $args, $defaults );
 
-			$top_items['comment']   = $this->get_top( [
-				"type" => 'comment', "rel_type" => '', "status" => ['like','dislike'], 'period' => NULL
-			], NULL );
+			// Extract variables
+			extract( $parsed_args );
 
-			$top_items['activity'] = $this->get_top( [
-				"type" => 'activity', "rel_type" => '', "status" => ['like','dislike'], 'period' => NULL
-			], NULL );
+			$cache_key = sanitize_key( sprintf( 'count_total_interactions_for_%s_table_in_%s_daterange', $table, is_array($date) ? implode('_', $date) : $date ) );
 
-			$top_items['topic']     = $this->get_top( [
-				"type" => 'topic', "rel_type" => '', "status" => ['like','dislike'], 'period' => NULL
-			], NULL );
+			$engaged_users = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
 
-			$top_items['engagers']   = $this->get_top( [
-				"type" => 'engagers', "rel_type" => '', "status" => ['like','dislike'], 'period' => NULL
-			], NULL );
+			// Make a cachable query to get new like count from all tables
+			if( false === $engaged_users ){
+				$query = sprintf( "SELECT COUNT(DISTINCT user_id) FROM %s WHERE 1=1", $this->wpdb->prefix . $table );
+				$query .= wp_ulike_get_period_limit_sql( $date );
 
-			return $top_items;
+				$engaged_users = $this->wpdb->get_var( $query );
+				wp_cache_set( $cache_key, $engaged_users, WP_ULIKE_PRO_DOMAIN, 10 );
+			}
+
+	        return  empty( $engaged_users ) ? 0 : absint( $engaged_users );
 		}
-
 
 		/**
 		 * Get top items of each type
@@ -540,19 +587,56 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			$result = [];
 
 			if($posts && $posts->have_posts()) {
-				$is_distinct = wp_ulike_setting_repo::isDistinct('post');
+				$is_distinct        = wp_ulike_setting_repo::isDistinct('post');
+				$total_interactions = $this->count_total_interactions(array("table" => 'ulike', "date" => $settings['period'] ?? 'all'));
 
 				while($posts->have_posts()) {
 					$posts->the_post();
 
-					$like_count    = wp_ulike_get_counter_value( wp_ulike_get_the_id( get_the_ID() ), 'post', 'like', $is_distinct, $settings['period'] ?? NULL );
-					$dislike_count = wp_ulike_get_counter_value( wp_ulike_get_the_id( get_the_ID() ), 'post', 'dislike', $is_distinct, $settings['period'] ?? NULL );
+					$post_id = wp_ulike_get_the_id();
+
+					$like_count    = wp_ulike_get_counter_value( $post_id, 'post', 'like', $is_distinct, $settings['period'] ?? NULL );
+					$dislike_count = wp_ulike_get_counter_value( $post_id, 'post', 'dislike', $is_distinct, $settings['period'] ?? NULL );
+					$thumbnail     = get_the_post_thumbnail_url( $post_id, 'thumbnail');
+					$engaged_users = wp_ulike_get_likers_list_per_post( 'ulike', 'post_id', $post_id, NULL );
+
+					$engaged_users_info = [];
+					foreach ( $engaged_users as $user ) {
+						$user_info	= get_user_by( 'id', $user );
+						// Check user existence
+						if( ! $user_info ){
+							continue;
+						}
+
+						$engaged_users_info[] = [
+							'name'     => esc_attr( $user_info->display_name ),
+							'avatar'   => get_avatar_url( $user_info->user_email, [ 'size' => 48 ] ),
+							'role'     => $this->get_i18n_role_name( $user_info->roles[0] ?? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) ),
+							'activity' => wp_ulike_pro_get_user_latest_activity( $post_id, $user, 'post' )
+						];
+					}
+
+
+					if( empty( $thumbnail ) ){
+						$thumbnail = WP_ULIKE_PRO_ADMIN_URL . '/assets/img/no-image.svg';
+					}
+
+					$comment_number  = get_comments_number($post_id);
+					$engagement_rate = ( ( $like_count + $dislike_count + $comment_number ) / $total_interactions ) * 100;
 
 					$result[] = [
+						'id'             => $post_id,
 						'title'          => get_the_title(),
+						'image'          => $thumbnail,
 						'permalink'      => get_permalink(),
 						'likes_count'    => $like_count,
-						'dislikes_count' => $dislike_count
+						'dislikes_count' => $dislike_count,
+						'engaged_users'  => $engaged_users_info,
+						'meta_data'      => [
+							'Published'  => get_the_date( '', $post_id ),
+							'Comments'   => get_comments_number($post_id),
+							'Engagement' => number_format($engagement_rate, 2). "%",
+						],
 					];
 				}
 				wp_reset_postdata(); // VERY VERY IMPORTANT
@@ -588,19 +672,48 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			$result = [];
 
 			if( $comments ) {
-				$is_distinct = wp_ulike_setting_repo::isDistinct('comment');
+				$is_distinct        = wp_ulike_setting_repo::isDistinct('comment');
+				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_comments', "date" => $settings['period'] ?? 'all'));
 
 				foreach ( $comments as $comment ) {
 
 					$like_count    = wp_ulike_get_counter_value( $comment->comment_ID, 'comment', 'like', $is_distinct, $settings['period'] ?? NULL );
 					$dislike_count = wp_ulike_get_counter_value( $comment->comment_ID, 'comment', 'dislike', $is_distinct, $settings['period'] ?? NULL );
 
+					$engaged_users = wp_ulike_get_likers_list_per_post( 'ulike_comments', 'comment_id', $comment->comment_ID, NULL );
+
+					$engaged_users_info = [];
+					foreach ( $engaged_users as $user ) {
+						$user_info	= get_user_by( 'id', $user );
+						// Check user existence
+						if( ! $user_info ){
+							continue;
+						}
+
+						$engaged_users_info[] = [
+							'name'     => esc_attr( $user_info->display_name ),
+							'avatar'   => get_avatar_url( $user_info->user_email, [ 'size' => 100 ] ),
+							'role'     => $this->get_i18n_role_name( $user_info->roles[0] ?? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) ),
+							'activity' => wp_ulike_pro_get_user_latest_activity( $comment->comment_ID, $user, 'comment' )
+						];
+					}
+
+					$comment_number  = get_comments_number( $comment->comment_post_ID );
+					$engagement_rate = ( ( $like_count + $dislike_count + $comment_number ) / $total_interactions ) * 100;
+
 					$result[] = [
-						'author'         => $comment->comment_author,
+						'id'             => $comment->comment_ID,
 						'title'          => get_the_title($comment->comment_post_ID),
+						'image'          => get_avatar_url( $comment->comment_author_email, [ 'size' => 100 ] ),
 						'permalink'      => get_comment_link($comment->comment_ID),
 						'likes_count'    => $like_count,
-						'dislikes_count' => $dislike_count
+						'dislikes_count' => $dislike_count,
+						'engaged_users'  => $engaged_users_info,
+						'meta_data'      => [
+							'Published'  => get_comment_date( '', $comment->comment_ID ),
+							'By'         => esc_attr( $comment->comment_author ),
+							'Engagement' => number_format($engagement_rate, 2). "%",
+						],
 					];
 				}
 			}
@@ -640,18 +753,55 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if($topics && $topics->have_posts()) {
 				$is_distinct = wp_ulike_setting_repo::isDistinct('topic');
+				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_forums', "date" => $settings['period'] ?? 'all'));
 
 				while($topics->have_posts()) {
 					$topics->the_post();
 
-					$like_count    = wp_ulike_get_counter_value( get_the_ID(), 'topic', 'like', $is_distinct, $settings['period'] ?? NULL );
-					$dislike_count = wp_ulike_get_counter_value( get_the_ID(), 'topic', 'dislike', $is_distinct, $settings['period'] ?? NULL );
+					$topic_id      = get_the_ID();
+					$like_count    = wp_ulike_get_counter_value( $topic_id, 'topic', 'like', $is_distinct, $settings['period'] ?? NULL );
+					$dislike_count = wp_ulike_get_counter_value( $topic_id, 'topic', 'dislike', $is_distinct, $settings['period'] ?? NULL );
+
+					$engaged_users = wp_ulike_get_likers_list_per_post( 'ulike_forums', 'topic_id', $topic_id, NULL );
+
+					$engaged_users_info = [];
+					foreach ( $engaged_users as $user ) {
+						$user_info	= get_user_by( 'id', $user );
+						// Check user existence
+						if( ! $user_info ){
+							continue;
+						}
+
+						$engaged_users_info[] = [
+							'name'     => esc_attr( $user_info->display_name ),
+							'avatar'   => get_avatar_url( $user_info->user_email, [ 'size' => 100 ] ),
+							'role'     => $this->get_i18n_role_name( $user_info->roles[0] ?? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) ),
+							'activity' => wp_ulike_pro_get_user_latest_activity( $topic_id, $user, 'topic' )
+						];
+					}
+
+					$engagement_rate = ( ( $like_count + $dislike_count ) / $total_interactions ) * 100;
+
+					$author_avatar = NULL;
+					if ( ! bbp_is_topic_anonymous( $topic_id ) ) {
+						$author_avatar = get_avatar_url( bbp_get_topic_author_id( $topic_id ), 100 );
+					} else {
+						$author_avatar = get_avatar_url( get_post_meta( $topic_id, '_bbp_anonymous_email', true ), 100 );
+					}
 
 					$result[] = [
-						'title'          => function_exists('bbp_get_forum_title') ? bbp_get_forum_title( get_the_ID() ) : get_the_title(),
-						'permalink'      => 'topic' === get_post_type( get_the_ID() ) ? bbp_get_topic_permalink( get_the_ID() ) : bbp_get_reply_url( get_the_ID() ),
+						'id'             => $topic_id,
+						'title'          => bbp_get_forum_title( $topic_id ),
+						'image'          => $author_avatar,
+						'permalink'      => 'topic' === get_post_type( $topic_id ) ? bbp_get_topic_permalink( $topic_id ) : bbp_get_reply_url( $topic_id ),
 						'likes_count'    => $like_count,
-						'dislikes_count' => $dislike_count
+						'dislikes_count' => $dislike_count,
+						'engaged_users'  => $engaged_users_info,
+						'meta_data'      => [
+							'Published'  => bbp_get_topic_post_date( $topic_id ),
+							'By'         => bbp_get_topic_author_display_name( $topic_id ),
+							'Engagement' => number_format($engagement_rate, 2). "%",
+						],
 					];
 				}
 				wp_reset_postdata(); // VERY VERY IMPORTANT
@@ -692,17 +842,47 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if( $activities ) {
 				$is_distinct = wp_ulike_setting_repo::isDistinct('activity');
+				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_activities', "date" => $settings['period'] ?? 'all'));
 
 				foreach ( $activities as $activity ) {
 
 					$like_count    = wp_ulike_get_counter_value( $activity->id, 'activity', 'like', $is_distinct, $settings['period'] ?? NULL );
 					$dislike_count = wp_ulike_get_counter_value( $activity->id, 'activity', 'dislike', $is_distinct, $settings['period'] ?? NULL );
 
+					$engaged_users = wp_ulike_get_likers_list_per_post( 'ulike_activities', 'activity_id', $activity->id, NULL );
+
+					$engaged_users_info = [];
+					foreach ( $engaged_users as $user ) {
+						$user_info	= get_user_by( 'id', $user );
+						// Check user existence
+						if( ! $user_info ){
+							continue;
+						}
+
+						$engaged_users_info[] = [
+							'name'     => esc_attr( $user_info->display_name ),
+							'avatar'   => get_avatar_url( $user_info->user_email, [ 'size' => 100 ] ),
+							'role'     => $this->get_i18n_role_name( $user_info->roles[0] ?? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) ),
+							'activity' => wp_ulike_pro_get_user_latest_activity( $activity->id, $user, 'activity' )
+						];
+					}
+
+					$author          = get_user_by( 'id', $activity->user_id );
+					$engagement_rate = ( ( $like_count + $dislike_count ) / $total_interactions ) * 100;
+
 					$result[] = [
+						'id'             => $activity->id,
 						'title'          => ! empty( $activity->content ) ? wp_strip_all_tags( $activity->content ) : wp_strip_all_tags( $activity->action ),
+						'image'          => get_avatar_url( $author->user_email, [ 'size' => 100 ] ),
 						'permalink'      => function_exists('bp_activity_get_permalink') ? bp_activity_get_permalink( $activity->id ) : '',
 						'likes_count'    => $like_count,
-						'dislikes_count' => $dislike_count
+						'dislikes_count' => $dislike_count,
+						'engaged_users'  => $engaged_users_info,
+						'meta_data'      => [
+							'Published'  => wp_ulike_date_i18n( $activity->date_recorded ),
+							'By'         => esc_attr( $author->display_name ),
+							'Engagement' => number_format($engagement_rate, 2). "%",
+						],
 					];
 				}
 			}
@@ -728,17 +908,21 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if( ! empty( $top_likers ) ){
 				foreach ( $top_likers as $user ) {
-					$user_ID  = stripslashes( $user->user_id );
-					$userdata = get_userdata( $user_ID );
-					$username = empty( $userdata ) ? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) : esc_attr( $userdata->display_name );
+					$user_ID         = stripslashes( $user->user_id );
+					$userdata        = get_userdata( $user_ID );
+					$username        = empty( $userdata ) ? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) : esc_attr( $userdata->display_name );
+					$latest_activity = wp_ulike_pro_get_latest_user_activity_date( $user_ID );
 
 					$result[] = [
-						'permalink'        => get_edit_profile_url( $user_ID ),
+						'id'               => $user_ID,
+						'image'            => get_avatar_url( $user_ID, ['size' => 256] ),
 						'title'            => $username,
+						'permalink'        => get_edit_profile_url( $user_ID ),
+						'last_activity'    => $latest_activity,
 						'likes_count'      => absint( $user->likeCount ?? 0 ),
 						'dislikes_count'   => absint( $user->dislikeCount ?? 0 ),
 						'unlikes_count'    => absint( $user->unlikeCount ?? 0 ),
-						'undislikes_count' => absint( $user->undislikeCount ?? 0 )
+						'undislikes_count' => absint( $user->undislikeCount ?? 0 ),
 					];
 				}
 			}
@@ -747,152 +931,274 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		}
 
 		/**
-		 * Get aggregated data by past months
+		 * Get aggregated data from multiple tables using object caching.
 		 *
-		 * @param string $interval
+		 * @param string   $cache_key         Cache key for the result.
+		 * @param string   $interval          Time interval, e.g., '5 MONTH'.
+		 * @param string   $selectExpression  SQL expression to format the date (group key).
+		 * @param string   $orderByExpression SQL expression for ordering the group key.
+		 * @param callable $formatter         Callback to format each row.
+		 * @return array
+		 */
+		private function get_aggregated_data($cache_key, $interval, $selectExpression, $orderByExpression, callable $formatter) {
+			// Try to fetch a cached result.
+			$cached = wp_cache_get($cache_key, WP_ULIKE_PRO_DOMAIN);
+			if ( false !== $cached ) {
+				return $cached;
+			}
+
+			// Validate interval format to avoid potential SQL injection.
+			if ( ! preg_match('/^\d+\s+(DAY|MONTH|YEAR)$/i', $interval) ) {
+				// Fallback to a default interval if invalid.
+				$interval = '5 MONTH';
+			}
+
+			// Build the union query to aggregate date_time from all relevant tables.
+			$unionQuery = "
+				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['posts']}
+					WHERE date_time >= NOW() - INTERVAL {$interval}
+				UNION ALL
+				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['activities']}
+					WHERE date_time >= NOW() - INTERVAL {$interval}
+				UNION ALL
+				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['comments']}
+					WHERE date_time >= NOW() - INTERVAL {$interval}
+				UNION ALL
+				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['topics']}
+					WHERE date_time >= NOW() - INTERVAL {$interval}
+			";
+
+			// Build the full query using the provided SELECT expression and ORDER BY clause.
+			$query = "
+				SELECT
+					{$selectExpression} AS period,
+					COUNT(*) AS total_count
+				FROM (
+					{$unionQuery}
+				) AS combined
+				GROUP BY period
+				ORDER BY {$orderByExpression} ASC
+			";
+
+			$results = $this->wpdb->get_results($query);
+
+			$data = [];
+			if ( ! empty($results) ) {
+				foreach ( $results as $result ) {
+					$data[] = $formatter($result);
+				}
+			}
+
+			// Cache the result for a short duration (10 seconds) to ensure near real-time data.
+			wp_cache_set($cache_key, $data, WP_ULIKE_PRO_DOMAIN, 10);
+
+			return $data;
+		}
+
+		/**
+		 * Get aggregated data by past months.
+		 *
+		 * @param string $interval Time interval (e.g., '5 MONTH').
 		 * @return array
 		 */
 		public function get_aggregated_data_by_month($interval = '5 MONTH') {
-			$query = "SELECT
-				DATE_FORMAT(date_time, '%Y-%m') AS month,
-				COUNT(*) AS total_count
-			FROM (
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['posts']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['activities']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['comments']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['topics']} WHERE date_time >= NOW() - INTERVAL {$interval}
-			) AS combined
-			GROUP BY month
-			ORDER BY month ASC;";
-
-			$results = $this->wpdb->get_results($query);
-
-			$month_counts = array();
-
-			foreach ($results as $result) {
-				if( empty( $result->month ) ){
-					continue;
+			$cache_key = 'aggregated_data_by_month_' . md5($interval);
+			return $this->get_aggregated_data(
+				$cache_key,
+				$interval,
+				"DATE_FORMAT(date_time, '%Y-%m')",  // Group by year-month.
+				"DATE_FORMAT(date_time, '%Y-%m')",  // Order by year-month.
+				function( $result ) {
+					// Convert the period (year-month) to a timestamp and format it.
+					$date = DateTime::createFromFormat('Y-m', $result->period);
+					return [
+						'total_count' => absint($result->total_count),
+						'month_name'  => wp_date("F Y", $date->getTimestamp())
+					];
 				}
-
-				$date = DateTime::createFromFormat('Y-m', $result->month);
-				$month_counts[] = [
-					'total_count' => absint($result->total_count),
-					'month_name'  => wp_date( "F Y", $date->getTimestamp() )
-				];
-			}
-
-			return $month_counts;
+			);
 		}
 
 		/**
-		 * Get aggregated data by past days
+		 * Get aggregated data by past days.
 		 *
-		 * @param string $interval
+		 * @param string $interval Time interval (e.g., '6 DAY').
 		 * @return array
 		 */
 		public function get_aggregated_data_by_date($interval = '6 DAY') {
-			$query = "SELECT
-				DATE(date_time) AS vote_date,
-				COUNT(*) AS total_count
-			FROM (
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['posts']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['activities']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['comments']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				UNION ALL
-				SELECT DATE(date_time) AS date_time FROM {$this->wpdb->prefix}{$this->tables['topics']} WHERE date_time >= NOW() - INTERVAL {$interval}
-			) AS combined
-			GROUP BY vote_date
-			ORDER BY vote_date ASC;";
-
-			// Execute the query and get results
-			$results = $this->wpdb->get_results($query);
-
-			$date_counts = array();
-
-			foreach ($results as $result) {
-				$date_counts[] = [
-					'total_count' => absint($result->total_count),
-					'vote_date' => wp_date( "Y-m-d", strtotime( $result->vote_date ) )
-				];
-			}
-
-			return $date_counts;
+			$cache_key = 'aggregated_data_by_date_' . md5($interval);
+			return $this->get_aggregated_data(
+				$cache_key,
+				$interval,
+				"DATE(date_time)",   // Group by date.
+				"DATE(date_time)",   // Order by date.
+				function( $result ) {
+					return [
+						'total_count' => absint($result->total_count),
+						'vote_date'   => wp_date("Y-m-d", strtotime($result->period))
+					];
+				}
+			);
 		}
 
-		/**
-		 * Get User Role Distribution in Engagements
-		 *
-		 * @param string $interval
-		 * @return array
-		 */
-		public function get_voting_statistics_by_user_type($interval = '5 MONTH') {
+		// Method to count device types across all relevant tables in the last 6 months
+		public function count_device_types() {
+			// Check cache first
+			$device_counts = wp_cache_get('device_types', WP_ULIKE_PRO_DOMAIN);
+			if ($device_counts !== false) {
+				return $device_counts;
+			}
 
-			// Step 1: Query to get user IDs and serialized role data
-			$query = "
-				SELECT
-					u.ID AS user_id,
-					roles.meta_value AS role_data
-				FROM (
-					SELECT user_id FROM {$this->wpdb->prefix}{$this->tables['posts']} WHERE date_time >= NOW() - INTERVAL {$interval}
-					UNION ALL
-					SELECT user_id FROM {$this->wpdb->prefix}{$this->tables['activities']} WHERE date_time >= NOW() - INTERVAL {$interval}
-					UNION ALL
-					SELECT user_id FROM {$this->wpdb->prefix}{$this->tables['comments']} WHERE date_time >= NOW() - INTERVAL {$interval}
-					UNION ALL
-					SELECT user_id FROM {$this->wpdb->prefix}{$this->tables['topics']} WHERE date_time >= NOW() - INTERVAL {$interval}
-				) AS combined
-				LEFT JOIN {$this->wpdb->users} u ON combined.user_id = u.ID
-				LEFT JOIN {$this->wpdb->usermeta} roles ON u.ID = roles.user_id AND roles.meta_key = '{$this->wpdb->prefix}capabilities'
-				GROUP BY u.ID;
-			";
+			// Get the date 6 months ago
+			$six_months_ago = date('Y-m-d H:i:s', strtotime('-6 months'));
 
-			// Execute the query and get results
-			$results = $this->wpdb->get_results($query);
+			// Tables to query
+			$tables = [
+				"{$this->wpdb->prefix}ulike",
+				"{$this->wpdb->prefix}ulike_comments",
+				"{$this->wpdb->prefix}ulike_activities",
+				"{$this->wpdb->prefix}ulike_forums"
+			];
 
-			// Process the results to count users by their main role
-			$role_counts = array();
+			// Initialize result array
+			$device_counts = [];
 
-			$editable_roles = wp_roles()->roles;
+			// Query each table
+			foreach ($tables as $table) {
+				$query = $this->wpdb->prepare(
+					"SELECT device, COUNT(DISTINCT user_id) AS count FROM $table WHERE date_time > %s AND device IS NOT NULL GROUP BY device",
+					$six_months_ago
+				);
 
-			$guest = esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN);
+				$results = $this->wpdb->get_results($query, ARRAY_A);
 
-			foreach ($results as $result) {
-				$roles = maybe_unserialize($result->role_data);
+				foreach ($results as $row) {
+					$device = $row['device'];
+					$count = (int) $row['count'];
 
-				if (is_array($roles)) {
-					// Get the main role (first role found)
-					$main_role = key($roles);
-
-					if( isset( $editable_roles[$main_role] ) ){
-						$main_role = translate_user_role( $editable_roles[$main_role]['name'] );
+					if (isset($device_counts[$device])) {
+						$device_counts[$device] += $count;
+					} else {
+						$device_counts[$device] = $count;
 					}
-
-					// Count the role occurrences
-					if (!isset($role_counts[$main_role])) {
-						$role_counts[$main_role] = 0;
-					}
-					$role_counts[$main_role]++;
-				} else {
-					// Handle users without roles
-					if (!isset($role_counts[$guest])) {
-						$role_counts[$guest] = 0;
-					}
-					$role_counts[$guest]++;
 				}
 			}
 
-			// Convert the counts array to a more user-friendly format if needed
-			$formatted_results = array();
-			foreach ($role_counts as $role => $count) {
-				$formatted_results[] = (object) array('user_role' => translate_user_role( $role ), 'unique_user_count' => $count);
+			wp_cache_set('device_types', $device_counts, WP_ULIKE_PRO_DOMAIN, 10);
+
+			return $device_counts;
+		}
+
+		public function count_country_codes( $dateRange = [], $selected_status = [] ) {
+			// Set the date range if provided
+			if (!empty($dateRange)) {
+				$this->setDateRange($dateRange);
 			}
 
-			return $formatted_results;
+			// Generate a unique cache key based on the date range
+			$cache_key = 'country_counts_' . md5(json_encode($this->dateRange));
+			$country_counts = wp_cache_get($cache_key, WP_ULIKE_PRO_DOMAIN);
+			if (false !== $country_counts) {
+				return json_decode($country_counts, true);
+			}
+
+			// Initialize result array
+			$country_counts = [];
+
+			// Loop through each table and fetch country codes
+			foreach ($this->tables as $content_type => $table_name) {
+				$table = "{$this->wpdb->prefix}{$table_name}";
+				$date_condition = $this->getMySqlDateRange($table);
+
+				// Prepare query based on the selected status
+				$status_condition = '';
+				if (!empty($selected_status)) {
+					// Map selected statuses to prepared query format
+					$selectedStatus = array_map(function($status) {
+						return $this->wpdb->prepare('%s', $status);
+					}, $selected_status);
+
+					// Add status filter to the query
+					$status_condition = "AND `status` IN (" . implode(',', $selectedStatus) . ")";
+				}
+
+				// Prepare the query with the additional status condition if applicable
+				$query = "
+					SELECT country_code, COUNT(DISTINCT user_id) AS count
+				";
+
+				// Add status to the query if statuses are provided
+				if (!empty($selected_status)) {
+					$query .= ", `status`";
+				}
+
+				$query .= "
+					FROM `$table`
+					WHERE $date_condition
+					AND country_code IS NOT NULL
+					AND country_code != ''
+					$status_condition
+					GROUP BY country_code";
+
+				// Add status to GROUP BY if statuses are provided
+				if (!empty($selected_status)) {
+					$query .= ", `status`";
+				}
+
+				// Fetch results
+				$results = $this->wpdb->get_results($query, ARRAY_A);
+
+				// Sum up the counts across all content types
+				foreach ($results as $row) {
+					$country_code = $row['country_code'];
+					$count = (int) $row['count'];
+
+					if (empty($selected_status)) {
+						// If no selected status, group by total
+						if (!isset($country_counts[$country_code])) {
+							$country_counts[$country_code] = [];
+						}
+						if (isset($country_counts[$country_code]['total'])) {
+							$country_counts[$country_code]['total'] += $count;
+						} else {
+							$country_counts[$country_code]['total'] = $count;
+						}
+					} else {
+						// If selected statuses exist, group by both country_code and status
+						$status = $row['status'];
+						if (!isset($country_counts[$country_code])) {
+							$country_counts[$country_code] = [];
+						}
+						if (isset($country_counts[$country_code][$status])) {
+							$country_counts[$country_code][$status] += $count;
+						} else {
+							$country_counts[$country_code][$status] = $count;
+						}
+					}
+				}
+			}
+
+			// Cache the result for 12 hours
+			wp_cache_set($cache_key, json_encode($country_counts), WP_ULIKE_PRO_DOMAIN, 10);
+
+			return $country_counts;
+		}
+
+
+		/**
+		 * Get translated role name
+		 *
+		 * @param string $role
+		 * @return string
+		 */
+		public function get_i18n_role_name( $role ){
+			$editable_roles = wp_roles()->roles;
+
+			if( isset( $editable_roles[$role] ) ){
+				return translate_user_role( $editable_roles[$role]['name'] );
+			}
+
+			return $role;
 		}
 
 

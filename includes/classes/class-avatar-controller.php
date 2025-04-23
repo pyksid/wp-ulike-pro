@@ -28,7 +28,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 		$this->data['configs']  = [
 			'limit'       => 1,
 			'fileMaxSize' => $configurations['maxSize'],
-			'extensions'  => ['image/*'],
+			'extensions'  => ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
 			'title'       => 'auto',
 			'uploadDir'   => WP_ULIKE_CUSTOM_DIR . '/avatars/',
 			'replace'     => false,

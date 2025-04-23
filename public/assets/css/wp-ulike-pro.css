@@ -3983,7 +3983,7 @@ html.with-ulpmodal {
   background-color: #2ca5e0; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-flat .ulp-share-twitter, .ulp-social-buttons-color-official.ulp-social-skin-gradient .ulp-share-twitter {
-  background-color: #1da1f2; }
+  background-color: #000000; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-flat .ulp-share-vimeo, .ulp-social-buttons-color-official.ulp-social-skin-gradient .ulp-share-vimeo {
   background-color: #1ab7ea; }
@@ -4132,9 +4132,9 @@ html.with-ulpmodal {
     background-color: #2ca5e0; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-boxed .ulp-share-twitter {
-  color: #1da1f2; }
+  color: #000000; }
   .ulp-social-buttons-color-official.ulp-social-skin-boxed .ulp-share-twitter .ulp-share-btn-icon {
-    background-color: #1da1f2; }
+    background-color: #000000; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-boxed .ulp-share-vimeo {
   color: #1ab7ea; }
@@ -4266,7 +4266,7 @@ html.with-ulpmodal {
   color: #2ca5e0; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-framed .ulp-share-twitter {
-  color: #1da1f2; }
+  color: #000000; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-framed .ulp-share-vimeo {
   color: #1ab7ea; }
@@ -4415,9 +4415,9 @@ html.with-ulpmodal {
     background-color: #2ca5e0; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-minimal .ulp-share-twitter {
-  color: #1da1f2; }
+  color: #000000; }
   .ulp-social-buttons-color-official.ulp-social-skin-minimal .ulp-share-twitter .ulp-share-btn-icon {
-    background-color: #1da1f2; }
+    background-color: #000000; }
 
 .ulp-social-buttons-color-official.ulp-social-skin-minimal .ulp-share-vimeo {
   color: #1ab7ea; }

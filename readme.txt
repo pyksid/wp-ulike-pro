@@ -4,14 +4,14 @@ Author: TechnoWich
 Tags: like, marketing, elementor, favorite, statistics
 Requires PHP: 7.2.5
 Requires at least: 6.0
-Tested up to: 6.6.1
-Stable tag: 1.8.7
+Tested up to: 6.7
+Stable tag: 1.9.3
 
 Boost user engagement and SEO with WP ULike Pro. Easily add "like" and "favorite" buttons and gain insights with advanced analytics—no coding needed.
 
 == Description ==
 
-WP ULike PRO is a cutting-edge web marketing toolkit that supercharges your site's engagement and analytics capabilities. Instantly elevate your on-page SEO, identify your top-performing content, and gain valuable insights through user votes. With no coding required, it’s easy to integrate and use, making it perfect for boosting interaction and optimizing your site's performance.
+WP ULike PRO boosts engagement with voting, user profiles, schema, and analytics—optimizing your site's performance effortlessly.
 
 == Installation ==
 
@@ -25,6 +25,39 @@ WP ULike PRO is a cutting-edge web marketing toolkit that supercharges your site
 Documentation : [wpulike.com](https://docs.wpulike.com)
 
 == Changelog ==
+
+= 1.9.3 =
+* Improvement: Enhanced UI on the stats panel for a better experience, now fully mobile-friendly.
+* Improvement: Optimized code for improved performance in the stats panel.
+* Fix: Resolved minor bugs.
+
+= 1.9.2 =
+* New: Display user country data on a world map with top engagement percentages.
+* New: Replace the user role engagement chart with a device type chart.
+* Improvement: Enhanced stats panel UI with grouped engagement summaries.
+* Improvement: Refined RTL support and fixed missing translations.
+* Improvement: Optimized stats panel API queries for better performance.
+* Fix: Minor bug fixes.
+
+= 1.9.1 =
+* Improvement: Enhanced license checker system for better validation and stability.
+* Improvement: Redesined Stats Panel UI with a modern layout and improved data visualization.
+* Fix: Various bugs and performance issues.
+
+= 1.9.0 =
+* Improvement: Enhanced responsiveness of the stats panel and optimized API performance.
+* Fix: Resolved several minor issues for better stability and user experience.
+
+= 1.8.9 =
+* Improvement: Enhanced WPML compatibility to better handle multilingual setups.
+* Improvement: Addressed various UI experience issues to create a more intuitive and user-friendly interface.
+* Fix: Addressed several minor bugs to improve overall stability.
+
+= 1.8.8 =
+* New: Added detailed top items in the stats panel, showcasing engagement rate, likers list, and more comprehensive insights.
+* Improvement: Enhanced stats panel performance for faster loading and smoother interaction.
+* Security: Implemented nonce validation in the stats panel for strengthened protection.
+* Fix: Addressed various minor bugs for a more stable experience.
 
 = 1.8.7 =
 * New: Added email verification support for newly registered users.

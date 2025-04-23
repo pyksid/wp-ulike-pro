@@ -3,7 +3,7 @@
  * License template
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -67,20 +67,7 @@
 
 			<input type="submit" class="button" value="<?php esc_attr_e( 'Deactivate', WP_ULIKE_PRO_DOMAIN ); ?>"/>
 
-			<p>
-				<?php esc_html_e( 'Status', WP_ULIKE_PRO_DOMAIN ); ?>:
-				<?php if ( WP_Ulike_Pro_API::STATUS_EXPIRED === $license_data['license'] ) : ?>
-					<span style="color: #ff0000; font-style: italic;"><?php esc_html_e( 'Expired', WP_ULIKE_PRO_DOMAIN ); ?></span>
-				<?php elseif ( WP_Ulike_Pro_API::STATUS_SITE_INACTIVE === $license_data['license'] ) : ?>
-					<span style="color: #ff0000; font-style: italic;"><?php esc_html_e( 'Mismatch', WP_ULIKE_PRO_DOMAIN ); ?></span>
-				<?php elseif ( WP_Ulike_Pro_API::STATUS_INVALID === $license_data['license'] ) : ?>
-					<span style="color: #ff0000; font-style: italic;"><?php esc_html_e( 'Invalid', WP_ULIKE_PRO_DOMAIN ); ?></span>
-				<?php elseif ( WP_Ulike_Pro_API::STATUS_DISABLED === $license_data['license'] ) : ?>
-					<span style="color: #ff0000; font-style: italic;"><?php esc_html_e( 'Disabled', WP_ULIKE_PRO_DOMAIN ); ?></span>
-				<?php else : ?>
-					<span style="color: #008000; font-style: italic;"><?php esc_html_e( 'Active', WP_ULIKE_PRO_DOMAIN ); ?></span>
-				<?php endif; ?>
-			</p>
+			<p><?php WP_Ulike_Pro_License::render_part_license_status_header( $license_data ); ?></p>
 
 			<?php if ( WP_Ulike_Pro_API::STATUS_EXPIRED === $license_data['license'] ) : ?>
 			<p class="wp-ulike-pro-admin-alert wp-ulike-pro-alert-danger"><?php printf( __( '<strong>Your License Has Expired.</strong> <a href="%s" target="_blank">Renew your license today</a> to keep getting feature updates, premium support and unlimited access to the template library.', WP_ULIKE_PRO_DOMAIN ), 'https://wpulike.com/pricing/?utm_source=license-page&utm_campaign=renewal&utm_medium=wp-dash' ); ?></p>

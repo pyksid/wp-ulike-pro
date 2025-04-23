@@ -59,6 +59,7 @@ class WP_Ulike_Pro_License {
 
 		delete_option( 'wp_ulike_pro_license_key' );
 		delete_transient( 'wp_ulike_pro_license_data' );
+		delete_transient( 'wp_ulike_pro_license_data_fallback' );
 	}
 
 	public static function get_hidden_license_key() {
@@ -92,9 +93,6 @@ class WP_Ulike_Pro_License {
 				'back_link' => true,
 			] );
 		}
-
-
-		WP_Ulike_Pro_API::get_version( true );
 
 		$data = WP_Ulike_Pro_API::activate_license( $license_key );
 
@@ -136,6 +134,31 @@ class WP_Ulike_Pro_License {
 		return admin_url( 'admin.php?page=' . self::PAGE_ID );
 	}
 
+	public static function render_part_license_status_header( $license_data ) {
+		$license_errors = [
+			WP_Ulike_Pro_API::STATUS_EXPIRED        => esc_html__( 'Expired',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE  => esc_html__( 'Mismatch',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_INVALID        => esc_html__( 'Invalid',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_DISABLED       => esc_html__( 'Cancelled',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_HTTP_ERROR     => esc_html__( 'HTTP Error',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_MISSING        => esc_html__( 'Missing',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_REQUEST_LOCKED => esc_html__( 'Request Locked',WP_ULIKE_PRO_DOMAIN ),
+		];
+
+		echo esc_html__( 'Status',WP_ULIKE_PRO_DOMAIN ); ?>:
+		<?php if ( $license_data['license'] === WP_Ulike_Pro_API::STATUS_VALID ) : ?>
+			<span style="color: #008000; font-style: italic;"><?php echo esc_html__( 'Active',WP_ULIKE_PRO_DOMAIN ); ?></span>
+		<?php else : ?>
+			<span style="color: #ff0000; font-style: italic;">
+				<?php
+				echo isset( $license_data['license'], $license_errors[ $license_data['license'] ] )
+					? esc_html( $license_errors[ $license_data['license'] ] )
+					: esc_html__( 'Unknown',WP_ULIKE_PRO_DOMAIN ) . ' (' . esc_html( $license_data['license'] ) . ')';
+				?>
+			</span>
+		<?php endif;
+	}
+
 	private function is_block_editor_page() {
 		$current_screen = get_current_screen();
 
@@ -151,6 +174,14 @@ class WP_Ulike_Pro_License {
 	}
 
 	public function admin_license_details() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( $this->is_block_editor_page() ) {
+			return;
+		}
+
 		$license_key = self::get_license_key();
 
 		if ( empty( $license_key ) ) {
@@ -181,7 +212,6 @@ class WP_Ulike_Pro_License {
 		}
 
 		$errors = self::get_errors_details();
-		// $license_data['license'] = WP_Ulike_Pro_API::STATUS_SITE_INACTIVE;
 
 		if ( isset( $errors[ $license_data['license'] ] ) ) {
 			$error_data  = $errors[ $license_data['license'] ];
@@ -212,49 +242,46 @@ class WP_Ulike_Pro_License {
 			return;
 		}
 
-		if ( WP_Ulike_Pro_API::is_license_active() ) {
-			if ( WP_Ulike_Pro_API::is_license_about_to_expire() ) {
+		if ( WP_Ulike_Pro_API::is_license_active() && WP_Ulike_Pro_API::is_license_about_to_expire() ) {
+			$renew_url = add_query_arg( array(
+				'edd_license_key' => $license_key,
+				'download_id'     => WP_Ulike_Pro_API::PRODUCT_ID
+			), WP_Ulike_Pro_API::RENEW_URL );
 
-				$renew_url = add_query_arg( array(
-					'edd_license_key' => $license_key,
-					'download_id'     => WP_Ulike_Pro_API::PRODUCT_ID
-				), WP_Ulike_Pro_API::RENEW_URL );
+			$title       = sprintf( esc_html__( 'Your License Will Expire in %s.', WP_ULIKE_PRO_DOMAIN ), human_time_diff( current_time( 'timestamp' ), strtotime( $license_data['expires'] ) ) );
+			$description = esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get updates, support, Pro templates for another year.', WP_ULIKE_PRO_DOMAIN );
 
-				$title       = sprintf( esc_html__( 'Your License Will Expire in %s.', WP_ULIKE_PRO_DOMAIN ), human_time_diff( current_time( 'timestamp' ), strtotime( $license_data['expires'] ) ) );
-				$description = esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get updates, support, Pro templates for another year.', WP_ULIKE_PRO_DOMAIN );
-
-				if ( isset( $license_data['renewal_discount'] ) && 0 < $license_data['renewal_discount'] ) {
-					$description = sprintf(
-						/* translators: %s: Renewal discount. */
-						esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get an exclusive, time-limited %s discount.', WP_ULIKE_PRO_DOMAIN ),
-						$license_data['renewal_discount'] . '&#37;'
-					);
-				}
-
-				echo wp_ulike_get_notice_render([
-					'id'          => 'wp_ulike_license_renewal',
-					'title'       => $title,
-					'description' => $description,
-					'has_close'   => false,
-					'buttons'     => array(
-						array(
-							'label'      => esc_html__( 'Renew License', WP_ULIKE_PRO_DOMAIN ),
-							'link'       => $renew_url,
-							'target'     => '_self'
-						),
-						array(
-							'label'      => esc_html__('Remind Me Later', WP_ULIKE_PRO_DOMAIN),
-							'type'       => 'skip',
-							'color_name' => 'info',
-							'expiration' => DAY_IN_SECONDS * 3
-						)
-					),
-					'image'     => [
-						'width' => '100',
-						'src'   => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/svg/admin/banner-license-renewal.svg'
-					]
-				]);
+			if ( isset( $license_data['renewal_discount'] ) && 0 < $license_data['renewal_discount'] ) {
+				$description = sprintf(
+					/* translators: %s: Renewal discount. */
+					esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get an exclusive, time-limited %s discount.', WP_ULIKE_PRO_DOMAIN ),
+					$license_data['renewal_discount'] . '&#37;'
+				);
 			}
+
+			echo wp_ulike_get_notice_render([
+				'id'          => 'wp_ulike_license_renewal',
+				'title'       => $title,
+				'description' => $description,
+				'has_close'   => false,
+				'buttons'     => array(
+					array(
+						'label'      => esc_html__( 'Renew License', WP_ULIKE_PRO_DOMAIN ),
+						'link'       => $renew_url,
+						'target'     => '_self'
+					),
+					array(
+						'label'      => esc_html__('Remind Me Later', WP_ULIKE_PRO_DOMAIN),
+						'type'       => 'skip',
+						'color_name' => 'info',
+						'expiration' => DAY_IN_SECONDS * 3
+					)
+				),
+				'image'     => [
+					'width' => '100',
+					'src'   => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/svg/admin/banner-license-renewal.svg'
+				]
+			]);
 		}
 	}
 

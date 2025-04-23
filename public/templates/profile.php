@@ -198,7 +198,7 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
 
                         $tab_type = 'nav_internal';
                         $tab_slug = esc_attr( strtolower( preg_replace( '/\s+/', '-', $tab_args['title'] ) ) );
-                        $tab_link = $profile_url . $tab_slug;
+                        $tab_link = WP_Ulike_Pro_Permalinks::localize_url( $profile_url, $tab_slug, 'wp_ulike_profile_tab' );
                         if( ! empty( $tab_args['has_link']['url'] ) ){
                             $tab_link = esc_url( $tab_args['has_link']['url'] );
                             $tab_type = 'nav_external';

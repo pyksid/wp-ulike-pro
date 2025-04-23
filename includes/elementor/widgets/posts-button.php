@@ -51,7 +51,7 @@ class PostsButton extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__('Like Button', WP_ULIKE_PRO_NAME );
+        return esc_html__('Like Button', WP_ULIKE_PRO_DOMAIN );
     }
 
     /**
@@ -99,14 +99,14 @@ class PostsButton extends Widget_Base {
         $this->start_controls_section(
             'general',
             array(
-                'label'      => esc_html__('General', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__('General', WP_ULIKE_PRO_DOMAIN ),
             )
         );
 
         $this->add_control(
             'style',
             array(
-                'label'       => esc_html__('Template', WP_ULIKE_PRO_NAME),
+                'label'       => esc_html__('Template', WP_ULIKE_PRO_DOMAIN),
                 'type'        => Controls_Manager::SELECT,
                 'default'     => 'wpulike-default',
                 'options'     => wp_ulike_pro_get_templates_list_by_name()
@@ -116,7 +116,7 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'like_icon',
             array(
-                'label'        => esc_html__('Like Icon', WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Like Icon', WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::ICONS,
                 'condition'    => array(
                     'style' => array( 'wpulike-default', 'wpulike-heart', 'wp-ulike-pro-default' ),
@@ -127,7 +127,7 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'dislike_icon',
             array(
-                'label'        => esc_html__('Dislike Icon', WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Dislike Icon', WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::ICONS,
                 'condition'    => array(
                     'style' => array( 'wp-ulike-pro-default' ),
@@ -138,10 +138,10 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'custom_id',
             array(
-                'label'        => esc_html__('Enable Custom ID',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Enable Custom ID',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'no'
             )
@@ -150,8 +150,8 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'item_id',
             array(
-                'label'       => esc_html__('Enter a Post ID',WP_ULIKE_PRO_NAME ),
-                'description' => esc_html__('You can set a custom id instead of our automattic get id function to make multiple buttons in a page.',WP_ULIKE_PRO_NAME ),
+                'label'       => esc_html__('Enter a Post ID',WP_ULIKE_PRO_DOMAIN ),
+                'description' => esc_html__('You can set a custom id instead of our automattic get id function to make multiple buttons in a page.',WP_ULIKE_PRO_DOMAIN ),
                 'type'        => Controls_Manager::NUMBER,
                 'default'     => '',
                 'step'        => 1,
@@ -164,11 +164,11 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'enable_dynamic_id',
             array(
-                'label'        => esc_html__('Enable Custom Dynamic ID',WP_ULIKE_PRO_NAME ),
-                'description'  => esc_html__('By activating this option, the IDs of the buttons are created dynamically according to the Item ID set.',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Enable Custom Dynamic ID',WP_ULIKE_PRO_DOMAIN ),
+                'description'  => esc_html__('By activating this option, the IDs of the buttons are created dynamically according to the Item ID set.',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'no',
                 'condition'    => array(
@@ -181,10 +181,10 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'display_counter',
             array(
-                'label'        => esc_html__('Display Counter',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display Counter',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'yes'
             )
@@ -193,10 +193,10 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'display_likers',
             array(
-                'label'        => esc_html__('Display Likers Box',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display Likers Box',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'no'
             )
@@ -205,12 +205,12 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'likers_style',
             array(
-                'label'   => esc_html__( 'Likers Display', WP_ULIKE_PRO_NAME ),
+                'label'   => esc_html__( 'Likers Display', WP_ULIKE_PRO_DOMAIN ),
                 'type'    => Controls_Manager::SELECT,
                 'options' => array(
-					'default' => esc_html__( 'Default', WP_ULIKE_PRO_NAME ),
-					'popover' => esc_html__( 'Popover', WP_ULIKE_PRO_NAME ),
-					'pile'    => esc_html__( 'Pile Modal', WP_ULIKE_PRO_NAME )
+					'default' => esc_html__( 'Default', WP_ULIKE_PRO_DOMAIN ),
+					'popover' => esc_html__( 'Popover', WP_ULIKE_PRO_DOMAIN ),
+					'pile'    => esc_html__( 'Pile Modal', WP_ULIKE_PRO_DOMAIN )
                 ),
                 'default'   => 'popover',
                 'condition' => array(
@@ -225,7 +225,7 @@ class PostsButton extends Widget_Base {
         $this->start_controls_section(
 			'section_style_icon',
 			[
-				'label'      => esc_html__( 'Icon', WP_ULIKE_PRO_NAME ),
+				'label'      => esc_html__( 'Icon', WP_ULIKE_PRO_DOMAIN ),
 				'tab'        => Controls_Manager::TAB_STYLE,
 				'conditions' => array(
                     'relation' => 'or',
@@ -250,14 +250,14 @@ class PostsButton extends Widget_Base {
 		$this->start_controls_tab(
 			'icon_colors_normal',
 			[
-				'label' => esc_html__( 'Not Liked', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Not Liked', WP_ULIKE_PRO_DOMAIN ),
 			]
 		);
 
 		$this->add_control(
 			'primary_color',
 			[
-				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
@@ -277,14 +277,14 @@ class PostsButton extends Widget_Base {
 		$this->start_controls_tab(
 			'icon_colors_hover',
 			[
-				'label' => esc_html__( 'Liked', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Liked', WP_ULIKE_PRO_DOMAIN ),
 			]
 		);
 
 		$this->add_control(
 			'active_primary_color',
 			[
-				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
@@ -302,7 +302,7 @@ class PostsButton extends Widget_Base {
 		$this->add_control(
 			'hover_animation',
 			[
-				'label' => esc_html__( 'Hover Animation', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Hover Animation', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::HOVER_ANIMATION,
 			]
 		);
@@ -314,7 +314,7 @@ class PostsButton extends Widget_Base {
 		$this->add_responsive_control(
 			'size',
 			[
-				'label' => esc_html__( 'Size', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Size', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
@@ -331,7 +331,7 @@ class PostsButton extends Widget_Base {
 		$this->add_responsive_control(
 			'rotate',
 			[
-				'label' => esc_html__( 'Rotate', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Rotate', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'deg' ],
 				'default' => [
@@ -355,7 +355,7 @@ class PostsButton extends Widget_Base {
         $this->start_controls_section(
 			'section_style_counter',
 			[
-				'label'      => esc_html__( 'Counter', WP_ULIKE_PRO_NAME ),
+				'label'      => esc_html__( 'Counter', WP_ULIKE_PRO_DOMAIN ),
 				'tab'        => Controls_Manager::TAB_STYLE,
 				'condition' => array(
                     'display_counter' => 'yes'
@@ -375,7 +375,7 @@ class PostsButton extends Widget_Base {
         $this->add_responsive_control(
             'counter_padding',
             array(
-                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(
@@ -389,7 +389,7 @@ class PostsButton extends Widget_Base {
         $this->start_controls_section(
 			'section_style_button',
 			[
-				'label'      => esc_html__( 'Button', WP_ULIKE_PRO_NAME ),
+				'label'      => esc_html__( 'Button', WP_ULIKE_PRO_DOMAIN ),
 				'tab'        => Controls_Manager::TAB_STYLE,
 			]
         );
@@ -405,7 +405,7 @@ class PostsButton extends Widget_Base {
         $this->add_responsive_control(
             'button_padding',
             array(
-                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(
@@ -417,7 +417,7 @@ class PostsButton extends Widget_Base {
         $this->add_responsive_control(
             'button_margin',
             array(
-                'label'      => esc_html__( 'Margin', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Margin', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(
@@ -429,7 +429,7 @@ class PostsButton extends Widget_Base {
 		$this->add_control(
 			'border_radius',
 			[
-				'label' => esc_html__( 'Border Radius', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Border Radius', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
@@ -441,7 +441,7 @@ class PostsButton extends Widget_Base {
         $this->add_responsive_control(
 			'icon_width',
 			[
-				'label' => esc_html__( 'Icon Width', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Icon Width', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px', 'em' ],
 				'selectors' => [
@@ -452,7 +452,7 @@ class PostsButton extends Widget_Base {
         $this->add_responsive_control(
 			'icon_height',
 			[
-				'label' => esc_html__( 'Icon Height', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Icon Height', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px', 'em' ],
 				'selectors' => [

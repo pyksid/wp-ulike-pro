@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -250,15 +250,6 @@ class WP_Ulike_Pro_Options_Panel {
             'id'       => 'statistics_display_roles',
             'type'     => 'select',
             'title'    => esc_html__( 'Display Stats Menu Capability', WP_ULIKE_PRO_DOMAIN),
-            'desc'     => esc_html__( 'Manage users\' access level to view this page',WP_ULIKE_PRO_DOMAIN ),
-            'chosen'   => true,
-            'multiple' => true,
-            'options'  => $user_roles_list
-        );
-        $options[] = array(
-            'id'       => 'logs_display_roles',
-            'type'     => 'select',
-            'title'    => esc_html__('Display Logs Menu Capability',WP_ULIKE_PRO_DOMAIN),
             'desc'     => esc_html__( 'Manage users\' access level to view this page',WP_ULIKE_PRO_DOMAIN ),
             'chosen'   => true,
             'multiple' => true,
@@ -1344,13 +1335,16 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'       => 'network',
                         'type'     => 'select',
                         'title'    => esc_html__( 'Network', WP_ULIKE_PRO_DOMAIN),
+                        'settings'   => array(
+                            'width' => '50%'
+                        ),
                         'chosen'   => true,
                         'multiple' => false,
                         'options'  => array(
                             'Facebook'  => esc_html__( 'Facebook', WP_ULIKE_PRO_DOMAIN),
                             'GitHub'    => esc_html__( 'GitHub', WP_ULIKE_PRO_DOMAIN),
                             'Google'    => esc_html__( 'Google', WP_ULIKE_PRO_DOMAIN),
-                            'Twitter'   => esc_html__( 'Twitter', WP_ULIKE_PRO_DOMAIN),
+                            'Twitter'   => esc_html__( 'X', WP_ULIKE_PRO_DOMAIN),
                             'Amazon'    => esc_html__( 'Amazon', WP_ULIKE_PRO_DOMAIN),
                             'LinkedIn'  => esc_html__( 'LinkedIn', WP_ULIKE_PRO_DOMAIN),
                             'Apple'     => esc_html__( 'Apple', WP_ULIKE_PRO_DOMAIN),
@@ -2632,11 +2626,14 @@ class WP_Ulike_Pro_Options_Panel {
                                 'type'     => 'select',
                                 'title'    => esc_html__( 'Network', WP_ULIKE_PRO_DOMAIN),
                                 'chosen'   => true,
+                                'settings'   => array(
+                                    'width' => '50%'
+                                ),
                                 'multiple' => false,
                                 'options'  => array(
                                     'facebook'      => esc_html__( 'facebook', WP_ULIKE_PRO_DOMAIN),
                                     'linkedin'      => esc_html__( 'linkedin', WP_ULIKE_PRO_DOMAIN),
-                                    'twitter'       => esc_html__( 'twitter', WP_ULIKE_PRO_DOMAIN),
+                                    'twitter'       => esc_html__( 'x', WP_ULIKE_PRO_DOMAIN),
                                     'vkontakte'     => esc_html__( 'vkontakte', WP_ULIKE_PRO_DOMAIN),
                                     'odnoklassniki' => esc_html__( 'odnoklassniki', WP_ULIKE_PRO_DOMAIN),
                                     'tumblr'        => esc_html__( 'tumblr', WP_ULIKE_PRO_DOMAIN),

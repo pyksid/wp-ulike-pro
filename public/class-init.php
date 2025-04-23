@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -108,6 +108,11 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
       // Check database upgrade if needed
       if ( version_compare( $current_version, '1.0.1', '<' ) ) {
         WP_Ulike_Pro_Activator::activate();
+      }
+
+      // Check database upgrade if needed
+      if ( version_compare( $current_version, '1.0.2', '<' ) ) {
+        WP_Ulike_Pro_Activator::upgrade_0();
       }
     }
 
@@ -245,28 +250,18 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
      * @since    3.1
      */
     public function load_plugin_textdomain() {
-			// Set filter for language directory
-			$lang_dir = WP_ULIKE_PRO_DIR . 'languages/';
-			$lang_dir = apply_filters( 'wp_ulike_pro_languages_directory', $lang_dir );
+      // Set filter for language directory
+      $lang_dir = WP_ULIKE_PRO_DOMAIN . '/languages';
+      $lang_dir = apply_filters( 'wp_ulike_pro_languages_directory', $lang_dir );
 
-			// Traditional WordPress plugin locale filter
-			$locale = apply_filters( 'plugin_locale', get_locale(), WP_ULIKE_PRO_DOMAIN );
-			$mofile = sprintf( '%1$s-%2$s.mo', WP_ULIKE_PRO_DOMAIN, $locale );
+      $locale   = determine_locale();
+      /**
+       * Filter to adjust the wp ulike pro locale to use for translations.
+       */
+      $locale = apply_filters( 'plugin_locale', $locale, WP_ULIKE_PRO_DOMAIN );
 
-			// Setup paths to current locale file
-			$mofile_local   = $lang_dir . $mofile;
-			$mofile_global  = WP_LANG_DIR . '/plugins/' . WP_ULIKE_PRO_DOMAIN . '/' . $mofile;
-
-			if( file_exists( $mofile_global ) ) {
-				// Look in global /wp-content/languages/plugins/wp-ulike/ folder
-				load_textdomain( WP_ULIKE_PRO_DOMAIN, $mofile_global );
-			} elseif( file_exists( $mofile_local ) ) {
-				// Look in local /wp-content/plugins/wp-ulike/languages/ folder
-				load_textdomain( WP_ULIKE_PRO_DOMAIN, $mofile_local );
-			} else {
-				// Load the default language files
-				load_plugin_textdomain( WP_ULIKE_PRO_DOMAIN, false, $lang_dir );
-			}
+      load_textdomain( WP_ULIKE_PRO_DOMAIN, WP_LANG_DIR . '/' . WP_ULIKE_PRO_DOMAIN . '/' . WP_ULIKE_PRO_DOMAIN . '-' . $locale . '.mo' );
+      load_plugin_textdomain( WP_ULIKE_PRO_DOMAIN, false, $lang_dir );
     }
 
     /**

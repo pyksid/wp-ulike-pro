@@ -14,12 +14,15 @@ class WP_Ulike_Pro_API {
 	const PRICING_URL  = 'https://wpulike.com/pricing/';
 
 	// License Statuses
-	const STATUS_VALID         = 'valid';
-	const STATUS_INVALID       = 'invalid';
-	const STATUS_EXPIRED       = 'expired';
-	const STATUS_DEACTIVATED   = 'deactivated';
-	const STATUS_SITE_INACTIVE = 'site_inactive';
-	const STATUS_DISABLED      = 'disabled';
+	const STATUS_VALID          = 'valid';
+	const STATUS_INVALID        = 'invalid';
+	const STATUS_EXPIRED        = 'expired';
+	const STATUS_DEACTIVATED    = 'deactivated';
+	const STATUS_SITE_INACTIVE  = 'site_inactive';
+	const STATUS_DISABLED       = 'disabled';
+	const STATUS_HTTP_ERROR     = 'http_error';
+	const STATUS_MISSING        = 'missing';
+	const STATUS_REQUEST_LOCKED = 'request_locked';
 
 	protected static $transient_data = [];
 
@@ -44,7 +47,11 @@ class WP_Ulike_Pro_API {
 
 		// set site url
 		$site_url = $use_home_url ? home_url() : get_site_url();
-		if( is_multisite() ){
+
+		// Check if multisite logic should be applied
+		$apply_multisite_logic = apply_filters('wp_ulike_pro_api_apply_multisite_logic', true);
+
+		if ($apply_multisite_logic && is_multisite()) {
 			$site_url = $use_home_url ? network_home_url() : network_site_url();
 		}
 
@@ -59,7 +66,7 @@ class WP_Ulike_Pro_API {
 			]
 		);
 
- 		$response = wp_remote_post( self::BASE_API_URL, [
+		$response = wp_remote_post( self::BASE_API_URL, [
 			'timeout' => 40,
 			'body'    => $body_args
 		] );
@@ -69,8 +76,31 @@ class WP_Ulike_Pro_API {
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
 		if ( empty( $data ) || ! is_array( $data ) ) {
-			return new \WP_Error( 'no_json', esc_html__( 'An error occurred, please try again', WP_ULIKE_PRO_DOMAIN ) );
+			$debug_message = sprintf(
+				"Server IP: %s\nRemote IP: %s\nResponse Code: %s\nResponse Message: %s\nPHP Version: %s\nWordPress Version: %s\nWP ULike Version: %s\nLicense Key: %s\nIs Multisite: %s\nSite URL: %s",
+				$_SERVER['SERVER_ADDR'] ?? 'Unknown',
+				$_SERVER['REMOTE_ADDR'] ?? 'Unknown',
+				wp_remote_retrieve_response_code( $response ) ?: 'Unknown',
+				wp_remote_retrieve_response_message( $response ) ?: 'Unknown',
+				phpversion(),
+				get_bloginfo( 'version' ),
+				WP_ULIKE_PRO_VERSION ?? 'Unknown',
+				$body_args['item_license'] ?? 'Not provided',
+				is_multisite() ? 'Yes' : 'No',
+				$site_url
+			);
+
+			$debug_info = sprintf(
+				'<p><strong>An error occurred, please try again.</strong></p>
+				<p>If the problem persists, please contact our support at
+				<a href="mailto:info@wpulike.com">info@wpulike.com</a> and share the following information:</p>
+				<pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;">%s</pre>',
+				esc_html( trim( $debug_message ) )
+			);
+
+			return new \WP_Error( 'no_json', $debug_info );
 		}
 
 		return $data['data'];
@@ -126,14 +156,21 @@ class WP_Ulike_Pro_API {
 
 	public static function set_license_data( $license_data, $expiration = null ) {
 		if ( null === $expiration ) {
-			$expiration = '+12 hours';
+			$expiration = '+48 hours';
 
-			self::set_transient( 'wp_ulike_pro_license_data_fallback', $license_data, '+24 hours' );
+			self::set_transient( 'wp_ulike_pro_license_data_fallback', $license_data, '+72 hours' );
 		}
 
 		self::set_transient( 'wp_ulike_pro_license_data', $license_data, $expiration );
 	}
 
+	/**
+	 * Check if another request is in progress.
+	 *
+	 * @param string $name Request name
+	 *
+	 * @return bool
+	 */
 	public static function is_request_running( $name ) {
 		$requests_lock = get_option( 'wp_ulike_pro_api_requests_lock', [] );
 		if ( isset( $requests_lock[ $name ] ) ) {
@@ -162,6 +199,8 @@ class WP_Ulike_Pro_API {
 		$license_key = WP_Ulike_Pro_License::get_license_key();
 
 		if ( empty( $license_key ) ) {
+			$license_data_error['license'] = 'missing';
+
 			return $license_data_error;
 		}
 
@@ -177,6 +216,8 @@ class WP_Ulike_Pro_API {
 				if ( false !== $license_data ) {
 					return $license_data;
 				}
+
+				$license_data_error['license'] = 'request_locked';
 
 				return $license_data_error;
 			}

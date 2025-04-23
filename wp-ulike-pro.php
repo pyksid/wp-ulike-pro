@@ -4,18 +4,18 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  *
  * Plugin Name:       WP ULike Pro
  * Plugin URI:        https://wpulike.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
- * Description:       WP ULike PRO is a cutting-edge web marketing toolkit that supercharges your site's engagement and analytics capabilities. Instantly elevate your on-page SEO, identify your top-performing content, and gain valuable insights through user votes. With no coding required, it’s easy to integrate and use, making it perfect for boosting interaction and optimizing your site's performance.
- * Version:           1.8.7
+ * Description:       WP ULike PRO boosts engagement with voting, user profiles, schema, and analytics—optimizing your site's performance effortlessly.
+ * Version:           1.9.3
  * Author:            TechnoWich
  * Author URI:        https://technowich.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain:       wp-ulike-pro
- * Domain Path:       /languages/
- * Tested up to: 	  6.6.1
+ * Domain Path:       /languages
+ * Tested up to: 	  6.7
 */
 
 // If this file is called directly, abort.
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define path and text domain
-define( 'WP_ULIKE_PRO_VERSION'      , '1.8.7'   );
+define( 'WP_ULIKE_PRO_VERSION'      , '1.9.3'   );
 define( 'WP_ULIKE_PRO_DB_VERSION'   , '1.0.1' 	);
 define( 'WP_ULIKE_PRO__FILE__'      , __FILE__  );
 
@@ -34,7 +34,7 @@ define( 'WP_ULIKE_PRO_BASENAME'     , plugin_basename( WP_ULIKE_PRO__FILE__ ) );
 define( 'WP_ULIKE_PRO_DIR'          , plugin_dir_path( WP_ULIKE_PRO__FILE__ ) );
 define( 'WP_ULIKE_PRO_URL'          , plugin_dir_url(  WP_ULIKE_PRO__FILE__ ) );
 
-define( 'WP_ULIKE_PRO_NAME'         , esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) );
+define( 'WP_ULIKE_PRO_NAME'         , 'WP ULike Pro'					);
 
 define( 'WP_ULIKE_PRO_ADMIN_DIR'    , WP_ULIKE_PRO_DIR . '/admin' 		);
 define( 'WP_ULIKE_PRO_ADMIN_URL'    , WP_ULIKE_PRO_URL . 'admin' 		);
@@ -64,14 +64,14 @@ function wp_ulike_pro_load_plugin() {
 		return;
 	}
 
-	$version_required = '4.7.4';
+	$version_required = '4.7.9';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_required, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_fail_load_out_of_date' );
 
 		return;
 	}
 
-	$version_recommendation = '4.7.4';
+	$version_recommendation = '4.7.9';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_recommendation, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_admin_notice_upgrade_recommendation' );
 	}

@@ -50,7 +50,7 @@ class BestLikers extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__('Best Likers', WP_ULIKE_PRO_NAME );
+        return esc_html__('Best Likers', WP_ULIKE_PRO_DOMAIN );
     }
 
     /**
@@ -98,14 +98,14 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'general_section',
             array(
-                'label'      => esc_html__('General', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__('General', WP_ULIKE_PRO_DOMAIN ),
             )
         );
 
         $this->add_control(
             'number',
             array(
-                'label'       => esc_html__('Number of users', WP_ULIKE_PRO_NAME),
+                'label'       => esc_html__('Number of users', WP_ULIKE_PRO_DOMAIN),
                 'label_block' => false,
                 'type'        => Controls_Manager::NUMBER,
                 'default'     => '8',
@@ -117,16 +117,16 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'peroid_limit',
             array(
-                'label'   => esc_html__( 'Peroid Limit', WP_ULIKE_PRO_NAME ),
+                'label'   => esc_html__( 'Peroid Limit', WP_ULIKE_PRO_DOMAIN ),
                 'type'    => Controls_Manager::SELECT,
                 'options' => array(
-					'all'       => esc_html__( 'All', WP_ULIKE_PRO_NAME ),
-					'today'     => esc_html__( 'Today', WP_ULIKE_PRO_NAME ),
-					'yesterday' => esc_html__( 'Yesterday', WP_ULIKE_PRO_NAME ),
-					'week'      => esc_html__( 'Week', WP_ULIKE_PRO_NAME ),
-					'month'     => esc_html__( 'Month', WP_ULIKE_PRO_NAME ),
-					'year'      => esc_html__( 'Year', WP_ULIKE_PRO_NAME ),
-					'past_days' => esc_html__( 'Last X Days', WP_ULIKE_PRO_NAME )
+					'all'       => esc_html__( 'All', WP_ULIKE_PRO_DOMAIN ),
+					'today'     => esc_html__( 'Today', WP_ULIKE_PRO_DOMAIN ),
+					'yesterday' => esc_html__( 'Yesterday', WP_ULIKE_PRO_DOMAIN ),
+					'week'      => esc_html__( 'Week', WP_ULIKE_PRO_DOMAIN ),
+					'month'     => esc_html__( 'Month', WP_ULIKE_PRO_DOMAIN ),
+					'year'      => esc_html__( 'Year', WP_ULIKE_PRO_DOMAIN ),
+					'past_days' => esc_html__( 'Last X Days', WP_ULIKE_PRO_DOMAIN )
                 ),
                 'default'   => 'all',
             )
@@ -135,7 +135,7 @@ class BestLikers extends Widget_Base {
 		$this->add_control(
 			'past_days_num',
 			array(
-				'label' => esc_html__( 'Past Days Number', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Past Days Number', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::NUMBER,
 				'default' => 30,
                 'condition' => array(
@@ -147,10 +147,10 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_avatar',
             array(
-                'label'        => esc_html__('Display avatar',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display avatar',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'yes'
             )
@@ -159,10 +159,10 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_name',
             array(
-                'label'        => esc_html__('Display name',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display name',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'yes'
             )
@@ -171,10 +171,10 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_meta',
             array(
-                'label'        => esc_html__('Display meta',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display meta',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'yes'
             )
@@ -183,10 +183,10 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_user_profile',
             array(
-                'label'        => esc_html__('Display user profile',WP_ULIKE_PRO_NAME ),
+                'label'        => esc_html__('Display user profile',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_NAME ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_NAME ),
+                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
+                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
                 'return_value' => 'yes',
                 'default'      => 'yes'
             )
@@ -195,13 +195,13 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'profile_url',
             array(
-                'label'   => esc_html__( 'Profile URL type', WP_ULIKE_PRO_NAME ),
+                'label'   => esc_html__( 'Profile URL type', WP_ULIKE_PRO_DOMAIN ),
                 'type'    => Controls_Manager::SELECT,
                 'options' => array(
-					'default'    => esc_html__( 'Default ', WP_ULIKE_PRO_NAME ),
-					'author'     => esc_html__( 'Author Page', WP_ULIKE_PRO_NAME ),
-					'buddypress' => esc_html__( 'BuddyPress', WP_ULIKE_PRO_NAME ),
-					'um'         => esc_html__( 'Ultimate Member', WP_ULIKE_PRO_NAME )
+					'default'    => esc_html__( 'Default ', WP_ULIKE_PRO_DOMAIN ),
+					'author'     => esc_html__( 'Author Page', WP_ULIKE_PRO_DOMAIN ),
+					'buddypress' => esc_html__( 'BuddyPress', WP_ULIKE_PRO_DOMAIN ),
+					'um'         => esc_html__( 'Ultimate Member', WP_ULIKE_PRO_DOMAIN )
                 ),
                 'default'   => 'default',
                 'condition' => array(
@@ -219,27 +219,27 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'custom_text_section',
             array(
-                'label'      => esc_html__('Custom Text', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__('Custom Text', WP_ULIKE_PRO_DOMAIN ),
             )
         );
 
 		$this->add_control(
 			'not_found_text',
 			[
-				'label'       => esc_html__( 'Not Found Text', WP_ULIKE_PRO_NAME),
+				'label'       => esc_html__( 'Not Found Text', WP_ULIKE_PRO_DOMAIN),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'No user found!',
-				'placeholder' => esc_html__( 'Type your text here', WP_ULIKE_PRO_NAME ),
+				'placeholder' => esc_html__( 'Type your text here', WP_ULIKE_PRO_DOMAIN ),
 			]
         );
 
 		$this->add_control(
 			'ago_text',
 			[
-				'label'       => esc_html__( 'Ago Text', WP_ULIKE_PRO_NAME),
+				'label'       => esc_html__( 'Ago Text', WP_ULIKE_PRO_DOMAIN),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'Ago',
-				'placeholder' => esc_html__( 'Type your text here', WP_ULIKE_PRO_NAME ),
+				'placeholder' => esc_html__( 'Type your text here', WP_ULIKE_PRO_DOMAIN ),
 			]
         );
 
@@ -252,7 +252,7 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'item_style_section',
             array(
-                'label'     => esc_html__( 'Items', WP_ULIKE_PRO_NAME ),
+                'label'     => esc_html__( 'Items', WP_ULIKE_PRO_DOMAIN ),
                 'tab'       => Controls_Manager::TAB_STYLE
             )
         );
@@ -261,7 +261,7 @@ class BestLikers extends Widget_Base {
 			Group_Control_Border::get_type(),
 			[
 				'name' => 'item_border',
-				'label' => esc_html__( '', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( '', WP_ULIKE_PRO_DOMAIN ),
 				'selector' => '{{WRAPPER}} .wp-ulike-user',
 			]
         );
@@ -277,7 +277,7 @@ class BestLikers extends Widget_Base {
         $this->add_responsive_control(
             'item_padding',
             array(
-                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(
@@ -289,7 +289,7 @@ class BestLikers extends Widget_Base {
         $this->add_responsive_control(
             'item_margin',
             array(
-                'label'      => esc_html__( 'Margin', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Margin', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(
@@ -308,7 +308,7 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'avatar_style_section',
             array(
-                'label'     => esc_html__( 'Avatar', WP_ULIKE_PRO_NAME ),
+                'label'     => esc_html__( 'Avatar', WP_ULIKE_PRO_DOMAIN ),
                 'tab'       => Controls_Manager::TAB_STYLE,
                 'condition' => array(
                     'display_avatar' => 'yes'
@@ -319,7 +319,7 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'avatar_size',
             array(
-                'label' => esc_html__( 'Avatar size', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Avatar size', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::SLIDER,
                 'default' => array(
                     'size' => 128,
@@ -336,7 +336,7 @@ class BestLikers extends Widget_Base {
         $this->add_responsive_control(
             'avatar_radius',
             array(
-                'label'      => esc_html__( 'Avatar radius', WP_ULIKE_PRO_NAME ),
+                'label'      => esc_html__( 'Avatar radius', WP_ULIKE_PRO_DOMAIN ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', 'em', '%' ),
                 'selectors'  => array(
@@ -363,7 +363,7 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'title_style_section',
             array(
-                'label'     => esc_html__( 'Title', WP_ULIKE_PRO_NAME ),
+                'label'     => esc_html__( 'Title', WP_ULIKE_PRO_DOMAIN ),
                 'tab'       => Controls_Manager::TAB_STYLE,
                 'condition' => array(
                     'display_name' => 'yes'
@@ -376,14 +376,14 @@ class BestLikers extends Widget_Base {
         $this->start_controls_tab(
             'title_color_normal',
             array(
-                'label' => esc_html__( 'Normal' , WP_ULIKE_PRO_NAME )
+                'label' => esc_html__( 'Normal' , WP_ULIKE_PRO_DOMAIN )
             )
         );
 
         $this->add_control(
             'title_color',
             array(
-                'label' => esc_html__( 'Color', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => array(
                     '{{WRAPPER}} .wp-ulike-user-name a, {{WRAPPER}} .wp-ulike-user-name' => 'color: {{VALUE}};',
@@ -396,14 +396,14 @@ class BestLikers extends Widget_Base {
         $this->start_controls_tab(
             'title_color_hover',
             array(
-                'label' => esc_html__( 'Hover' , WP_ULIKE_PRO_NAME )
+                'label' => esc_html__( 'Hover' , WP_ULIKE_PRO_DOMAIN )
             )
         );
 
         $this->add_control(
             'title_hover_color',
             array(
-                'label' => esc_html__( 'Color', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => array(
                     '{{WRAPPER}} .wp-ulike-user-name a:hover, {{WRAPPER}} .wp-ulike-user-name:hover' => 'color: {{VALUE}};',
@@ -427,7 +427,7 @@ class BestLikers extends Widget_Base {
         $this->add_responsive_control(
             'title_margin_bottom',
             array(
-                'label' => esc_html__( 'Bottom space', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Bottom space', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::SLIDER,
                 'range' => array(
                     'px' => array(
@@ -449,7 +449,7 @@ class BestLikers extends Widget_Base {
         $this->start_controls_section(
             'meta_style_section',
             array(
-                'label'     => esc_html__( 'Meta Info', WP_ULIKE_PRO_NAME ),
+                'label'     => esc_html__( 'Meta Info', WP_ULIKE_PRO_DOMAIN ),
                 'tab'       => Controls_Manager::TAB_STYLE,
                 'condition' => array(
                     'display_meta' => 'yes'
@@ -462,14 +462,14 @@ class BestLikers extends Widget_Base {
         $this->start_controls_tab(
             'meta_color_normal',
             array(
-                'label' => esc_html__( 'Normal' , WP_ULIKE_PRO_NAME )
+                'label' => esc_html__( 'Normal' , WP_ULIKE_PRO_DOMAIN )
             )
         );
 
         $this->add_control(
             'meta_color',
             array(
-                'label' => esc_html__( 'Color', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => array(
                     '{{WRAPPER}} .wp-ulike-user-meta a, {{WRAPPER}} .wp-ulike-user-meta' => 'color: {{VALUE}};',
@@ -482,14 +482,14 @@ class BestLikers extends Widget_Base {
         $this->start_controls_tab(
             'meta_color_hover',
             array(
-                'label' => esc_html__( 'Hover' , WP_ULIKE_PRO_NAME )
+                'label' => esc_html__( 'Hover' , WP_ULIKE_PRO_DOMAIN )
             )
         );
 
         $this->add_control(
             'meta_hover_color',
             array(
-                'label' => esc_html__( 'Color', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => array(
                     '{{WRAPPER}} .wp-ulike-user-meta a:hover' => 'color: {{VALUE}};',
@@ -513,7 +513,7 @@ class BestLikers extends Widget_Base {
         $this->add_responsive_control(
             'meta_spacing_between',
             array(
-                'label' => esc_html__( 'Space between metas', WP_ULIKE_PRO_NAME ),
+                'label' => esc_html__( 'Space between metas', WP_ULIKE_PRO_DOMAIN ),
                 'type'  => Controls_Manager::SLIDER,
                 'range' => array(
                     'px' => array(

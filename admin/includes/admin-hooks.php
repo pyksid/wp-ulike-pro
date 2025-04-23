@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -111,14 +111,14 @@ function wp_ulike_pro_export_current_query( $query ) {
             $wp_query->the_post();
 
             $data = array(
-                'post_id'    => get_the_ID(),
+                'post_id'    => wp_ulike_get_the_id(),
                 'post_title' => get_the_title(),
                 'post_url'   => get_permalink()
             );
 
             if( ! empty( $taxonomy ) ){
                 foreach ($taxonomy as $tax) {
-                    $terms = get_the_terms( get_the_ID(), $tax );
+                    $terms = get_the_terms( wp_ulike_get_the_id(), $tax );
                     $data[$tax] = $terms && ! is_wp_error( $terms ) ? join(', ', wp_list_pluck( $terms, 'name' ) ) : NULL;
                 }
             }
@@ -252,28 +252,30 @@ add_action( 'wp_ulike_manage_comment_sortable_columns_order' , 'wp_ulike_pro_man
 function wp_ulike_pro_admin_notices( $notice_list ){
     $installed_core_pages = wp_ulike_pro_get_installed_core_pages();
 
-    if( empty( $installed_core_pages ) && WP_Ulike_Pro_API::has_permission() ){
-        $notice_list[ 'wp_ulike_install_core_pages' ] = new wp_ulike_notices([
-            'id'          => 'wp_ulike_install_core_pages',
-            'title'       => esc_html__( 'Install Core Pages', WP_ULIKE_SLUG ),
-            'description' => esc_html__( "WP ULike Pro needs to create several pages (User Profiles, Edit Account, Registration, Login, Password Reset) to function correctly." , WP_ULIKE_SLUG ),
-            'skin'        => 'default',
-            'has_close'   => true,
-            'buttons'     => array(
-                array(
-                    'label'        => esc_html__( "Create Pages", WP_ULIKE_SLUG ),
-                    'ajax_request' => array(
-                        'action' => 'wp_ulike_pro_install_core_pages'
+    if( empty( $installed_core_pages ) ){
+        if( WP_Ulike_Pro_API::has_permission() ){
+            $notice_list[ 'wp_ulike_install_core_pages' ] = new wp_ulike_notices([
+                'id'          => 'wp_ulike_install_core_pages',
+                'title'       => esc_html__( 'Install Core Pages', WP_ULIKE_SLUG ),
+                'description' => esc_html__( "WP ULike Pro needs to create several pages (User Profiles, Edit Account, Registration, Login, Password Reset) to function correctly." , WP_ULIKE_SLUG ),
+                'skin'        => 'default',
+                'has_close'   => true,
+                'buttons'     => array(
+                    array(
+                        'label'        => esc_html__( "Create Pages", WP_ULIKE_SLUG ),
+                        'ajax_request' => array(
+                            'action' => 'wp_ulike_pro_install_core_pages'
+                        )
+                    ),
+                    array(
+                        'label'      => esc_html__('No thanks and never ask me again', WP_ULIKE_SLUG),
+                        'type'       => 'skip',
+                        'color_name' => 'error',
+                        'expiration' => YEAR_IN_SECONDS * 10
                     )
-                ),
-                array(
-                    'label'      => esc_html__('No thanks and never ask me again', WP_ULIKE_SLUG),
-                    'type'       => 'skip',
-                    'color_name' => 'error',
-                    'expiration' => YEAR_IN_SECONDS * 10
                 )
-            )
-        ]);
+            ]);
+        }
     }
 
     return $notice_list;

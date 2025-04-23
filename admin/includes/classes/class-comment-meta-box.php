@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -28,7 +28,7 @@ class WP_Ulike_Pro_Comment_Meta_Box {
 
         // Create a comment metabox
         ULF::createCommentMetabox( $this->option_domain, array(
-            'title' => WP_ULIKE_PRO_NAME . ' ' . esc_html__('Metabox Tools', WP_ULIKE_PRO_DOMAIN),
+            'title' => esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . ' ' . esc_html__('Metabox Tools', WP_ULIKE_PRO_DOMAIN),
             'theme' => 'light wp-ulike-comment-metabox-panel'
         ) );
 

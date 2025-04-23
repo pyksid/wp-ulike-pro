@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInitd2857dc1681bac067c1c22beda26d89e
 {
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'WhichBrowser\\' => 13,
+        ),
         'S' => 
         array (
             'Spatie\\SchemaOrg\\' => 17,
@@ -15,13 +19,35 @@ class ComposerStaticInitd2857dc1681bac067c1c22beda26d89e
         array (
             'RobThree\\Auth\\' => 14,
         ),
+        'P' => 
+        array (
+            'Psr\\Cache\\' => 10,
+        ),
+        'M' => 
+        array (
+            'MaxMind\\WebService\\' => 19,
+            'MaxMind\\Exception\\' => 18,
+            'MaxMind\\Db\\' => 11,
+        ),
         'H' => 
         array (
             'Hybridauth\\' => 11,
         ),
+        'G' => 
+        array (
+            'GeoIp2\\' => 7,
+        ),
+        'C' => 
+        array (
+            'Composer\\CaBundle\\' => 18,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'WhichBrowser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/whichbrowser/parser/src',
+        ),
         'Spatie\\SchemaOrg\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/schema-org/src',
@@ -30,14 +56,70 @@ class ComposerStaticInitd2857dc1681bac067c1c22beda26d89e
         array (
             0 => __DIR__ . '/..' . '/robthree/twofactorauth/lib',
         ),
+        'Psr\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
+        'MaxMind\\WebService\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService',
+        ),
+        'MaxMind\\Exception\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception',
+        ),
+        'MaxMind\\Db\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db',
+        ),
         'Hybridauth\\' => 
         array (
             0 => __DIR__ . '/..' . '/hybridauth/hybridauth/src',
         ),
+        'GeoIp2\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geoip2/geoip2/src',
+        ),
+        'Composer\\CaBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
+        ),
     );
 
     public static $classMap = array (
+        'Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'GeoIp2\\Database\\Reader' => __DIR__ . '/..' . '/geoip2/geoip2/src/Database/Reader.php',
+        'GeoIp2\\Exception\\AddressNotFoundException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
+        'GeoIp2\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AuthenticationException.php',
+        'GeoIp2\\Exception\\GeoIp2Exception' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/GeoIp2Exception.php',
+        'GeoIp2\\Exception\\HttpException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/HttpException.php',
+        'GeoIp2\\Exception\\InvalidRequestException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/InvalidRequestException.php',
+        'GeoIp2\\Exception\\OutOfQueriesException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/OutOfQueriesException.php',
+        'GeoIp2\\Model\\AbstractModel' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/AbstractModel.php',
+        'GeoIp2\\Model\\AnonymousIp' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/AnonymousIp.php',
+        'GeoIp2\\Model\\Asn' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Asn.php',
+        'GeoIp2\\Model\\City' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/City.php',
+        'GeoIp2\\Model\\ConnectionType' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/ConnectionType.php',
+        'GeoIp2\\Model\\Country' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Country.php',
+        'GeoIp2\\Model\\Domain' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Domain.php',
+        'GeoIp2\\Model\\Enterprise' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Enterprise.php',
+        'GeoIp2\\Model\\Insights' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Insights.php',
+        'GeoIp2\\Model\\Isp' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Isp.php',
+        'GeoIp2\\ProviderInterface' => __DIR__ . '/..' . '/geoip2/geoip2/src/ProviderInterface.php',
+        'GeoIp2\\Record\\AbstractPlaceRecord' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/AbstractPlaceRecord.php',
+        'GeoIp2\\Record\\AbstractRecord' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/AbstractRecord.php',
+        'GeoIp2\\Record\\City' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/City.php',
+        'GeoIp2\\Record\\Continent' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Continent.php',
+        'GeoIp2\\Record\\Country' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Country.php',
+        'GeoIp2\\Record\\Location' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Location.php',
+        'GeoIp2\\Record\\MaxMind' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/MaxMind.php',
+        'GeoIp2\\Record\\Postal' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Postal.php',
+        'GeoIp2\\Record\\RepresentedCountry' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/RepresentedCountry.php',
+        'GeoIp2\\Record\\Subdivision' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Subdivision.php',
+        'GeoIp2\\Record\\Traits' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Traits.php',
+        'GeoIp2\\Util' => __DIR__ . '/..' . '/geoip2/geoip2/src/Util.php',
+        'GeoIp2\\WebService\\Client' => __DIR__ . '/..' . '/geoip2/geoip2/src/WebService/Client.php',
         'Hybridauth\\Adapter\\AbstractAdapter' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/Adapter/AbstractAdapter.php',
         'Hybridauth\\Adapter\\AdapterInterface' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/Adapter/AdapterInterface.php',
         'Hybridauth\\Adapter\\DataStoreTrait' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/Adapter/DataStoreTrait.php',
@@ -133,6 +215,27 @@ class ComposerStaticInitd2857dc1681bac067c1c22beda26d89e
         'Hybridauth\\User\\Activity' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/User/Activity.php',
         'Hybridauth\\User\\Contact' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/User/Contact.php',
         'Hybridauth\\User\\Profile' => __DIR__ . '/..' . '/hybridauth/hybridauth/src/User/Profile.php',
+        'MaxMind\\Db\\Reader' => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db/Reader.php',
+        'MaxMind\\Db\\Reader\\Decoder' => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db/Reader/Decoder.php',
+        'MaxMind\\Db\\Reader\\InvalidDatabaseException' => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db/Reader/InvalidDatabaseException.php',
+        'MaxMind\\Db\\Reader\\Metadata' => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db/Reader/Metadata.php',
+        'MaxMind\\Db\\Reader\\Util' => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db/Reader/Util.php',
+        'MaxMind\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/AuthenticationException.php',
+        'MaxMind\\Exception\\HttpException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/HttpException.php',
+        'MaxMind\\Exception\\InsufficientFundsException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/InsufficientFundsException.php',
+        'MaxMind\\Exception\\InvalidInputException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/InvalidInputException.php',
+        'MaxMind\\Exception\\InvalidRequestException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/InvalidRequestException.php',
+        'MaxMind\\Exception\\IpAddressNotFoundException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/IpAddressNotFoundException.php',
+        'MaxMind\\Exception\\PermissionRequiredException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/PermissionRequiredException.php',
+        'MaxMind\\Exception\\WebServiceException' => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception/WebServiceException.php',
+        'MaxMind\\WebService\\Client' => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService/Client.php',
+        'MaxMind\\WebService\\Http\\CurlRequest' => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService/Http/CurlRequest.php',
+        'MaxMind\\WebService\\Http\\Request' => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService/Http/Request.php',
+        'MaxMind\\WebService\\Http\\RequestFactory' => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService/Http/RequestFactory.php',
+        'Psr\\Cache\\CacheException' => __DIR__ . '/..' . '/psr/cache/src/CacheException.php',
+        'Psr\\Cache\\CacheItemInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemInterface.php',
+        'Psr\\Cache\\CacheItemPoolInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemPoolInterface.php',
+        'Psr\\Cache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/cache/src/InvalidArgumentException.php',
         'RobThree\\Auth\\Providers\\Qr\\BaconQrCodeProvider' => __DIR__ . '/..' . '/robthree/twofactorauth/lib/Providers/Qr/BaconQrCodeProvider.php',
         'RobThree\\Auth\\Providers\\Qr\\BaseHTTPQRCodeProvider' => __DIR__ . '/..' . '/robthree/twofactorauth/lib/Providers/Qr/BaseHTTPQRCodeProvider.php',
         'RobThree\\Auth\\Providers\\Qr\\EndroidQrCodeProvider' => __DIR__ . '/..' . '/robthree/twofactorauth/lib/Providers/Qr/EndroidQrCodeProvider.php',
@@ -1961,6 +2064,67 @@ class ComposerStaticInitd2857dc1681bac067c1c22beda26d89e
         'Spatie\\SchemaOrg\\WriteAction' => __DIR__ . '/..' . '/spatie/schema-org/src/WriteAction.php',
         'Spatie\\SchemaOrg\\XPathType' => __DIR__ . '/..' . '/spatie/schema-org/src/XPathType.php',
         'Spatie\\SchemaOrg\\Zoo' => __DIR__ . '/..' . '/spatie/schema-org/src/Zoo.php',
+        'WhichBrowser\\Analyser' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser.php',
+        'WhichBrowser\\Analyser\\Camouflage' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Camouflage.php',
+        'WhichBrowser\\Analyser\\Corrections' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Corrections.php',
+        'WhichBrowser\\Analyser\\Derive' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Derive.php',
+        'WhichBrowser\\Analyser\\Header' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header.php',
+        'WhichBrowser\\Analyser\\Header\\Baidu' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Baidu.php',
+        'WhichBrowser\\Analyser\\Header\\BrowserId' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/BrowserId.php',
+        'WhichBrowser\\Analyser\\Header\\OperaMini' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/OperaMini.php',
+        'WhichBrowser\\Analyser\\Header\\Puffin' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Puffin.php',
+        'WhichBrowser\\Analyser\\Header\\UCBrowserNew' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/UCBrowserNew.php',
+        'WhichBrowser\\Analyser\\Header\\UCBrowserOld' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/UCBrowserOld.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Application' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Application.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Bot' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Bot.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Browser' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Browser.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Appliance' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Appliance.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Cars' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Cars.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Ereader' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Ereader.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Gaming' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Gaming.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Gps' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Gps.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Media' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Media.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Mobile' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Mobile.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Pda' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Pda.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Phone' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Phone.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Printer' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Printer.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Signage' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Signage.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Tablet' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Tablet.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Device\\Television' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Device/Television.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Engine' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Engine.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Os' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Os.php',
+        'WhichBrowser\\Analyser\\Header\\Useragent\\Using' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Useragent/Using.php',
+        'WhichBrowser\\Analyser\\Header\\Wap' => __DIR__ . '/..' . '/whichbrowser/parser/src/Analyser/Header/Wap.php',
+        'WhichBrowser\\Cache' => __DIR__ . '/..' . '/whichbrowser/parser/src/Cache.php',
+        'WhichBrowser\\Constants\\BrowserType' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/BrowserType.php',
+        'WhichBrowser\\Constants\\DeviceSubType' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/DeviceSubType.php',
+        'WhichBrowser\\Constants\\DeviceType' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/DeviceType.php',
+        'WhichBrowser\\Constants\\EngineType' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/EngineType.php',
+        'WhichBrowser\\Constants\\Feature' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/Feature.php',
+        'WhichBrowser\\Constants\\Flag' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/Flag.php',
+        'WhichBrowser\\Constants\\Id' => __DIR__ . '/..' . '/whichbrowser/parser/src/Constants/Id.php',
+        'WhichBrowser\\Data\\Applications' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/Applications.php',
+        'WhichBrowser\\Data\\BrowserIds' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/BrowserIds.php',
+        'WhichBrowser\\Data\\BuildIds' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/BuildIds.php',
+        'WhichBrowser\\Data\\CFNetwork' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/CFNetwork.php',
+        'WhichBrowser\\Data\\Chrome' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/Chrome.php',
+        'WhichBrowser\\Data\\Darwin' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/Darwin.php',
+        'WhichBrowser\\Data\\DeviceModels' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/DeviceModels.php',
+        'WhichBrowser\\Data\\DeviceProfiles' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/DeviceProfiles.php',
+        'WhichBrowser\\Data\\Manufacturers' => __DIR__ . '/..' . '/whichbrowser/parser/src/Data/Manufacturers.php',
+        'WhichBrowser\\Model\\Browser' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Browser.php',
+        'WhichBrowser\\Model\\Device' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Device.php',
+        'WhichBrowser\\Model\\Engine' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Engine.php',
+        'WhichBrowser\\Model\\Family' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Family.php',
+        'WhichBrowser\\Model\\Main' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Main.php',
+        'WhichBrowser\\Model\\Os' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Os.php',
+        'WhichBrowser\\Model\\Primitive\\Base' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Primitive/Base.php',
+        'WhichBrowser\\Model\\Primitive\\NameVersion' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Primitive/NameVersion.php',
+        'WhichBrowser\\Model\\Using' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Using.php',
+        'WhichBrowser\\Model\\Version' => __DIR__ . '/..' . '/whichbrowser/parser/src/Model/Version.php',
+        'WhichBrowser\\Parser' => __DIR__ . '/..' . '/whichbrowser/parser/src/Parser.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

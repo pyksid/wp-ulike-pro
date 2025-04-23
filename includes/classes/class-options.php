@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -78,7 +78,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return integer
 	 */
 	public static function getProfilePage(){
-		return self::getOption( 'user_profiles_core_page', '' );
+		$page_id = self::getOption( 'user_profiles_core_page', '' );
+		return $page_id ? wp_ulike_get_the_id( $page_id ) : '';
 	}
 
 	/**
@@ -150,7 +151,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return string
 	 */
 	public static function getLoginPage(){
-		return self::getOption( 'login_core_page', '' );
+		$page_id = self::getOption( 'login_core_page', '' );
+		return $page_id ? wp_ulike_get_the_id( $page_id ) : '';
     }
 
 	/**
@@ -186,7 +188,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return string
 	 */
 	public static function getSignUpPage(){
-		return self::getOption( 'signup_core_page', '' );
+		$page_id = self::getOption( 'signup_core_page', '' );
+		return $page_id ? wp_ulike_get_the_id( $page_id ) : '';
 	}
 
 	/**
@@ -213,7 +216,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return string
 	 */
 	public static function getResetPasswordPage(){
-		return self::getOption( 'reset_password_core_page', '' );
+		$page_id = self::getOption( 'reset_password_core_page', '' );
+		return $page_id ? wp_ulike_get_the_id( $page_id ) : '';
     }
 
 	/**
@@ -237,7 +241,8 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return string
 	 */
 	public static function getEditAccountPage(){
-		return self::getOption( 'edit_account_core_page', '' );
+		$page_id = self::getOption( 'edit_account_core_page', '' );
+		return $page_id ? wp_ulike_get_the_id( $page_id ) : '';
 	}
 
 	/**
@@ -271,6 +276,9 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 		if( empty( $page_id ) ){
 			$page_id = get_queried_object_id();
 		}
+
+		$page_id = wp_ulike_get_the_id( $page_id );
+
 		return is_page( $page_id ) && in_array( $page_id, self::getCorePages( $type ) );
     }
 
@@ -570,6 +578,15 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 */
 	public static function isEmailVerifyEnabled(){
 		return self::getOption( 'signup_status', 'approved' ) == 'checkmail';
+	}
+
+	/**
+	 * Get aria label for dislike buttons
+	 *
+	 * @return string
+	 */
+	public static function getDislikeAriaLabel(){
+		return esc_attr( self::getOption( 'dislike_button_aria_label', esc_html__( 'Dislike Button', 'wp-ulike' ) ) );
 	}
 
 }

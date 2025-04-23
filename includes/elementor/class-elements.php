@@ -9,7 +9,7 @@ namespace WpUlikePro\Includes\Elementor;
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -329,7 +329,7 @@ final class Elements {
         $categories_manager->add_category(
             WP_ULIKE_PRO_DOMAIN,
             array(
-                'title' => WP_ULIKE_PRO_NAME,
+                'title' => esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ),
                 'icon' => 'eicon-font',
             )
         );
@@ -365,7 +365,7 @@ final class Elements {
 
         $message = sprintf(
           esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', WP_ULIKE_PRO_DOMAIN ),
-          '<strong>' . WP_ULIKE_PRO_NAME . '</strong>',
+          '<strong>' . esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
           '<strong>' . esc_html__( 'Elementor', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
            self::MINIMUM_ELEMENTOR_VERSION
         );
@@ -389,7 +389,7 @@ final class Elements {
         $message = sprintf(
           /* translators: 1: Plugin name 2: PHP 3: Required PHP version */
           esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', WP_ULIKE_PRO_DOMAIN ),
-          '<strong>' . WP_ULIKE_PRO_NAME . '</strong>',
+          '<strong>' . esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
           '<strong>' . esc_html__( 'PHP', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
            self::MINIMUM_PHP_VERSION
         );

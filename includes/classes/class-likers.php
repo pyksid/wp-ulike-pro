@@ -3,6 +3,7 @@
 final class WP_Ulike_Pro_Likers {
 
 	public $data;
+	private $settings_type;
 
 	public function __construct(){
 		$this->setFormData();

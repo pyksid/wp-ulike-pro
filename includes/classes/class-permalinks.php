@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -121,14 +121,35 @@ class WP_Ulike_Pro_Permalinks {
 		$profile_url = WP_Ulike_Pro_Options::getProfilePageUrl();
 		$profile_url = apply_filters( 'wp_ulike_pro_localize_permalink_filter', $profile_url, $page_id );
 
+		return ! empty( $profile_url ) ? self::localize_url( $profile_url, $slug, 'wp_ulike_user' ) : '';
+	}
+
+
+	public static function localize_url( $url, $slug, $param_name ) {
+		// Parse query parameters from the profile URL
+		$parsed_url   = wp_parse_url( $url );
+		$query_params = isset($parsed_url['query']) ? wp_parse_args( $parsed_url['query'] ) : [];
+		// Remove query parameters from the URL
+		$url = remove_query_arg( array_keys($query_params), $url );
+
 		if ( get_option('permalink_structure') ) {
-			$profile_url = trailingslashit( untrailingslashit( $profile_url ) );
-			$profile_url = $profile_url . strtolower( $slug ). '/';
+			$url = trailingslashit( untrailingslashit( $url ) );
+			$url = $url . strtolower( $slug ). '/';
 		} else {
-			$profile_url =  add_query_arg( 'wp_ulike_user', strtolower( $slug ), $profile_url );
+			$url =  add_query_arg( $param_name, strtolower( $slug ), $url );
 		}
 
-		return ! empty( $profile_url ) ? $profile_url : '';
+		// Add back the removed query parameters
+		if (!empty($query_params)) {
+			$url = add_query_arg( $query_params, $url );
+		}
+
+		if ( wp_ulike_is_wpml_active() && wp_ulike_setting_repo::isWpmlSynchronizationOn() ) {
+			$current_language = apply_filters( 'wpml_current_language', null );
+			$url              = apply_filters( 'wpml_permalink', $url, $current_language );
+		}
+
+		return $url;
 	}
 
 	/**

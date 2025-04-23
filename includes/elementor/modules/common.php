@@ -60,7 +60,7 @@ class Common {
             $widget->start_controls_section(
                 'wp_ulike_core_common_custom_css_section',
                 array(
-                    'label'     => WP_ULIKE_PRO_NAME . ' - ' .esc_html__( 'Custom CSS', WP_ULIKE_PRO_NAME ),
+                    'label'     => esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . ' - ' .esc_html__( 'Custom CSS', WP_ULIKE_PRO_DOMAIN ),
                     'tab'       => Controls_Manager::TAB_ADVANCED
                 )
             );
@@ -69,7 +69,7 @@ class Common {
                 'custom_css',
                 array(
                     'type'        => Controls_Manager::CODE,
-                    'label'       => esc_html__( 'Custom CSS', WP_ULIKE_PRO_NAME ),
+                    'label'       => esc_html__( 'Custom CSS', WP_ULIKE_PRO_DOMAIN ),
                     'label_block' => true,
                     'language'    => 'css'
                 )
@@ -78,7 +78,7 @@ class Common {
             $widget->add_control(
                 'custom_css_description',
                 array(
-                    'raw'             => __( 'Use "selector" to target wrapper element. Examples:<br>selector {color: red;} // For main element<br>selector .child-element {margin: 10px;} // For child element<br>.my-class {text-align: center;} // Or use any custom selector', WP_ULIKE_PRO_NAME ),
+                    'raw'             => __( 'Use "selector" to target wrapper element. Examples:<br>selector {color: red;} // For main element<br>selector .child-element {margin: 10px;} // For child element<br>.my-class {text-align: center;} // Or use any custom selector', WP_ULIKE_PRO_DOMAIN ),
                     'type'            => Controls_Manager::RAW_HTML,
                     'content_classes' => 'elementor-descriptor',
                 )

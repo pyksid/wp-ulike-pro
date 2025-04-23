@@ -72,12 +72,12 @@ class Module extends Module_Base {
 		$widget->add_control(
 			'exclude',
 			[
-				'label' => esc_html__( 'Exclude', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Exclude', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::SELECT2,
 				'multiple' => true,
 				'options' => [
-					'current_post' => esc_html__( 'Current Post', WP_ULIKE_PRO_NAME ),
-					'manual_selection' => esc_html__( 'Manual Selection', WP_ULIKE_PRO_NAME ),
+					'current_post' => esc_html__( 'Current Post', WP_ULIKE_PRO_DOMAIN ),
+					'manual_selection' => esc_html__( 'Manual Selection', WP_ULIKE_PRO_DOMAIN ),
 				],
 				'label_block' => true,
 			]
@@ -86,7 +86,7 @@ class Module extends Module_Base {
 		$widget->add_control(
 			'exclude_ids',
 			[
-				'label' => esc_html__( 'Search & Select', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Search & Select', WP_ULIKE_PRO_DOMAIN ),
 				'type' => self::QUERY_CONTROL_ID,
 				'autocomplete' => [
 					'object' => self::QUERY_OBJECT_POST,
@@ -103,10 +103,10 @@ class Module extends Module_Base {
 		$widget->add_control(
 			'avoid_duplicates',
 			[
-				'label' => esc_html__( 'Avoid Duplicates', WP_ULIKE_PRO_NAME ),
+				'label' => esc_html__( 'Avoid Duplicates', WP_ULIKE_PRO_DOMAIN ),
 				'type' => Controls_Manager::SWITCHER,
 				'default' => '',
-				'description' => esc_html__( 'Set to Yes to avoid duplicate posts from showing up on the page. This only affects the frontend.', WP_ULIKE_PRO_NAME ),
+				'description' => esc_html__( 'Set to Yes to avoid duplicate posts from showing up on the page. This only affects the frontend.', WP_ULIKE_PRO_DOMAIN ),
 			]
 		);
 

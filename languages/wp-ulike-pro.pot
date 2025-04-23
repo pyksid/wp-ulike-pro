@@ -1,14 +1,14 @@
-# Copyright (C) 2024 TechnoWich
+# Copyright (C) 2025 TechnoWich
 # This file is distributed under the same license as the WP ULike Pro package.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP ULike Pro 1.8.7\n"
+"Project-Id-Version: WP ULike Pro 1.9.3\n"
 "Report-Msgid-Bugs-To: https://wpulike.com\n"
-"POT-Creation-Date: 2024-08-29 07:43:53+00:00\n"
+"POT-Creation-Date: 2025-03-17 08:01:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: WP ULike Team <info@wpulike.com>\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
@@ -49,9 +49,9 @@ msgstr ""
 #: admin/includes/admin-hooks.php:46 admin/includes/admin-hooks.php:184
 #: admin/includes/classes/class-options-panel.php:202
 #: admin/includes/classes/class-options-panel.php:216
-#: admin/includes/classes/class-options-panel.php:287
-#: admin/includes/classes/class-options-panel.php:311
-#: admin/includes/classes/class-options-panel.php:2757
+#: admin/includes/classes/class-options-panel.php:278
+#: admin/includes/classes/class-options-panel.php:302
+#: admin/includes/classes/class-options-panel.php:2754
 #: admin/includes/classes/class-shortcoder.php:114
 #: admin/includes/classes/class-shortcoder.php:167
 #: admin/includes/classes/class-shortcoder.php:237
@@ -64,38 +64,35 @@ msgstr ""
 msgid "Export Logs"
 msgstr ""
 
-#: admin/includes/admin-hooks.php:255
+#: admin/includes/admin-hooks.php:256
 msgid "Install Core Pages"
 msgstr ""
 
-#: admin/includes/admin-hooks.php:256
+#: admin/includes/admin-hooks.php:257
 msgid ""
 "WP ULike Pro needs to create several pages (User Profiles, Edit Account, "
 "Registration, Login, Password Reset) to function correctly."
 msgstr ""
 
-#: admin/includes/admin-hooks.php:261
-#: admin/includes/classes/class-options-panel.php:2571
+#: admin/includes/admin-hooks.php:262
+#: admin/includes/classes/class-options-panel.php:2565
 msgid "Create Pages"
 msgstr ""
 
-#: admin/includes/admin-hooks.php:267
+#: admin/includes/admin-hooks.php:268
 msgid "No thanks and never ask me again"
 msgstr ""
 
-#: admin/includes/classes/class-api.php:73
-msgid "An error occurred, please try again"
-msgstr ""
-
-#: admin/includes/classes/class-api.php:212
+#: admin/includes/classes/class-api.php:253
 msgid "Another check is in progress."
 msgstr ""
 
-#: admin/includes/classes/class-api.php:224
+#: admin/includes/classes/class-api.php:265
+#: admin/includes/classes/class-license.php:143
 msgid "HTTP Error"
 msgstr ""
 
-#: admin/includes/classes/class-api.php:237
+#: admin/includes/classes/class-api.php:278
 #. translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link
 #. opening tag, 4: Link closing tag.
 msgid ""
@@ -103,7 +100,7 @@ msgid ""
 "advanced license%4$s (you'll only need to cover the difference)."
 msgstr ""
 
-#: admin/includes/classes/class-api.php:245
+#: admin/includes/classes/class-api.php:286
 #. translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link
 #. opening tag, 4: Link closing tag.
 msgid ""
@@ -113,12 +110,12 @@ msgid ""
 "%3$sRenew now%4$s"
 msgstr ""
 
-#: admin/includes/classes/class-api.php:251
+#: admin/includes/classes/class-api.php:292
 #: admin/includes/classes/class-license-activation.php:57
 msgid "Your license is missing. Please check your key again."
 msgstr ""
 
-#: admin/includes/classes/class-api.php:254
+#: admin/includes/classes/class-api.php:295
 #: admin/includes/classes/class-license.php:25
 #. translators: 1: Bold text opening tag, 2: Bold text closing tag.
 msgid ""
@@ -126,14 +123,18 @@ msgid ""
 "request). Please consider acquiring a new license."
 msgstr ""
 
-#: admin/includes/classes/class-api.php:258
+#: admin/includes/classes/class-api.php:299
 msgid "Your license is invalid for this domain. Please check your key again."
 msgstr ""
 
-#: admin/includes/classes/class-api.php:268
+#: admin/includes/classes/class-api.php:309
 msgid ""
 "An error occurred. Please check your internet connection and try again. If "
 "the problem persists, contact our support."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WP ULike Pro"
 msgstr ""
 
 #: admin/includes/classes/class-comment-meta-box.php:28
@@ -243,7 +244,7 @@ msgid ""
 msgstr ""
 
 #: admin/includes/classes/class-license.php:18
-#: admin/includes/classes/class-license.php:241
+#: admin/includes/classes/class-license.php:269
 msgid "Renew License"
 msgstr ""
 
@@ -252,10 +253,10 @@ msgid "Your License Is Inactive"
 msgstr ""
 
 #: admin/includes/classes/class-license.php:29
-#: admin/includes/classes/class-license.php:165
-#: admin/includes/classes/class-license.php:265
+#: admin/includes/classes/class-license.php:196
+#: admin/includes/classes/class-license.php:292
 #: admin/includes/classes/class-meta-box.php:53
-#: admin/includes/classes/class-options-panel.php:2957
+#: admin/includes/classes/class-options-panel.php:2954
 #: admin/includes/templates/statistics.php:21
 msgid "Activate License"
 msgstr ""
@@ -289,53 +290,88 @@ msgid ""
 "then reactivate it again."
 msgstr ""
 
-#: admin/includes/classes/class-license.php:91
+#: admin/includes/classes/class-license.php:92
 msgid "Please enter your license key."
 msgstr ""
 
-#. Plugin Name of the plugin/theme
-msgid "WP ULike Pro"
+#: admin/includes/classes/class-license.php:139
+msgid "Expired"
 msgstr ""
 
-#: admin/includes/classes/class-license.php:159
+#: admin/includes/classes/class-license.php:140
+msgid "Mismatch"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:141
+msgid "Invalid"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:142
+msgid "Cancelled"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:144
+msgid "Missing"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:145
+msgid "Request Locked"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:148
+msgid "Status"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:150
+msgid "Active"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:156
+msgid "Unknown"
+msgstr ""
+
+#: admin/includes/classes/class-license.php:190
 msgid "Welcome to WP ULike PRO!"
 msgstr ""
 
-#: admin/includes/classes/class-license.php:160
+#: admin/includes/classes/class-license.php:191
 msgid ""
 "Please activate your license to get automatic updates, premium support, and "
 "unlimited access to our pro features."
 msgstr ""
 
-#: admin/includes/classes/class-license.php:201
-#: admin/includes/classes/class-license.php:246
+#: admin/includes/classes/class-license.php:231
+#: admin/includes/classes/class-license.php:274
 msgid "Remind Me Later"
 msgstr ""
 
-#: admin/includes/classes/class-license.php:223
+#: admin/includes/classes/class-license.php:251
 msgid "Your License Will Expire in %s."
 msgstr ""
 
-#: admin/includes/classes/class-license.php:224
+#: admin/includes/classes/class-license.php:252
 msgid ""
 "Your WP ULike Pro license is about to expire. Renew now and get updates, "
 "support, Pro templates for another year."
 msgstr ""
 
-#: admin/includes/classes/class-license.php:229
+#: admin/includes/classes/class-license.php:257
 #. translators: %s: Renewal discount.
 msgid ""
 "Your WP ULike Pro license is about to expire. Renew now and get an "
 "exclusive, time-limited %s discount."
 msgstr ""
 
-#: admin/includes/classes/class-license.php:273
+#: admin/includes/classes/class-license.php:300
 msgid "License"
 msgstr ""
 
 #: admin/includes/classes/class-logs.php:274
-#: admin/includes/classes/class-stats-v2.php:730
-#: admin/includes/classes/class-stats-v2.php:859
+#: admin/includes/classes/class-stats-v2.php:611
+#: admin/includes/classes/class-stats-v2.php:693
+#: admin/includes/classes/class-stats-v2.php:775
+#: admin/includes/classes/class-stats-v2.php:862
+#: admin/includes/classes/class-stats-v2.php:910
 #: admin/includes/classes/class-stats.php:575
 msgid "Guest User"
 msgstr ""
@@ -349,7 +385,7 @@ msgid "Not Found!"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:53
-#: admin/includes/classes/class-options-panel.php:2957
+#: admin/includes/classes/class-options-panel.php:2954
 #: admin/includes/templates/statistics.php:21
 msgid ""
 "Features of the Pro version are only available once you have registered "
@@ -453,8 +489,8 @@ msgid "Select an option"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:150
-#: admin/includes/classes/class-options-panel.php:1773
-#: admin/includes/classes/class-options-panel.php:1869
+#: admin/includes/classes/class-options-panel.php:1767
+#: admin/includes/classes/class-options-panel.php:1863
 #: admin/includes/classes/class-shortcoder.php:290
 #: admin/includes/classes/class-shortcoder.php:590
 #: admin/includes/classes/class-shortcoder.php:613
@@ -796,8 +832,8 @@ msgid "Steps"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:499
-#: admin/includes/classes/class-options-panel.php:1198
-#: admin/includes/classes/class-options-panel.php:1786
+#: admin/includes/classes/class-options-panel.php:1189
+#: admin/includes/classes/class-options-panel.php:1780
 #: admin/includes/classes/class-shortcoder.php:600
 #: includes/elementor/widgets/most-liked-posts.php:878
 msgid "Image"
@@ -808,8 +844,8 @@ msgid "Step List"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:511
-#: admin/includes/classes/class-options-panel.php:1480
-#: admin/includes/classes/class-options-panel.php:2673
+#: admin/includes/classes/class-options-panel.php:1474
+#: admin/includes/classes/class-options-panel.php:2670
 #: admin/includes/classes/class-shortcoder.php:694
 msgid "Text"
 msgstr ""
@@ -960,50 +996,50 @@ msgid "Delete Data"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:664
-#: admin/includes/classes/class-options-panel.php:2223
-#: admin/includes/classes/class-options-panel.php:2307
-#: admin/includes/classes/class-options-panel.php:2391
-#: admin/includes/classes/class-options-panel.php:2464
+#: admin/includes/classes/class-options-panel.php:2217
+#: admin/includes/classes/class-options-panel.php:2301
+#: admin/includes/classes/class-options-panel.php:2385
+#: admin/includes/classes/class-options-panel.php:2458
 msgid "Delete All Logs"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:665
-#: admin/includes/classes/class-options-panel.php:2224
-#: admin/includes/classes/class-options-panel.php:2308
-#: admin/includes/classes/class-options-panel.php:2392
-#: admin/includes/classes/class-options-panel.php:2465
+#: admin/includes/classes/class-options-panel.php:2218
+#: admin/includes/classes/class-options-panel.php:2302
+#: admin/includes/classes/class-options-panel.php:2386
+#: admin/includes/classes/class-options-panel.php:2459
 msgid "Delete Records"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:666
-#: admin/includes/classes/class-options-panel.php:2225
-#: admin/includes/classes/class-options-panel.php:2309
-#: admin/includes/classes/class-options-panel.php:2393
-#: admin/includes/classes/class-options-panel.php:2466
+#: admin/includes/classes/class-options-panel.php:2219
+#: admin/includes/classes/class-options-panel.php:2303
+#: admin/includes/classes/class-options-panel.php:2387
+#: admin/includes/classes/class-options-panel.php:2460
 msgid "You Are About To Delete All Likes Logs. This Action Is Not Reversible."
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:676
-#: admin/includes/classes/class-options-panel.php:2245
-#: admin/includes/classes/class-options-panel.php:2329
-#: admin/includes/classes/class-options-panel.php:2413
-#: admin/includes/classes/class-options-panel.php:2486
+#: admin/includes/classes/class-options-panel.php:2239
+#: admin/includes/classes/class-options-panel.php:2323
+#: admin/includes/classes/class-options-panel.php:2407
+#: admin/includes/classes/class-options-panel.php:2480
 msgid "Delete Meta Counter Values"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:677
-#: admin/includes/classes/class-options-panel.php:2246
-#: admin/includes/classes/class-options-panel.php:2330
-#: admin/includes/classes/class-options-panel.php:2414
-#: admin/includes/classes/class-options-panel.php:2487
+#: admin/includes/classes/class-options-panel.php:2240
+#: admin/includes/classes/class-options-panel.php:2324
+#: admin/includes/classes/class-options-panel.php:2408
+#: admin/includes/classes/class-options-panel.php:2481
 msgid "Delete Values"
 msgstr ""
 
 #: admin/includes/classes/class-meta-box.php:678
-#: admin/includes/classes/class-options-panel.php:2247
-#: admin/includes/classes/class-options-panel.php:2331
-#: admin/includes/classes/class-options-panel.php:2415
-#: admin/includes/classes/class-options-panel.php:2488
+#: admin/includes/classes/class-options-panel.php:2241
+#: admin/includes/classes/class-options-panel.php:2325
+#: admin/includes/classes/class-options-panel.php:2409
+#: admin/includes/classes/class-options-panel.php:2482
 msgid ""
 "You Are About To Delete All Meta Counter Data. This Action Is Not "
 "Reversible."
@@ -1068,9 +1104,9 @@ msgstr ""
 
 #: admin/includes/classes/class-options-panel.php:208
 #: admin/includes/classes/class-options-panel.php:221
-#: admin/includes/classes/class-options-panel.php:298
-#: admin/includes/classes/class-options-panel.php:323
-#: admin/includes/classes/class-options-panel.php:2759
+#: admin/includes/classes/class-options-panel.php:289
+#: admin/includes/classes/class-options-panel.php:314
+#: admin/includes/classes/class-options-panel.php:2756
 #: admin/includes/classes/class-shortcoder.php:169
 #: admin/includes/classes/class-shortcoder.php:239
 msgid "Undislike"
@@ -1089,70 +1125,65 @@ msgid "Display Stats Menu Capability"
 msgstr ""
 
 #: admin/includes/classes/class-options-panel.php:250
-#: admin/includes/classes/class-options-panel.php:259
 msgid "Manage users' access level to view this page"
 msgstr ""
 
 #: admin/includes/classes/class-options-panel.php:258
-msgid "Display Logs Menu Capability"
-msgstr ""
-
-#: admin/includes/classes/class-options-panel.php:267
 msgid "Enable Meta Box"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:268
+#: admin/includes/classes/class-options-panel.php:259
 msgid "Display meta box panel in selected post types."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:292
-#: admin/includes/classes/class-options-panel.php:303
+#: admin/includes/classes/class-options-panel.php:283
+#: admin/includes/classes/class-options-panel.php:294
 msgid "Button Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:316
-#: admin/includes/classes/class-options-panel.php:328
+#: admin/includes/classes/class-options-panel.php:307
+#: admin/includes/classes/class-options-panel.php:319
 msgid "Button Image"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:338
+#: admin/includes/classes/class-options-panel.php:329
 msgid "Modal"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:343
+#: admin/includes/classes/class-options-panel.php:334
 msgid "Pile + Modal"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:352
+#: admin/includes/classes/class-options-panel.php:343
 msgid "Enable Percentage Values"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:364
+#: admin/includes/classes/class-options-panel.php:355
 msgid "Modal Template"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:374
-#: includes/classes/class-options.php:380
+#: admin/includes/classes/class-options-panel.php:365
+#: includes/classes/class-options.php:388
 msgid "Likers"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:375
+#: admin/includes/classes/class-options-panel.php:366
 msgid "Likers Modal Title"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:397
+#: admin/includes/classes/class-options-panel.php:388
 msgid "Likers Modal Template"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:398
+#: admin/includes/classes/class-options-panel.php:389
 msgid "Allowed Variables:"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:417
+#: admin/includes/classes/class-options-panel.php:408
 msgid "Enable Serialize Data type"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:418
+#: admin/includes/classes/class-options-panel.php:409
 msgid ""
 "By activating this option, the metabox information will be serialized and "
 "stored in a single row. This will lead to fewer records in the database and "
@@ -1160,815 +1191,815 @@ msgid ""
 "options below to convert the old metaboxes to the new serialize structure."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:423
+#: admin/includes/classes/class-options-panel.php:414
 msgid "Conversions"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:429
+#: admin/includes/classes/class-options-panel.php:420
 msgid "Upgrade Metabox Values"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:430
+#: admin/includes/classes/class-options-panel.php:421
 msgid "Merge Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:431
+#: admin/includes/classes/class-options-panel.php:422
 msgid "Convert the old meta boxes to the new serialize structure."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:440
+#: admin/includes/classes/class-options-panel.php:431
 msgid "Delete Old Post Meta"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:441
-#: admin/includes/classes/class-options-panel.php:2538
-#: admin/includes/classes/class-options-panel.php:2549
+#: admin/includes/classes/class-options-panel.php:432
+#: admin/includes/classes/class-options-panel.php:2532
+#: admin/includes/classes/class-options-panel.php:2543
 msgid "Delete All Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:442
+#: admin/includes/classes/class-options-panel.php:433
 msgid ""
 "Drop all unserialized meta box rows after upgrade to serialize structure. "
 "This Action Is Not Reversible."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:464
+#: admin/includes/classes/class-options-panel.php:455
 #: includes/general-hooks.php:231 includes/general-hooks.php:247
 #: includes/general-hooks.php:255
 msgid "Sorry! You Disliked This."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:465
+#: admin/includes/classes/class-options-panel.php:456
 msgid "Dislike Notice Message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:470
+#: admin/includes/classes/class-options-panel.php:461
 #: includes/general-hooks.php:239
 msgid "Thanks! You Undisliked This."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:471
+#: admin/includes/classes/class-options-panel.php:462
 msgid "Undislike Notice Message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:476
-#: includes/general-functions.php:373 includes/general-functions.php:598
+#: admin/includes/classes/class-options-panel.php:467
+#: includes/classes/class-options.php:586
 msgid "Dislike Button"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:477
+#: admin/includes/classes/class-options-panel.php:468
 msgid "Dislike Button Aria Label"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:483
+#: admin/includes/classes/class-options-panel.php:474
 msgid "Forms Notices"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:489
+#: admin/includes/classes/class-options-panel.php:480
 #: includes/classes/class-login.php:106 includes/classes/class-password.php:84
-#: includes/classes/class-signup.php:147
+#: includes/classes/class-signup.php:150
 msgid "Please enter required fields."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:490
+#: admin/includes/classes/class-options-panel.php:481
 msgid "Enter Required Fields"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:496
+#: admin/includes/classes/class-options-panel.php:487
 #: includes/classes/class-avatar-controller.php:160
 #: includes/classes/class-forms-toggle.php:31
-#: includes/classes/class-likers.php:35 includes/classes/class-login.php:111
+#: includes/classes/class-likers.php:36 includes/classes/class-login.php:111
 #: includes/classes/class-logout.php:74 includes/classes/class-password.php:104
 #: includes/classes/class-password.php:179
-#: includes/classes/class-profile.php:104 includes/classes/class-signup.php:142
+#: includes/classes/class-profile.php:104 includes/classes/class-signup.php:145
 #: includes/classes/class-two-factor-remove.php:32
 #: includes/classes/class-two-factor-validation.php:33
 msgid "Something went wrong. Please try again or contact the admin."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:497
+#: admin/includes/classes/class-options-panel.php:488
 msgid "Permission Denied"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:503
+#: admin/includes/classes/class-options-panel.php:494
 #: includes/classes/class-login.php:65
 msgid "Login successful."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:504
+#: admin/includes/classes/class-options-panel.php:495
 msgid "Login Successful"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:510
+#: admin/includes/classes/class-options-panel.php:501
 #: includes/general-hooks.php:764
 msgid "Invalid username or incorrect password!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:511
+#: admin/includes/classes/class-options-panel.php:502
 msgid "Login Failed"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:517
+#: admin/includes/classes/class-options-panel.php:508
 #: includes/classes/class-password.php:47
 msgid "Your password has been reset."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:518
+#: admin/includes/classes/class-options-panel.php:509
 #: includes/classes/class-core-pages.php:31
 msgid "Password Reset"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:524
+#: admin/includes/classes/class-options-panel.php:515
 #: includes/classes/class-password.php:88
 msgid "Oops! Password did not match! Try again."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:525
+#: admin/includes/classes/class-options-panel.php:516
 msgid "Password Match"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:531
+#: admin/includes/classes/class-options-panel.php:522
 #: includes/classes/class-password.php:127
 msgid "Enter a username or email address."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:532
+#: admin/includes/classes/class-options-panel.php:523
 msgid "Empty Username"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:538
+#: admin/includes/classes/class-options-panel.php:529
 #: includes/classes/class-password.php:131
 #: includes/classes/class-password.php:139
 msgid "There is no account with that username or email address."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:539
+#: admin/includes/classes/class-options-panel.php:530
 msgid "Invalid Combo"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:545
+#: admin/includes/classes/class-options-panel.php:536
 #: includes/classes/class-password.php:147
 msgid "The email could not be sent."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:546
+#: admin/includes/classes/class-options-panel.php:537
 msgid "Email Error"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:552
+#: admin/includes/classes/class-options-panel.php:543
 msgid "Error Occured please fill up the signup form carefully."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:553
+#: admin/includes/classes/class-options-panel.php:544
 msgid "Fill Signup Form"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:559
+#: admin/includes/classes/class-options-panel.php:550
 msgid "An error has occurred! Please try again later."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:560
+#: admin/includes/classes/class-options-panel.php:551
 msgid "Error Occurred"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:566
-#: includes/classes/class-signup.php:89
+#: admin/includes/classes/class-options-panel.php:557
+#: includes/classes/class-signup.php:92
 msgid "Signup successful."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:567
+#: admin/includes/classes/class-options-panel.php:558
 msgid "Signup Sucess"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:573
+#: admin/includes/classes/class-options-panel.php:564
 #: includes/classes/class-signup.php:68
 msgid "Please check your email to activate your account."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:574
+#: admin/includes/classes/class-options-panel.php:565
 msgid "Email Verification Required"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:580
+#: admin/includes/classes/class-options-panel.php:571
 #: includes/classes/class-rewrite.php:205
 msgid "Your email has been successfully verified. You can now log in."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:581
+#: admin/includes/classes/class-options-panel.php:572
 msgid "Email Successfully Verified"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:587
+#: admin/includes/classes/class-options-panel.php:578
 #: includes/classes/class-rewrite.php:207
 msgid "Verification failed. The link might be expired or invalid."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:588
+#: admin/includes/classes/class-options-panel.php:579
 msgid "Email Verification Failed"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:594
+#: admin/includes/classes/class-options-panel.php:585
 #: includes/general-hooks.php:1041
 msgid ""
 "Your account is not yet verified. Please check your email for the "
 "verification link."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:595
+#: admin/includes/classes/class-options-panel.php:586
 msgid "Account Not Verified"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:601
-#: includes/classes/class-signup.php:151
+#: admin/includes/classes/class-options-panel.php:592
+#: includes/classes/class-signup.php:154
 msgid "Registration is currently disabled."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:602
+#: admin/includes/classes/class-options-panel.php:593
 msgid "Disabled Registration"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:608
-#: includes/classes/class-profile.php:99 includes/classes/class-signup.php:156
+#: admin/includes/classes/class-options-panel.php:599
+#: includes/classes/class-profile.php:99 includes/classes/class-signup.php:159
 msgid "Email address is not valid!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:609
+#: admin/includes/classes/class-options-panel.php:600
 msgid "Invalid Email Address"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:615
-#: includes/classes/class-signup.php:161
+#: admin/includes/classes/class-options-panel.php:606
+#: includes/classes/class-signup.php:164
 msgid "Sorry, that email address is already used!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:616
+#: admin/includes/classes/class-options-panel.php:607
 msgid "Email Exist"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:622
-#: includes/classes/class-signup.php:166
+#: admin/includes/classes/class-options-panel.php:613
+#: includes/classes/class-signup.php:169
 msgid "Sorry, that username is already used!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:623
+#: admin/includes/classes/class-options-panel.php:614
 msgid "Username Exist"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:629
+#: admin/includes/classes/class-options-panel.php:620
 msgid "Upload Avatar Labels"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:635
+#: admin/includes/classes/class-options-panel.php:626
 #: public/templates/profile.php:254
 msgid "User Not Found!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:636
+#: admin/includes/classes/class-options-panel.php:627
 msgid "User Not Found Message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:642
-#: includes/classes/class-options.php:474
+#: admin/includes/classes/class-options-panel.php:633
+#: includes/classes/class-options.php:482
 msgid "Upload"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:643
+#: admin/includes/classes/class-options-panel.php:634
 msgid "Avatar Upload Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:649
-#: includes/classes/class-options.php:475
+#: admin/includes/classes/class-options-panel.php:640
+#: includes/classes/class-options.php:483
 msgid "Edit"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:650
+#: admin/includes/classes/class-options-panel.php:641
 msgid "Avatar Edit Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:656
-#: includes/classes/class-options.php:476
+#: admin/includes/classes/class-options-panel.php:647
+#: includes/classes/class-options.php:484
 msgid "Delete"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:657
+#: admin/includes/classes/class-options-panel.php:648
 msgid "Avatar Delete Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:663
-#: includes/classes/class-options.php:477
+#: admin/includes/classes/class-options-panel.php:654
+#: includes/classes/class-options.php:485
 msgid "Log Out"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:664
+#: admin/includes/classes/class-options-panel.php:655
 msgid "Profile Log Out Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:671
+#: admin/includes/classes/class-options-panel.php:662
 msgid "Login Form Labels"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:677
-#: admin/includes/classes/class-options-panel.php:678
-#: admin/includes/classes/class-options-panel.php:732
-#: admin/includes/classes/class-options-panel.php:733
-#: admin/includes/classes/class-options-panel.php:1621
+#: admin/includes/classes/class-options-panel.php:668
+#: admin/includes/classes/class-options-panel.php:669
+#: admin/includes/classes/class-options-panel.php:723
+#: admin/includes/classes/class-options-panel.php:724
+#: admin/includes/classes/class-options-panel.php:1615
 #: includes/managers/shortcodes.php:212 includes/managers/shortcodes.php:255
 msgid "Username"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:684
-#: admin/includes/classes/class-options-panel.php:685
-#: admin/includes/classes/class-options-panel.php:760
-#: admin/includes/classes/class-options-panel.php:761
+#: admin/includes/classes/class-options-panel.php:675
+#: admin/includes/classes/class-options-panel.php:676
+#: admin/includes/classes/class-options-panel.php:751
+#: admin/includes/classes/class-options-panel.php:752
 #: includes/managers/shortcodes.php:213 includes/managers/shortcodes.php:259
 msgid "Password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:691
-#: admin/includes/classes/class-options-panel.php:692
+#: admin/includes/classes/class-options-panel.php:682
+#: admin/includes/classes/class-options-panel.php:683
 #: includes/managers/shortcodes.php:214
 msgid "Remember Me"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:698
-#: admin/includes/classes/class-options-panel.php:699
+#: admin/includes/classes/class-options-panel.php:689
+#: admin/includes/classes/class-options-panel.php:690
 #: includes/managers/shortcodes.php:215
 msgid "Log in"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:705
-#: admin/includes/classes/class-options-panel.php:706
+#: admin/includes/classes/class-options-panel.php:696
+#: admin/includes/classes/class-options-panel.php:697
 #: includes/managers/shortcodes.php:216
 msgid "Forgot Password?"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:712
-#: admin/includes/classes/class-options-panel.php:713
+#: admin/includes/classes/class-options-panel.php:703
+#: admin/includes/classes/class-options-panel.php:704
 #: includes/managers/shortcodes.php:218
 msgid "Don't have an account?"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:719
-#: admin/includes/classes/class-options-panel.php:720
+#: admin/includes/classes/class-options-panel.php:710
+#: admin/includes/classes/class-options-panel.php:711
 #: includes/managers/shortcodes.php:219
 msgid "Create Account"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:726
+#: admin/includes/classes/class-options-panel.php:717
 msgid "Signup Form Labels"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:739
-#: admin/includes/classes/class-options-panel.php:740
-#: admin/includes/classes/class-options-panel.php:878
-#: admin/includes/classes/class-options-panel.php:879
+#: admin/includes/classes/class-options-panel.php:730
+#: admin/includes/classes/class-options-panel.php:731
+#: admin/includes/classes/class-options-panel.php:869
+#: admin/includes/classes/class-options-panel.php:870
 #: includes/managers/shortcodes.php:256 includes/managers/shortcodes.php:333
 msgid "First Name"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:746
-#: admin/includes/classes/class-options-panel.php:747
-#: admin/includes/classes/class-options-panel.php:885
-#: admin/includes/classes/class-options-panel.php:886
+#: admin/includes/classes/class-options-panel.php:737
+#: admin/includes/classes/class-options-panel.php:738
+#: admin/includes/classes/class-options-panel.php:876
+#: admin/includes/classes/class-options-panel.php:877
 #: includes/managers/shortcodes.php:257 includes/managers/shortcodes.php:334
 msgid "Last Name"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:753
-#: admin/includes/classes/class-options-panel.php:754
-#: admin/includes/classes/class-options-panel.php:906
-#: admin/includes/classes/class-options-panel.php:907
+#: admin/includes/classes/class-options-panel.php:744
+#: admin/includes/classes/class-options-panel.php:745
+#: admin/includes/classes/class-options-panel.php:897
+#: admin/includes/classes/class-options-panel.php:898
 #: includes/managers/shortcodes.php:258 includes/managers/shortcodes.php:337
 msgid "Email Address"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:767
-#: admin/includes/classes/class-options-panel.php:768
+#: admin/includes/classes/class-options-panel.php:758
+#: admin/includes/classes/class-options-panel.php:759
 #: includes/managers/shortcodes.php:260
 msgid "Register"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:774
-#: admin/includes/classes/class-options-panel.php:775
+#: admin/includes/classes/class-options-panel.php:765
+#: admin/includes/classes/class-options-panel.php:766
 #: includes/managers/shortcodes.php:261
 msgid "Already have an account?"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:781
-#: admin/includes/classes/class-options-panel.php:782
+#: admin/includes/classes/class-options-panel.php:772
+#: admin/includes/classes/class-options-panel.php:773
 #: includes/managers/shortcodes.php:262
 msgid "Sign In"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:788
+#: admin/includes/classes/class-options-panel.php:779
 msgid "Reset Password Form Labels"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:794
+#: admin/includes/classes/class-options-panel.php:785
 #: includes/managers/shortcodes.php:297
 msgid "To reset your password, please enter your email address or username below"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:795
+#: admin/includes/classes/class-options-panel.php:786
 msgid "To reset your password..."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:801
-#: admin/includes/classes/class-options-panel.php:802
+#: admin/includes/classes/class-options-panel.php:792
+#: admin/includes/classes/class-options-panel.php:793
 #: includes/managers/shortcodes.php:298
 msgid "Enter your new password below."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:808
+#: admin/includes/classes/class-options-panel.php:799
 msgid ""
 "Check your e-mail address linked to the account for the confirmation link, "
 "including the spam or junk folder.\n"
 "            "
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:810
+#: admin/includes/classes/class-options-panel.php:801
 msgid "Email Confirmation"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:816
-#: admin/includes/classes/class-options-panel.php:817
+#: admin/includes/classes/class-options-panel.php:807
+#: admin/includes/classes/class-options-panel.php:808
 #: includes/managers/shortcodes.php:299
 msgid "Username or Email"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:823
-#: admin/includes/classes/class-options-panel.php:824
+#: admin/includes/classes/class-options-panel.php:814
+#: admin/includes/classes/class-options-panel.php:815
 #: includes/managers/shortcodes.php:300
 msgid "New Password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:830
-#: admin/includes/classes/class-options-panel.php:831
+#: admin/includes/classes/class-options-panel.php:821
+#: admin/includes/classes/class-options-panel.php:822
 #: includes/managers/shortcodes.php:301
 msgid "Re-enter New Password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:837
+#: admin/includes/classes/class-options-panel.php:828
 #: includes/classes/class-rewrite.php:156
 msgid ""
 "Your password reset link appears to be invalid. Please request a new link "
 "below."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:838
+#: admin/includes/classes/class-options-panel.php:829
 msgid "Your password reset link appears to be invalid."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:844
+#: admin/includes/classes/class-options-panel.php:835
 #: includes/classes/class-rewrite.php:159
 msgid "Your password reset link has expired. Please request a new link below."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:845
+#: admin/includes/classes/class-options-panel.php:836
 msgid "Your password reset link has expired."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:851
-#: admin/includes/classes/class-options-panel.php:852
+#: admin/includes/classes/class-options-panel.php:842
+#: admin/includes/classes/class-options-panel.php:843
 #: includes/managers/shortcodes.php:302
 msgid "Get New Password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:858
-#: admin/includes/classes/class-options-panel.php:859
+#: admin/includes/classes/class-options-panel.php:849
+#: admin/includes/classes/class-options-panel.php:850
 #: includes/managers/shortcodes.php:303
 msgid "Reset password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:865
-#: admin/includes/classes/class-options-panel.php:866
+#: admin/includes/classes/class-options-panel.php:856
+#: admin/includes/classes/class-options-panel.php:857
 #: includes/managers/shortcodes.php:304
 msgid "Go to login page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:872
+#: admin/includes/classes/class-options-panel.php:863
 msgid "Edit Account Form Labels"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:892
-#: admin/includes/classes/class-options-panel.php:893
+#: admin/includes/classes/class-options-panel.php:883
+#: admin/includes/classes/class-options-panel.php:884
 #: includes/managers/shortcodes.php:335
 msgid "Website"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:899
-#: admin/includes/classes/class-options-panel.php:900
+#: admin/includes/classes/class-options-panel.php:890
+#: admin/includes/classes/class-options-panel.php:891
 #: includes/managers/shortcodes.php:336
 msgid "Biographical Info"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:913
-#: admin/includes/classes/class-options-panel.php:914
+#: admin/includes/classes/class-options-panel.php:904
+#: admin/includes/classes/class-options-panel.php:905
 #: admin/includes/general-functions.php:722
 #: includes/managers/shortcodes.php:338
 msgid "Upload Avatar"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:920
-#: admin/includes/classes/class-options-panel.php:921
+#: admin/includes/classes/class-options-panel.php:911
+#: admin/includes/classes/class-options-panel.php:912
 #: includes/managers/shortcodes.php:339 includes/managers/shortcodes.php:495
 msgid "Submit"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:927
+#: admin/includes/classes/class-options-panel.php:918
 #: includes/managers/shortcodes.php:340 includes/managers/shortcodes.php:499
 msgid "You don't have access to edit the information on this page!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:928
+#: admin/includes/classes/class-options-panel.php:919
 msgid "You don't have access Message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:934
+#: admin/includes/classes/class-options-panel.php:925
 msgid "Two Factor Notices"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:940
-#: includes/general-functions.php:1421
+#: admin/includes/classes/class-options-panel.php:931
+#: includes/general-functions.php:1423
 msgid "Enter the six-digit code from the application"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:941
+#: admin/includes/classes/class-options-panel.php:932
 msgid "Two Factor Title"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:947
+#: admin/includes/classes/class-options-panel.php:938
 #: includes/classes/class-two-factor-validation.php:48
 #: includes/general-hooks.php:778
 msgid "The one-time password (TFA code) you entered was incorrect"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:948
+#: admin/includes/classes/class-options-panel.php:939
 msgid "Incorrect one-time password message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:954
+#: admin/includes/classes/class-options-panel.php:945
 msgid "Recaptcha Notices"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:960
+#: admin/includes/classes/class-options-panel.php:951
 #: includes/general-hooks.php:695
 msgid "The secret parameter is missing."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:961
+#: admin/includes/classes/class-options-panel.php:952
 msgid "Recaptcha Missing Secret."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:967
+#: admin/includes/classes/class-options-panel.php:958
 #: includes/general-hooks.php:696
 msgid "The secret parameter is invalid or malformed."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:968
+#: admin/includes/classes/class-options-panel.php:959
 msgid "Recaptcha Invalid Secret."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:974
+#: admin/includes/classes/class-options-panel.php:965
 #: includes/general-hooks.php:697
 msgid "Please confirm you are not a robot"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:975
+#: admin/includes/classes/class-options-panel.php:966
 msgid "Recaptcha Missing Input."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:981
+#: admin/includes/classes/class-options-panel.php:972
 #: includes/general-hooks.php:698
 msgid "The response parameter is invalid or malformed."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:982
+#: admin/includes/classes/class-options-panel.php:973
 msgid "Recaptcha Invalid Input."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:988
+#: admin/includes/classes/class-options-panel.php:979
 #: includes/general-hooks.php:699
 msgid "The request is invalid or malformed."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:989
+#: admin/includes/classes/class-options-panel.php:980
 msgid "Recaptcha Bad Request."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:995
+#: admin/includes/classes/class-options-panel.php:986
 #: includes/general-hooks.php:700
 msgid ""
 "The response is no longer valid: either is too old or has been used "
 "previously."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:996
+#: admin/includes/classes/class-options-panel.php:987
 msgid "The response is no longer valid."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1002
-#: admin/includes/classes/class-options-panel.php:1003
+#: admin/includes/classes/class-options-panel.php:993
+#: admin/includes/classes/class-options-panel.php:994
 #: includes/general-hooks.php:701
 msgid "Undefined reCAPTCHA error."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1009
-#: admin/includes/classes/class-options-panel.php:1010
+#: admin/includes/classes/class-options-panel.php:1000
+#: admin/includes/classes/class-options-panel.php:1001
 #: includes/general-hooks.php:702
 msgid "It is very likely a bot."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1031
+#: admin/includes/classes/class-options-panel.php:1022
 msgid ""
 "Warning: Please never cache pages \"Login\", \"Password Reset\", "
 "\"Register\", \"Edit Account\", \"User Profiles\". These pages may work "
 "wrong if cached."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1038
+#: admin/includes/classes/class-options-panel.php:1029
 msgid "Select Login Page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1044
+#: admin/includes/classes/class-options-panel.php:1035
 msgid "Login Redirect URL"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1050
+#: admin/includes/classes/class-options-panel.php:1041
 msgid "Logout Redirect URL"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1057
+#: admin/includes/classes/class-options-panel.php:1048
 msgid "Redirect WordPress Default Login"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1058
+#: admin/includes/classes/class-options-panel.php:1049
 msgid ""
 "You can easily replace default WordPress login page with your own custom "
 "login page."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1066
+#: admin/includes/classes/class-options-panel.php:1057
 msgid "Select Signup Page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1072
+#: admin/includes/classes/class-options-panel.php:1063
 msgid "Signup Redirect URL"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1078
+#: admin/includes/classes/class-options-panel.php:1069
 msgid "Signup Status"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1081
+#: admin/includes/classes/class-options-panel.php:1072
 msgid "Auto Approve"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1082
+#: admin/includes/classes/class-options-panel.php:1073
 msgid "Require Email Activation"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1090
+#: admin/includes/classes/class-options-panel.php:1081
 msgid "Enable Auto Login After Signup"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1101
+#: admin/includes/classes/class-options-panel.php:1092
 msgid "Select Reset Password Page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1109
+#: admin/includes/classes/class-options-panel.php:1100
 msgid "Select Edit Account Page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1120
+#: admin/includes/classes/class-options-panel.php:1111
 msgid "Logged In Message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1126
+#: admin/includes/classes/class-options-panel.php:1117
 msgid "Enable 2-factor Authentication"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1127
+#: admin/includes/classes/class-options-panel.php:1118
 msgid "Increase security for user accounts by using multiple authentication steps."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1128
+#: admin/includes/classes/class-options-panel.php:1119
 msgid ""
 "After activating this option, put the %s shortcode in the profile tabs or "
 "any another page."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1134
+#: admin/includes/classes/class-options-panel.php:1125
 msgid "Enable Google reCAPTCHA"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1135
+#: admin/includes/classes/class-options-panel.php:1126
 msgid ""
 "Turn on or off your Google reCAPTCHA on your site registration, login and "
 "reset password forms by default."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1141
+#: admin/includes/classes/class-options-panel.php:1132
 msgid "Enable Global reCAPTCHA Scripts"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1142
+#: admin/includes/classes/class-options-panel.php:1133
 msgid ""
 "Enable this option if you use the Recaptcha gobally on all pages. Like when "
 "you use it on Modal login forms."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1148
+#: admin/includes/classes/class-options-panel.php:1139
 msgid ""
 "Choose the type of reCAPTCHA for this site key. A site key only works with "
 "a single reCAPTCHA site type."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1150
+#: admin/includes/classes/class-options-panel.php:1141
 msgid "reCAPTCHA type"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1152
+#: admin/includes/classes/class-options-panel.php:1143
 msgid "reCAPTCHA v2"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1153
+#: admin/includes/classes/class-options-panel.php:1144
 msgid "reCAPTCHA v3"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1162
-#: admin/includes/classes/class-options-panel.php:1179
+#: admin/includes/classes/class-options-panel.php:1153
+#: admin/includes/classes/class-options-panel.php:1170
 msgid "Site Key"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1163
-#: admin/includes/classes/class-options-panel.php:1180
+#: admin/includes/classes/class-options-panel.php:1154
+#: admin/includes/classes/class-options-panel.php:1171
 msgid ""
 "You can register your site and generate a site key via <a "
 "href=\"https://www.google.com/recaptcha/\">Google reCAPTCHA</a>"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1169
-#: admin/includes/classes/class-options-panel.php:1186
+#: admin/includes/classes/class-options-panel.php:1160
+#: admin/includes/classes/class-options-panel.php:1177
 msgid "Secret Key"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1170
-#: admin/includes/classes/class-options-panel.php:1187
+#: admin/includes/classes/class-options-panel.php:1161
+#: admin/includes/classes/class-options-panel.php:1178
 msgid ""
 "Keep this a secret. You can get your secret key via <a "
 "href=\"https://www.google.com/recaptcha/\">Google reCAPTCHA</a>"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1194
+#: admin/includes/classes/class-options-panel.php:1185
 msgid "Type"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1195
-#: admin/includes/classes/class-options-panel.php:1299
+#: admin/includes/classes/class-options-panel.php:1186
+#: admin/includes/classes/class-options-panel.php:1290
 msgid "The type of reCAPTCHA to serve."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1197
+#: admin/includes/classes/class-options-panel.php:1188
 msgid "Audio"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1206
+#: admin/includes/classes/class-options-panel.php:1197
 msgid "Language"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1207
+#: admin/includes/classes/class-options-panel.php:1198
 msgid "Select the language to be used in your reCAPTCHA."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1286
+#: admin/includes/classes/class-options-panel.php:1277
 msgid "Theme"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1287
+#: admin/includes/classes/class-options-panel.php:1278
 msgid "Select a color theme of the widget."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1289
+#: admin/includes/classes/class-options-panel.php:1280
 msgid "Dark"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1290
+#: admin/includes/classes/class-options-panel.php:1281
 msgid "Light"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1298
+#: admin/includes/classes/class-options-panel.php:1289
 #: includes/classes/class-admin-customizer.php:450
 #: includes/elementor/widgets/counter.php:267
 #: includes/elementor/widgets/posts-button.php:317
 msgid "Size"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1301
+#: admin/includes/classes/class-options-panel.php:1292
 msgid "Compact"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1302
+#: admin/includes/classes/class-options-panel.php:1293
 #: includes/elementor/widgets/best-likers.php:379
 #: includes/elementor/widgets/best-likers.php:465
 #: includes/elementor/widgets/counter.php:211
@@ -1989,7 +2020,7 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1325
+#: admin/includes/classes/class-options-panel.php:1316
 msgid ""
 "Enhance your user experience by integrating seamless social logins on your "
 "platform. Whether you prefer to auto-display login options or manually "
@@ -1998,107 +2029,108 @@ msgid ""
 "optimize your user onboarding today!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1332
+#: admin/includes/classes/class-options-panel.php:1323
 msgid "Enable Social Logins"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1337
+#: admin/includes/classes/class-options-panel.php:1328
 msgid "Social networks"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1343
-#: admin/includes/classes/class-options-panel.php:2630
+#: admin/includes/classes/class-options-panel.php:1334
+#: admin/includes/classes/class-options-panel.php:2624
 msgid "Network"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1347
+#: admin/includes/classes/class-options-panel.php:1341
 msgid "Facebook"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1348
+#: admin/includes/classes/class-options-panel.php:1342
 msgid "GitHub"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1349
+#: admin/includes/classes/class-options-panel.php:1343
 msgid "Google"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1350
-msgid "Twitter"
+#: admin/includes/classes/class-options-panel.php:1344
+msgid "X"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1351
+#: admin/includes/classes/class-options-panel.php:1345
 msgid "Amazon"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1352
+#: admin/includes/classes/class-options-panel.php:1346
 msgid "LinkedIn"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1353
+#: admin/includes/classes/class-options-panel.php:1347
 msgid "Apple"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1354
+#: admin/includes/classes/class-options-panel.php:1348
 msgid "WordPress"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1355
+#: admin/includes/classes/class-options-panel.php:1349
 msgid "Yahoo"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1356
+#: admin/includes/classes/class-options-panel.php:1350
 msgid "Slack"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1357
+#: admin/includes/classes/class-options-panel.php:1351
 msgid "Medium"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1358
+#: admin/includes/classes/class-options-panel.php:1352
 msgid "Dribbble"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1359
+#: admin/includes/classes/class-options-panel.php:1353
 msgid "Paypal"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1365
+#: admin/includes/classes/class-options-panel.php:1359
 msgid "Login Button Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1366
+#: admin/includes/classes/class-options-panel.php:1360
 msgid "Controls the text displayed on the login button."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1371
+#: admin/includes/classes/class-options-panel.php:1365
 msgid "Link Button Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1372
+#: admin/includes/classes/class-options-panel.php:1366
 msgid "Controls the text displayed on the link account button."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1377
+#: admin/includes/classes/class-options-panel.php:1371
 msgid "Client ID"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1378
+#: admin/includes/classes/class-options-panel.php:1372
 msgid "Your app ID"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1383
+#: admin/includes/classes/class-options-panel.php:1377
 msgid "Client Secret"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1384
+#: admin/includes/classes/class-options-panel.php:1378
 msgid "Your app secret"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1390
+#: admin/includes/classes/class-options-panel.php:1384
 msgid "Disable Social Connect"
 msgstr ""
 
+#: admin/includes/classes/class-options-panel.php:1389
 #: admin/includes/classes/class-options-panel.php:1395
 #: admin/includes/classes/class-options-panel.php:1401
 #: admin/includes/classes/class-options-panel.php:1407
@@ -2111,24 +2143,23 @@ msgstr ""
 #: admin/includes/classes/class-options-panel.php:1449
 #: admin/includes/classes/class-options-panel.php:1455
 #: admin/includes/classes/class-options-panel.php:1461
-#: admin/includes/classes/class-options-panel.php:1467
 msgid "The redirect URI is:"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1476
-#: admin/includes/classes/class-options-panel.php:2669
+#: admin/includes/classes/class-options-panel.php:1470
+#: admin/includes/classes/class-options-panel.php:2666
 #: admin/includes/classes/class-shortcoder.php:690
 msgid "View"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1478
-#: admin/includes/classes/class-options-panel.php:2671
+#: admin/includes/classes/class-options-panel.php:1472
+#: admin/includes/classes/class-options-panel.php:2668
 #: admin/includes/classes/class-shortcoder.php:692
 msgid "Icon & Text"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1479
-#: admin/includes/classes/class-options-panel.php:2672
+#: admin/includes/classes/class-options-panel.php:1473
+#: admin/includes/classes/class-options-panel.php:2669
 #: admin/includes/classes/class-shortcoder.php:693
 #: includes/classes/class-admin-customizer.php:427
 #: includes/elementor/widgets/counter.php:137
@@ -2137,68 +2168,68 @@ msgstr ""
 msgid "Icon"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1488
-#: admin/includes/classes/class-options-panel.php:2680
+#: admin/includes/classes/class-options-panel.php:1482
+#: admin/includes/classes/class-options-panel.php:2677
 #: admin/includes/classes/class-shortcoder.php:701
 msgid "Skin"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1490
-#: admin/includes/classes/class-options-panel.php:2682
+#: admin/includes/classes/class-options-panel.php:1484
+#: admin/includes/classes/class-options-panel.php:2679
 #: admin/includes/classes/class-shortcoder.php:703
 msgid "Gradient"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1491
-#: admin/includes/classes/class-options-panel.php:2683
+#: admin/includes/classes/class-options-panel.php:1485
+#: admin/includes/classes/class-options-panel.php:2680
 #: admin/includes/classes/class-shortcoder.php:704
 msgid "Minimal"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1492
-#: admin/includes/classes/class-options-panel.php:2684
+#: admin/includes/classes/class-options-panel.php:1486
+#: admin/includes/classes/class-options-panel.php:2681
 #: admin/includes/classes/class-shortcoder.php:705
 msgid "Framed"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1493
-#: admin/includes/classes/class-options-panel.php:2685
+#: admin/includes/classes/class-options-panel.php:1487
+#: admin/includes/classes/class-options-panel.php:2682
 #: admin/includes/classes/class-shortcoder.php:706
 msgid "Boxed"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1494
-#: admin/includes/classes/class-options-panel.php:2686
+#: admin/includes/classes/class-options-panel.php:1488
+#: admin/includes/classes/class-options-panel.php:2683
 #: admin/includes/classes/class-shortcoder.php:707
 msgid "Flat"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1501
-#: admin/includes/classes/class-options-panel.php:2692
+#: admin/includes/classes/class-options-panel.php:1495
+#: admin/includes/classes/class-options-panel.php:2689
 #: admin/includes/classes/class-shortcoder.php:713
 msgid "Shape"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1504
-#: admin/includes/classes/class-options-panel.php:2695
+#: admin/includes/classes/class-options-panel.php:1498
+#: admin/includes/classes/class-options-panel.php:2692
 #: admin/includes/classes/class-shortcoder.php:716
 msgid "Square"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1505
-#: admin/includes/classes/class-options-panel.php:2696
+#: admin/includes/classes/class-options-panel.php:1499
+#: admin/includes/classes/class-options-panel.php:2693
 #: admin/includes/classes/class-shortcoder.php:717
 msgid "Rounded"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1506
-#: admin/includes/classes/class-options-panel.php:2697
+#: admin/includes/classes/class-options-panel.php:1500
+#: admin/includes/classes/class-options-panel.php:2694
 #: admin/includes/classes/class-shortcoder.php:718
 msgid "Circle"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1514
-#: admin/includes/classes/class-options-panel.php:2704
+#: admin/includes/classes/class-options-panel.php:1508
+#: admin/includes/classes/class-options-panel.php:2701
 #: admin/includes/classes/class-shortcoder.php:725
 #: includes/classes/class-admin-customizer.php:295
 #: includes/classes/class-admin-customizer.php:432
@@ -2241,254 +2272,254 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1516
-#: admin/includes/classes/class-options-panel.php:2706
+#: admin/includes/classes/class-options-panel.php:1510
+#: admin/includes/classes/class-options-panel.php:2703
 #: admin/includes/classes/class-shortcoder.php:727
 msgid "Official"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1517
-#: admin/includes/classes/class-options-panel.php:1766
-#: admin/includes/classes/class-options-panel.php:2707
+#: admin/includes/classes/class-options-panel.php:1511
+#: admin/includes/classes/class-options-panel.php:1760
+#: admin/includes/classes/class-options-panel.php:2704
 #: admin/includes/classes/class-shortcoder.php:728
 #: includes/elementor/modules/query-control/controls/group-control-query.php:295
 msgid "Custom"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1524
+#: admin/includes/classes/class-options-panel.php:1518
 #: includes/elementor/widgets/most-liked-posts.php:670
 msgid "Layout"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1531
-#: admin/includes/classes/class-options-panel.php:2731
+#: admin/includes/classes/class-options-panel.php:1525
+#: admin/includes/classes/class-options-panel.php:2728
 msgid "Auto Display"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1534
-#: admin/includes/classes/class-options-panel.php:2734
+#: admin/includes/classes/class-options-panel.php:1528
+#: admin/includes/classes/class-options-panel.php:2731
 #: includes/elementor/modules/query-control/controls/group-control-related.php:58
 msgid "None"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1535
+#: admin/includes/classes/class-options-panel.php:1529
 msgid "After Login Form"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1536
+#: admin/includes/classes/class-options-panel.php:1530
 msgid "Before Login Form"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1537
-#: admin/includes/classes/class-options-panel.php:2738
+#: admin/includes/classes/class-options-panel.php:1531
+#: admin/includes/classes/class-options-panel.php:2735
 msgid "Cutom Hook"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1544
-#: admin/includes/classes/class-options-panel.php:2744
+#: admin/includes/classes/class-options-panel.php:1538
+#: admin/includes/classes/class-options-panel.php:2741
 msgid "Enter Hook Name"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1545
-#: admin/includes/classes/class-options-panel.php:2745
+#: admin/includes/classes/class-options-panel.php:1539
+#: admin/includes/classes/class-options-panel.php:2742
 msgid ""
 "Please enter your desired action name in this field so that the social "
 "buttons are automatically displayed there."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1556
-#: admin/includes/classes/class-options-panel.php:2717
+#: admin/includes/classes/class-options-panel.php:1550
+#: admin/includes/classes/class-options-panel.php:2714
 #: admin/includes/classes/class-shortcoder.php:675
 msgid "Before Content"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1566
-#: admin/includes/classes/class-options-panel.php:2726
+#: admin/includes/classes/class-options-panel.php:1560
+#: admin/includes/classes/class-options-panel.php:2723
 #: admin/includes/classes/class-shortcoder.php:684
 msgid "After Content"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1596
+#: admin/includes/classes/class-options-panel.php:1590
 #: includes/elementor/widgets/most-liked-posts.php:1234
 msgid "Read More"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1603
+#: admin/includes/classes/class-options-panel.php:1597
 msgid "Enable User Profiles"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1610
+#: admin/includes/classes/class-options-panel.php:1604
 msgid "Select Profile Page"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1618
+#: admin/includes/classes/class-options-panel.php:1612
 msgid ""
 "Here you can control the permalink structure of the user profile URL "
 "globally."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1619
+#: admin/includes/classes/class-options-panel.php:1613
 msgid "Profile Permalink Base"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1622
+#: admin/includes/classes/class-options-panel.php:1616
 msgid "First and Last Name with '.'"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1623
+#: admin/includes/classes/class-options-panel.php:1617
 msgid "First and Last Name with '-'"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1624
+#: admin/includes/classes/class-options-panel.php:1618
 msgid "First and Last Name with '+'"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1625
+#: admin/includes/classes/class-options-panel.php:1619
 msgid "User ID"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1633
+#: admin/includes/classes/class-options-panel.php:1627
 msgid "Redirect author page to their profile"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1640
+#: admin/includes/classes/class-options-panel.php:1634
 msgid "User Profile Access"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1642
+#: admin/includes/classes/class-options-panel.php:1636
 msgid "Everyone"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1643
+#: admin/includes/classes/class-options-panel.php:1637
 msgid "Logged In Users"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1651
-#: admin/includes/classes/class-options-panel.php:2057
+#: admin/includes/classes/class-options-panel.php:1645
+#: admin/includes/classes/class-options-panel.php:2051
 msgid "Custom Redirect URL"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1658
-#: admin/includes/classes/class-options-panel.php:1889
+#: admin/includes/classes/class-options-panel.php:1652
+#: admin/includes/classes/class-options-panel.php:1883
 msgid "Show only for profile owner"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1659
+#: admin/includes/classes/class-options-panel.php:1653
 msgid ""
 "Restrict access to profiles only for the account holder. (In case of "
 "discrepancies, users will be redirected to their own profile.)"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1665
+#: admin/includes/classes/class-options-panel.php:1659
 msgid "Exclusive Roles"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1666
+#: admin/includes/classes/class-options-panel.php:1660
 msgid ""
 "Specify all user roles that can access the profile except the account "
 "holder."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1674
+#: admin/includes/classes/class-options-panel.php:1668
 msgid "Profile Appearance"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1678
-#: admin/includes/classes/class-options-panel.php:1943
+#: admin/includes/classes/class-options-panel.php:1672
+#: admin/includes/classes/class-options-panel.php:1937
 msgid "User Info"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1684
+#: admin/includes/classes/class-options-panel.php:1678
 msgid "Show user avatar"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1689
+#: admin/includes/classes/class-options-panel.php:1683
 msgid "Avatar image size"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1701
+#: admin/includes/classes/class-options-panel.php:1695
 msgid "Show user info section"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1707
+#: admin/includes/classes/class-options-panel.php:1701
 msgid "Show display name"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1714
+#: admin/includes/classes/class-options-panel.php:1708
 msgid "Show user description"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1721
+#: admin/includes/classes/class-options-panel.php:1715
 msgid "Show a custom message if user bio is empty"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1727
+#: admin/includes/classes/class-options-panel.php:1721
 msgid "Custom message"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1740
-#: admin/includes/classes/class-options-panel.php:1796
+#: admin/includes/classes/class-options-panel.php:1734
+#: admin/includes/classes/class-options-panel.php:1790
 msgid "Custom HTML"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1741
+#: admin/includes/classes/class-options-panel.php:1735
 msgid ""
 "A Custom HTML structure where you can display it at the bottom of the Info "
 "section. (This option also supports shortcode)"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1747
-#: admin/includes/classes/class-options-panel.php:1959
+#: admin/includes/classes/class-options-panel.php:1741
+#: admin/includes/classes/class-options-panel.php:1953
 #: includes/classes/class-admin-customizer.php:107
 msgid "Badges"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1753
+#: admin/includes/classes/class-options-panel.php:1747
 msgid "Show badges section"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1758
+#: admin/includes/classes/class-options-panel.php:1752
 msgid "Add Profile Badges"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1763
+#: admin/includes/classes/class-options-panel.php:1757
 msgid "Badge Type"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1765
+#: admin/includes/classes/class-options-panel.php:1759
 #: includes/elementor/widgets/most-liked-posts.php:449
 #: includes/elementor/widgets/posts-button.php:211
 msgid "Default"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1780
+#: admin/includes/classes/class-options-panel.php:1774
 msgid "Subtitle"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1797
+#: admin/includes/classes/class-options-panel.php:1791
 msgid ""
 "A Custom HTML structure where you can display it as a badge item. (This "
 "option also supports shortcode)"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1842
+#: admin/includes/classes/class-options-panel.php:1836
 #: includes/classes/class-admin-customizer.php:126
 msgid "Tabs"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1848
+#: admin/includes/classes/class-options-panel.php:1842
 msgid "Show tabs section"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1853
+#: admin/includes/classes/class-options-panel.php:1847
 msgid "Select Tabs Side"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1856
+#: admin/includes/classes/class-options-panel.php:1850
 msgid "Top"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1857
+#: admin/includes/classes/class-options-panel.php:1851
 #: includes/elementor/widgets/most-liked-activities.php:323
 #: includes/elementor/widgets/most-liked-comments.php:494
 #: includes/elementor/widgets/most-liked-posts.php:727
@@ -2496,7 +2527,7 @@ msgstr ""
 msgid "Left"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1858
+#: admin/includes/classes/class-options-panel.php:1852
 #: includes/elementor/widgets/most-liked-activities.php:331
 #: includes/elementor/widgets/most-liked-comments.php:502
 #: includes/elementor/widgets/most-liked-posts.php:735
@@ -2504,11 +2535,11 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1864
+#: admin/includes/classes/class-options-panel.php:1858
 msgid "Add Profile Tabs"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1874
+#: admin/includes/classes/class-options-panel.php:1868
 #: includes/elementor/widgets/most-liked-activities.php:348
 #: includes/elementor/widgets/most-liked-comments.php:519
 #: includes/elementor/widgets/most-liked-posts.php:962
@@ -2516,332 +2547,332 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1876
+#: admin/includes/classes/class-options-panel.php:1870
 msgid "A simple HTML/Text structure where you can use different shortcodes."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1882
+#: admin/includes/classes/class-options-panel.php:1876
 msgid "Create Link Tab"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1883
+#: admin/includes/classes/class-options-panel.php:1877
 msgid "Using this option, you can add custom external link for profile nav tabs."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1907
+#: admin/includes/classes/class-options-panel.php:1901
 msgid "Appearance"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1911
+#: admin/includes/classes/class-options-panel.php:1905
 #: includes/classes/class-admin-customizer.php:217
 msgid "Wrapper"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1916
+#: admin/includes/classes/class-options-panel.php:1910
 msgid "Header column width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1922
+#: admin/includes/classes/class-options-panel.php:1916
 msgid "Tabs column width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1927
+#: admin/includes/classes/class-options-panel.php:1921
 msgid "Heading"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1932
+#: admin/includes/classes/class-options-panel.php:1926
 msgid "Header info width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1938
+#: admin/includes/classes/class-options-panel.php:1932
 msgid "Header badges width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1948
+#: admin/includes/classes/class-options-panel.php:1942
 msgid "Avatar column width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1954
+#: admin/includes/classes/class-options-panel.php:1948
 msgid "User info column width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1964
+#: admin/includes/classes/class-options-panel.php:1958
 msgid "Badge item width"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1981
+#: admin/includes/classes/class-options-panel.php:1975
 msgid "Enable Upload Local Avatar"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1987
+#: admin/includes/classes/class-options-panel.php:1981
 msgid ""
 "Do you want to use gravatars instead of the default plugin profile photo "
 "(If the user did not upload a custom profile photo / avatar)"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1988
+#: admin/includes/classes/class-options-panel.php:1982
 msgid "Use Gravatars?"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:1994
+#: admin/includes/classes/class-options-panel.php:1988
 msgid "Default Avatar"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2007
+#: admin/includes/classes/class-options-panel.php:2001
 msgid "Avatar Maximum File Size"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2017
+#: admin/includes/classes/class-options-panel.php:2011
 msgid "Avatar Maximum Width "
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2025
+#: admin/includes/classes/class-options-panel.php:2019
 msgid "Image Quality"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2026
+#: admin/includes/classes/class-options-panel.php:2020
 msgid ""
 "Quality is used to determine quality of image uploads, and ranges from 0 "
 "(worst quality, smaller file) to 100 (best quality, biggest file). The "
 "default range is 60."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2036
+#: admin/includes/classes/class-options-panel.php:2030
 msgid "Enable Dashboard Limit Access"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2042
+#: admin/includes/classes/class-options-panel.php:2036
 msgid "Hide Admin Bar"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2048
+#: admin/includes/classes/class-options-panel.php:2042
 msgid "Dashboard User Access"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2049
+#: admin/includes/classes/class-options-panel.php:2043
 msgid "Dashboard access can be restricted to users of certain roles only."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2068
+#: admin/includes/classes/class-options-panel.php:2062
 msgid "Desktop"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2088
+#: admin/includes/classes/class-options-panel.php:2082
 msgid "Tablet"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2108
+#: admin/includes/classes/class-options-panel.php:2102
 msgid "Mobile"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2145
+#: admin/includes/classes/class-options-panel.php:2139
 msgid "Enable REST API"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2150
+#: admin/includes/classes/class-options-panel.php:2144
 msgid "Authentication Type"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2153
+#: admin/includes/classes/class-options-panel.php:2147
 msgid "User Login"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2154
+#: admin/includes/classes/class-options-panel.php:2148
 msgid "Custom Keys"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2161
+#: admin/includes/classes/class-options-panel.php:2155
 msgid "Access to readable routes"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2162
-#: admin/includes/classes/class-options-panel.php:2173
+#: admin/includes/classes/class-options-panel.php:2156
+#: admin/includes/classes/class-options-panel.php:2167
 msgid "Manage users' access level to REST API."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2172
+#: admin/includes/classes/class-options-panel.php:2166
 msgid "Access to writable routes"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2185
+#: admin/includes/classes/class-options-panel.php:2179
 msgid "Enable Auto User ID"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2217
-#: admin/includes/classes/class-options-panel.php:2771
+#: admin/includes/classes/class-options-panel.php:2211
+#: admin/includes/classes/class-options-panel.php:2768
 msgid "Posts"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2234
-#: admin/includes/classes/class-options-panel.php:2318
-#: admin/includes/classes/class-options-panel.php:2402
-#: admin/includes/classes/class-options-panel.php:2475
+#: admin/includes/classes/class-options-panel.php:2228
+#: admin/includes/classes/class-options-panel.php:2312
+#: admin/includes/classes/class-options-panel.php:2396
+#: admin/includes/classes/class-options-panel.php:2469
 msgid "Delete Orphaned Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2235
-#: admin/includes/classes/class-options-panel.php:2257
-#: admin/includes/classes/class-options-panel.php:2319
-#: admin/includes/classes/class-options-panel.php:2341
-#: admin/includes/classes/class-options-panel.php:2403
-#: admin/includes/classes/class-options-panel.php:2425
-#: admin/includes/classes/class-options-panel.php:2476
-#: admin/includes/classes/class-options-panel.php:2498
-#: admin/includes/classes/class-options-panel.php:2560
+#: admin/includes/classes/class-options-panel.php:2229
+#: admin/includes/classes/class-options-panel.php:2251
+#: admin/includes/classes/class-options-panel.php:2313
+#: admin/includes/classes/class-options-panel.php:2335
+#: admin/includes/classes/class-options-panel.php:2397
+#: admin/includes/classes/class-options-panel.php:2419
+#: admin/includes/classes/class-options-panel.php:2470
+#: admin/includes/classes/class-options-panel.php:2492
+#: admin/includes/classes/class-options-panel.php:2554
 msgid "Delete Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2236
-#: admin/includes/classes/class-options-panel.php:2320
-#: admin/includes/classes/class-options-panel.php:2404
-#: admin/includes/classes/class-options-panel.php:2477
+#: admin/includes/classes/class-options-panel.php:2230
+#: admin/includes/classes/class-options-panel.php:2314
+#: admin/includes/classes/class-options-panel.php:2398
+#: admin/includes/classes/class-options-panel.php:2471
 msgid ""
 "Drop all rows in the logs table where its related table row no longer "
 "exists. (Don't try this option if you're using custom IDs)"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2256
-#: admin/includes/classes/class-options-panel.php:2340
-#: admin/includes/classes/class-options-panel.php:2424
-#: admin/includes/classes/class-options-panel.php:2497
+#: admin/includes/classes/class-options-panel.php:2250
+#: admin/includes/classes/class-options-panel.php:2334
+#: admin/includes/classes/class-options-panel.php:2418
+#: admin/includes/classes/class-options-panel.php:2491
 msgid "Delete Dulicate Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2258
-#: admin/includes/classes/class-options-panel.php:2342
-#: admin/includes/classes/class-options-panel.php:2426
-#: admin/includes/classes/class-options-panel.php:2499
+#: admin/includes/classes/class-options-panel.php:2252
+#: admin/includes/classes/class-options-panel.php:2336
+#: admin/includes/classes/class-options-panel.php:2420
+#: admin/includes/classes/class-options-panel.php:2493
 msgid "Delete all duplicate rows generated by the spam users."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2267
-#: admin/includes/classes/class-options-panel.php:2351
-#: admin/includes/classes/class-options-panel.php:2435
-#: admin/includes/classes/class-options-panel.php:2508
+#: admin/includes/classes/class-options-panel.php:2261
+#: admin/includes/classes/class-options-panel.php:2345
+#: admin/includes/classes/class-options-panel.php:2429
+#: admin/includes/classes/class-options-panel.php:2502
 msgid "Optimize Table Overhead"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2268
-#: admin/includes/classes/class-options-panel.php:2352
-#: admin/includes/classes/class-options-panel.php:2436
-#: admin/includes/classes/class-options-panel.php:2509
+#: admin/includes/classes/class-options-panel.php:2262
+#: admin/includes/classes/class-options-panel.php:2346
+#: admin/includes/classes/class-options-panel.php:2430
+#: admin/includes/classes/class-options-panel.php:2503
 msgid "Optimize Table"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2269
-#: admin/includes/classes/class-options-panel.php:2353
-#: admin/includes/classes/class-options-panel.php:2437
-#: admin/includes/classes/class-options-panel.php:2510
+#: admin/includes/classes/class-options-panel.php:2263
+#: admin/includes/classes/class-options-panel.php:2347
+#: admin/includes/classes/class-options-panel.php:2431
+#: admin/includes/classes/class-options-panel.php:2504
 msgid ""
 "Overhead is a temporary disk space that is used by your database to store "
 "queries. Over time, a table’s overhead will increase."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2278
-#: admin/includes/classes/class-options-panel.php:2362
+#: admin/includes/classes/class-options-panel.php:2272
+#: admin/includes/classes/class-options-panel.php:2356
 msgid "Migrate Counter Metadata"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2279
-#: admin/includes/classes/class-options-panel.php:2363
+#: admin/includes/classes/class-options-panel.php:2273
+#: admin/includes/classes/class-options-panel.php:2357
 msgid "Migrate Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2280
-#: admin/includes/classes/class-options-panel.php:2364
+#: admin/includes/classes/class-options-panel.php:2274
+#: admin/includes/classes/class-options-panel.php:2358
 msgid "You are about to migrate counter values to wordpress meta table."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2289
-#: admin/includes/classes/class-options-panel.php:2373
-#: admin/includes/classes/class-options-panel.php:2446
-#: admin/includes/classes/class-options-panel.php:2519
+#: admin/includes/classes/class-options-panel.php:2283
+#: admin/includes/classes/class-options-panel.php:2367
+#: admin/includes/classes/class-options-panel.php:2440
+#: admin/includes/classes/class-options-panel.php:2513
 msgid "Reset Counter Values"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2290
-#: admin/includes/classes/class-options-panel.php:2374
-#: admin/includes/classes/class-options-panel.php:2447
-#: admin/includes/classes/class-options-panel.php:2520
+#: admin/includes/classes/class-options-panel.php:2284
+#: admin/includes/classes/class-options-panel.php:2368
+#: admin/includes/classes/class-options-panel.php:2441
+#: admin/includes/classes/class-options-panel.php:2514
 msgid "Reset Counter"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2291
-#: admin/includes/classes/class-options-panel.php:2375
-#: admin/includes/classes/class-options-panel.php:2448
-#: admin/includes/classes/class-options-panel.php:2521
+#: admin/includes/classes/class-options-panel.php:2285
+#: admin/includes/classes/class-options-panel.php:2369
+#: admin/includes/classes/class-options-panel.php:2442
+#: admin/includes/classes/class-options-panel.php:2515
 msgid "Reset all counters without affecting stats information."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2301
-#: admin/includes/classes/class-options-panel.php:2772
+#: admin/includes/classes/class-options-panel.php:2295
+#: admin/includes/classes/class-options-panel.php:2769
 msgid "Comments"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2385
+#: admin/includes/classes/class-options-panel.php:2379
 #: admin/includes/classes/class-stats.php:754
 #: includes/elementor/widgets/best-likers.php:203
 #: includes/elementor/widgets/most-liked-activities.php:707
 msgid "BuddyPress"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2458
+#: admin/includes/classes/class-options-panel.php:2452
 #: admin/includes/classes/class-stats.php:705
 #: includes/elementor/widgets/most-liked-topics.php:834
 msgid "bbPress"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2531
+#: admin/includes/classes/class-options-panel.php:2525
 msgid "Other cases"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2537
+#: admin/includes/classes/class-options-panel.php:2531
 msgid "Delete All Meta User Status"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2539
+#: admin/includes/classes/class-options-panel.php:2533
 msgid "You Are About To Delete All Meta User Status."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2548
+#: admin/includes/classes/class-options-panel.php:2542
 msgid "Delete All Meta Statistics Values"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2550
+#: admin/includes/classes/class-options-panel.php:2544
 msgid "You Are About To Delete All Meta Stats Values."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2559
+#: admin/includes/classes/class-options-panel.php:2553
 msgid "Delete Empty Post Meta Rows"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2561
+#: admin/includes/classes/class-options-panel.php:2555
 msgid "Drop all Metabox rows in the post meta table where its value is empty."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2570
+#: admin/includes/classes/class-options-panel.php:2564
 msgid "Create default pages"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2572
+#: admin/includes/classes/class-options-panel.php:2566
 msgid ""
 "This tool will install all the missing pages. Pages already defined and set "
 "up will not be replaced."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2581
+#: admin/includes/classes/class-options-panel.php:2575
 msgid "Delete default pages"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2582
+#: admin/includes/classes/class-options-panel.php:2576
 msgid "Delete Pages"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2583
+#: admin/includes/classes/class-options-panel.php:2577
 msgid "This tool will delete all the default pages"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2609
+#: admin/includes/classes/class-options-panel.php:2603
 msgid ""
 "You can create multiple share buttons as you wish and use them as "
 "shortocode or try auto display options. Just be sure to set the \"Slug\" "
@@ -2850,134 +2881,134 @@ msgid ""
 "social buttons:"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2615
+#: admin/includes/classes/class-options-panel.php:2609
 msgid "Add Share Items"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2620
+#: admin/includes/classes/class-options-panel.php:2614
 #: admin/includes/classes/class-shortcoder.php:579
 msgid "Slug"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2625
+#: admin/includes/classes/class-options-panel.php:2619
 msgid "Share Buttons "
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2634
+#: admin/includes/classes/class-options-panel.php:2631
 msgid "facebook"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2635
+#: admin/includes/classes/class-options-panel.php:2632
 msgid "linkedin"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2636
-msgid "twitter"
+#: admin/includes/classes/class-options-panel.php:2633
+msgid "x"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2637
+#: admin/includes/classes/class-options-panel.php:2634
 msgid "vkontakte"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2638
+#: admin/includes/classes/class-options-panel.php:2635
 msgid "odnoklassniki"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2639
+#: admin/includes/classes/class-options-panel.php:2636
 msgid "tumblr"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2640
+#: admin/includes/classes/class-options-panel.php:2637
 msgid "blogger"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2641
+#: admin/includes/classes/class-options-panel.php:2638
 msgid "pinterest"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2642
+#: admin/includes/classes/class-options-panel.php:2639
 msgid "digg"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2643
+#: admin/includes/classes/class-options-panel.php:2640
 msgid "evernote"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2644
+#: admin/includes/classes/class-options-panel.php:2641
 msgid "reddit"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2645
+#: admin/includes/classes/class-options-panel.php:2642
 msgid "delicious"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2646
+#: admin/includes/classes/class-options-panel.php:2643
 msgid "mix"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2647
+#: admin/includes/classes/class-options-panel.php:2644
 msgid "xing"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2648
+#: admin/includes/classes/class-options-panel.php:2645
 msgid "wordpress"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2649
+#: admin/includes/classes/class-options-panel.php:2646
 msgid "baidu"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2650
+#: admin/includes/classes/class-options-panel.php:2647
 msgid "renren"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2651
+#: admin/includes/classes/class-options-panel.php:2648
 msgid "weibo"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2652
+#: admin/includes/classes/class-options-panel.php:2649
 msgid "skype"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2653
+#: admin/includes/classes/class-options-panel.php:2650
 msgid "telegram"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2654
+#: admin/includes/classes/class-options-panel.php:2651
 msgid "whatsapp"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2655
+#: admin/includes/classes/class-options-panel.php:2652
 msgid "wechat"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2661
+#: admin/includes/classes/class-options-panel.php:2658
 #: includes/classes/class-admin-customizer.php:290
 msgid "Label"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2735
+#: admin/includes/classes/class-options-panel.php:2732
 msgid "After Button"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2736
+#: admin/includes/classes/class-options-panel.php:2733
 msgid "Before Button"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2737
+#: admin/includes/classes/class-options-panel.php:2734
 msgid "Modal After Vote"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2751
+#: admin/includes/classes/class-options-panel.php:2748
 msgid "Filter Status"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2752
-#: admin/includes/classes/class-options-panel.php:2767
+#: admin/includes/classes/class-options-panel.php:2749
+#: admin/includes/classes/class-options-panel.php:2764
 msgid "By selecting any type, you can disable adding share buttons in that area."
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2756
+#: admin/includes/classes/class-options-panel.php:2753
 #: admin/includes/classes/class-shortcoder.php:113
 #: admin/includes/classes/class-shortcoder.php:166
 #: admin/includes/classes/class-shortcoder.php:236
@@ -2987,99 +3018,99 @@ msgstr ""
 msgid "Like"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2758
+#: admin/includes/classes/class-options-panel.php:2755
 #: admin/includes/classes/class-shortcoder.php:168
 #: admin/includes/classes/class-shortcoder.php:238
 msgid "Unlike"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2766
+#: admin/includes/classes/class-options-panel.php:2763
 msgid "Filter Types"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2773
+#: admin/includes/classes/class-options-panel.php:2770
 msgid "Activities"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2774
+#: admin/includes/classes/class-options-panel.php:2771
 msgid "Topics"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2798
+#: admin/includes/classes/class-options-panel.php:2795
 msgid "Emails"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2804
+#: admin/includes/classes/class-options-panel.php:2801
 msgid "You can use the following variables in all templates:"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2810
-#: admin/includes/classes/class-options-panel.php:2867
-#: admin/includes/classes/class-options-panel.php:2886
+#: admin/includes/classes/class-options-panel.php:2807
+#: admin/includes/classes/class-options-panel.php:2864
+#: admin/includes/classes/class-options-panel.php:2883
 msgid "Account Welcome Email"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2815
-#: admin/includes/classes/class-options-panel.php:2834
-#: admin/includes/classes/class-options-panel.php:2853
-#: admin/includes/classes/class-options-panel.php:2872
-#: admin/includes/classes/class-options-panel.php:2891
+#: admin/includes/classes/class-options-panel.php:2812
+#: admin/includes/classes/class-options-panel.php:2831
+#: admin/includes/classes/class-options-panel.php:2850
+#: admin/includes/classes/class-options-panel.php:2869
+#: admin/includes/classes/class-options-panel.php:2888
 msgid "Subject Line"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2816
+#: admin/includes/classes/class-options-panel.php:2813
 msgid "Welcome to {site_name}!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2822
-#: admin/includes/classes/class-options-panel.php:2841
-#: admin/includes/classes/class-options-panel.php:2860
-#: admin/includes/classes/class-options-panel.php:2879
-#: admin/includes/classes/class-options-panel.php:2898
+#: admin/includes/classes/class-options-panel.php:2819
+#: admin/includes/classes/class-options-panel.php:2838
+#: admin/includes/classes/class-options-panel.php:2857
+#: admin/includes/classes/class-options-panel.php:2876
+#: admin/includes/classes/class-options-panel.php:2895
 msgid "Message Body"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2829
+#: admin/includes/classes/class-options-panel.php:2826
 msgid "Password Reset Email"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2835
+#: admin/includes/classes/class-options-panel.php:2832
 msgid "Reset your password"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2848
+#: admin/includes/classes/class-options-panel.php:2845
 msgid "Password Changed Email"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2854
+#: admin/includes/classes/class-options-panel.php:2851
 msgid "Your {site_name} password has been changed!"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2873
+#: admin/includes/classes/class-options-panel.php:2870
 msgid "Please activate your account"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2892
+#: admin/includes/classes/class-options-panel.php:2889
 msgid "Your account at {site_name} is now active"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2905
+#: admin/includes/classes/class-options-panel.php:2902
 msgid "Admin E-mail Address"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2911
+#: admin/includes/classes/class-options-panel.php:2908
 msgid "Mail appears from"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2917
+#: admin/includes/classes/class-options-panel.php:2914
 msgid "Mail appears from address"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2924
+#: admin/includes/classes/class-options-panel.php:2921
 msgid "Use HTML for E-mails?"
 msgstr ""
 
-#: admin/includes/classes/class-options-panel.php:2946
+#: admin/includes/classes/class-options-panel.php:2943
 #: includes/classes/class-admin-customizer.php:474
 msgid "Backup"
 msgstr ""
@@ -3627,39 +3658,15 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: admin/includes/templates/license.php:68
-msgid "Status"
-msgstr ""
-
 #: admin/includes/templates/license.php:70
-msgid "Expired"
-msgstr ""
-
-#: admin/includes/templates/license.php:72
-msgid "Mismatch"
-msgstr ""
-
-#: admin/includes/templates/license.php:74
-msgid "Invalid"
-msgstr ""
-
-#: admin/includes/templates/license.php:76
-msgid "Disabled"
-msgstr ""
-
-#: admin/includes/templates/license.php:78
-msgid "Active"
-msgstr ""
-
-#: admin/includes/templates/license.php:83
 msgid ""
 "<strong>Your License Has Expired.</strong> <a href=\"%s\" "
 "target=\"_blank\">Renew your license today</a> to keep getting feature "
 "updates, premium support and unlimited access to the template library."
 msgstr ""
 
-#: admin/includes/templates/license.php:87
-#: admin/includes/templates/license.php:91
+#: admin/includes/templates/license.php:74
+#: admin/includes/templates/license.php:78
 msgid ""
 "<strong>Your license key doesn't match your current domain</strong>. This "
 "is most likely due to a change in the domain URL of your site (including "
@@ -3870,16 +3877,16 @@ msgstr ""
 msgid "Edit Account"
 msgstr ""
 
-#: includes/classes/class-likers.php:39
+#: includes/classes/class-likers.php:40
 msgid "Invalid item type."
 msgstr ""
 
-#: includes/classes/class-likers.php:48
+#: includes/classes/class-likers.php:49
 msgid "This item has not been liked by any user!"
 msgstr ""
 
 #: includes/classes/class-login.php:101 includes/classes/class-password.php:174
-#: includes/classes/class-profile.php:94 includes/classes/class-signup.php:137
+#: includes/classes/class-profile.php:94 includes/classes/class-signup.php:140
 #: includes/classes/class-social-login.php:81
 msgid "It is not possible to perform this process in preview mode!"
 msgstr ""
@@ -4979,8 +4986,6 @@ msgid "Top Topics"
 msgstr ""
 
 #: includes/elementor/widgets/posts-button.php:54
-#: includes/general-functions.php:353 includes/general-functions.php:457
-#: includes/general-functions.php:506 includes/general-functions.php:575
 msgid "Like Button"
 msgstr ""
 
@@ -5232,12 +5237,8 @@ msgstr ""
 
 #. Description of the plugin/theme
 msgid ""
-"WP ULike PRO is a cutting-edge web marketing toolkit that supercharges your "
-"site's engagement and analytics capabilities. Instantly elevate your "
-"on-page SEO, identify your top-performing content, and gain valuable "
-"insights through user votes. With no coding required, it’s easy to "
-"integrate and use, making it perfect for boosting interaction and "
-"optimizing your site's performance."
+"WP ULike PRO boosts engagement with voting, user profiles, schema, and "
+"analytics—optimizing your site's performance effortlessly."
 msgstr ""
 
 #. Author of the plugin/theme
