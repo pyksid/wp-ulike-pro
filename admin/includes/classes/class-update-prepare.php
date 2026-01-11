@@ -1,42 +1,53 @@
 <?php
 
 // no direct access allowed
-if ( ! defined('ABSPATH') ) {
-    die();
+if ( ! defined( 'ABSPATH' ) ) {
+	die();
 }
 
+/**
+ * Class WP_Ulike_Pro_Update_Prepare
+ *
+ * Handles plugin update preparation and version checking.
+ *
+ * @package WP_Ulike_Pro
+ */
 class WP_Ulike_Pro_Update_Prepare {
 
 	/**
 	 * The plugin current version
+	 *
 	 * @var string
 	 */
 	public $current_version;
 
 	/**
 	 * Plugin Slug (plugin_directory/plugin_file.php)
-     *
+	 *
 	 * @var string
 	 */
-    public $plugin_slug;
+	public $plugin_slug;
 
 	/**
 	 * Plugin name (plugin_file)
-     *
+	 *
 	 * @var string
 	 */
 	public $plugin_name;
 
-    /**
-     * Private transient key
-     *
-     * @var st
-     */
+	/**
+	 * Private transient key
+	 *
+	 * @var string
+	 */
 	private $response_transient_key;
 
-    function __construct(){
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
 		// Set plugin current version
-        $this->current_version = WP_ULIKE_PRO_VERSION;
+		$this->current_version = WP_ULIKE_PRO_VERSION;
 		// Set the Plugin Slug
 		$this->plugin_slug = basename( WP_ULIKE_PRO__FILE__, '.php' );
 		$this->plugin_name = WP_ULIKE_PRO_BASENAME;
@@ -47,8 +58,13 @@ class WP_Ulike_Pro_Update_Prepare {
 		$this->maybe_delete_transients();
 	}
 
+	/**
+	 * Setup WordPress hooks
+	 *
+	 * @return void
+	 */
 	private function setup_hooks() {
-		// define the alternative API for updating checking
+		// Define the alternative API for updating checking
 		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ], 50 );
 		add_action( 'delete_site_transient_update_plugins', [ $this, 'delete_transients' ] );
 		// Define the alternative response for information checking
@@ -57,13 +73,9 @@ class WP_Ulike_Pro_Update_Prepare {
 		remove_action( 'after_plugin_row_' . $this->plugin_name, 'wp_plugin_update_row' );
 		add_action( 'after_plugin_row_' . $this->plugin_name, [ $this, 'show_update_notification' ], 10, 2 );
 
-		add_action( 'update_option_WPLANG', function () {
-			$this->clean_get_version_cache();
-		} );
-
-		add_action( 'upgrader_process_complete', function () {
-			$this->clean_get_version_cache();
-		} );
+		// Clear cache when language or upgrade changes
+		add_action( 'update_option_WPLANG', [ $this, 'clean_get_version_cache' ] );
+		add_action( 'upgrader_process_complete', [ $this, 'clean_get_version_cache' ] );
 	}
 
 	public function delete_transients() {
@@ -78,65 +90,74 @@ class WP_Ulike_Pro_Update_Prepare {
 	private function maybe_delete_transients() {
 		global $pagenow;
 
-		if ( 'update-core.php' === $pagenow && isset( $_GET['force-check'] ) ) {
-			$this->delete_transients();
+		// Only allow force-check on update-core.php page with proper capability
+		// Note: WordPress core doesn't use nonce verification for force-check as it's protected by capability checks
+		if ( 'update-core.php' === $pagenow && current_user_can( 'update_plugins' ) && isset( $_GET['force-check'] ) ) {
+			// Sanitize the force-check parameter
+			$force_check = sanitize_text_field( wp_unslash( $_GET['force-check'] ) );
+			if ( '1' === $force_check ) {
+				$this->delete_transients();
+			}
 		}
 	}
 
 	/**
 	 * Check transient info with server
 	 *
-	 * @param object $_transient_data
-	 * @return object
+	 * @param object|false $_transient_data Transient data object or false.
+	 * @return object Transient data object with update information.
 	 */
-	public function check_transient_data( $_transient_data ){
+	public function check_transient_data( $_transient_data ) {
 		if ( ! is_object( $_transient_data ) ) {
 			$_transient_data = new \stdClass();
 		}
 
-		$version_info = WP_Ulike_Pro_API::get_version( false /* Use Cache */ );
+		$version_info = WP_Ulike_Pro_API::get_version( false ); // Use Cache
 
 		if ( is_wp_error( $version_info ) ) {
 			return $_transient_data;
 		}
 
-		// include an unmodified $wp_version
-		include( ABSPATH . WPINC . '/version.php' );
+		// Include an unmodified $wp_version
+		require ABSPATH . WPINC . '/version.php';
 
 		if ( version_compare( $wp_version, $version_info['requires'], '<' ) ) {
 			return $_transient_data;
 		}
 
-		if ( version_compare( $this->current_version, $version_info['new_version'], '<' ) ) {
-			$plugin_info = (object) $version_info;
-			unset( $plugin_info->sections );
+		$plugin_info = (object) $version_info;
+		unset( $plugin_info->sections );
 
-			if( ! empty( $plugin_info->banners ) ){
-				$plugin_info->banners = maybe_unserialize( $plugin_info->banners );
-			}
+		$plugin_info->plugin = $this->plugin_name;
 
-			if( ! empty( $plugin_info->icons ) ){
-				$plugin_info->icons = maybe_unserialize( $plugin_info->icons );
-			}
-
-			$_transient_data->response[ $this->plugin_name ] = $plugin_info;
+		if ( ! empty( $plugin_info->banners ) ) {
+			$plugin_info->banners = maybe_unserialize( $plugin_info->banners );
 		}
 
-		$_transient_data->last_checked = current_time( 'timestamp' );
-		$_transient_data->checked[ $this->plugin_name ] = $this->current_version;
+		if ( ! empty( $plugin_info->icons ) ) {
+			$plugin_info->icons = maybe_unserialize( $plugin_info->icons );
+		}
+
+		if ( version_compare( $this->current_version, $version_info['new_version'], '<' ) ) {
+			$_transient_data->response[ $this->plugin_name ] = $plugin_info;
+			$_transient_data->checked[ $this->plugin_name ]  = $version_info['new_version'];
+		} else {
+			$_transient_data->no_update[ $this->plugin_name ] = $plugin_info;
+			$_transient_data->checked[ $this->plugin_name ]   = $this->current_version;
+		}
+
+		$_transient_data->last_checked = time();
 
 		return $_transient_data;
 	}
 
-    /**
+	/**
 	 * Add our self-hosted autoupdate plugin to the filter transient
 	 *
-	 * @param $transient
-	 * @return object $ transient
+	 * @param object|false $_transient_data Transient data object or false.
+	 * @return object Transient data object with update information.
 	 */
 	public function check_update( $_transient_data ) {
-		global $pagenow;
-
 		if ( ! is_object( $_transient_data ) ) {
 			$_transient_data = new \stdClass();
 		}
@@ -144,7 +165,15 @@ class WP_Ulike_Pro_Update_Prepare {
 		return $this->check_transient_data( $_transient_data );
 	}
 
-	public function plugins_api_filter( $_data, $_action = '', $_args = null  ){
+	/**
+	 * Filter plugin API response
+	 *
+	 * @param false|object|array $_data Plugin API response data.
+	 * @param string              $_action Action being performed.
+	 * @param object              $_args Arguments for the API request.
+	 * @return false|object|array Modified plugin API response data.
+	 */
+	public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
 		if ( 'plugin_information' !== $_action ) {
 			return $_data;
 		}
@@ -153,7 +182,8 @@ class WP_Ulike_Pro_Update_Prepare {
 			return $_data;
 		}
 
-		$cache_key = 'wp_ulike_pro_api_request_' . substr( md5( serialize( $this->plugin_slug ) ), 0, 15 );
+		// Optimized cache key generation (no need for serialize on simple string)
+		$cache_key = 'wp_ulike_pro_api_request_' . substr( md5( $this->plugin_slug ), 0, 15 );
 
 		$api_request_transient = get_site_transient( $cache_key );
 
@@ -178,6 +208,7 @@ class WP_Ulike_Pro_Update_Prepare {
 			$api_request_transient->download_link = $api_response['download_link'];
 			$api_request_transient->banners       = maybe_unserialize( $api_response['banners'] );
 			$api_request_transient->sections      = maybe_unserialize( $api_response['sections'] );
+			$api_request_transient->autoupdate    = true;
 
 			// Expires in 1 day
 			set_site_transient( $cache_key, $api_request_transient, DAY_IN_SECONDS );
@@ -186,13 +217,13 @@ class WP_Ulike_Pro_Update_Prepare {
 		$_data = $api_request_transient;
 
 		return $_data;
-    }
+	}
 
 	/**
 	 * Show update notices
 	 *
-	 * @param string $file
-	 * @param string $plugin
+	 * @param string $file Plugin file path.
+	 * @param array  $plugin Plugin data array.
 	 * @return void
 	 */
 	public function show_update_notification( $file, $plugin ) {
@@ -223,35 +254,24 @@ class WP_Ulike_Pro_Update_Prepare {
 		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
 	}
 
-	protected function get_transient( $cache_key ) {
-		$cache_data = get_option( $cache_key );
-
-		if ( empty( $cache_data['timeout'] ) || current_time( 'timestamp' ) > $cache_data['timeout'] ) {
-			// Cache is expired.
-			return false;
-		}
-
-		return $cache_data['value'];
-	}
-
-	protected function set_transient( $cache_key, $value, $expiration = 0 ) {
-		if ( empty( $expiration ) ) {
-			$expiration = strtotime( '+12 hours', current_time( 'timestamp' ) );
-		}
-
-		$data = [
-			'timeout' => $expiration,
-			'value' => $value,
-		];
-
-		update_option( $cache_key, $data, 'no' );
-	}
-
+	/**
+	 * Delete transient value
+	 *
+	 * Note: This uses options instead of WordPress transients for persistence.
+	 *
+	 * @param string $cache_key Cache key.
+	 * @return void
+	 */
 	protected function delete_transient( $cache_key ) {
 		delete_option( $cache_key );
 	}
 
-	private function clean_get_version_cache() {
+	/**
+	 * Clean version cache when language or upgrade completes
+	 *
+	 * @return void
+	 */
+	public function clean_get_version_cache() {
 		delete_option( 'wp_ulike_pro_remote_info_api_data_' . WP_ULIKE_PRO_VERSION );
 	}
 

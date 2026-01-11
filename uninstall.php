@@ -89,7 +89,8 @@ class wp_ulike_pro_uninstall {
 
 		$wpdb->query(
 			"DROP TABLE IF EXISTS
-			{$wpdb->prefix}ulike_sessions"
+			{$wpdb->prefix}ulike_sessions,
+			{$wpdb->prefix}ulike_views"
 		);
 
 	}
@@ -127,8 +128,8 @@ class wp_ulike_pro_uninstall {
 
 		global $wpdb;
 
-		// Delete all plugin metadata.
-		$wpdb->query( "DELETE from $wpdb->options WHERE option_name LIKE '_transient_wp_ulike_pro%'" );
+		// Delete all plugin transients and their timeouts.
+		$wpdb->query( "DELETE from $wpdb->options WHERE option_name LIKE '_transient_wp_ulike_pro%' OR option_name LIKE '_transient_timeout_wp_ulike_pro%'" );
 	}
 
 	/**

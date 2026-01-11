@@ -111,7 +111,8 @@ class WP_Ulike_Pro_Core_Pages {
 			update_option( 'wp_ulike_settings', $options );
 		}
 
-		return true;
+		// Return count of created pages
+		return count( $core_pages );
 	}
 
 }

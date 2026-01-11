@@ -169,7 +169,9 @@ add_filter( 'found_posts', 'wp_ulike_pro_manage_columns_found_posts', 10, 2 );
 function wp_ulike_pro_add_export_button_for_post_types( $which ) {
     global $typenow;
 
-    if ( 'top' === $which && ! empty( $_GET['orderby'] ) && in_array( $_GET['orderby'], array( 'likes', 'dislikes' ) ) ) {
+    // SECURITY: Sanitize and validate orderby parameter
+    $orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : '';
+    if ( 'top' === $which && ! empty( $orderby ) && in_array( $orderby, array( 'likes', 'dislikes' ), true ) ) {
         echo sprintf( '<input type="submit" name="ulp_export_post_type" class="button button-primary" value="%s" />', esc_html__('Export Logs',WP_ULIKE_PRO_DOMAIN) );
     }
 }

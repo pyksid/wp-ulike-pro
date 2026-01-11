@@ -46,6 +46,8 @@ class WP_Ulike_Pro_Permalinks {
 		$parts = parse_url( $this->get_current_url() );
 		if ( isset( $parts['query'] ) ) {
 			parse_str( $parts['query'], $query );
+			// SECURITY: Sanitize query parameters
+			$query = array_map( 'sanitize_text_field', $query );
 			return $query;
 		}
 
@@ -66,16 +68,18 @@ class WP_Ulike_Pro_Permalinks {
 
 		//check if WP-CLI there isn't set HTTP_HOST, use localhost instead
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			$host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : 'localhost';
+			$host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : 'localhost';
 		} else{
 			if ( isset( $_SERVER['HTTP_HOST'] ) ) {
-			  $host = $_SERVER['HTTP_HOST'];
+			  $host = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );
 			}else{
 			  $host = 'localhost';
 			}
 		}
 
-		$page_url = ( is_ssl() ? 'https://' : 'http://' ) . $host . $_SERVER['REQUEST_URI'];
+		// SECURITY: Sanitize REQUEST_URI
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$page_url = ( is_ssl() ? 'https://' : 'http://' ) . $host . $request_uri;
 
 		if ( $no_query_params == true ) {
 			$page_url = strtok( $page_url, '?' );
@@ -93,18 +97,27 @@ class WP_Ulike_Pro_Permalinks {
 		global $wpdb;
 
 		$permalink_base = WP_Ulike_Pro_Options::getProfilePermalinkBase();
-
+		
+		// SECURITY: Sanitize permalink_base and slug to prevent SQL injection
+		$permalink_base = sanitize_key( $permalink_base );
+		$slug = sanitize_text_field( $slug );
+		
+		// SECURITY: Use prepared statement
+		$meta_key = 'ulp_user_profile_url_slug_' . $permalink_base;
 		$user_id = $wpdb->get_var(
-			"SELECT user_id
-			FROM {$wpdb->usermeta}
-			WHERE meta_key = 'ulp_user_profile_url_slug_{$permalink_base}' AND
-					meta_value = '{$slug}'
-			ORDER BY umeta_id ASC
-			LIMIT 1"
+			$wpdb->prepare(
+				"SELECT user_id
+				FROM {$wpdb->usermeta}
+				WHERE meta_key = %s AND meta_value = %s
+				ORDER BY umeta_id ASC
+				LIMIT 1",
+				$meta_key,
+				$slug
+			)
 		);
 
 		if ( ! empty( $user_id ) ) {
-			return $user_id;
+			return absint( $user_id );
 		}
 
 		return false;
@@ -182,7 +195,8 @@ class WP_Ulike_Pro_Permalinks {
 					$difficulties++;
 				}
 
-				$full_name = strtolower( str_replace( " ", ".", $full_name ) );
+				// UTF-8: Use mb_strtolower for proper UTF-8 handling
+				$full_name = mb_strtolower( str_replace( " ", ".", $full_name ), 'UTF-8' );
 
 				if( strpos( $full_name, '_.' ) > -1 ){
 					$full_name  = str_replace('_.', '_', $full_name );
@@ -206,7 +220,8 @@ class WP_Ulike_Pro_Permalinks {
 
 				$difficulties = 0;
 
-				$full_name_slug = strtolower( $full_name );
+				// UTF-8: Use mb_strtolower for proper UTF-8 handling
+				$full_name_slug = mb_strtolower( $full_name, 'UTF-8' );
 
 				// if last name has dashed replace with underscore
 				if( strpos( $last_name, '-') > -1 && strpos( $full_name, '-' ) > -1 ){
@@ -237,7 +252,8 @@ class WP_Ulike_Pro_Permalinks {
 
 				$difficulties = 0;
 
-				$full_name_slug = strtolower( $full_name );
+				// UTF-8: Use mb_strtolower for proper UTF-8 handling
+				$full_name_slug = mb_strtolower( $full_name, 'UTF-8' );
 
 				// if last name has dashed replace with underscore
 				if( strpos( $last_name, '+') > -1 && strpos( $full_name, '+' ) > -1 ){

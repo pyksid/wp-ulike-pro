@@ -34,129 +34,167 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 			$this->sort     = $sort;
 		}
 
-		/**
-		 * get SQL results
-		 *
-		 * @return object
-		 */
-		public function get_results(){
-			$table     = esc_sql( $this->wpdb->prefix . $this->table );
-			$paged     = ( $this->page - 1 ) * $this->per_page;
-			$orderBy   = $this->sort['field'];
-			$orderType = $this->sort['type'];
-			$serachBy  = $this->generate_search_condition( $this->search );
+	/**
+	 * get SQL results
+	 *
+	 * @return object
+	 */
+	public function get_results(){
+		$table     = esc_sql( $this->wpdb->prefix . $this->table );
+		$paged     = absint( ( $this->page - 1 ) * $this->per_page );
+		$per_page  = absint( $this->per_page );
 
-			return $this->wpdb->get_results( "SELECT * FROM {$table} $serachBy ORDER BY {$orderBy} {$orderType} LIMIT {$paged}, {$this->per_page}" );
-		}
+		// Whitelist allowed order by fields to prevent SQL injection
+		$allowed_fields = array( 'id', 'user_id', 'post_id', 'comment_id', 'activity_id', 'topic_id', 'status', 'ip', 'date_time' );
+		$orderBy = isset( $this->sort['field'] ) && in_array( $this->sort['field'], $allowed_fields, true )
+			? esc_sql( $this->sort['field'] )
+			: 'id';
 
-		/**
-		 * get SQL row
-		 *
-		 * @return object
-		 */
-		public function get_row( $item_ID ){
-			$table = esc_sql( $this->wpdb->prefix . $this->table );
+		// Whitelist allowed order types
+		$orderType = isset( $this->sort['type'] ) && in_array( strtoupper( $this->sort['type'] ), array( 'ASC', 'DESC' ), true )
+			? strtoupper( $this->sort['type'] )
+			: 'ASC';
 
-			return $this->wpdb->get_row( "
-				SELECT *
-				FROM `$table`
-				WHERE `id` = $item_ID"
-			);
-		}
+		$serachBy  = $this->generate_search_condition( $this->search );
 
-		/**
-		 * get all SQL results
-		 *
-		 * @return object
-		 */
-		public function get_all_rows(){
-			$table = esc_sql( $this->wpdb->prefix . $this->table );
-			$orderBy   = $this->sort['field'];
-			$orderType = $this->sort['type'];
+		return $this->wpdb->get_results( $this->wpdb->prepare( "SELECT * FROM `{$table}` {$serachBy} ORDER BY `{$orderBy}` {$orderType} LIMIT %d, %d", $paged, $per_page ) );
+	}
 
-			return $this->wpdb->get_results( "
-				SELECT *
-				FROM `$table`
-				ORDER BY $orderBy $orderType"
-			);
-		}
+	/**
+	 * get SQL row
+	 *
+	 * @return object
+	 */
+	public function get_row( $item_ID ){
+		$table = esc_sql( $this->wpdb->prefix . $this->table );
+		$item_ID = absint( $item_ID );
 
-		/**
-		 * Generate search condition string by table type
-		 *
-		 * @param string $search
-		 * @return string
-		 */
-		private function generate_search_condition( $search ){
-			$output = 'WHERE 1';
-			$search = normalize_whitespace( esc_sql( $search ) );
+		return $this->wpdb->get_row( $this->wpdb->prepare( "
+			SELECT *
+			FROM `{$table}`
+			WHERE `id` = %d",
+			$item_ID
+		) );
+	}
 
-			if( ! empty( $search ) ){
-				switch ( $this->table ) {
-					case 'ulike_comments':
-						$output  = sprintf( '
-						WHERE Concat(`comment_id`, " ", `status`, " ", `ip`, " ", `date_time` ) like "%1$s" OR `comment_id` IN
-						(SELECT comment_ID FROM `%2$s` WHERE `comment_content` LIKE "%1$s" OR `comment_author` LIKE "%1$s" ) OR `user_id` IN
-						(SELECT ID FROM `%3$s` WHERE `user_login` LIKE "%1$s")'
-						, '%' . $search . '%', $this->wpdb->comments, $this->wpdb->users
-						);
-						break;
+	/**
+	 * get all SQL results
+	 *
+	 * @return object
+	 */
+	public function get_all_rows(){
+		$table = esc_sql( $this->wpdb->prefix . $this->table );
 
-					case 'ulike_activities':
-						// check buddypress activation
-						if( ! function_exists('is_buddypress') ){
-							break;
-						}
-						if ( is_multisite() ) {
-							$bp_prefix = 'base_prefix';
-						} else {
-							$bp_prefix = 'prefix';
-						}
-						$output  = sprintf( '
-						WHERE Concat(`activity_id`, " ", `status`, " ", `ip`, " ", `date_time` ) like "%1$s" OR `activity_id` IN
-						(SELECT id FROM `%2$sbp_activity` WHERE `content` LIKE "%1$s" ) OR `user_id` IN
-						(SELECT ID FROM `%3$s` WHERE `user_login` LIKE "%1$s")'
-						, '%' . $search . '%', $this->wpdb->$bp_prefix, $this->wpdb->users
-						);
-						break;
+		// Whitelist allowed order by fields to prevent SQL injection
+		$allowed_fields = array( 'id', 'user_id', 'post_id', 'comment_id', 'activity_id', 'topic_id', 'status', 'ip', 'date_time' );
+		$orderBy = isset( $this->sort['field'] ) && in_array( $this->sort['field'], $allowed_fields, true )
+			? esc_sql( $this->sort['field'] )
+			: 'id';
 
-					case 'ulike_forums':
-						$output  = sprintf( '
-						WHERE Concat(`topic_id`, " ", `status`, " ", `ip`, " ", `date_time` ) like "%1$s" OR `topic_id` IN
-						(SELECT ID FROM `%2$s` WHERE `post_title` LIKE "%1$s") OR `user_id` IN
-						(SELECT ID FROM `%3$s` WHERE `user_login` LIKE "%1$s")'
-						, '%' . $search . '%', $this->wpdb->posts, $this->wpdb->users
-						);
-						break;
+		// Whitelist allowed order types
+		$orderType = isset( $this->sort['type'] ) && in_array( strtoupper( $this->sort['type'] ), array( 'ASC', 'DESC' ), true )
+			? strtoupper( $this->sort['type'] )
+			: 'ASC';
 
-					default:
-						$output  = sprintf( '
-						WHERE Concat(`post_id`, " ", `status`, " ", `ip`, " ", `date_time` ) like "%1$s" OR `post_id` IN
-						(SELECT ID FROM `%2$s` WHERE `post_title` LIKE "%1$s") OR `user_id` IN
-						(SELECT ID FROM `%3$s` WHERE `user_login` LIKE "%1$s")'
-						, '%' . $search . '%', $this->wpdb->posts, $this->wpdb->users
-						);
-						break;
-				}
-			}
+		return $this->wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY `{$orderBy}` {$orderType}" );
+	}
 
+	/**
+	 * Generate search condition string by table type
+	 *
+	 * @param string $search
+	 * @return string
+	 */
+	private function generate_search_condition( $search ){
+		$output = 'WHERE 1=1';
+
+		// Sanitize search term - use wpdb->esc_like for LIKE queries
+		$search = normalize_whitespace( $search );
+		if( empty( $search ) ){
 			return $output;
 		}
 
-		/**
-		 * Delete selected rows
-		 *
-		 * @param array $items
-		 * @return void
-		 */
-		public function delete_rows( $items ){
-			$table = esc_sql( $this->wpdb->prefix . $this->table );
+		// Use wpdb->esc_like for proper LIKE escaping
+		$search_like = '%' . $this->wpdb->esc_like( $search ) . '%';
+
+		// Sanitize table names
+		$comments_table = esc_sql( $this->wpdb->comments );
+		$users_table = esc_sql( $this->wpdb->users );
+		$posts_table = esc_sql( $this->wpdb->posts );
+
+		switch ( $this->table ) {
+			case 'ulike_comments':
+				$output = $this->wpdb->prepare( '
+					WHERE (Concat(`comment_id`, " ", `status`, " ", `ip`, " ", `date_time` ) LIKE %s)
+					OR (`comment_id` IN (SELECT comment_ID FROM `' . $comments_table . '` WHERE `comment_content` LIKE %s OR `comment_author` LIKE %s))
+					OR (`user_id` IN (SELECT ID FROM `' . $users_table . '` WHERE `user_login` LIKE %s))',
+					$search_like, $search_like, $search_like, $search_like
+				);
+				break;
+
+			case 'ulike_activities':
+				// check buddypress activation
+				if( ! function_exists('is_buddypress') ){
+					break;
+				}
+				if ( is_multisite() ) {
+					$bp_prefix = $this->wpdb->base_prefix;
+				} else {
+					$bp_prefix = $this->wpdb->prefix;
+				}
+				$bp_activity_table = esc_sql( $bp_prefix . 'bp_activity' );
+				$output = $this->wpdb->prepare( '
+					WHERE (Concat(`activity_id`, " ", `status`, " ", `ip`, " ", `date_time` ) LIKE %s)
+					OR (`activity_id` IN (SELECT id FROM `' . $bp_activity_table . '` WHERE `content` LIKE %s))
+					OR (`user_id` IN (SELECT ID FROM `' . $users_table . '` WHERE `user_login` LIKE %s))',
+					$search_like, $search_like, $search_like
+				);
+				break;
+
+			case 'ulike_forums':
+				$output = $this->wpdb->prepare( '
+					WHERE (Concat(`topic_id`, " ", `status`, " ", `ip`, " ", `date_time` ) LIKE %s)
+					OR (`topic_id` IN (SELECT ID FROM `' . $posts_table . '` WHERE `post_title` LIKE %s))
+					OR (`user_id` IN (SELECT ID FROM `' . $users_table . '` WHERE `user_login` LIKE %s))',
+					$search_like, $search_like, $search_like
+				);
+				break;
+
+			default:
+				$output = $this->wpdb->prepare( '
+					WHERE (Concat(`post_id`, " ", `status`, " ", `ip`, " ", `date_time` ) LIKE %s)
+					OR (`post_id` IN (SELECT ID FROM `' . $posts_table . '` WHERE `post_title` LIKE %s))
+					OR (`user_id` IN (SELECT ID FROM `' . $users_table . '` WHERE `user_login` LIKE %s))',
+					$search_like, $search_like, $search_like
+				);
+				break;
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Delete selected rows
+	 *
+	 * @param array $items
+	 * @return void
+	 */
+	public function delete_rows( $items ){
+		$table = esc_sql( $this->wpdb->prefix . $this->table );
+
+		if( ! empty( $items ) && is_array( $items ) ){
+			// Sanitize all IDs
+			$items = array_map( 'absint', $items );
+			$items = array_filter( $items ); // Remove any invalid values
 
 			if( ! empty( $items ) ){
-				$selectedIds = implode( ',', array_map( 'absint', $items ) );
-				$this->wpdb->query( "DELETE FROM $table WHERE ID IN($selectedIds)" );
+				// Use placeholders for prepared statement
+				$placeholders = implode( ',', array_fill( 0, count( $items ), '%d' ) );
+				$query = $this->wpdb->prepare( "DELETE FROM `{$table}` WHERE `id` IN({$placeholders})", $items );
+				$this->wpdb->query( $query );
 			}
 		}
+	}
 
 		/**
 		 * Get total rows per table
@@ -323,7 +361,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Logs' ) ) {
 						$output[$key]->comment_author  = $comment->comment_author;
 						$output[$key]->comment_content = sprintf( "<a href='%s'> %s </a>" , esc_url( get_comment_link( $comment ) ), wp_strip_all_tags( $comment->comment_content ) );
 					} else {
-						$output[$key]->comment_author  = $output[$key]->comment_content = esc_html__( 'Not Found!', WP_ULIKE_PRO_DOMAIN );
+						$output[$key]->comment_author  = $output[$key]->comment_content = esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN );
 					}
 				}
 			}

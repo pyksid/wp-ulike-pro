@@ -106,8 +106,11 @@ class WP_Ulike_Pro_Rewrite {
 	 */
 	function redirect_author_page() {
 		if ( $this->options['author_redirect'] && is_author() ) {
-			$id = get_query_var( 'author' );
-			exit( wp_redirect( wp_ulike_pro_get_user_profile_permalink( $id ) ) );
+			// SECURITY: Sanitize author ID
+			$id = absint( get_query_var( 'author' ) );
+			if ( $id > 0 ) {
+				exit( wp_redirect( wp_ulike_pro_get_user_profile_permalink( $id ) ) );
+			}
 		}
 	}
 
@@ -129,15 +132,27 @@ class WP_Ulike_Pro_Rewrite {
 	 */
 	function change_password(){
 		// Prepare site for reset password
-		if ( WP_Ulike_Pro_Options::isCorePage( '', ['reset_password'] ) && ! is_user_logged_in() && isset( $_REQUEST['action'] ) && sanitize_key( $_REQUEST['action'] ) == 'changepassword' ) {
+		// SECURITY: Sanitize action parameter
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
+		if ( WP_Ulike_Pro_Options::isCorePage( '', ['reset_password'] ) && ! is_user_logged_in() && $action == 'changepassword' ) {
 			wp_fix_server_vars();
 
-			$url = parse_url( $_SERVER["REQUEST_URI"], PHP_URL_PATH );
+			// SECURITY: Sanitize REQUEST_URI
+			$request_uri = isset( $_SERVER["REQUEST_URI"] ) ? esc_url_raw( wp_unslash( $_SERVER["REQUEST_URI"] ) ) : '';
+			$url = parse_url( $request_uri, PHP_URL_PATH );
 			$rp_cookie = 'wp-resetpass-' . COOKIEHASH;
 
 			//Store Reset link data to cookie
+			// SECURITY: Sanitize key and login parameters
 			if ( isset( $_GET['key'] ) && isset( $_GET['login'] ) ) {
-				$value = sprintf( '%s:%s', wp_unslash( $_GET['login'] ), wp_unslash( $_GET['key'] ) );
+				$key = sanitize_text_field( wp_unslash( $_GET['key'] ) );
+				$login = sanitize_user( wp_unslash( $_GET['login'] ) );
+				// Validate key format (should be alphanumeric)
+				if ( ! preg_match( '/^[a-zA-Z0-9]+$/', $key ) ) {
+					wp_safe_redirect( home_url() );
+					exit;
+				}
+				$value = sprintf( '%s:%s', $login, $key );
 				wp_ulike_pro_setcookie( $rp_cookie, $value );
 
 				wp_safe_redirect( remove_query_arg( array( 'key', 'login' ) ) );
@@ -181,9 +196,22 @@ class WP_Ulike_Pro_Rewrite {
 		// Prepare site for reset password
 		if ( WP_Ulike_Pro_Options::isCorePage( '', ['signup', 'login'] ) && isset( $_REQUEST['action'] ) && sanitize_key( $_REQUEST['action'] ) == 'checkmail' ) {
 
-			// Sanitize and retrieve the parameters from the URL
-			$key     = sanitize_text_field($_GET['key']);
-			$user_id = intval($_GET['login']);
+			// SECURITY: Sanitize and retrieve the parameters from the URL
+			$key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
+			$user_id = isset( $_GET['login'] ) ? absint( wp_unslash( $_GET['login'] ) ) : 0;
+			
+			// Validate key format
+			if ( empty( $key ) || ! preg_match( '/^[a-zA-Z0-9]+$/', $key ) ) {
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
+				exit;
+			}
+			
+			if ( empty( $user_id ) ) {
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. Invalid user ID.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
+				exit;
+			}
 
 			// Verify the key and user ID
 			$saved_key = get_user_meta($user_id, 'ulp_email_verification_key', true);
@@ -222,7 +250,9 @@ class WP_Ulike_Pro_Rewrite {
 	 * @return void
 	 */
 	function logout_redirect(){
-		$queried_action = isset( $_GET['action'] ) && $_GET['action'] === 'logout';
+		// SECURITY: Sanitize action parameter
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		$queried_action = ( $action === 'logout' );
 		if( is_user_logged_in() && $queried_action  ){
 			// Check logout parameter
 			$logout = new WP_Ulike_Pro_Logout();
@@ -300,18 +330,25 @@ class WP_Ulike_Pro_Rewrite {
 					//Try
 					if ( ! $user_id ) {
 
-						// Search by Profile Slug
-						$args = array(
-							"fields" => 'ids',
-							'meta_query' => array(
-								array(
-									'key'       =>  'ulp_user_profile_url_slug_' . $permalink_base,
-									'value'     => strtolower( $queried_user ),
-									'compare'   => '='
-								)
+					// Search by Profile Slug
+					// Note: $queried_user from URL may be encoded. Slugs in DB are stored encoded.
+					$args = array(
+						"fields" => 'ids',
+						'meta_query' => array(
+							'relation' => 'OR',
+							array(
+								'key'       =>  'ulp_user_profile_url_slug_' . $permalink_base,
+								'value'     => $queried_user, // Try exact match first (encoded)
+								'compare'   => '='
 							),
-							'number'    => 1
-						);
+							array(
+								'key'       =>  'ulp_user_profile_url_slug_' . $permalink_base,
+								'value'     => rawurldecode( $queried_user ), // Try decoded (for backward compatibility)
+								'compare'   => '='
+							)
+						),
+						'number'    => 1
+					);
 
 						$ids = new \WP_User_Query( $args );
 						if ( $ids->total_users > 0 ) {
@@ -343,7 +380,8 @@ class WP_Ulike_Pro_Rewrite {
 				if ( ! empty( $user_id ) ) {
 					// Check restrict owner conditions
 					if( $this->options['profiles_access'] === 'logged_in_users' && $this->options['restrict_owner'] ){
-						if( isset( $this->current_user->ID ) && $this->current_user->ID != $user_id ){
+						// SECURITY: Use strict comparison for user IDs
+						if( isset( $this->current_user->ID ) && (int) $this->current_user->ID !== (int) $user_id ){
 							// Check user roles that can access the profile.
 							$access_roles = array();
 							if( ! empty( $this->options['exclusive_roles'] ) ){
@@ -362,13 +400,32 @@ class WP_Ulike_Pro_Rewrite {
 						$display_tabs = wp_ulike_get_option( 'user_profiles_appearance|tabs', array() );
 						if( ! empty( $display_tabs ) ){
 							$tab_exist = false;
+							$tab_is_restricted = false;
+							
+							// Get the logged-in user ID (the actual user viewing, not the profile owner)
+							$logged_in_user_id = 0;
+							if ( ! empty( $this->current_user->ID ) ) {
+								$logged_in_user_id = (int) $this->current_user->ID;
+							} elseif ( is_user_logged_in() ) {
+								$logged_in_user_id = (int) get_current_user_id();
+							}
+							
 							foreach ($display_tabs as $tab_key => $tab_args) {
-								if( $selected_tab == esc_attr( strtolower( preg_replace( '/\s+/', '-', $tab_args['title'] ) ) ) ){
+								// UTF-8: Use mb_strtolower for proper UTF-8 handling
+								$tab_slug = esc_attr( mb_strtolower( preg_replace( '/\s+/', '-', $tab_args['title'] ), 'UTF-8' ) );
+								if( $selected_tab == $tab_slug ){
 									$tab_exist = true;
+									// Check if tab is restricted to profile owner
+									// Only restrict if: tab has restrict flag AND current user is NOT the profile owner
+									if( ! empty( $tab_args['restrict'] ) && (int) $user_id !== $logged_in_user_id ){
+										$tab_is_restricted = true;
+									}
+									break;
 								}
 							}
-							// If tab not exist, redirect to main profile page
-							if( ! $tab_exist ){
+							
+							// If tab doesn't exist or is restricted for current user, redirect to main profile page
+							if( ! $tab_exist || $tab_is_restricted ){
 								exit( wp_redirect( $this->get_current_user_profile_url( $core_page_id, $user_id ) ) );
 							}
 						}

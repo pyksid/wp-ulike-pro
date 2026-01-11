@@ -106,12 +106,12 @@ class Counter extends Widget_Base {
         $this->add_control(
             'status',
             array(
-                'label'       => esc_html__('Select status', WP_ULIKE_PRO_DOMAIN),
+                'label'       => esc_html__('Select Status', WP_ULIKE_PRO_DOMAIN),
                 'type'        => Controls_Manager::SELECT,
                 'default'     => 'like',
                 'options'     => array(
                     'like'    => esc_html__('Like', WP_ULIKE_PRO_DOMAIN),
-                    'dislike' => esc_html__('DisLike', WP_ULIKE_PRO_DOMAIN)
+                    'dislike' => esc_html__('Dislike', WP_ULIKE_PRO_DOMAIN)
                 )
             )
         );

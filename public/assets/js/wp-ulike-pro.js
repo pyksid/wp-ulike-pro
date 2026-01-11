@@ -3,99 +3,455 @@
 /* ================== public/assets/js/src/_forms.js =================== */
 
 
-(function ($, window, document, undefined) {
+(function (window, document, undefined) {
   "use strict";
 
   // Create the defaults once
-  var pluginName = "WordpressUlikeAjaxForms",
-    $window = $(window),
-    $document = $(document),
-    defaults = {};
+  const pluginName = "WordpressUlikeAjaxForms";
+  const defaults = {};
+
+  // Helper function to trigger custom events (vanilla JS only)
+  const triggerEvent = (element, eventName, data) => {
+    // Create CustomEvent for vanilla JS listeners
+    const event = new CustomEvent(eventName, {
+      bubbles: true,
+      cancelable: true,
+      detail: data
+    });
+
+    // Dispatch the event
+    element.dispatchEvent(event);
+  };
+
+  // Store plugin instances to prevent multiple instantiations
+  const pluginInstances = new WeakMap();
+
+  // Helper function to serialize form data (like jQuery's serializeArray)
+  // jQuery's serializeArray() only includes: checked checkboxes, selected radios, 
+  // selected options, and all text inputs/selects/textareas with values
+  const serializeForm = (form) => {
+    const values = {};
+    const formData = new FormData(form);
+
+    // Process all form fields (FormData only includes checked checkboxes, selected radios, etc.)
+    for (const [name, value] of formData.entries()) {
+      if (values[name] !== undefined) {
+        // Convert to array if multiple values
+        if (!Array.isArray(values[name])) {
+          values[name] = [values[name]];
+        }
+        values[name].push(value || "");
+      } else {
+        values[name] = value || "";
+      }
+    }
+
+    return values;
+  };
+
+  // Helper function to apply fragments (DOM updates from response)
+  const applyFragments = (fragments) => {
+    if (!fragments || typeof fragments !== "object") return;
+
+    Object.keys(fragments).forEach((selector) => {
+      const fragment = fragments[selector];
+      if (!fragment || typeof fragment !== "object") return;
+
+      const elements = document.querySelectorAll(selector);
+      elements.forEach((element) => {
+        const method = fragment.method || "append";
+        const content = fragment.content || "";
+
+        switch (method) {
+          case "prepend":
+            if (content) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = content;
+              // Insert all children in reverse order to maintain original order
+              const children = Array.from(tempDiv.children);
+              children.reverse().forEach((child) => {
+                element.insertBefore(child, element.firstChild);
+              });
+            }
+            break;
+
+          case "hidden":
+            element.classList.add("ulp-hidden-visually");
+            break;
+
+          case "append":
+          default:
+            if (content) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = content;
+              while (tempDiv.firstChild) {
+                element.appendChild(tempDiv.firstChild);
+              }
+            }
+            break;
+        }
+      });
+    });
+  };
 
   // The actual plugin constructor
   function Plugin(element, options) {
+    if (!element) {
+      console.warn("WordpressUlikeAjaxForms: element is required");
+      return;
+    }
+
+    // Check if already instantiated
+    if (pluginInstances.has(element)) {
+      return pluginInstances.get(element);
+    }
+
     this.element = element;
-    this.$element = $(element);
-    this.settings = $.extend({}, defaults, options);
+    this.settings = Object.assign({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
 
-    this.form = this.$element.find("form");
+    // Find form element
+    this.form = this.element.querySelector("form");
+    if (!this.form) {
+      console.warn("WordpressUlikeAjaxForms: no form element found");
+      return;
+    }
+
+    // Store instance
+    pluginInstances.set(element, this);
 
     this.init();
   }
 
-  // Avoid Plugin.prototype conflicts
-  $.extend(Plugin.prototype, {
-    init: function () {
-      // Call _ajaxify function on click button
-      this.form.on("submit", this._submit.bind(this));
+  // Password strength calculator
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    const checks = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      numbers: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password),
+    };
+
+    Object.values(checks).forEach(check => {
+      if (check) strength += 20;
+    });
+
+    // Bonus for longer passwords
+    if (password.length >= 12) strength += 10;
+    if (password.length >= 16) strength += 10;
+
+    return Math.min(100, strength);
+  };
+
+  // Get password strength class and value (text hidden via CSS for better UX)
+  const getPasswordStrengthInfo = (strength) => {
+    if (strength === 0) return { class: '', value: 0 };
+    if (strength < 30) return { class: 'ulp-strength-very-weak', value: strength };
+    if (strength < 50) return { class: 'ulp-strength-weak', value: strength };
+    if (strength < 70) return { class: 'ulp-strength-fair', value: strength };
+    if (strength < 90) return { class: 'ulp-strength-good', value: strength };
+    return { class: 'ulp-strength-strong', value: strength };
+  };
+
+  // Debounce function for performance
+  const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  // Validate email format
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Plugin prototype methods
+  Plugin.prototype = {
+    init() {
+      // Call submit handler on form submit
+      if (this.form) {
+        this.form.addEventListener("submit", this._submit.bind(this));
+      }
+
+      // Initialize password visibility toggles
+      this._initPasswordToggles();
+
+      // Initialize password strength indicators
+      this._initPasswordStrength();
+
+      // Initialize real-time validation
+      this._initValidation();
+    },
+
+    /**
+     * Initialize password visibility toggles
+     */
+    _initPasswordToggles() {
+      const passwordToggles = this.element.querySelectorAll(".ulp-password-toggle");
+      
+      passwordToggles.forEach((toggle) => {
+        const passwordInput = toggle.closest(".ulp-password-wrapper")?.querySelector('input[type="password"], input[type="text"]');
+        if (!passwordInput) return;
+
+        const toggleIcon = toggle.querySelector(".ulp-password-toggle-icon");
+        if (!toggleIcon) return;
+
+        // Set initial state
+        toggleIcon.classList.add("ulp-password-hidden");
+
+        // Click handler
+        const handleToggle = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const isPassword = passwordInput.type === "password";
+          passwordInput.type = isPassword ? "text" : "password";
+          toggle.setAttribute("aria-pressed", isPassword ? "true" : "false");
+          // Update aria-label using data attributes (translated in templates)
+          const label = isPassword 
+            ? toggle.getAttribute("data-label-hide") || toggle.getAttribute("aria-label") || ""
+            : toggle.getAttribute("data-label-show") || toggle.getAttribute("aria-label") || "";
+          if (label) {
+            toggle.setAttribute("aria-label", label);
+          }
+          toggleIcon.classList.toggle("ulp-password-visible", isPassword);
+          toggleIcon.classList.toggle("ulp-password-hidden", !isPassword);
+        };
+
+        toggle.addEventListener("click", handleToggle, { passive: false });
+        
+        // Keyboard handler for accessibility (WCAG 2.1 Level AA compliance)
+        toggle.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleToggle(e);
+          }
+        }, { passive: false });
+      });
+    },
+
+    /**
+     * Initialize password strength indicators
+     */
+    _initPasswordStrength() {
+      const passwordInputs = this.element.querySelectorAll('input[type="password"][name="password"], input[type="password"][name="newpassword"]');
+      
+      passwordInputs.forEach((passwordInput) => {
+        const wrapper = passwordInput.closest(".ulp-password-wrapper");
+        if (!wrapper) return;
+
+        const strengthBar = wrapper.querySelector(".ulp-password-strength-fill");
+        const requirements = wrapper.querySelector(".ulp-password-requirements");
+
+        if (!strengthBar) return;
+
+        const updateStrength = debounce(() => {
+          const password = passwordInput.value;
+          
+          if (!password) {
+            strengthBar.style.width = "0%";
+            strengthBar.setAttribute("aria-valuenow", "0");
+            strengthBar.className = "ulp-password-strength-fill";
+            requirements?.classList.remove("ulp-visible");
+            return;
+          }
+
+          const strength = calculatePasswordStrength(password);
+          const info = getPasswordStrengthInfo(strength);
+
+          // Use requestAnimationFrame for smooth animations (modern performance pattern)
+          requestAnimationFrame(() => {
+            strengthBar.style.width = `${info.value}%`;
+            strengthBar.setAttribute("aria-valuenow", info.value);
+            strengthBar.className = `ulp-password-strength-fill ${info.class}`;
+            requirements?.classList.add("ulp-visible");
+          });
+        }, 300);
+
+        passwordInput.addEventListener("input", updateStrength, { passive: true });
+        passwordInput.addEventListener("blur", updateStrength);
+      });
+    },
+
+    /**
+     * Initialize real-time validation - Visual feedback only (no text messages)
+     */
+    _initValidation() {
+      // Email validation - visual feedback via border color only
+      const emailInputs = this.element.querySelectorAll('input[type="email"]');
+      emailInputs.forEach((input) => {
+        const validateEmailField = debounce(() => {
+          const email = input.value.trim();
+          if (email && !validateEmail(email)) {
+            input.classList.add("ulp-input-error");
+            input.classList.remove("ulp-input-success");
+          } else if (email && validateEmail(email)) {
+            input.classList.remove("ulp-input-error");
+            input.classList.add("ulp-input-success");
+          } else {
+            input.classList.remove("ulp-input-error", "ulp-input-success");
+          }
+        }, 300);
+
+        input.addEventListener("blur", validateEmailField);
+        // Clear error immediately on input for better UX
+        input.addEventListener("input", () => {
+          if (input.classList.contains("ulp-input-error")) {
+            input.classList.remove("ulp-input-error");
+            if (input.value.trim()) {
+              validateEmailField();
+            } else {
+              input.classList.remove("ulp-input-success");
+            }
+          }
+        }, { passive: true });
+      });
+
+      // Password match validation - visual feedback via border color only
+      const passwordInput = this.element.querySelector('input[name="newpassword"]');
+      const confirmPasswordInput = this.element.querySelector('input[name="repassword"]');
+      
+      if (passwordInput && confirmPasswordInput) {
+        const validatePasswordMatch = debounce(() => {
+          const password = passwordInput.value;
+          const confirmPassword = confirmPasswordInput.value;
+
+          if (!password || !confirmPassword) {
+            // Reset validation states when fields are empty
+            confirmPasswordInput.classList.remove("ulp-input-error", "ulp-input-success");
+            passwordInput.classList.remove("ulp-input-error", "ulp-input-success");
+            return;
+          }
+
+          if (password === confirmPassword) {
+            // Passwords match - show success state
+            confirmPasswordInput.classList.remove("ulp-input-error");
+            confirmPasswordInput.classList.add("ulp-input-success");
+            passwordInput.classList.remove("ulp-input-error");
+            passwordInput.classList.add("ulp-input-success");
+          } else {
+            // Passwords don't match - show error state
+            confirmPasswordInput.classList.remove("ulp-input-success");
+            confirmPasswordInput.classList.add("ulp-input-error");
+            passwordInput.classList.remove("ulp-input-success");
+            passwordInput.classList.add("ulp-input-error");
+          }
+        }, 300);
+
+        passwordInput.addEventListener("input", validatePasswordMatch, { passive: true });
+        confirmPasswordInput.addEventListener("input", validatePasswordMatch, { passive: true });
+      }
     },
 
     /**
      * global AJAX callback
      */
-    _ajax: function (args, callback) {
-      // Do Ajax & update default value
-      $.ajax({
-        url: UlikeProCommonConfig.AjaxUrl,
-        type: "POST",
-        cache: false,
-        dataType: "json",
-        data: args,
-      }).done(callback);
+    _ajax(args, callback) {
+      // Convert args to FormData
+      const formData = new FormData();
+      for (const key in args) {
+        if (args.hasOwnProperty(key)) {
+          const value = args[key];
+          if (Array.isArray(value)) {
+            // Preserve original field name format: if key already ends with [],
+            // use it as-is (e.g., "otp[]" stays "otp[]"), otherwise append []
+            // This prevents double-bracketing: "otp[]" -> "otp[][]"
+            const arrayKey = key.endsWith("[]") ? key : key + "[]";
+            value.forEach((v) => {
+              formData.append(arrayKey, v);
+            });
+          } else {
+            formData.append(key, value);
+          }
+        }
+      }
+
+      fetch(UlikeProCommonConfig.AjaxUrl, {
+        method: "POST",
+        cache: "no-cache",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then(callback)
+        .catch((error) => {
+          console.error("WP ULike Pro Ajax Forms error:", error);
+          // Re-enable button on error - querySelectorAll returns NodeList
+          if (this.buttonElement && this.buttonElement.length > 0) {
+            Array.from(this.buttonElement).forEach((btn) => {
+              btn.disabled = false;
+            });
+          }
+          if (this.currentForm) {
+            this.currentForm.classList.remove("ulp-loading");
+          }
+        });
     },
+
 
     /**
      * init ulike core process
      */
-    _submit: function (event) {
+    _submit(event) {
       event.preventDefault();
       event.stopPropagation();
 
       // Manipulations
-      $document.trigger("UlpAjaxFormStarted", [this.element]);
+      triggerEvent(document, "UlpAjaxFormStarted", [this.element]);
 
-      this.currentForm = $(event.currentTarget);
-      this.buttonElement = this.currentForm.find(".ulp-button");
+      this.currentForm = event.currentTarget;
+      // querySelectorAll always returns NodeList (matching jQuery .find() behavior)
+      this.buttonElement = this.currentForm.querySelectorAll(".ulp-button");
 
-      var values = {};
-      $.each(this.currentForm.serializeArray(), function () {
-        if (values[this.name] !== undefined) {
-          if (!values[this.name].push) {
-            values[this.name] = [values[this.name]];
-          }
-          values[this.name].push(this.value || "");
-        } else {
-          values[this.name] = this.value || "";
-        }
-      });
+      // Serialize form data
+      const values = serializeForm(this.currentForm);
 
-      // Disable button
-      this.buttonElement.prop("disabled", true);
+      // Disable button(s) - querySelectorAll returns NodeList (works like jQuery .find())
+      if (this.buttonElement && this.buttonElement.length > 0) {
+        Array.from(this.buttonElement).forEach((btn) => {
+          btn.disabled = true;
+        });
+      }
       // Add progress class
-      this.currentForm.addClass("ulp-loading");
+      this.currentForm.classList.add("ulp-loading");
       // submit form data
       this._submitFormData(values);
     },
 
-    _submitFormData: function (args) {
+    _submitFormData(args) {
       // Start AJAX process
       this._ajax(
         args,
-        function (response) {
+        (response) => {
           // if has nested ajax levels
           if (
             typeof response.data.action !== "undefined" &&
             response.data.action
           ) {
             this._submitFormData(response.data);
+            // Note: Old version continued processing after nested call
+            // Keeping same behavior for compatibility
           }
 
-          // Add progress class
-          this.currentForm.removeClass("ulp-loading");
-          // Re-enable button
-          this.buttonElement.prop("disabled", false);
+          // Remove progress class
+          if (this.currentForm) {
+            this.currentForm.classList.remove("ulp-loading");
+          }
+          // Re-enable button(s) - querySelectorAll returns NodeList (works like jQuery .find())
+          if (this.buttonElement && this.buttonElement.length > 0) {
+            Array.from(this.buttonElement).forEach((btn) => {
+              btn.disabled = false;
+            });
+          }
 
           if (
             typeof response.data.message !== "undefined" &&
@@ -104,36 +460,74 @@
             this._sendNotification(response.data.status, response.data.message);
           }
 
+          // Handle fragments (DOM updates)
           if (
             typeof response.data.fragments !== "undefined" &&
             response.data.fragments
           ) {
-            $.each(response.data.fragments, function (key, value) {
-              switch (value.method) {
-                case "prepend":
-                  $(key).prepend(value.content);
-                  break;
-
-                case "hidden":
-                  $(key).addClass("ulp-hidden-visually");
-                  break;
-
-                default:
-                  $(key).append(value.content);
-                  break;
-              }
-            });
+            applyFragments(response.data.fragments);
+            
+            // Re-initialize password features in updated fragments
+            if (this._initPasswordToggles) {
+              this._initPasswordToggles();
+            }
+            if (this._initPasswordStrength) {
+              this._initPasswordStrength();
+            }
+            if (this._initValidation) {
+              this._initValidation();
+            }
+            
+            // Initialize OTP inputs if fragments contain 2FA code inputs (with small delay)
+            if (typeof window.ulpOtpInput === "function") {
+              setTimeout(() => {
+                window.ulpOtpInput();
+              }, 50);
+            }
           }
 
+          // Handle form replacement
           if (
             typeof response.data.replace !== "undefined" &&
             response.data.replace
           ) {
-            this.currentForm.replaceWith(response.data.replace);
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = response.data.replace;
+            const newForm = tempDiv.firstElementChild;
+            if (newForm && this.currentForm && this.currentForm.parentNode) {
+              // Re-initialize plugin on new form element
+              this.currentForm.parentNode.replaceChild(newForm, this.currentForm);
+              // Find the container element
+              const container = newForm.closest(".ulp-ajax-form");
+              if (container) {
+                // Remove old instance and create new one
+                pluginInstances.delete(this.element);
+                const newInstance = new Plugin(container);
+                
+                // Re-initialize password features
+                if (newInstance._initPasswordToggles) {
+                  newInstance._initPasswordToggles();
+                }
+                if (newInstance._initPasswordStrength) {
+                  newInstance._initPasswordStrength();
+                }
+                if (newInstance._initValidation) {
+                  newInstance._initValidation();
+                }
+                
+                // Initialize OTP inputs if present (with small delay to ensure DOM is ready)
+                if (typeof window.ulpOtpInput === "function") {
+                  setTimeout(() => {
+                    window.ulpOtpInput(container);
+                  }, 50);
+                }
+              }
+              return; // Exit early after replacement
+            }
           }
 
           // Add new trigger when process finished
-          $document.trigger("UlpAjaxFormEnded", [this.element, response]);
+          triggerEvent(document, "UlpAjaxFormEnded", [this.element, response]);
 
           if (
             typeof response.data.refresh !== "undefined" &&
@@ -148,1375 +542,1473 @@
           ) {
             window.location.replace(response.data.redirect);
           }
-        }.bind(this)
+        }
       );
     },
 
     /**
      * Send notification by 'WordpressUlikeNotifications' plugin
      */
-    _sendNotification: function (messageType, messageText) {
-      // Display Notification
-      $(document.body).WordpressUlikeNotifications({
-        messageType: messageType,
-        messageText: messageText,
-      });
-    },
-  });
-
-  // A really lightweight plugin wrapper around the constructor,
-  // preventing against multiple instantiations
-  $.fn[pluginName] = function (options) {
-    return this.each(function () {
-      if (!$.data(this, "plugin_" + pluginName)) {
-        $.data(this, "plugin_" + pluginName, new Plugin(this, options));
+    _sendNotification(messageType, messageText) {
+      // Display Notification (vanilla JS only)
+      if (typeof WordpressUlikeNotifications !== "undefined") {
+        new WordpressUlikeNotifications(document.body, {
+          messageType,
+          messageText,
+        });
       }
-    });
+    },
   };
-})(jQuery, window, document);
+
+  // Expose plugin to window for global access
+  window[pluginName] = Plugin;
+})(window, document);
 
 
 /* ================== public/assets/js/src/_modal.js =================== */
 
 
-(function (factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
-		define(['jquery'], factory);
-	} else if (typeof module === 'object' && module.exports) {
-		// Node/CommonJS
-		module.exports = function (root, jQuery) {
-			if (jQuery === undefined) {
-				// require('jQuery') returns a factory that requires window to
-				// build a jQuery instance, we normalize how we use modules
-				// that require this pattern but the window provided is a noop
-				// if it's defined (how jquery works)
-				if (typeof window !== 'undefined') {
-					jQuery = require('jquery');
-				} else {
-					jQuery = require('jquery')(root);
-				}
-			}
-			factory(jQuery);
-			return jQuery;
-		};
-	} else {
-		// Browser globals
-		factory(jQuery);
-	}
-})(function($) {
-	"use strict";
+/**
+ * Lightweight Vanilla JavaScript Modal
+ * ~180 lines - maintains HTML structure and CSS classes
+ */
+(function() {
+	'use strict';
 
-	if('undefined' === typeof $) {
-		if('console' in window){ window.console.info('Too much lightness, WordpressUlikeAjaxModal needs jQuery.'); }
-		return;
-	}
-	if($.fn.jquery.match(/-ajax/)) {
-		if('console' in window){ window.console.info('WordpressUlikeAjaxModal needs regular jQuery, not the slim version.'); }
-		return;
-	}
-	/* WordpressUlikeAjaxModal is exported as $.ulpmodal.
-	   It is a function used to open a ulpmodal lightbox.
-
-	   [tech]
-	   WordpressUlikeAjaxModal uses prototype inheritance.
-	   Each opened lightbox will have a corresponding object.
-	   That object may have some attributes that override the
-	   prototype's.
-	   Extensions created with WordpressUlikeAjaxModal.extend will have their
-	   own prototype that inherits from WordpressUlikeAjaxModal's prototype,
-	   thus attributes can be overriden either at the object level,
-	   or at the extension level.
-	   To create callbacks that chain themselves instead of overriding,
-	   use chainCallbacks.
-	   For those familiar with CoffeeScript, this correspond to
-	   WordpressUlikeAjaxModal being a class and the Gallery being a class
-	   extending WordpressUlikeAjaxModal.
-	   The chainCallbacks is used since we don't have access to
-	   CoffeeScript's `super`.
-	*/
-
-	function WordpressUlikeAjaxModal($content, config) {
-		if(this instanceof WordpressUlikeAjaxModal) {  /* called with new */
-			this.id = WordpressUlikeAjaxModal.id++;
-			this.setup($content, config);
-			this.chainCallbacks(WordpressUlikeAjaxModal._callbackChain);
-		} else {
-			var fl = new WordpressUlikeAjaxModal($content, config);
-			fl.open();
-			return fl;
-		}
-	}
-
-	var opened = [],
-		pruneOpened = function(remove) {
-			opened = $.grep(opened, function(fl) {
-				return fl !== remove && fl.$instance.closest('body').length > 0;
-			} );
-			return opened;
-		};
-
-	// Removes keys of `set` from `obj` and returns the removed key/values.
-	function slice(obj, set) {
-		var r = {};
-		for (var key in obj) {
-			if (key in set) {
-				r[key] = obj[key];
-				delete obj[key];
-			}
-		}
-		return r;
-	}
-
-	// NOTE: List of available [iframe attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe).
-	var iFrameAttributeSet = {
-		allow: 1, allowfullscreen: 1, frameborder: 1, height: 1, longdesc: 1, marginheight: 1, marginwidth: 1,
-		mozallowfullscreen: 1, name: 1, referrerpolicy: 1, sandbox: 1, scrolling: 1, src: 1, srcdoc: 1, style: 1,
-		webkitallowfullscreen: 1, width: 1
+	let currentModal = null; // Track current modal to prevent multiple
+	const defaults = {
+		namespace: 'ulpmodal',
+		closeOnClick: 'background',
+		closeOnEsc: true,
+		closeIcon: '&#10005;',
+		openSpeed: 250,
+		closeSpeed: 250,
+		afterOpen: null
 	};
 
-	// Converts camelCased attributes to dasherized versions for given prefix:
-	//   parseAttrs({hello: 1, hellFrozeOver: 2}, 'hell') => {froze-over: 2}
-	function parseAttrs(obj, prefix) {
-		var attrs = {},
-			regex = new RegExp('^' + prefix + '([A-Z])(.*)');
-		for (var key in obj) {
-			var match = key.match(regex);
-			if (match) {
-				var dasherized = (match[1] + match[2].replace(/([A-Z])/g, '-$1')).toLowerCase();
-				attrs[dasherized] = obj[key];
+	// Create modal HTML structure
+	const createModal = (config) => {
+		const ns = config.namespace || defaults.namespace;
+		const modal = document.createElement('div');
+		modal.className = `${ns}-loading ${ns}`;
+		modal.setAttribute('role', 'dialog');
+		modal.setAttribute('aria-modal', 'true');
+		modal.setAttribute('aria-labelledby', `${ns}-title`);
+		modal.setAttribute('tabindex', '-1');
+		modal.innerHTML = `
+			<div class="${ns}-content">
+				<button class="${ns}-close-icon ${ns}-close" aria-label="Close" type="button">${config.closeIcon || defaults.closeIcon}</button>
+				<div class="${ns}-inner" role="document"></div>
+			</div>
+		`;
+		return modal;
+	};
+
+	// Get content from URL or element
+	const getContent = async (target, type) => {
+		// If it's already a DOM element
+		if (target instanceof Element) {
+			return target.cloneNode(true);
+		}
+
+		// If it's HTML string
+		if (typeof target === 'string' && target.trim().startsWith('<')) {
+			const div = document.createElement('div');
+			div.innerHTML = target.trim();
+			const result = div.firstElementChild || div;
+			// If it's a wrapper div, return its children
+			if (result.tagName === 'DIV' && result.children.length > 0) {
+				return result;
+			}
+			return result;
+		}
+
+		// If it's a URL (ajax or image)
+		if (typeof target === 'string') {
+			if (type === 'ajax' || (!type && !target.match(/\.(png|jpg|jpeg|gif|svg|webp)(\?|$)/i))) {
+				// AJAX request
+				try {
+					const response = await fetch(target);
+					if (!response.ok) throw new Error('Network response was not ok');
+					const html = await response.text();
+					const div = document.createElement('div');
+					div.innerHTML = html;
+					return div;
+				} catch (e) {
+					console.error('Modal AJAX error:', e);
+					const div = document.createElement('div');
+					div.textContent = 'Failed to load content';
+					return div;
+				}
+			} else {
+				// Image
+				return new Promise((resolve, reject) => {
+					const img = document.createElement('img');
+					img.src = target;
+					img.className = 'ulpmodal-image';
+					img.alt = '';
+					img.onload = () => resolve(img);
+					img.onerror = () => reject(img);
+				});
 			}
 		}
-		return attrs;
-	}
 
-	/* document wide key handler */
-	var eventMap = { keyup: 'onKeyUp', resize: 'onResize' };
+		// Fallback
+		const div = document.createElement('div');
+		div.textContent = String(target);
+		return div;
+	};
 
-	var globalEventHandler = function(event) {
-		$.each(WordpressUlikeAjaxModal.opened().reverse(), function() {
-			if (!event.isDefaultPrevented()) {
-				if (false === this[eventMap[event.type]](event)) {
-					event.preventDefault(); event.stopPropagation(); return false;
-			  }
+	// Close current modal
+	const closeCurrent = () => {
+		if (currentModal) {
+			const modal = currentModal;
+			const ns = defaults.namespace;
+
+			modal.classList.remove(`${ns}-visible`);
+
+			setTimeout(() => {
+				modal.remove();
+				currentModal = null;
+				document.documentElement.classList.remove('with-ulpmodal');
+			}, defaults.closeSpeed);
+		}
+	};
+
+	// Open modal
+	const open = async (content, config = {}) => {
+		config = { ...defaults, ...config };
+		const ns = config.namespace || defaults.namespace;
+
+		// Close existing modal if open
+		if (currentModal) {
+			closeCurrent();
+			// Wait a bit for close animation
+			await new Promise(resolve => setTimeout(resolve, config.closeSpeed));
+		}
+
+		// Create modal
+		const modal = createModal(config);
+		document.body.appendChild(modal);
+		currentModal = modal;
+
+		// Store previously focused element for restoration
+		const previouslyFocused = document.activeElement;
+		
+		// Show modal immediately with loading state
+		document.documentElement.classList.add('with-ulpmodal');
+
+		// Force reflow before showing
+		modal.offsetHeight;
+
+		// Add visible class - CSS handles display and fade in
+		modal.classList.add(`${ns}-visible`);
+		
+		// Focus the modal for keyboard navigation
+		modal.focus();
+
+		// Get content type
+		const type = config.type || (content && content.getAttribute && content.getAttribute('data-ulpmodal-type'));
+
+		// Load content asynchronously
+		try {
+			const contentEl = await getContent(content, type);
+			const inner = modal.querySelector(`.${ns}-inner`);
+			if (inner && contentEl) {
+				inner.replaceWith(contentEl);
+				contentEl.classList.add(`${ns}-inner`);
+				contentEl.setAttribute('role', 'document');
+				modal.classList.remove(`${ns}-loading`);
+				
+				// Focus first focusable element or close button
+				const focusable = contentEl.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+				if (focusable) {
+					setTimeout(() => focusable.focus(), 100);
+				} else {
+					const closeBtn = modal.querySelector(`.${ns}-close`);
+					if (closeBtn) closeBtn.focus();
+				}
 			}
+		} catch (e) {
+			console.error('Modal content error:', e);
+			modal.classList.remove(`${ns}-loading`);
+			const inner = modal.querySelector(`.${ns}-inner`);
+			if (inner) {
+				inner.innerHTML = '<div class="ulpmodal-error"><p>Failed to load content. Please try again.</p></div>';
+			}
+		}
+
+		// Close handler
+		const close = (e) => {
+			if (e) e.preventDefault();
+			if (currentModal !== modal) return; // Prevent closing if modal changed
+
+			// Remove visible class - CSS handles the fade out
+			modal.classList.remove(`${ns}-visible`);
+
+			setTimeout(() => {
+				if (currentModal === modal) {
+					modal.remove();
+					currentModal = null;
+					if (!document.querySelector(`.${ns}.${ns}-visible`)) {
+						document.documentElement.classList.remove('with-ulpmodal');
+					}
+					
+					// Restore focus to previously focused element
+					if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+						previouslyFocused.focus();
+					}
+				}
+			}, config.closeSpeed);
+		};
+
+		// Click to close
+		modal.addEventListener('click', (e) => {
+			if (config.closeOnClick === 'background' && e.target === modal) {
+				close(e);
+			} else if (e.target.closest(`.${ns}-close`)) {
+				close(e);
+			}
+		});
+
+		// ESC to close
+		if (config.closeOnEsc) {
+			const escHandler = (e) => {
+				if (e.key === 'Escape' || e.keyCode === 27) {
+					close(e);
+					document.removeEventListener('keydown', escHandler);
+				}
+			};
+			document.addEventListener('keydown', escHandler);
+		}
+		
+		// Focus trap - keep focus within modal (updates when content loads)
+		const updateFocusTrap = () => {
+			const focusableElements = modal.querySelectorAll(
+				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+			);
+			const firstFocusable = focusableElements[0] || modal.querySelector(`.${ns}-close`);
+			const lastFocusable = focusableElements[focusableElements.length - 1] || modal.querySelector(`.${ns}-close`);
+			
+			return { firstFocusable, lastFocusable };
+		};
+		
+		const trapFocus = (e) => {
+			if (e.key !== 'Tab') return;
+			const { firstFocusable, lastFocusable } = updateFocusTrap();
+			
+			if (e.shiftKey) {
+				if (document.activeElement === firstFocusable) {
+					lastFocusable.focus();
+					e.preventDefault();
+				}
+			} else {
+				if (document.activeElement === lastFocusable) {
+					firstFocusable.focus();
+					e.preventDefault();
+				}
+			}
+		};
+		
+		modal.addEventListener('keydown', trapFocus);
+
+		// After open callback
+		setTimeout(() => {
+			if (config.afterOpen) config.afterOpen({ target: modal });
+		}, config.openSpeed);
+
+		return modal;
+	};
+
+	// Auto-bind data-ulpmodal attributes
+	const autoBind = () => {
+		// Use event delegation for all clicks (works with dynamically added elements)
+		document.addEventListener('click', (e) => {
+			// Find the closest element with data-ulpmodal
+			const trigger = e.target.closest('[data-ulpmodal]');
+			if (!trigger) return;
+
+			// Get the URL and type
+			const url = trigger.getAttribute('data-ulpmodal');
+			if (!url || !url.trim()) return;
+
+			// Prevent default to stop navigation
+			e.preventDefault();
+			e.stopPropagation();
+
+			// Prevent multiple clicks - if modal is already open, ignore
+			if (currentModal) return;
+
+			// Open modal
+			const type = trigger.getAttribute('data-ulpmodal-type') || 'ajax';
+			open(url, { type, afterOpen: defaults.afterOpen });
 		});
 	};
 
-	var toggleGlobalEvents = function(set) {
-			if(set !== WordpressUlikeAjaxModal._globalHandlerInstalled) {
-				WordpressUlikeAjaxModal._globalHandlerInstalled = set;
-				var events = $.map(eventMap, function(_, name) { return name+'.'+WordpressUlikeAjaxModal.prototype.namespace; } ).join(' ');
-				$(window)[set ? 'on' : 'off'](events, globalEventHandler);
-			}
-		};
+	// Export
+	if (typeof window !== 'undefined') {
+		window.ulpmodal = open;
+		window.ulpmodalClose = closeCurrent;
+	}
 
-	WordpressUlikeAjaxModal.prototype = {
-		constructor: WordpressUlikeAjaxModal,
-		/*** defaults ***/
-		/* extend ulpmodal with defaults and methods */
-		namespace:      'ulpmodal',        /* Name of the events and css class prefix */
-		targetAttr:     'data-ulpmodal',   /* Attribute of the triggered element that contains the selector to the lightbox content */
-		variant:        null,                  /* Class that will be added to change look of the lightbox */
-		resetCss:       false,                 /* Reset all css */
-		background:     null,                  /* Custom DOM for the background, wrapper and the closebutton */
-		openTrigger:    'click',               /* Event that triggers the lightbox */
-		closeTrigger:   'click',               /* Event that triggers the closing of the lightbox */
-		filter:         null,                  /* Selector to filter events. Think $(...).on('click', filter, eventHandler) */
-		root:           'body',                /* Where to append ulpmodals */
-		openSpeed:      250,                   /* Duration of opening animation */
-		closeSpeed:     250,                   /* Duration of closing animation */
-		closeOnClick:   'background',          /* Close lightbox on click ('background', 'anywhere' or false) */
-		closeOnEsc:     true,                  /* Close lightbox when pressing esc */
-		closeIcon:      '&#10005;',            /* Close icon */
-		loading:        '',                    /* Content to show while initial content is loading */
-		persist:        false,                 /* If set, the content will persist and will be shown again when opened again. 'shared' is a special value when binding multiple elements for them to share the same content */
-		otherClose:     null,                  /* Selector for alternate close buttons (e.g. "a.close") */
-		beforeOpen:     $.noop,                /* Called before open. can return false to prevent opening of lightbox. Gets event as parameter, this contains all data */
-		beforeContent:  $.noop,                /* Called when content is loaded. Gets event as parameter, this contains all data */
-		beforeClose:    $.noop,                /* Called before close. can return false to prevent closing of lightbox. Gets event as parameter, this contains all data */
-		afterOpen:      $.noop,                /* Called after open. Gets event as parameter, this contains all data */
-		afterContent:   $.noop,                /* Called after content is ready and has been set. Gets event as parameter, this contains all data */
-		afterClose:     $.noop,                /* Called after close. Gets event as parameter, this contains all data */
-		onKeyUp:        $.noop,                /* Called on key up for the frontmost ulpmodal */
-		onResize:       $.noop,                /* Called after new content and when a window is resized */
-		type:           null,                  /* Specify type of lightbox. If unset, it will check for the targetAttrs value. */
-		contentFilters: ['jquery', 'image', 'html', 'ajax', 'iframe', 'text'], /* List of content filters to use to determine the content */
+	// Auto-bind on ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', autoBind);
+	} else {
+		autoBind();
+	}
 
-		/*** methods ***/
-		/* setup iterates over a single instance of ulpmodal and prepares the background and binds the events */
-		setup: function(target, config){
-			/* all arguments are optional */
-			if (typeof target === 'object' && target instanceof $ === false && !config) {
-				config = target;
-				target = undefined;
-			}
-
-			var self = $.extend(this, config, {target: target}),
-				css = !self.resetCss ? self.namespace : self.namespace+'-reset', /* by adding -reset to the classname, we reset all the default css */
-				$background = $(self.background || [
-					'<div class="'+css+'-loading '+css+'">',
-						'<div class="'+css+'-content">',
-							'<button class="'+css+'-close-icon '+ self.namespace + '-close" aria-label="Close">',
-								self.closeIcon,
-							'</button>',
-							'<div class="'+self.namespace+'-inner">' + self.loading + '</div>',
-						'</div>',
-					'</div>'].join('')),
-				closeButtonSelector = '.'+self.namespace+'-close' + (self.otherClose ? ',' + self.otherClose : '');
-
-			self.$instance = $background.clone().addClass(self.variant); /* clone DOM for the background, wrapper and the close button */
-
-			/* close when click on background/anywhere/null or closebox */
-			self.$instance.on(self.closeTrigger+'.'+self.namespace, function(event) {
-				if(event.isDefaultPrevented()) {
-					return;
-				}
-				var $target = $(event.target);
-				if( ('background' === self.closeOnClick  && $target.is('.'+self.namespace))
-					|| 'anywhere' === self.closeOnClick
-					|| $target.closest(closeButtonSelector).length ){
-					self.close(event);
-					event.preventDefault();
-				}
-			});
-
-			return this;
-		},
-
-		/* this method prepares the content and converts it into a jQuery object or a promise */
-		getContent: function(){
-			if(this.persist !== false && this.$content) {
-				return this.$content;
-			}
-			var self = this,
-				filters = this.constructor.contentFilters,
-				readTargetAttr = function(name){ return self.$currentTarget && self.$currentTarget.attr(name); },
-				targetValue = readTargetAttr(self.targetAttr),
-				data = self.target || targetValue || '';
-
-			/* Find which filter applies */
-			var filter = filters[self.type]; /* check explicit type like {type: 'image'} */
-
-			/* check explicit type like data-ulpmodal="image" */
-			if(!filter && data in filters) {
-				filter = filters[data];
-				data = self.target && targetValue;
-			}
-			data = data || readTargetAttr('href') || '';
-
-			/* check explicity type & content like {image: 'photo.jpg'} */
-			if(!filter) {
-				for(var filterName in filters) {
-					if(self[filterName]) {
-						filter = filters[filterName];
-						data = self[filterName];
-					}
-				}
-			}
-
-			/* otherwise it's implicit, run checks */
-			if(!filter) {
-				var target = data;
-				data = null;
-				$.each(self.contentFilters, function() {
-					filter = filters[this];
-					if(filter.test)  {
-						data = filter.test(target);
-					}
-					if(!data && filter.regex && target.match && target.match(filter.regex)) {
-						data = target;
-					}
-					return !data;
-				});
-				if(!data) {
-					if('console' in window){ window.console.error('WordpressUlikeAjaxModal: no content filter found ' + (target ? ' for "' + target + '"' : ' (no target specified)')); }
-					return false;
-				}
-			}
-			/* Process it */
-			return filter.process.call(self, data);
-		},
-
-		/* sets the content of $instance to $content */
-		setContent: function($content){
-      this.$instance.removeClass(this.namespace+'-loading');
-
-      /* we need a special class for the iframe */
-      this.$instance.toggleClass(this.namespace+'-iframe', $content.is('iframe'));
-
-      /* replace content by appending to existing one before it is removed
-         this insures that ulpmodal-inner remain at the same relative
-         position to any other items added to ulpmodal-content */
-      this.$instance.find('.'+this.namespace+'-inner')
-        .not($content)                /* excluded new content, important if persisted */
-        .slice(1).remove().end()      /* In the unexpected event where there are many inner elements, remove all but the first one */
-        .replaceWith($.contains(this.$instance[0], $content[0]) ? '' : $content);
-
-      this.$content = $content.addClass(this.namespace+'-inner');
-
-      return this;
-		},
-
-		/* opens the lightbox. "this" contains $instance with the lightbox, and with the config.
-			Returns a promise that is resolved after is successfully opened. */
-		open: function(event){
-			var self = this;
-			self.$instance.hide().appendTo(self.root);
-			if((!event || !event.isDefaultPrevented())
-				&& self.beforeOpen(event) !== false) {
-
-				if(event){
-					event.preventDefault();
-				}
-				var $content = self.getContent();
-
-				if($content) {
-					opened.push(self);
-
-					toggleGlobalEvents(true);
-
-					self.$instance.fadeIn(self.openSpeed);
-					self.beforeContent(event);
-
-					/* Set content and show */
-					return $.when($content)
-						.always(function($openendContent){
-							if($openendContent) {
-								self.setContent($openendContent);
-								self.afterContent(event);
-							}
-						})
-						.then(self.$instance.promise())
-						/* Call afterOpen after fadeIn is done */
-						.done(function(){ self.afterOpen(event); });
-				}
-			}
-			self.$instance.detach();
-			return $.Deferred().reject().promise();
-		},
-
-		/* closes the lightbox. "this" contains $instance with the lightbox, and with the config
-			returns a promise, resolved after the lightbox is successfully closed. */
-		close: function(event){
-			var self = this,
-				deferred = $.Deferred();
-
-			if(self.beforeClose(event) === false) {
-				deferred.reject();
-			} else {
-
-				if (0 === pruneOpened(self).length) {
-					toggleGlobalEvents(false);
-				}
-
-				self.$instance.fadeOut(self.closeSpeed,function(){
-					self.$instance.detach();
-					self.afterClose(event);
-					deferred.resolve();
-				});
-			}
-			return deferred.promise();
-		},
-
-		/* resizes the content so it fits in visible area and keeps the same aspect ratio.
-				Does nothing if either the width or the height is not specified.
-				Called automatically on window resize.
-				Override if you want different behavior. */
-		resize: function(w, h) {
-			if (w && h) {
-				/* Reset apparent image size first so container grows */
-				this.$content.css('width', '').css('height', '');
-				/* Calculate the worst ratio so that dimensions fit */
-				 /* Note: -1 to avoid rounding errors */
-				var ratio = Math.max(
-					w  / (this.$content.parent().width()-1),
-					h / (this.$content.parent().height()-1));
-				/* Resize content */
-				if (ratio > 1) {
-					ratio = h / Math.floor(h / ratio); /* Round ratio down so height calc works */
-					this.$content.css('width', '' + w / ratio + 'px').css('height', '' + h / ratio + 'px');
-				}
-			}
-		},
-
-		/* Utility function to chain callbacks
-		   [Warning: guru-level]
-		   Used be extensions that want to let users specify callbacks but
-		   also need themselves to use the callbacks.
-		   The argument 'chain' has callback names as keys and function(super, event)
-		   as values. That function is meant to call `super` at some point.
-		*/
-		chainCallbacks: function(chain) {
-			for (var name in chain) {
-				this[name] = $.proxy(chain[name], this, $.proxy(this[name], this));
-			}
-		}
-	};
-
-	$.extend(WordpressUlikeAjaxModal, {
-		id: 0,                                    /* Used to id single ulpmodal instances */
-		autoBind:       '[data-ulpmodal]',    /* Will automatically bind elements matching this selector. Clear or set before onReady */
-		defaults:       WordpressUlikeAjaxModal.prototype,   /* You can access and override all defaults using $.ulpmodal.defaults, which is just a synonym for $.ulpmodal.prototype */
-		/* Contains the logic to determine content */
-		contentFilters: {
-			jquery: {
-				regex: /^[#.]\w/,         /* Anything that starts with a class name or identifiers */
-				test: function(elem)    { return elem instanceof $ && elem; },
-				process: function(elem) { return this.persist !== false ? $(elem) : $(elem).clone(true); }
-			},
-			image: {
-				regex: /\.(png|jpg|jpeg|gif|tiff?|bmp|svg)(\?\S*)?$/i,
-				process: function(url)  {
-					var self = this,
-						deferred = $.Deferred(),
-						img = new Image(),
-						$img = $('<img src="'+url+'" alt="" class="'+self.namespace+'-image" />');
-					img.onload  = function() {
-						/* Store naturalWidth & height for IE8 */
-						$img.naturalWidth = img.width; $img.naturalHeight = img.height;
-						deferred.resolve( $img );
-					};
-					img.onerror = function() { deferred.reject($img); };
-					img.src = url;
-					return deferred.promise();
-				}
-			},
-			html: {
-				regex: /^\s*<[\w!][^<]*>/, /* Anything that starts with some kind of valid tag */
-				process: function(html) { return $(html); }
-			},
-			ajax: {
-				regex: /./,            /* At this point, any content is assumed to be an URL */
-				process: function(url)  {
-					var self = this,
-						deferred = $.Deferred();
-					/* we are using load so one can specify a target with: url.html #targetelement */
-					var $container = $('<div></div>').load(url, function(response, status){
-						if ( status !== "error" ) {
-							deferred.resolve($container.contents());
-						}
-						deferred.reject();
-					});
-					return deferred.promise();
-				}
-			},
-			iframe: {
-				process: function(url) {
-					var deferred = new $.Deferred();
-					var $content = $('<iframe/>');
-					var css = parseAttrs(this, 'iframe');
-					var attrs = slice(css, iFrameAttributeSet);
-					$content.hide()
-						.attr('src', url)
-						.attr(attrs)
-						.css(css)
-						.on('load', function() { deferred.resolve($content.show()); })
-						// We can't move an <iframe> and avoid reloading it,
-						// so let's put it in place ourselves right now:
-						.appendTo(this.$instance.find('.' + this.namespace + '-content'));
-					return deferred.promise();
-				}
-			},
-			text: {
-				process: function(text) { return $('<div>', {text: text}); }
-			}
-		},
-
-		functionAttributes: ['beforeOpen', 'afterOpen', 'beforeContent', 'afterContent', 'beforeClose', 'afterClose'],
-
-		/*** class methods ***/
-		/* read element's attributes starting with data-ulpmodal- */
-		readElementConfig: function(element, namespace) {
-			var Klass = this,
-				regexp = new RegExp('^data-' + namespace + '-(.*)'),
-				config = {};
-			if (element && element.attributes) {
-				$.each(element.attributes, function(){
-					var match = this.name.match(regexp);
-					if (match) {
-						var val = this.value,
-							name = $.camelCase(match[1]);
-						if ($.inArray(name, Klass.functionAttributes) >= 0) {  /* jshint -W054 */
-							val = new Function(val);                           /* jshint +W054 */
-						} else {
-							try { val = JSON.parse(val); }
-							catch(e) {}
-						}
-						config[name] = val;
-					}
-				});
-			}
-			return config;
-		},
-
-		/* Used to create a WordpressUlikeAjaxModal extension
-		   [Warning: guru-level]
-		   Creates the extension's prototype that in turn
-		   inherits WordpressUlikeAjaxModal's prototype.
-		   Could be used to extend an extension too...
-		   This is pretty high level wizardy, it comes pretty much straight
-		   from CoffeeScript and won't teach you anything about WordpressUlikeAjaxModal
-		   as it's not really specific to this library.
-		   My suggestion: move along and keep your sanity.
-		*/
-		extend: function(child, defaults) {
-			/* Setup class hierarchy, adapted from CoffeeScript */
-			var Ctor = function(){ this.constructor = child; };
-			Ctor.prototype = this.prototype;
-			child.prototype = new Ctor();
-			child.__super__ = this.prototype;
-			/* Copy class methods & attributes */
-			$.extend(child, this, defaults);
-			child.defaults = child.prototype;
-			return child;
-		},
-
-		attach: function($source, $content, config) {
-			var Klass = this;
-			if (typeof $content === 'object' && $content instanceof $ === false && !config) {
-				config = $content;
-				$content = undefined;
-			}
-			/* make a copy */
-			config = $.extend({}, config);
-
-			/* Only for openTrigger, filter & namespace... */
-			var namespace = config.namespace || Klass.defaults.namespace,
-				tempConfig = $.extend({}, Klass.defaults, Klass.readElementConfig($source[0], namespace), config),
-				sharedPersist;
-			var handler = function(event) {
-				var $target = $(event.currentTarget);
-				/* ... since we might as well compute the config on the actual target */
-				var elemConfig = $.extend(
-					{$source: $source, $currentTarget: $target},
-					Klass.readElementConfig($source[0], tempConfig.namespace),
-					Klass.readElementConfig(event.currentTarget, tempConfig.namespace),
-					config);
-				var fl = sharedPersist || $target.data('ulpmodal-persisted') || new Klass($content, elemConfig);
-				if(fl.persist === 'shared') {
-					sharedPersist = fl;
-				} else if(fl.persist !== false) {
-					$target.data('ulpmodal-persisted', fl);
-				}
-				if (typeof elemConfig.$currentTarget.trigger === "function") {
-					elemConfig.$currentTarget.trigger('blur'); // Otherwise 'enter' key might trigger the dialog again
-				}
-				fl.open(event);
-			};
-
-			$source.on(tempConfig.openTrigger+'.'+tempConfig.namespace, tempConfig.filter, handler);
-
-			return {filter: tempConfig.filter, handler: handler};
-		},
-
-		current: function() {
-			var all = this.opened();
-			return all[all.length - 1] || null;
-		},
-
-		opened: function() {
-			var klass = this;
-			pruneOpened();
-			return $.grep(opened, function(fl) { return fl instanceof klass; } );
-		},
-
-		close: function(event) {
-			var cur = this.current();
-			if(cur) { return cur.close(event); }
-		},
-
-		/* Does the auto binding on startup.
-		   Meant only to be used by WordpressUlikeAjaxModal and its extensions
-		*/
-		_onReady: function() {
-			var Klass = this;
-			if(Klass.autoBind){
-				var $autobound = $(Klass.autoBind);
-				/* Bind existing elements */
-				$autobound.each(function(){
-					Klass.attach($(this));
-				});
-				/* If a click propagates to the document level, then we have an item that was added later on */
-				$(document).on('click', Klass.autoBind, function(evt) {
-					if (evt.isDefaultPrevented()) {
-						return;
-					}
-					var $cur = $(evt.currentTarget);
-					var len = $autobound.length;
-					$autobound = $autobound.add($cur);
-					if(len === $autobound.length) {
-						return; /* already bound */
-					}
-					/* Bind ulpmodal */
-					var data = Klass.attach($cur);
-					/* Dispatch event directly */
-					if (!data.filter || $(evt.target).parentsUntil($cur, data.filter).length > 0) {
-						data.handler(evt);
-					}
-				});
-			}
-		},
-
-		/* WordpressUlikeAjaxModal uses the onKeyUp callback to intercept the escape key.
-		   Private to WordpressUlikeAjaxModal.
-		*/
-		_callbackChain: {
-			onKeyUp: function(_super, event){
-				if(27 === event.keyCode) {
-					if (this.closeOnEsc) {
-						$.ulpmodal.close(event);
-					}
-					return false;
-				} else {
-					return _super(event);
-				}
-			},
-
-			beforeOpen: function(_super, event) {
-				// Used to disable scrolling
-				$(document.documentElement).addClass('with-ulpmodal');
-
-				// Remember focus:
-				this._previouslyActive = document.activeElement;
-
-				// Disable tabbing:
-				// See http://stackoverflow.com/questions/1599660/which-html-elements-can-receive-focus
-				this._$previouslyTabbable = $("a, input, select, textarea, iframe, button, iframe, [contentEditable=true]")
-					.not('[tabindex]')
-					.not(this.$instance.find('button'));
-
-				this._$previouslyWithTabIndex = $('[tabindex]').not('[tabindex="-1"]');
-				this._previousWithTabIndices = this._$previouslyWithTabIndex.map(function(_i, elem) {
-					return $(elem).attr('tabindex');
-				});
-
-				this._$previouslyWithTabIndex.add(this._$previouslyTabbable).attr('tabindex', -1);
-
-				if (typeof document.activeElement.trigger === "function") {
-					document.activeElement.trigger('blur');
-				}
-				return _super(event);
-			},
-
-			afterClose: function(_super, event) {
-				var r = _super(event);
-				// Restore focus
-				var self = this;
-				this._$previouslyTabbable.removeAttr('tabindex');
-				this._$previouslyWithTabIndex.each(function(i, elem) {
-					$(elem).attr('tabindex', self._previousWithTabIndices[i]);
-				});
-				if(typeof this._previouslyActive.trigger === "function"){
-					this._previouslyActive.trigger('focus');
-				}
-				// Restore scroll
-				if(WordpressUlikeAjaxModal.opened().length === 0) {
-					$(document.documentElement).removeClass('with-ulpmodal');
-				}
-				return r;
-			},
-
-			onResize: function(_super, event){
-				this.resize(this.$content.naturalWidth, this.$content.naturalHeight);
-				return _super(event);
-			},
-
-			afterContent: function(_super, event){
-				var r = _super(event);
-				this.$instance.find('[autofocus]:not([disabled])').trigger('focus');
-				this.onResize(event);
-				return r;
-			}
-		}
-	});
-
-	$.ulpmodal = WordpressUlikeAjaxModal;
-
-	/* bind jQuery elements to trigger ulpmodal */
-	$.fn.ulpmodal = function($content, config) {
-		WordpressUlikeAjaxModal.attach(this, $content, config);
-		return this;
-	};
-
-	/* bind ulpmodal on ready if config autoBind is set */
-	$(function() {
-		WordpressUlikeAjaxModal._onReady();
-	} );
-});
+})();
 
 
 /* ================== public/assets/js/src/_toast.js =================== */
 
 
-/* 'WordpressUlikeNotifications' plugin : https://github.com/alimir/wp-ulike */
-(function ($, window, document, undefined) {
+/**
+ * WP ULike Notifications Plugin
+ *
+ * @fileoverview Toast notification system for user feedback
+ * @requires ES7 (ES2016) compatible browser
+ * @author WP ULike Team
+ * @see https://github.com/alimir/wp-ulike
+ */
+(function (window, document, undefined) {
   "use strict";
 
   // Create the defaults once
-  var pluginName = "WordpressUlikeNotifications",
-    defaults = {
-      messageType: "success",
-      messageText: "Hello World!",
-      timeout: 8000,
-      messageElement: "wpulike-message",
-      notifContainer: "wpulike-notification"
-    };
+  const pluginName = "WordpressUlikeNotifications";
+  const defaults = {
+    messageType: "success",
+    messageText: "Hello World!",
+    timeout: 8000,
+    messageElement: "wpulike-message",
+    notifContainer: "wpulike-notification",
+    fadeOutClass: "wpulike-message-fadeout"
+  };
+
+  // Constants
+  const FADE_OUT_DURATION = 300; // Match CSS transition duration
+
+  // Cache container instances to avoid repeated DOM queries
+  const containerCache = new WeakMap();
+
+  /**
+   * Helper function to dispatch custom events
+   * Optimized: avoid creating empty objects
+   */
+  const triggerEvent = (element, eventName, detail) => {
+    if (!element) return;
+    const event = new CustomEvent(eventName, {
+      bubbles: true,
+      cancelable: true,
+      detail: detail || null
+    });
+    element.dispatchEvent(event);
+  };
+
+  /**
+   * Helper function to fade out an element using CSS class
+   * No inline styles - all handled by CSS
+   * Optimized: use requestAnimationFrame for better timing
+   */
+  const fadeOut = (element, callback, instance) => {
+    if (!element) return;
+
+    // Use requestAnimationFrame to sync with CSS transition
+    requestAnimationFrame(() => {
+      element.classList.add(defaults.fadeOutClass);
+
+      // Remove element after transition completes
+      const timeoutId = setTimeout(() => {
+        if (instance) instance.fadeTimeoutId = null;
+        if (callback) {
+          callback();
+        }
+      }, FADE_OUT_DURATION);
+      if (instance) instance.fadeTimeoutId = timeoutId;
+    });
+  };
+
+  /**
+   * Helper to get or create notification container
+   * Optimized: cache container lookup using WeakMap
+   */
+  const getOrCreateContainer = (parentElement, containerClass) => {
+    // Check cache first
+    let container = containerCache.get(parentElement);
+    if (container && container.parentNode) {
+      return container;
+    }
+
+    // Query DOM only if not cached
+    container = parentElement.querySelector(`.${containerClass}`);
+    if (!container) {
+      container = document.createElement("div");
+      container.className = containerClass;
+      parentElement.appendChild(container);
+    }
+
+    // Cache the container
+    containerCache.set(parentElement, container);
+    return container;
+  };
+
   // The actual plugin constructor
   function Plugin(element, options) {
+    if (!element) {
+      console.warn("WordpressUlikeNotifications: element is required");
+      return;
+    }
+
     this.element = element;
-    this.$element = $(element);
-    this.settings = $.extend({}, defaults, options);
+    this.settings = Object.assign({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
+    this.timeoutId = null;
+    this.fadeTimeoutId = null; // Track fade timeout
+    this.isRemoving = false;
+    // Cache className to avoid template literal on each access
+    this._messageClassName = null;
+
     this.init();
   }
 
-  // Avoid Plugin.prototype conflicts
-  $.extend(Plugin.prototype, {
-    init: function () {
+  // Plugin prototype methods
+  Plugin.prototype = {
+    init() {
       // Create Message Wrapper
-      this._message();
-      // Create Notification Container
-      this._container();
+      this._createMessage();
+      // Get or Create Notification Container
+      this._getContainer();
       // Append Notification
       this._append();
-      // Remove Notification
-      this._remove();
+      // Setup removal handlers
+      this._setupRemoval();
     },
 
     /**
      * Create Message Wrapper
+     * Optimized: cache className string
      */
-    _message: function () {
-      this.$messageElement = $("<div/>")
-        .addClass(
-          this.settings.messageElement + " wpulike-" + this.settings.messageType
-        )
-        .text(this.settings.messageText);
+    _createMessage() {
+      this.messageElement = document.createElement("div");
+
+      // Cache className to avoid template literal recreation
+      if (!this._messageClassName) {
+        this._messageClassName = `${this.settings.messageElement} wpulike-${this.settings.messageType}`;
+      }
+      this.messageElement.className = this._messageClassName;
+
+      this.messageElement.textContent = this.settings.messageText;
+      this.messageElement.setAttribute("role", "alert");
+      this.messageElement.setAttribute("aria-live", "polite");
     },
 
     /**
-     * Create notification container
+     * Get or create notification container
      */
-    _container: function () {
-      // Make notification container if not exist
-      if (!$("." + this.settings.notifContainer).length) {
-        this.$element.append(
-          $("<div/>").addClass(this.settings.notifContainer)
-        );
-      }
-      this.$notifContainer = this.$element.find(
-        "." + this.settings.notifContainer
+    _getContainer() {
+      this.notifContainer = getOrCreateContainer(
+        this.element,
+        this.settings.notifContainer
       );
     },
 
     /**
-     * Append notice
+     * Append notice to container
+     * Optimized: batch DOM operations
      */
-    _append: function () {
-      // Append Notification
-      this.$notifContainer
-        .append(this.$messageElement)
-        .trigger("WordpressUlikeNotificationAppend");
+    _append() {
+      if (!this.notifContainer || !this.messageElement) return;
+
+      // Single DOM operation
+      this.notifContainer.appendChild(this.messageElement);
+
+      // Trigger event after DOM update
+      requestAnimationFrame(() => {
+        triggerEvent(this.notifContainer, "WordpressUlikeNotificationAppend", {
+          messageElement: this.messageElement
+        });
+      });
     },
 
     /**
-     * Disappear notice
+     * Setup removal handlers (click and timeout)
+     * Optimized: use arrow function to avoid binding
      */
-    _remove: function () {
-      var self = this;
-      // Remove Message On Click
-      this.$messageElement.on('click', function () {
-        $(this)
-          .fadeOut(300, function () {
-            $(this).remove();
-            if (!$("." + self.settings.messageElement).length) {
-              self.$notifContainer.remove();
-            }
-          })
-          .trigger("WordpressUlikeRemoveNotification");
-      });
+    _setupRemoval() {
+      if (!this.messageElement) return;
+
+      // Remove Message On Click - use arrow function for better performance
+      this.messageElement.addEventListener("click", () => {
+        this.remove();
+      }, { once: true, passive: true }); // passive for better scroll performance
+
       // Remove Message With Timeout
-      if (self.settings.timeout) {
-        setTimeout(function () {
-          self.$messageElement
-            .fadeOut(300, function () {
-              $(this).remove();
-              if (!$("." + self.settings.messageElement).length) {
-                self.$notifContainer.remove();
-              }
-            })
-            .trigger("WordpressUlikeRemoveNotification");
-        }, self.settings.timeout);
+      if (this.settings.timeout && this.settings.timeout > 0) {
+        this.timeoutId = setTimeout(() => {
+          this.remove();
+        }, this.settings.timeout);
+      }
+    },
+
+    /**
+     * Remove message with fade out animation
+     * Optimized to prevent multiple calls
+     */
+    remove() {
+      if (this.isRemoving || !this.messageElement) return;
+      this.isRemoving = true;
+
+      // Clear timeouts if still pending
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+      if (this.fadeTimeoutId) {
+        clearTimeout(this.fadeTimeoutId);
+        this.fadeTimeoutId = null;
       }
 
-    }
-  });
+      // Remove message with fade out
+      fadeOut(this.messageElement, () => {
+        this._cleanup();
+      }, this);
+    },
 
-  // A really lightweight plugin wrapper around the constructor,
-  // preventing against multiple instantiations
-  $.fn[pluginName] = function (options) {
-    return this.each(function () {
-      new Plugin(this, options);
-    });
+    /**
+     * Cleanup after removal
+     * Optimized: batch DOM operations
+     */
+    _cleanup() {
+      if (!this.messageElement) return;
+
+      const messageEl = this.messageElement;
+      const container = this.notifContainer;
+
+      // Remove element from DOM
+      if (messageEl.parentNode) {
+        messageEl.remove();
+      }
+
+      // Check if container is empty and remove it
+      if (container && container.children.length === 0) {
+        if (container.parentNode) {
+          container.remove();
+          // Clear cache when container is removed
+          containerCache.delete(this.element);
+        }
+      }
+
+      // Trigger removal event
+      triggerEvent(this.element, "WordpressUlikeRemoveNotification", {
+        messageElement: messageEl
+      });
+
+      // Cleanup references
+      this.messageElement = null;
+      this.notifContainer = null;
+      this.isRemoving = false;
+      this._messageClassName = null;
+    }
   };
-})(jQuery, window, document);
+
+  // Expose plugin to window for global access
+  window[pluginName] = Plugin;
+
+  // Expose as jQuery plugin for backward compatibility (if jQuery is available)
+  // This allows users' existing jQuery code to continue working
+  // Example: $(document.body).WordpressUlikeNotifications({...})
+  if (typeof jQuery !== 'undefined' && jQuery && jQuery.fn) {
+    jQuery.fn[pluginName] = function (options) {
+      return this.each(function () {
+        new Plugin(this, options);
+      });
+    };
+  }
+})(window, document);
 
 
 /* ================== public/assets/js/src/_tooltip.js =================== */
 
 
-; (function ($) {
+/**
+ * WP ULike Tooltip Plugin
+ *
+ * @fileoverview Lightweight tooltip solution with dynamic content loading
+ * @requires ES7 (ES2016) compatible browser
+ * @author WP ULike Team
+ * @see https://github.com/alimir/wp-ulike
+ */
+(function (window, document, undefined) {
+  "use strict";
 
-    $.fn.WordpressUlikeTooltip = function (options) {
+  // Store tooltip instances
+  const tooltipInstances = new WeakMap();
+  const tooltipInstancesById = {}; // For easier access by ID
+  const activeTooltips = [];
 
-        //Instantiate WordpressUlikeTooltip once per dom element
-        if (this.length > 1) {
-            this.each(function () {
-                $(this).WordpressUlikeTooltip(options);
-            });
-            return this;
-        }
+  // Default options
+  const defaults = {
+    id: Date.now(),
+    title: "",
+    trigger: "hover",
+    position: "top",
+    class: "",
+    theme: "light",
+    size: "small",
+    singleton: true,
+    close_on_outside_click: true,
+  };
 
-        //if there's nothing being passed
-        if (typeof this === 'undefined' || this.length !== 1) {
-            return false;
-        }
+  // Constants
+  const SPACING = 13;
+  const SHOW_DELAY = 100;
+  const HIDE_DELAY = 100;
 
-        const dom_wrapped = $(this);
+  // Helper: Get element position (viewport-relative for fixed positioning)
+  const getOffset = (element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    };
+  };
 
-        //get list of options
-        options = $.extend({}, $.WordpressUlikeTooltip.defaults, options, dom_wrapped.data());
+  // Helper: Create loading spinner HTML
+  const createSpinnerHTML = () => {
+    return '<div class="ulf-loading-spinner"><div class="ulf-spinner-circle"></div><div class="ulf-spinner-circle"></div><div class="ulf-spinner-circle"></div></div>';
+  };
 
-        //get title attribute
-        let title = dom_wrapped.attr('title');
+  // Helper: Create tooltip element
+  const createTooltipElement = (content, className, isLoading) => {
+    const tooltip = document.createElement("div");
+    tooltip.className = `ulf-tooltip ${className || ""}`;
+    tooltip.setAttribute("role", "tooltip");
 
-        //if exists, override defaults
-        if (typeof title !== 'undefined' && title.length) {
-            options.title = title;
-        }
+    // Ensure content is never empty to prevent glitch
+    const contentHTML = isLoading ? createSpinnerHTML() : (content || "&nbsp;");
+    tooltip.innerHTML = `<div class="ulf-arrow"></div><div class="ulf-content">${contentHTML}</div>`;
+    return tooltip;
+  };
 
-        //add theme class
-        options.class += ' ulf-' + options.theme + '-theme';
-        //add size class
-        options.class += ' ulf-' + options.size;
+  // Helper: Position tooltip
+  const positionTooltip = (tooltip, reference, placement) => {
+    // Force a reflow to ensure tooltip has proper dimensions
+    void tooltip.offsetHeight;
 
-        //lowercase and trim whatever trigger is provided to try to make it more forgiving (this means "Hover " works just as well as "hover")
-        options.trigger = options.trigger.toLowerCase().trim();
-
-        let helper = {
-            dom: this,
-            dom_wrapped: dom_wrapped,
-            position_debug: options.position_debug,
-            trigger: options.trigger,
-            id: options.id,
-            title: options.title,
-            content: options.title,
-            child_class: options.child,
-            theme: options.theme,
-            class: options.class,
-            position: options.position,
-            close_on_outside_click: options.close_on_outside_click,
-            singleton: options.singleton,
-            dataAttr: 'ulike-tooltip',
-            //create tooltip html
-            createTooltipHTML: function () {
-                return `<div class='ulf-tooltip ${helper.class}' role='tooltip'><div class='ulf-arrow'></div><div class='ulf-content'>${helper.content}</div></div>`;
-            },
-            //disable existing options/handlers
-            destroy: function () {
-                //only if it's actually tied to this element
-                const existing = helper.dom_wrapped.data(helper.dataAttr);
-                if (typeof existing !== 'undefined' && existing !== null) {
-                    existing.dom_wrapped.off('touchstart mouseenter', existing.show);
-                    existing.dom_wrapped.off('click', existing.preventDefaultHandler);
-
-                    //attach resize handler to reposition tooltip
-                    $(window).off('resize', existing.onResize);
-
-                    //if currently shown, hide it
-                    existing.isVisible() && existing.hide();
-
-                    //detach from dom
-                    existing.dom_wrapped.data(existing.dataAttr, null);
-                }
-            },
-            //initialize the plugin on this element
-            initialize: function () {
-                //attach on handler to show tooltip
-                //use touchstart and mousedown just like if you click outside the tooltip to close it
-                //this way it blocks the hide if you click the button a second time to close the tooltip
-                helper.dom_wrapped.on('touchstart mouseenter', helper.show);
-                helper.dom_wrapped.on('click', helper.preventDefaultHandler);
-                // helper.dom_wrapped.on('touchend mouseleave', helper.hide);
-
-
-                if (!$.WordpressUlikeTooltip.body_click_initialized) {
-                    $(document).on('touchstart mousedown', helper.onClickOutside);
-                    $.WordpressUlikeTooltip.bodyClickInitialized = true;
-                }
-
-                //attach to dom for easy access later
-                helper.dom_wrapped.data(helper.dataAttr, helper);
-
-                // WP ULike Actions
-                $(document).on('WordpressUlikeLikersMarkupUpdated', function (e, el, type, temp) {
-                    if (type == 'popover') {
-                        if (temp.length) {
-                            helper.show();
-                        } else {
-                            let existing = el.data(helper.dataAttr);
-                            if (typeof existing !== 'undefined' && existing !== null) {
-                                existing.destroy();
-                            }
-                        }
-                    }
-                });
-
-                //return dom for chaining of event handlers and such
-                return helper.dom;
-            },
-            //on click of element, prevent default
-            preventDefaultHandler: function (e) {
-                e.preventDefault();
-                return false;
-            },
-            //shows the tooltip
-            show: function (trigger_event) {
-                //if already visible, don't show
-                if (helper.isVisible()) {
-                    return false;
-                }
-
-                if (helper.singleton) {
-                    helper.hideAllVisible();
-                }
-
-                //cache reference to the body
-                const body = $('body');
-
-                //get string from function
-                if (typeof trigger_event === 'undefined' || trigger_event) {
-                    if (typeof helper.title === 'function') helper.content = helper.title(helper.dom_wrapped, helper);
-                }
-                //add the tooltip to the dom
-                body.append(helper.createTooltipHTML());
-                //cache tooltip
-                helper.tooltip = $('.ulf-tooltip:last');
-                //position it
-                helper.positionTooltip();
-                //attach resize handler to reposition tooltip
-                $(window).on('resize', helper.onResize);
-                //give the tooltip an id so we can set accessibility props
-                const id = 'ulp-dom-' + helper.id;
-                helper.tooltip.attr('id', id);
-                helper.dom.attr('aria-describedby', id);
-                //add to open array
-                $.WordpressUlikeTooltip.visible.push(helper);
-                //trigger event on show and pass the tooltip
-                if (typeof trigger_event === 'undefined' || trigger_event) {
-                    helper.dom.trigger('ulf-show', [helper.tooltip, helper.hide]);
-                }
-                //if the trigger element is modified, reposition tooltip (hides if no longer exists or invisible)
-                //if tooltip is modified, trigger reposition
-                //this is admittedly inefficient, but it's only listening when the tooltip is open
-                // Create a MutationObserver instance to replace the deprecated DOMSubtreeModified event
-                helper.observer = new MutationObserver(function(mutations) {
-                    // Call the positionTooltip method on DOM modifications
-                    helper.positionTooltip();
-                });
-
-                // Configuration for the observer to listen to DOM modifications
-                const config = { attributes: true, childList: true, subtree: true };
-
-                // Start observing the body for DOM modifications
-                helper.observer.observe(document.body, config);
-            },
-            //is this tooltip visible
-            isVisible: function () {
-                return $.inArray(helper, $.WordpressUlikeTooltip.visible) > -1;
-            },
-            //hide all visible tooltips
-            hideAllVisible: function () {
-                $.each($.WordpressUlikeTooltip.visible, function (index, WordpressUlikeTooltip) {
-                    //if it's not a focus/hoverfocus tooltip with focus currently, hide it
-                    if (!WordpressUlikeTooltip.dom_wrapped.hasClass('ulf-focused')) {
-                        WordpressUlikeTooltip.hide();
-                    }
-                });
-                return this;
-            },
-            //hides the tooltip for this element
-            hide: function (trigger_event) {
-                // Disconnect the MutationObserver to stop listening for DOM modifications
-                if (helper.observer) {
-                    helper.observer.disconnect();
-                    helper.observer = null;
-                }
-                //remove scroll handler to reposition tooltip
-                $(window).off('resize', helper.onResize);
-                //remove accessbility props
-                helper.dom.attr('aria-describedby', null);
-                //remove from dom
-                if (helper.tooltip && helper.tooltip.length) {
-                    helper.tooltip.remove();
-                }
-                //trigger hide event
-                if (typeof trigger_event === 'undefined' || trigger_event) {
-                    helper.dom.trigger('ulf-hide');
-                }
-                //hide on click if not click
-                if (helper.trigger !== 'click') {
-                    helper.dom_wrapped.off('touchstart mousedown', helper.hide);
-                }
-                //remove from open array
-                var index = $.inArray(helper, $.WordpressUlikeTooltip.visible);
-                $.WordpressUlikeTooltip.visible.splice(index, 1);
-
-                return helper.dom;
-            },
-            //on body resized
-            onResize: function () {
-                //hiding and showing the tooltip will update it's position
-                helper.hide(false);
-                helper.show(false);
-            },
-            //on click outside of the tooltip
-            onClickOutside: function (e) {
-                const target = $(e.target);
-                if (!target.hasClass('ulf-tooltip') && !target.parents('.ulf-tooltip:first').length) {
-                    $.each($.WordpressUlikeTooltip.visible, function (index, WordpressUlikeTooltip) {
-                        if (typeof WordpressUlikeTooltip !== 'undefined') {
-                            //if close on click AND target is NOT the trigger element OR it is the trigger element,
-                            // but the trigger is not focus/hoverfocus (since on click focus is granted in those cases and the tooltip should be displayed)
-                            if (WordpressUlikeTooltip.close_on_outside_click && (target !== WordpressUlikeTooltip.dom_wrapped || (WordpressUlikeTooltip.trigger !== 'focus' && WordpressUlikeTooltip.trigger !== 'hoverfocus'))) {
-                                WordpressUlikeTooltip.hide();
-                            }
-                        }
-                    });
-                }
-            },
-            //position tooltip based on where the clicked element is
-            positionTooltip: function () {
-
-                helper.positionDebug('-- Start positioning --');
-
-                //if no longer exists or is no longer visible
-                if (!helper.dom_wrapped.length || !helper.dom_wrapped.is(":visible")) {
-                    helper.positionDebug('Elem no longer exists. Removing tooltip');
-
-                    helper.hide(true);
-                }
-
-                //cache reference to arrow
-                let arrow = helper.tooltip.find('.ulf-arrow');
-
-                //first try to fit it with the preferred position
-                let [arrow_dir, elem_width, tooltip_width, tooltip_height, left, top] = helper.calculateSafePosition(helper.position);
-
-                //if still couldn't fit, switch to auto
-                if (typeof left === 'undefined' && helper.position !== 'auto') {
-                    helper.positionDebug('Couldn\'t fit preferred position');
-                    [arrow_dir, elem_width, tooltip_width, tooltip_height, left, top] = helper.calculateSafePosition('auto');
-                }
-
-                //fallback to centered (modal style)
-                if (typeof left === 'undefined') {
-                    helper.positionDebug('Doesn\'t appear to fit. Displaying centered');
-                    helper.tooltip.addClass('ulf-centered').css({
-                        'top': '50%',
-                        'left': '50%',
-                        'margin-left': -(tooltip_width / 2),
-                        'margin-top': -(tooltip_height / 2)
-                    });
-                    if (arrow && arrow.length) {
-                        arrow.remove();
-                    }
-                    helper.positionDebug('-- Done positioning --');
-                    return;
-                }
-
-                //position the tooltip
-                helper.positionDebug({ 'Setting Position': { 'Left': left, 'Top': top } });
-                helper.tooltip.css('left', left);
-                helper.tooltip.css('top', top);
-
-                //arrow won't point at it if hugging side
-                if (elem_width < 60) {
-                    helper.positionDebug('Element is less than ' + elem_width + 'px. Setting arrow to hug the side tighter');
-                    arrow_dir += ' ulf-arrow-super-hug';
-                }
-
-                //set the arrow location
-                arrow.addClass('ulf-arrow-' + arrow_dir);
-
-                helper.positionDebug('-- Done positioning --');
-
-                return helper;
-            },
-            //detects where it will fit and returns the positioning info
-            calculateSafePosition: function (position) {
-                //cache reference to arrow
-                let arrow = helper.tooltip.find('.ulf-arrow');
-
-                //get position + size of clicked element
-                let elem_position = helper.dom_wrapped.offset();
-                let elem_height = helper.dom_wrapped.outerHeight();
-                let elem_width = helper.dom_wrapped.outerWidth();
-
-                //get tooltip dimensions
-                let tooltip_width = helper.tooltip.outerWidth();
-                let tooltip_height = helper.tooltip.outerHeight();
-
-                //get window dimensions
-                let window_width = document.querySelector('body').offsetWidth;
-                let window_height = document.querySelector('body').offsetHeight;
-
-                //get arrow size so we can pad
-                let arrow_height = arrow.is(":visible") ? arrow.outerHeight() : 0;
-                let arrow_width = arrow.is(":visible") ? arrow.outerWidth() : 0;
-
-                //see where it fits in relation to the clicked element
-                let fits = {};
-                fits.below = (window_height - (tooltip_height + elem_height + elem_position.top)) > 5;
-                fits.above = (elem_position.top - tooltip_height) > 5;
-                fits.vertical_half = (elem_position.top + (elem_width / 2) - (tooltip_height / 2)) > 5;
-                fits.right = (window_width - (tooltip_width + elem_width + elem_position.left)) > 5;
-                fits.right_half = (window_width - elem_position.left - (elem_width / 2) - (tooltip_width / 2)) > 5;
-                fits.right_full = (window_width - elem_position.left - tooltip_width) > 5;
-                fits.left = (elem_position.left - tooltip_width) > 5;
-                fits.left_half = (elem_position.left + (elem_width / 2) - (tooltip_width / 2)) > 5;
-                fits.left_full = (elem_position.left - tooltip_width) > 5;
-
-                //in debug mode, display all details
-                helper.positionDebug({
-                    'Clicked Element': { 'Left': elem_position.left, 'Top': elem_position.top },
-                });
-                helper.positionDebug({
-                    'Element Dimensions': { 'Height': elem_height, 'Width': elem_width },
-                    'Tooltip Dimensions': { 'Height': tooltip_height, 'Width': tooltip_width },
-                    'Window Dimensions': { 'Height': window_height, 'Width': window_width },
-                    'Arrow Dimensions': { 'Height': arrow_height, 'Width': arrow_width },
-                });
-                helper.positionDebug(fits);
-
-                //vars we need for positioning
-                let arrow_dir, left, top;
-
-                if ((position === 'auto' || position === 'bottom') && fits.below && fits.left_half && fits.right_half) {
-                    helper.positionDebug('Displaying below, centered');
-                    arrow_dir = 'top';
-                    left = elem_position.left - (tooltip_width / 2) + (elem_width / 2);
-                    top = elem_position.top + elem_height + (arrow_height / 2);
-                }
-                else if ((position === 'auto' || position === 'top') && fits.above && fits.left_half && fits.right_half) {
-                    helper.positionDebug('Displaying above, centered');
-                    arrow_dir = 'bottom';
-                    if (helper.child_class) {
-                        let $child_element = helper.dom_wrapped.find(helper.child_class).first();
-                        left = $child_element.offset().left - (tooltip_width / 2) + ($child_element.width() / 2);
-                    } else {
-                        left = elem_position.left - (tooltip_width / 2) + (elem_width / 2);
-                    }
-                    top = elem_position.top - tooltip_height - (arrow_height / 2);
-                }
-                else if ((position === 'auto' || position === 'left') && fits.left && fits.vertical_half) {
-                    helper.positionDebug('Displaying left, centered');
-                    arrow_dir = 'right';
-                    left = elem_position.left - tooltip_width - (arrow_width / 2);
-                    top = elem_position.top + (elem_height / 2) - (tooltip_height / 2);
-                }
-                else if ((position === 'auto' || position === 'right') && fits.right && fits.vertical_half) {
-                    helper.positionDebug('Displaying right, centered');
-                    arrow_dir = 'left';
-                    left = elem_position.left + elem_width + (arrow_width / 2);
-                    top = elem_position.top + (elem_height / 2) - (tooltip_height / 2);
-                }
-                else if ((position === 'auto' || position === 'bottom') && fits.below && fits.right_full) {
-                    helper.positionDebug('Displaying below, to the right');
-                    arrow_dir = 'top ulf-arrow-hug-left';
-                    left = elem_position.left;
-                    top = elem_position.top + elem_height + (arrow_height / 2);
-                }
-                else if ((position === 'auto' || position === 'bottom') && fits.below && fits.left_full) {
-                    helper.positionDebug('Displaying below, to the left');
-                    arrow_dir = 'top ulf-arrow-hug-right';
-                    left = elem_position.left + elem_width - tooltip_width;
-                    top = elem_position.top + elem_height + (arrow_height / 2);
-                }
-                else if ((position === 'auto' || position === 'top') && fits.above && fits.right_full) {
-                    helper.positionDebug('Displaying above, to the right');
-                    arrow_dir = 'bottom ulf-arrow-hug-left';
-                    left = elem_position.left;
-                    top = elem_position.top - tooltip_height - (arrow_height / 2);
-                }
-                else if ((position === 'auto' || position === 'top') && fits.above && fits.left_full) {
-                    helper.positionDebug('Displaying above, to the left');
-                    arrow_dir = 'bottom ulf-arrow-hug-right';
-                    left = elem_position.left + elem_width - tooltip_width;
-                    top = elem_position.top - tooltip_height - (arrow_height / 2);
-                }
-
-                return [arrow_dir, elem_width, tooltip_width, tooltip_height, left, top];
-            },
-            //if position_debug is enabled, let's console.log the details
-            positionDebug: function (msg) {
-                if (!helper.position_debug) {
-                    return false;
-                }
-
-                return typeof msg === 'object' ? console.table(msg) : console.log(`Position: ${msg}`);
-            }
-        };
-
-        helper.destroy();
-
-        return helper.initialize();
+    const refRect = getOffset(reference);
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const arrow = tooltip.querySelector(".ulf-arrow");
+    const viewport = {
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
 
-    $.WordpressUlikeTooltip = {};
-    $.WordpressUlikeTooltip.visible = [];
-    $.WordpressUlikeTooltip.body_click_initialized = false;
-    $.WordpressUlikeTooltip.defaults = {
-        id: Date.now(),
-        title: '',
-        trigger: 'hoverfocus',
-        position: 'auto',
-        class: '',
-        theme: 'black',
-        size: 'small',
-        singleton: true,
-        close_on_outside_click: true,
+    const positions = {
+      top: {
+        top: refRect.top - tooltipRect.height - SPACING,
+        left: refRect.left + refRect.width / 2 - tooltipRect.width / 2,
+        arrow: "bottom",
+      },
+      bottom: {
+        top: refRect.top + refRect.height + SPACING,
+        left: refRect.left + refRect.width / 2 - tooltipRect.width / 2,
+        arrow: "top",
+      },
+      left: {
+        top: refRect.top + refRect.height / 2 - tooltipRect.height / 2,
+        left: refRect.left - tooltipRect.width - SPACING,
+        arrow: "right",
+      },
+      right: {
+        top: refRect.top + refRect.height / 2 - tooltipRect.height / 2,
+        left: refRect.left + refRect.width + SPACING,
+        arrow: "left",
+      },
+    };
+
+    const pos = positions[placement] || positions.top;
+
+    // Keep tooltip in viewport
+    if (pos.left < 10) pos.left = 10;
+    if (pos.left + tooltipRect.width > viewport.width - 10) {
+      pos.left = viewport.width - tooltipRect.width - 10;
+    }
+    if (pos.top < 10) pos.top = 10;
+    if (pos.top + tooltipRect.height > viewport.height - 10) {
+      pos.top = viewport.height - tooltipRect.height - 10;
     }
 
-})(jQuery);
+    // Use fixed positioning (viewport-relative) for consistent positioning
+    tooltip.style.position = "fixed";
+    tooltip.style.left = `${pos.left}px`;
+    tooltip.style.top = `${pos.top}px`;
+
+    if (arrow) {
+      arrow.className = `ulf-arrow ulf-arrow-${pos.arrow}`;
+    }
+
+    // Mark as positioned to show arrow
+    tooltip.setAttribute("data-positioned", "true");
+  };
+
+  // Helper: Convert array-like to array
+  const arrayFrom = Array.from || ((arr) => Array.prototype.slice.call(arr));
+
+  // Main plugin
+  function WordpressUlikeTooltipPlugin(element, options) {
+    // Handle multiple elements
+    if (element.length !== undefined && element.length > 1) {
+      arrayFrom(element).forEach((el) => {
+        new WordpressUlikeTooltipPlugin(el, options);
+      });
+      return element;
+    }
+
+    if (!element) return false;
+
+    // Merge options
+    options = Object.assign({}, defaults, options || {});
+
+    // Get title from attribute or hidden content element
+    if (!options.title) {
+      // Check for hidden content element (for dynamic content like likers)
+      const hiddenContent = element.querySelector('[data-tooltip-content]');
+      if (hiddenContent) {
+        const tooltipState = hiddenContent.getAttribute('data-tooltip-state');
+        if (tooltipState === 'ready') {
+          options.title = hiddenContent.innerHTML.trim();
+        }
+      }
+
+      // Fallback to title attribute
+      if (!options.title) {
+        const titleAttr = element.getAttribute("title");
+        if (titleAttr) {
+          options.title = titleAttr;
+          element.removeAttribute("title");
+        }
+      }
+    }
+
+    // Destroy existing
+    const existing = tooltipInstances.get(element);
+    if (existing) {
+      existing.destroy();
+    }
+
+    let tooltip = null;
+    let showTimeout = null;
+    let hideTimeout = null;
+    let isLoading = false;
+    let scrollHandler = null;
+    let scrollHandlerOptions = null;
+    let outsideHandler = null; // Store for cleanup
+    let isHovering = false; // Track if user is currently hovering
+
+    const show = (showLoading) => {
+      // If showing loading, always show even if tooltip exists
+      if (tooltip && tooltip.parentNode && !showLoading) return;
+
+      // Hide others if singleton
+      if (options.singleton !== false) {
+        activeTooltips.forEach((t) => {
+          if (t && t.hide && t.element !== element) t.hide();
+        });
+      }
+
+      // Create or update tooltip
+      let className = `ulf-${options.theme || "light"}-theme ulf-${options.size || "small"}`;
+      if (options.class) className += ` ${options.class}`;
+
+      // Get reference element for positioning
+      let reference = element;
+      if (options.child) {
+        const childEl = element.querySelector(options.child);
+        if (childEl) reference = childEl;
+      }
+
+      if (!tooltip || !tooltip.parentNode || showLoading) {
+        if (tooltip && tooltip.parentNode) {
+          tooltip.remove();
+        }
+        isLoading = showLoading === true;
+        tooltip = createTooltipElement(
+          options.title || "",
+          className,
+          isLoading
+        );
+        document.body.appendChild(tooltip);
+        // Position after a brief delay to ensure dimensions are calculated
+        requestAnimationFrame(() => {
+          if (tooltip && tooltip.parentNode) {
+            positionTooltip(tooltip, reference, options.position || "top");
+          }
+        });
+      } else {
+        // Update existing tooltip content
+        const contentEl = tooltip.querySelector(".ulf-content");
+        if (contentEl) {
+          isLoading = showLoading === true;
+          contentEl.innerHTML = isLoading
+            ? createSpinnerHTML()
+            : (options.title || "&nbsp;");
+        }
+        // Reposition after content update (with delay for dimension calculation)
+        requestAnimationFrame(() => {
+          if (tooltip && tooltip.parentNode) {
+            positionTooltip(tooltip, reference, options.position || "top");
+          }
+        });
+      }
+
+      // Add hover handlers to tooltip if trigger is hover
+      if (options.trigger === "hover" || !options.trigger) {
+        tooltip.addEventListener("mouseenter", () => {
+          clearTimeout(hideTimeout);
+        });
+        tooltip.addEventListener("mouseleave", handleHide);
+      }
+
+      // Add scroll listener to hide tooltip on scroll (standard behavior)
+      // This prevents tooltip from appearing to "move" when scrolling
+      // Most tooltip libraries (Tippy.js, Popper.js) hide tooltips on scroll
+      if (!scrollHandler) {
+        scrollHandler = () => {
+          if (tooltip && tooltip.parentNode) {
+            hide();
+          }
+        };
+        // Use capture phase and passive for better performance
+        scrollHandlerOptions = { capture: true, passive: true };
+        window.addEventListener("scroll", scrollHandler, scrollHandlerOptions);
+      }
+
+      // Add to active
+      const isInActive = activeTooltips.some((t) => t.element === element);
+      if (!isInActive) {
+        activeTooltips.push({ element, hide });
+      }
+
+      // Set ID for accessibility
+      const id = `ulp-dom-${options.id}`;
+      tooltip.setAttribute("id", id);
+      element.setAttribute("aria-describedby", id);
+
+      // Trigger event
+      const event = new CustomEvent("ulf-show", {
+        bubbles: true,
+        detail: { tooltip },
+      });
+      element.dispatchEvent(event);
+    };
+
+    // Helper: Get or create hidden content element
+    const getTooltipContentElement = () => {
+      let hiddenContent = element.querySelector('[data-tooltip-content]');
+      if (!hiddenContent) {
+        hiddenContent = document.createElement("div");
+        hiddenContent.setAttribute('data-tooltip-content', '');
+        hiddenContent.style.display = 'none';
+        element.appendChild(hiddenContent);
+      }
+      return hiddenContent;
+    };
+
+    // Helper: Set tooltip state
+    const setTooltipState = (state) => {
+      const hiddenContent = getTooltipContentElement();
+      hiddenContent.setAttribute('data-tooltip-state', state);
+    };
+
+    // Helper: Get tooltip state
+    const getTooltipState = () => {
+      const hiddenContent = element.querySelector('[data-tooltip-content]');
+      return hiddenContent ? hiddenContent.getAttribute('data-tooltip-state') : null;
+    };
+
+    const updateContent = (content) => {
+      // Update options.title to keep it in sync
+      options.title = content || "";
+
+      // Update hidden content element (for dynamic content)
+      const hiddenContent = getTooltipContentElement();
+      hiddenContent.innerHTML = content || "";
+
+      // Set state: 'ready' if has content, 'empty' if no content
+      const hasContent = content && content.trim().length > 0;
+      setTooltipState(hasContent ? 'ready' : 'empty');
+
+      // If content is empty, hide tooltip immediately (don't show empty tooltip)
+      if (!hasContent) {
+        if (tooltip && tooltip.parentNode) {
+          hide();
+        }
+        return;
+      }
+
+      // If tooltip is visible, update it immediately
+      if (tooltip && tooltip.parentNode) {
+        const contentEl = tooltip.querySelector(".ulf-content");
+        if (contentEl) {
+          contentEl.innerHTML = content;
+          isLoading = false;
+          // Reposition after content update
+          const reference = options.child ? (element.querySelector(options.child) || element) : element;
+          requestAnimationFrame(() => {
+            if (tooltip && tooltip.parentNode) {
+              positionTooltip(tooltip, reference, options.position || "top");
+            }
+          });
+        }
+      } else if (isHovering) {
+        // Tooltip not visible but user is hovering - show it
+        show(false);
+      }
+    };
+
+    const hide = () => {
+      if (!tooltip || !tooltip.parentNode) return;
+
+      // Remove scroll listener when hiding
+      if (scrollHandler && scrollHandlerOptions) {
+        window.removeEventListener("scroll", scrollHandler, scrollHandlerOptions);
+        scrollHandler = null;
+        scrollHandlerOptions = null;
+      }
+
+      tooltip.remove();
+      tooltip = null;
+      isLoading = false;
+
+      // Remove from active
+      const index = activeTooltips.findIndex((t) => t.element === element);
+      if (index > -1) {
+        activeTooltips.splice(index, 1);
+      }
+
+      // Remove aria
+      element.removeAttribute("aria-describedby");
+
+      // Trigger event
+      const event = new CustomEvent("ulf-hide", { bubbles: true });
+      element.dispatchEvent(event);
+    };
+
+    // Helper: Get cached content from hidden element
+    const getCachedContent = () => {
+      const hiddenContent = element.querySelector('[data-tooltip-content]');
+      return hiddenContent ? hiddenContent.innerHTML.trim() : '';
+    };
+
+    // Event handlers
+    const handleShow = () => {
+      clearTimeout(hideTimeout);
+      isHovering = true;
+
+      const tooltipState = getTooltipState();
+
+      // Handle different states
+      if (tooltipState === 'empty') return; // Don't show empty tooltip
+
+      if (tooltipState === 'ready') {
+        const cachedContent = getCachedContent();
+        if (cachedContent) {
+          options.title = cachedContent;
+          showTimeout = setTimeout(show, SHOW_DELAY);
+        } else {
+          setTooltipState('empty'); // Content disappeared - mark as empty
+        }
+        return;
+      }
+
+      if (tooltipState === 'loading') {
+        show(true);
+        return;
+      }
+
+      // Not initialized - request data
+      if (!tooltipState || tooltipState === '') {
+        if (instance.requestData && instance.requestData()) {
+          show(true);
+        } else {
+          setTooltipState('loading');
+          show(true);
+        }
+        return;
+      }
+
+      // Fallback for static content
+      if (options.showLoadingImmediately) {
+        show(true);
+      } else {
+        showTimeout = setTimeout(show, SHOW_DELAY);
+      }
+    };
+
+    const handleHide = () => {
+      clearTimeout(showTimeout);
+      isHovering = false;
+      hideTimeout = setTimeout(hide, HIDE_DELAY);
+    };
+
+    // Setup events based on trigger
+    if (options.trigger === "hover" || !options.trigger) {
+      element.addEventListener("mouseenter", handleShow);
+      element.addEventListener("mouseleave", handleHide);
+    } else if (options.trigger === "click") {
+      element.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (tooltip && tooltip.parentNode) {
+          hide();
+        } else {
+          show();
+        }
+      });
+    }
+
+    // Click outside handler
+    if (options.close_on_outside_click !== false) {
+      outsideHandler = (e) => {
+        if (
+          tooltip &&
+          tooltip.parentNode &&
+          !tooltip.contains(e.target) &&
+          !element.contains(e.target)
+        ) {
+          hide();
+        }
+      };
+      document.addEventListener("mousedown", outsideHandler);
+    }
+
+    // Store instance
+    const instance = {
+      show,
+      showLoading: () => show(true),
+      updateContent,
+      hide,
+      destroy: () => {
+        hide();
+        element.removeEventListener("mouseenter", handleShow);
+        element.removeEventListener("mouseleave", handleHide);
+        if (instance.contentUpdateHandler) {
+          element.removeEventListener("tooltip-content-updated", instance.contentUpdateHandler);
+        }
+        if (scrollHandler && scrollHandlerOptions) {
+          window.removeEventListener("scroll", scrollHandler, scrollHandlerOptions);
+          scrollHandler = null;
+          scrollHandlerOptions = null;
+        }
+        if (outsideHandler) {
+          document.removeEventListener("mousedown", outsideHandler);
+          outsideHandler = null;
+        }
+        if (showTimeout) {
+          clearTimeout(showTimeout);
+          showTimeout = null;
+        }
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+          hideTimeout = null;
+        }
+        tooltipInstances.delete(element);
+        if (options.id) delete tooltipInstancesById[options.id];
+      },
+    };
+
+    tooltipInstances.set(element, instance);
+    if (options.id) {
+      tooltipInstancesById[options.id] = instance;
+    }
+
+    // Expose helper methods for external use
+    instance.setLoadingState = () => {
+      setTooltipState('loading');
+    };
+
+    // If tooltip is created with hover trigger, check state immediately
+    // This handles the case when tooltip is created while user is already hovering
+    if (!options.trigger || options.trigger === "hover") {
+      setTimeout(() => {
+        const currentState = getTooltipState();
+        if (!currentState || currentState === '') {
+          handleShow(); // Will request data
+        } else if (currentState === 'loading') {
+          show(true);
+        } else if (currentState === 'ready') {
+          const cachedContent = getCachedContent();
+          if (cachedContent) {
+            options.title = cachedContent;
+            showTimeout = setTimeout(show, SHOW_DELAY);
+          }
+        }
+      }, 0);
+    }
+
+    // Request data from external source (e.g., AJAX)
+    // This method checks state and triggers event or calls dataFetcher callback if provided
+    instance.requestData = () => {
+      const currentState = getTooltipState();
+
+      // If already loaded (ready or empty), don't request again
+      if (currentState === 'ready' || currentState === 'empty') {
+        return false; // Data already available
+      }
+
+      // If already loading, don't request again
+      if (currentState === 'loading') {
+        return false; // Already requesting
+      }
+
+      // Set loading state
+      setTooltipState('loading');
+
+      // If dataFetcher callback is provided, use it directly
+      if (typeof options.dataFetcher === 'function') {
+        options.dataFetcher(element, options.id);
+        return true;
+      }
+
+      // Fallback: trigger event for external handler (backward compatibility)
+      setTimeout(() => {
+        const event = new CustomEvent("tooltip-request-data", {
+          bubbles: true,
+          detail: { element, tooltipId: options.id }
+        });
+        element.dispatchEvent(event);
+        document.dispatchEvent(event);
+      }, 0);
+
+      return true;
+    };
+
+    // Listen for content updates via custom event (optional, for external updates)
+    const contentUpdateHandler = (e) => {
+      const detail = e.detail || {};
+      if (detail.element === element || (detail.target && element.contains(detail.target))) {
+        updateContent(detail.content || "");
+      }
+    };
+    element.addEventListener("tooltip-content-updated", contentUpdateHandler);
+    instance.contentUpdateHandler = contentUpdateHandler;
+
+    return element;
+  }
+
+  // Expose
+  window.WordpressUlikeTooltipPlugin = WordpressUlikeTooltipPlugin;
+  window.WordpressUlikeTooltip = {
+    visible: activeTooltips,
+    defaults,
+    getInstanceById: (id) => tooltipInstancesById[id],
+    getInstanceByElement: (element) => tooltipInstances.get(element),
+  };
+
+  // Expose as jQuery plugin for backward compatibility (if jQuery is available)
+  // This allows users' existing jQuery code to continue working
+  // Example: $('.element').WordpressUlikeTooltip({...})
+  if (typeof jQuery !== 'undefined' && jQuery && jQuery.fn) {
+    jQuery.fn.WordpressUlikeTooltip = function (options) {
+      return this.each(function () {
+        new WordpressUlikeTooltipPlugin(this, options);
+      });
+    };
+  }
+})(window, document);
 
 
 /* ================== public/assets/js/src/_ulike.js =================== */
 
 
-(function ($, window, document, undefined) {
+/**
+ * WP ULike Pro - Main Plugin
+ *
+ * @fileoverview Core like/unlike functionality with AJAX support (Pro Version)
+ * @requires ES7 (ES2016) compatible browser
+ * @author WP ULike Team
+ * @see https://github.com/alimir/wp-ulike
+ */
+(function (window, document, undefined) {
   "use strict";
 
   // Create the defaults once
-  var pluginName = "WordpressUlike",
-    $window = $(window),
-    $document = $(document),
-    defaults = {
-      ID: 0,
-      nonce: 0,
-      type: "",
-      append: "",
-      appendTimeout: 2000,
-      displayLikers: false,
-      likersTemplate: "default",
-      disablePophover: true,
-      isTotal: false,
-      factor: "",
-      template: "",
-      counterSelector: ".count-box",
-      generalSelector: ".wp_ulike_general_class",
-      buttonSelector: ".wp_ulike_btn",
-      likersSelector: ".wp_ulike_likers_wrapper",
-    },
-    attributesMap = {
-      "ulike-id": "ID",
-      "ulike-nonce": "nonce",
-      "ulike-type": "type",
-      "ulike-append": "append",
-      "ulike-is-total": "isTotal",
-      "ulike-display-likers": "displayLikers",
-      "ulike-likers-style": "likersTemplate",
-      "ulike-disable-pophover": "disablePophover",
-      "ulike-append-timeout": "appendTimeout",
-      "ulike-factor": "factor",
-      "ulike-template": "template",
-    };
+  const pluginName = "WordpressUlike";
+  const defaults = {
+    ID: 0,
+    nonce: 0,
+    type: "",
+    append: "",
+    appendTimeout: 2000,
+    displayLikers: false,
+    likersTemplate: "default",
+    disablePophover: true,
+    isTotal: false,
+    factor: "",
+    template: "",
+    counterSelector: ".count-box",
+    generalSelector: ".wp_ulike_general_class",
+    buttonSelector: ".wp_ulike_btn",
+    likersSelector: ".wp_ulike_likers_wrapper",
+  };
+  const attributesMap = {
+    "ulike-id": "ID",
+    "ulike-nonce": "nonce",
+    "ulike-type": "type",
+    "ulike-append": "append",
+    "ulike-is-total": "isTotal",
+    "ulike-display-likers": "displayLikers",
+    "ulike-likers-style": "likersTemplate",
+    "ulike-disable-pophover": "disablePophover",
+    "ulike-append-timeout": "appendTimeout",
+    "ulike-factor": "factor",
+    "ulike-template": "template",
+  };
+
+  // Helper function to get data attribute value
+  const getDataAttribute = (element, name) => {
+    const camelName = name.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+    if (element.dataset && element.dataset[camelName] !== undefined) {
+      return element.dataset[camelName];
+    }
+    const value = element.getAttribute(`data-${name}`);
+    if (value === null) {
+      return undefined;
+    }
+    if (value === "true") return true;
+    if (value === "false") return false;
+    if (value === "" || value === "null") return null;
+    if (!isNaN(value) && value !== "") return Number(value);
+    return value;
+  };
+
+  // Helper function to trigger custom events (works with both jQuery and vanilla JS)
+  const triggerEvent = (element, eventName, data) => {
+    const event = new CustomEvent(eventName, {
+      bubbles: true,
+      cancelable: true,
+      detail: data
+    });
+    element.dispatchEvent(event);
+
+    if (typeof jQuery !== 'undefined' && jQuery && jQuery.fn && jQuery.fn.on) {
+      const $element = jQuery(element);
+      $element.trigger(eventName, data);
+    }
+  };
+
+  // Safe Array.from polyfill for older browsers
+  const arrayFrom = (arrayLike) => {
+    if (Array.from) {
+      return Array.from(arrayLike);
+    }
+    return Array.prototype.slice.call(arrayLike);
+  };
+
+  // Helper function to handle multiple elements (like jQuery collection)
+  const forEachElement = (elements, callback) => {
+    if (!elements) return;
+    if (elements.length === undefined) {
+      callback(elements, 0);
+    } else {
+      arrayFrom(elements).forEach(callback);
+    }
+  };
+
+  // Helper to get siblings (like jQuery .siblings())
+  const getSiblings = (element, selector) => {
+    const siblings = [];
+    const parent = element.parentNode;
+    if (!parent) return siblings;
+    const children = parent.children;
+    for (let i = 0; i < children.length; i++) {
+      if (children[i] !== element) {
+        if (!selector || children[i].matches(selector)) {
+          siblings.push(children[i]);
+        }
+      }
+    }
+    return siblings;
+  };
+
+  // Helper to get all siblings from multiple elements (like jQuery collection.siblings())
+  const getAllSiblings = (elements, selector) => {
+    const allSiblings = [];
+    const seen = new Set();
+    forEachElement(elements, (el) => {
+      const siblings = getSiblings(el, selector);
+      siblings.forEach((sibling) => {
+        if (!seen.has(sibling)) {
+          seen.add(sibling);
+          allSiblings.push(sibling);
+        }
+      });
+    });
+    return allSiblings;
+  };
+
+  // Helper to get single element from array/NodeList
+  const getSingleElement = (elements) => {
+    return Array.isArray(elements) || elements.length !== undefined
+      ? elements[0]
+      : elements;
+  };
+
+  // Helper to normalize boolean values in settings
+  const normalizeBooleanValues = (settings, defaults) => {
+    for (const key in defaults) {
+      if (typeof defaults[key] === 'boolean' && settings[key] != null) {
+        settings[key] = settings[key] != 0 && settings[key] !== "0" && settings[key] !== false;
+      }
+    }
+  };
 
   // The actual plugin constructor
   function Plugin(element, options) {
     this.element = element;
-    this.$element = $(element);
-    this.settings = $.extend({}, defaults, options);
+    this.settings = Object.assign({}, defaults, options);
+    // Normalize boolean values automatically
+    normalizeBooleanValues(this.settings, defaults);
     this._defaults = defaults;
     this._name = pluginName;
+    // Store handlers and timeouts for cleanup
+    this._boundHandlers = [];
+    this._timeouts = [];
+    // Initialize fetching flag
+    this._isFetchingLikers = false;
 
-    // Create main selectors
-    this.buttonElement = this.$element.find(this.settings.buttonSelector);
+    // Create main selectors (like jQuery .find())
+    this.buttonElement = this.element.querySelectorAll(this.settings.buttonSelector);
 
-    // read attributes
-    for (var attrName in attributesMap) {
-      var value = this.buttonElement.data(attrName);
-      if (value !== undefined) {
-        this.settings[attributesMap[attrName]] = value;
+    // read attributes from first button
+    const firstButton = this.buttonElement.length > 0 ? this.buttonElement[0] : null;
+    if (firstButton) {
+      for (const attrName in attributesMap) {
+        if (attributesMap.hasOwnProperty(attrName)) {
+          const value = getDataAttribute(firstButton, attrName);
+          if (value !== undefined) {
+            this.settings[attributesMap[attrName]] = value;
+          }
+        }
       }
+      // Normalize boolean values after reading attributes
+      normalizeBooleanValues(this.settings, defaults);
     }
 
-    // General element
-    this.generalElement = this.$element.find(this.settings.generalSelector);
+    // General element (like jQuery .find())
+    this.generalElement = this.element.querySelectorAll(this.settings.generalSelector);
 
-    // Create counter element
-    this.counterElement = this.generalElement.find(
-      this.settings.counterSelector
-    );
+    // Create counter element (like jQuery .find() on collection)
+    this.counterElement = [];
+    if (this.generalElement.length > 0) {
+      forEachElement(this.generalElement, (generalEl) => {
+        const counters = generalEl.querySelectorAll(this.settings.counterSelector);
+        forEachElement(counters, (counter) => {
+          this.counterElement.push(counter);
+        });
+      });
+    }
 
     // Append dom counter element
-    if (this.counterElement.length) {
-      this.counterElement.each(
-        function (index, element) {
-          if (typeof $(element).data("ulike-counter-value") !== "undefined") {
-            $(element).html($(element).data("ulike-counter-value"));
-          }
-        }.bind(this)
-      );
+    if (this.counterElement.length > 0) {
+      forEachElement(this.counterElement, (element) => {
+        const counterValue = getDataAttribute(element, "ulike-counter-value");
+        if (counterValue !== undefined) {
+          element.innerHTML = counterValue;
+        }
+      });
     }
     // Get likers box container element
-    this.likersElement = this.$element.find(this.settings.likersSelector);
+    this.likersElement = this.element.querySelector(this.settings.likersSelector);
 
     this.init();
   }
 
-  // Avoid Plugin.prototype conflicts
-  $.extend(Plugin.prototype, {
-    init: function () {
-      // Call _ajaxify function on click button
-      this.buttonElement.on("click", this._initLike.bind(this));
-      // Call likers box generator
-      this.generalElement.one("mouseenter", this._updateLikers.bind(this));
+  // Plugin prototype methods
+  Plugin.prototype = {
+    init() {
+      // Attach click listeners to ALL buttons
+      if (this.buttonElement && this.buttonElement.length > 0) {
+        const boundHandler = this._initLike.bind(this);
+        this._boundHandlers.push({ element: this.buttonElement, event: 'click', handler: boundHandler });
+        forEachElement(this.buttonElement, (button) => {
+          if (button) {
+            button.addEventListener("click", boundHandler);
+          }
+        });
+      }
+      // Call likers box generator (one-time event)
+      const firstGeneralEl = this.generalElement.length > 0 ? this.generalElement[0] : null;
+      if (firstGeneralEl) {
+        const mouseenterHandler = (event) => {
+          this._updateLikers(event);
+          firstGeneralEl.removeEventListener("mouseenter", mouseenterHandler);
+          // Remove from tracking since it removes itself
+          const index = this._boundHandlers.findIndex(h => h.handler === mouseenterHandler);
+          if (index > -1) this._boundHandlers.splice(index, 1);
+        };
+        this._boundHandlers.push({ element: firstGeneralEl, event: 'mouseenter', handler: mouseenterHandler });
+        firstGeneralEl.addEventListener("mouseenter", mouseenterHandler);
+      }
+      // Track button view when it becomes visible
+      this._trackButtonView();
     },
 
     /**
      * global AJAX callback
+     * PRO VERSION: Uses UlikeProCommonConfig.AjaxUrl
      */
-    _ajax: function (args, callback) {
-      // Do Ajax & update default value
-      $.ajax({
-        url: UlikeProCommonConfig.AjaxUrl,
-        type: "POST",
-        dataType: "json",
-        data: args,
-      }).done(callback);
+    _ajax(args, callback) {
+      const formData = new FormData();
+      for (const key in args) {
+        if (args.hasOwnProperty(key)) {
+          formData.append(key, args[key]);
+        }
+      }
+
+      const ajaxUrl = (typeof UlikeProCommonConfig !== 'undefined' && UlikeProCommonConfig.AjaxUrl)
+        ? UlikeProCommonConfig.AjaxUrl
+        : (typeof wp_ulike_params !== 'undefined' ? wp_ulike_params.ajax_url : '');
+
+      fetch(ajaxUrl, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then(callback)
+        .catch((error) => {
+          console.error("WP Ulike AJAX error:", error);
+        });
     },
 
     /**
      * init ulike core process
      */
-    _initLike: function (event) {
-      // Prevents further propagation of the current event in the capturing and bubbling phases
+    _initLike(event) {
       event.stopPropagation();
-      // Update element if there's more thab one button
+      // Update element if there's more than one button
       this._maybeUpdateElements(event);
       // Check for same buttons elements
       this._updateSameButtons();
       // Check for same likers elements
       this._updateSameLikers();
       // Disable button
-      this.buttonElement.prop("disabled", true);
+      if (this.buttonElement) {
+        forEachElement(this.buttonElement, (btn) => {
+          btn.disabled = true;
+        });
+      }
       // Manipulations
-      $document.trigger("WordpressUlikeLoading", this.element);
+      triggerEvent(document, "WordpressUlikeLoading", this.element);
       // Add progress class
-      this.generalElement.addClass("wp_ulike_is_loading");
+      if (this.generalElement) {
+        forEachElement(this.generalElement, (el) => {
+          el.classList.add("wp_ulike_is_loading");
+        });
+      }
       // Start AJAX process
       this._ajax(
         {
@@ -1529,11 +2021,16 @@
           displayLikers: this.settings.displayLikers,
           likersTemplate: this.settings.likersTemplate,
         },
-        function (response) {
+        (response) => {
           //remove progress class
-          this.generalElement.removeClass("wp_ulike_is_loading");
+          if (this.generalElement) {
+            forEachElement(this.generalElement, (el) => {
+              el.classList.remove("wp_ulike_is_loading");
+            });
+          }
           // Make changes
           if (response.success) {
+            // PRO VERSION: Handle modalTemplate before _updateMarkup
             if (
               typeof response.data.hasToast !== "undefined" &&
               typeof response.data.modalTemplate !== "undefined" &&
@@ -1545,53 +2042,100 @@
               // Append html data
               this._appendChild();
             }
-          } else if (response.data.hasToast) {
+          } else if (response.data && response.data.hasToast) {
             this._sendNotification("error", response.data.message);
           }
           // Re-enable button
-          this.buttonElement.prop("disabled", false);
+          if (this.buttonElement) {
+            forEachElement(this.buttonElement, (btn) => {
+              btn.disabled = false;
+            });
+          }
           // Add new trigger when process finished
-          $document.trigger("WordpressUlikeUpdated", this.element);
-        }.bind(this)
+          triggerEvent(document, "WordpressUlikeUpdated", this.element);
+        }
       );
     },
 
-    _openModal: function (data) {
-      // Content
-      var content = $("<div/>").addClass("ulpmodal-ajax-wrapper").html(data);
+    /**
+     * PRO VERSION: Open modal with content
+     */
+    _openModal(data) {
+      if (typeof window.ulpmodal === 'function') {
+        // Create wrapper div with class
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ulpmodal-ajax-wrapper';
+        wrapper.innerHTML = data;
 
-      $.ulpmodal(content, {
-        closeOnClick: "background",
-        afterOpen: function (event) {
-          // Add custom trigger
-          $document.trigger("WordpressUlikeModalAfterOpen", event);
-        },
-        closeOnEsc: true,
-      });
+        window.ulpmodal(wrapper, {
+          closeOnClick: "background",
+          afterOpen: (event) => {
+            triggerEvent(document, "WordpressUlikeModalAfterOpen", event);
+          },
+          closeOnEsc: true,
+        });
+      } else {
+        console.warn("WP ULike Pro: Modal functionality requires ulpmodal plugin");
+      }
     },
 
-    _maybeUpdateElements: function (event) {
-      this.buttonElement = $(event.currentTarget);
-      this.generalElement = this.buttonElement.closest(
-        this.settings.generalSelector
-      );
-      this.counterElement = this.generalElement.find(
-        this.settings.counterSelector
-      );
-      this.settings.factor = this.buttonElement.data("ulike-factor");
+    _maybeUpdateElements(event) {
+      this.buttonElement = event.currentTarget;
+      this.generalElement = this.buttonElement.closest(this.settings.generalSelector);
+      if (this.generalElement) {
+        this.counterElement = this.generalElement.querySelectorAll(this.settings.counterSelector);
+      } else {
+        this.counterElement = [];
+      }
+      this.settings.factor = getDataAttribute(this.buttonElement, "ulike-factor");
     },
 
     /**
      * append child
      */
-    _appendChild: function () {
-      if (this.settings.append !== "") {
-        var $appendedElement = $(this.settings.append);
-        this.buttonElement.append($appendedElement);
-        if (this.settings.appendTimeout) {
-          setTimeout(function () {
-            $appendedElement.detach();
-          }, this.settings.appendTimeout);
+    _appendChild() {
+      if (this.settings.append !== "" && this.buttonElement) {
+        let sourceElements = [];
+
+        // Check if append is HTML content (starts with <) or a CSS selector
+        if (this.settings.append.trim().startsWith('<')) {
+          // Parse HTML content
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = this.settings.append;
+          // Collect all children by removing them from tempDiv
+          while (tempDiv.firstChild) {
+            sourceElements.push(tempDiv.removeChild(tempDiv.firstChild));
+          }
+        } else {
+          // Try to use as CSS selector
+          const appendedElement = document.querySelector(this.settings.append);
+          if (appendedElement) {
+            sourceElements.push(appendedElement);
+          }
+        }
+
+        if (sourceElements.length > 0) {
+          const appendedElements = [];
+          forEachElement(this.buttonElement, (button) => {
+            if (button) {
+              sourceElements.forEach((sourceElement) => {
+                const clonedElement = sourceElement.cloneNode(true);
+                button.appendChild(clonedElement);
+                appendedElements.push(clonedElement);
+              });
+            }
+          });
+
+          if (this.settings.appendTimeout && appendedElements.length > 0) {
+            const timeoutId = setTimeout(() => {
+              appendedElements.forEach((el) => {
+                if (el && el.parentNode) {
+                  el.remove();
+                }
+              });
+            }, this.settings.appendTimeout);
+            this._timeouts.push(timeoutId);
+          }
         }
       }
     },
@@ -1599,7 +2143,7 @@
     /**
      * update button markup and calling some actions
      */
-    _updateMarkup: function (response) {
+    _updateMarkup(response) {
       // Set sibling general elements
       this._setSbilingElement();
       // Set sibling button elements
@@ -1609,7 +2153,7 @@
       // If data exist
       if (response.data.data !== null) {
         // Update counter + check refresh likers box
-        if (response.data.status != 5) {
+        if (response.data.status !== 5) {
           this.__updateCounter(response.data.data);
           // Refresh likers box on data update
           if (
@@ -1629,15 +2173,14 @@
           response.data.message
         );
       }
-      // Display share buttons
+      // PRO VERSION: Display share buttons modal after success
       if (response.data.modalAfterSuccess) {
         this._openModal(response.data.modalAfterSuccess);
       }
     },
 
-    _updateGeneralClassNames: function (status) {
-      // Our base status class names
-      var classNameObj = {
+    _updateGeneralClassNames(status) {
+      const classNameObj = {
         start: "wp_ulike_is_not_liked",
         active: "wp_ulike_is_liked",
         deactive: "wp_ulike_is_unliked",
@@ -1645,136 +2188,251 @@
       };
 
       // Remove status from sibling element
-      if (this.siblingElement.length) {
-        this.siblingElement.removeClass(
-          this._arrayToString([classNameObj.active, classNameObj.deactive])
-        );
+      if (this.siblingElement && this.siblingElement.length) {
+        forEachElement(this.siblingElement, (el) => {
+          el.classList.remove(classNameObj.active, classNameObj.deactive);
+        });
       }
 
-      switch (status) {
-        case 1:
-          this.generalElement
-            .addClass(classNameObj.active)
-            .removeClass(classNameObj.start);
-          this.generalElement.children().first().addClass(classNameObj.disable);
-          break;
+      // Update general element(s)
+      forEachElement(this.generalElement, (generalEl) => {
+        if (!generalEl) return;
 
-        case 2:
-          this.generalElement
-            .addClass(classNameObj.deactive)
-            .removeClass(classNameObj.active);
-          break;
+        switch (status) {
+          case 1:
+            generalEl.classList.add(classNameObj.active);
+            generalEl.classList.remove(classNameObj.start);
+            const firstChild = generalEl.firstElementChild;
+            if (firstChild) {
+              firstChild.classList.add(classNameObj.disable);
+            }
+            break;
 
-        case 3:
-          this.generalElement
-            .addClass(classNameObj.active)
-            .removeClass(classNameObj.deactive);
-          break;
+          case 2:
+            generalEl.classList.add(classNameObj.deactive);
+            generalEl.classList.remove(classNameObj.active);
+            break;
 
-        case 0:
-        case 5:
-          this.generalElement.addClass(classNameObj.disable);
-          if (this.siblingElement.length) {
-            this.siblingElement.addClass(classNameObj.disable);
-          }
-          break;
+          case 3:
+            generalEl.classList.add(classNameObj.active);
+            generalEl.classList.remove(classNameObj.deactive);
+            break;
+
+          case 0:
+          case 5:
+            generalEl.classList.add(classNameObj.disable);
+            break;
+        }
+      });
+
+      // Handle sibling disable for case 0 and 5
+      if ((status === 0 || status === 5) && this.siblingElement && this.siblingElement.length) {
+        forEachElement(this.siblingElement, (el) => {
+          el.classList.add(classNameObj.disable);
+        });
       }
     },
 
-    _arrayToString: function (data) {
+    _arrayToString(data) {
       return data.join(" ");
     },
 
-    _setSbilingElement: function () {
-      this.siblingElement = this.generalElement.siblings();
+    _setSbilingElement() {
+      // Like jQuery: this.generalElement.siblings()
+      // When generalElement is a collection, get siblings of ALL elements
+      if (this.generalElement.length !== undefined && this.generalElement.length > 1) {
+        this.siblingElement = getAllSiblings(this.generalElement);
+      } else {
+        const singleEl = getSingleElement(this.generalElement);
+        this.siblingElement = singleEl ? getSiblings(singleEl) : [];
+      }
     },
 
-    _setSbilingButtons: function () {
-      this.siblingButton = this.buttonElement.siblings(
-        this.settings.buttonSelector
-      );
+    _setSbilingButtons() {
+      // Like jQuery: this.buttonElement.siblings(selector)
+      // When buttonElement is a collection, get siblings of ALL elements
+      if (this.buttonElement.length !== undefined && this.buttonElement.length > 1) {
+        this.siblingButton = getAllSiblings(this.buttonElement, this.settings.buttonSelector);
+      } else {
+        const singleEl = getSingleElement(this.buttonElement);
+        this.siblingButton = singleEl ? getSiblings(singleEl, this.settings.buttonSelector) : [];
+      }
     },
 
-    __updateCounter: function (counterValue) {
+    /**
+     * PRO VERSION: Enhanced counter update with isTotal and factor (up/down) support
+     */
+    __updateCounter(counterValue) {
       // Update counter element
       if (typeof counterValue !== "object") {
-        this.counterElement
-          .attr("data-ulike-counter-value", counterValue)
-          .html(counterValue);
+        forEachElement(this.counterElement, (element) => {
+          element.setAttribute("data-ulike-counter-value", counterValue);
+          element.innerHTML = counterValue;
+        });
       } else {
         if (this.settings.isTotal && typeof counterValue.sub !== "undefined") {
-          this.counterElement
-            .attr("data-ulike-counter-value", counterValue.sub)
-            .html(counterValue.sub);
+          forEachElement(this.counterElement, (element) => {
+            element.setAttribute("data-ulike-counter-value", counterValue.sub);
+            element.innerHTML = counterValue.sub;
+          });
         } else {
           if (this.settings.factor === "down") {
-            this.counterElement
-              .attr("data-ulike-counter-value", counterValue.down)
-              .html(counterValue.down);
-            if (this.siblingElement.length) {
-              this.siblingElement
-                .find(this.settings.counterSelector)
-                .attr("data-ulike-counter-value", counterValue.up)
-                .html(counterValue.up);
+            forEachElement(this.counterElement, (element) => {
+              element.setAttribute("data-ulike-counter-value", counterValue.down);
+              element.innerHTML = counterValue.down;
+            });
+            if (this.siblingElement && this.siblingElement.length) {
+              forEachElement(this.siblingElement, (sibling) => {
+                const siblingCounters = sibling.querySelectorAll(this.settings.counterSelector);
+                forEachElement(siblingCounters, (counter) => {
+                  counter.setAttribute("data-ulike-counter-value", counterValue.up);
+                  counter.innerHTML = counterValue.up;
+                });
+              });
             }
           } else {
-            this.counterElement
-              .attr("data-ulike-counter-value", counterValue.up)
-              .html(counterValue.up);
-            if (this.siblingElement.length) {
-              this.siblingElement
-                .find(this.settings.counterSelector)
-                .attr("data-ulike-counter-value", counterValue.down)
-                .html(counterValue.down);
+            forEachElement(this.counterElement, (element) => {
+              element.setAttribute("data-ulike-counter-value", counterValue.up);
+              element.innerHTML = counterValue.up;
+            });
+            if (this.siblingElement && this.siblingElement.length) {
+              forEachElement(this.siblingElement, (sibling) => {
+                const siblingCounters = sibling.querySelectorAll(this.settings.counterSelector);
+                forEachElement(siblingCounters, (counter) => {
+                  counter.setAttribute("data-ulike-counter-value", counterValue.down);
+                  counter.innerHTML = counterValue.down;
+                });
+              });
             }
           }
         }
       }
 
-      $document.trigger("WordpressUlikeCounterUpdated", [this.buttonElement]);
+      const buttonEl = getSingleElement(this.buttonElement);
+      triggerEvent(document, "WordpressUlikeCounterUpdated", [buttonEl]);
+    },
+
+    /**
+     * Fetch likers data via AJAX
+     * Prevents duplicate requests
+     */
+    _fetchLikersData() {
+      if (!this.settings.displayLikers) {
+        this._isFetchingLikers = false;
+        return;
+      }
+
+      // Prevent duplicate requests
+      if (this._isFetchingLikers) {
+        return;
+      }
+
+      this._isFetchingLikers = true;
+
+      const generalEl = getSingleElement(this.generalElement);
+      if (generalEl) {
+        generalEl.classList.add("wp_ulike_is_getting_likers_list");
+      }
+
+      this._ajax(
+        {
+          action: "wp_ulike_get_likers",
+          id: this.settings.ID,
+          nonce: this.settings.nonce,
+          type: this.settings.type,
+          displayLikers: this.settings.displayLikers,
+          likersTemplate: this.settings.likersTemplate,
+        },
+        (response) => {
+          if (generalEl) {
+            generalEl.classList.remove("wp_ulike_is_getting_likers_list");
+          }
+          this._isFetchingLikers = false;
+          if (response.success) {
+            this._updateLikersMarkup(response.data);
+          } else {
+            this._updateLikersMarkup("");
+          }
+        }
+      );
+    },
+
+    /**
+     * Get all sibling wrapper elements that should have tooltips
+     */
+    _getAllTooltipElements() {
+      const factorMethod =
+        typeof this.settings.factor !== "undefined" && this.settings.factor
+          ? `_${this.settings.factor}`
+          : "";
+      const buttonSelector = `.wp_${this.settings.type.toLowerCase()}${factorMethod}_btn_${this.settings.ID}`;
+      const allSameButtons = document.querySelectorAll(buttonSelector);
+
+      const wrapperElements = [];
+      forEachElement(allSameButtons, (btn) => {
+        const wrapper = btn.closest('.wpulike');
+        if (wrapper && !wrapperElements.includes(wrapper)) {
+          wrapperElements.push(wrapper);
+        }
+      });
+
+      return wrapperElements.length > 0 ? wrapperElements : [this.element];
     },
 
     /**
      * init & update likers box
+     * PRO VERSION: Added "pile" template check
      */
-    _updateLikers: function (event) {
-      // Make a request to generate or refresh the likers box
+    _updateLikers(event) {
       if (this.settings.displayLikers) {
         // return on these conditions
         if (
-          this.settings.likersTemplate == "popover" &&
-          this.$element.data("ulike-tooltip")
+          this.settings.likersTemplate === "popover" &&
+          getDataAttribute(this.element, "ulike-tooltip")
         ) {
           return;
         } else if (
           ["default", "pile"].includes(this.settings.likersTemplate) &&
-          this.likersElement.length
+          this.likersElement &&
+          (this.likersElement.length === undefined || this.likersElement.length > 0)
         ) {
           return;
         }
-        // Add progress status class
-        this.generalElement.addClass("wp_ulike_is_getting_likers_list");
-        // Start ajax process
-        this._ajax(
-          {
-            action: "wp_ulike_get_likers",
-            id: this.settings.ID,
-            nonce: this.settings.nonce,
-            type: this.settings.type,
-            displayLikers: this.settings.displayLikers,
-            likersTemplate: this.settings.likersTemplate,
-          },
-          function (response) {
-            // Remove progress status class
-            this.generalElement.removeClass("wp_ulike_is_getting_likers_list");
-            // Change markup
-            if (response.success) {
-              this._updateLikersMarkup(response.data);
-            }
-          }.bind(this)
-        );
 
-        event.stopImmediatePropagation();
+        // Handle popover tooltips
+        if (this.settings.likersTemplate === "popover") {
+          if (typeof WordpressUlikeTooltipPlugin !== "undefined") {
+            const tooltipId = `${this.settings.type.toLowerCase()}-${this.settings.ID}`;
+
+            // Create tooltip only for current element (not all siblings) to ensure correct hover behavior
+            const currentInstance = window.WordpressUlikeTooltip && window.WordpressUlikeTooltip.getInstanceByElement
+              ? window.WordpressUlikeTooltip.getInstanceByElement(this.element)
+              : null;
+
+            if (!currentInstance) {
+              new WordpressUlikeTooltipPlugin(this.element, {
+                id: tooltipId,
+                position: "top",
+                child: this.settings.generalSelector,
+                theme: "white",
+                size: "tiny",
+                trigger: "hover",
+                dataFetcher: (element, tooltipId) => {
+                  // Don't set flag here - let _fetchLikersData handle it
+                  // This prevents the flag from blocking the AJAX request
+                  this._fetchLikersData();
+                }
+              });
+            }
+          }
+        } else {
+          // For default template, fetch data directly
+          this._fetchLikersData();
+        }
+
+        if (event) {
+          event.stopImmediatePropagation();
+        }
         return false;
       }
     },
@@ -1782,78 +2440,133 @@
     /**
      * Update likers markup
      */
-    _updateLikersMarkup: function (data) {
-      if (this.settings.likersTemplate == "popover") {
-        this.likersElement = this.$element;
-        if (data.template) {
-          this.likersElement.WordpressUlikeTooltip({
-            id: this.settings.type.toLowerCase() + "-" + this.settings.ID,
-            title: data.template,
-            position: "top",
-            child: this.settings.generalSelector,
-            theme: "white",
-            size: "tiny",
-            trigger: "hover",
+    _updateLikersMarkup(data) {
+      if (this.settings.likersTemplate === "popover") {
+        this.likersElement = this.element;
+        const tooltipId = `${this.settings.type.toLowerCase()}-${this.settings.ID}`;
+
+        const template = data && typeof data === 'object' ? data.template : data;
+        const templateContent = template || "";
+
+        const allTooltipElements = this._getAllTooltipElements();
+
+        // Update content for all siblings (existing instances and pre-populate for future instances)
+        forEachElement(allTooltipElements, (wrapperEl) => {
+          // Update existing tooltip instances via events
+          const updateEvent = new CustomEvent("tooltip-content-updated", {
+            bubbles: true,
+            detail: {
+              element: wrapperEl,
+              content: templateContent
+            }
           });
-        }
+          wrapperEl.dispatchEvent(updateEvent);
+          document.dispatchEvent(updateEvent);
+
+          // Pre-populate content for siblings that don't have tooltip instances yet
+          // This ensures when they're hovered, content is already available
+          let hiddenContent = wrapperEl.querySelector('[data-tooltip-content]');
+          if (!hiddenContent) {
+            hiddenContent = document.createElement("div");
+            hiddenContent.setAttribute('data-tooltip-content', '');
+            hiddenContent.setAttribute('data-tooltip-state', 'ready');
+            hiddenContent.style.display = 'none';
+            wrapperEl.appendChild(hiddenContent);
+          }
+          hiddenContent.innerHTML = templateContent;
+          hiddenContent.setAttribute('data-tooltip-state', 'ready');
+        });
       } else {
-        // If the likers container is not exist, we've to add it.
-        if (!this.likersElement.length) {
-          this.likersElement = $(data.template).appendTo(this.$element);
+        // Handle both single element and NodeList/array (from _updateSameLikers)
+        const hasLikersElement = this.likersElement &&
+          (this.likersElement.length === undefined
+            ? true
+            : this.likersElement.length > 0);
+
+        if (!hasLikersElement && data && data.template) {
+          // If the likers container doesn't exist, create it
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = data.template;
+          const newElement = tempDiv.firstElementChild;
+          if (newElement) {
+            this.element.appendChild(newElement);
+            this.likersElement = newElement;
+          }
         }
-        // Modify likers box innerHTML
-        if (data.template) {
-          this.likersElement.show().html(data.template);
-        } else {
-          this.likersElement.hide().empty();
+
+        // Update all likers elements (handles both single element and NodeList)
+        if (this.likersElement) {
+          const elementsToUpdate = this.likersElement.length !== undefined
+            ? arrayFrom(this.likersElement)
+            : [this.likersElement];
+
+          // Handle data as object with template property, or as string/empty
+          const template = (data && typeof data === 'object' && data.template)
+            ? data.template
+            : (typeof data === 'string' ? data : '');
+
+          forEachElement(elementsToUpdate, (likersEl) => {
+            if (!likersEl) return;
+            if (template) {
+              likersEl.style.display = "";
+              likersEl.innerHTML = template;
+            } else {
+              likersEl.style.display = "none";
+              likersEl.innerHTML = "";
+            }
+          });
         }
       }
 
-      $document.trigger("WordpressUlikeLikersMarkupUpdated", [
+      const template = data && typeof data === 'object' ? data.template : data;
+      triggerEvent(document, "WordpressUlikeLikersMarkupUpdated", [
         this.likersElement,
         this.settings.likersTemplate,
-        data.template,
+        template
       ]);
     },
 
     /**
      * Update the elements of same buttons at the same time
      */
-    _updateSameButtons: function () {
+    _updateSameButtons() {
       // Get buttons with same unique class names
-      var factorMethod =
-        typeof this.settings.factor !== "undefined"
-          ? "_" + this.settings.factor
+      const factorMethod =
+        typeof this.settings.factor !== "undefined" && this.settings.factor
+          ? `_${this.settings.factor}`
           : "";
-      this.sameButtons = $document.find(
-        ".wp_" +
-          this.settings.type.toLowerCase() +
-          factorMethod +
-          "_btn_" +
-          this.settings.ID
-      );
-      // Update general elements
+      const selector = `.wp_${this.settings.type.toLowerCase()}${factorMethod}_btn_${this.settings.ID}`;
+      this.sameButtons = document.querySelectorAll(selector);
+      // Update general elements (only when there are multiple same buttons)
       if (this.sameButtons.length > 1) {
         this.buttonElement = this.sameButtons;
-        this.generalElement = this.buttonElement.closest(
-          this.settings.generalSelector
-        );
-        this.counterElement = this.generalElement.find(
-          this.settings.counterSelector
-        );
+        // Get general elements for all buttons (like jQuery .closest() on collection)
+        const generalElements = [];
+        forEachElement(this.sameButtons, (btn) => {
+          const genEl = btn.closest(this.settings.generalSelector);
+          if (genEl) {
+            generalElements.push(genEl);
+          }
+        });
+        this.generalElement = generalElements.length === 1 ? generalElements[0] : generalElements;
+        // Get counter elements from all general elements (like jQuery .find() on collection)
+        const counterElements = [];
+        forEachElement(generalElements, (genEl) => {
+          const counters = genEl.querySelectorAll(this.settings.counterSelector);
+          forEachElement(counters, (counter) => {
+            counterElements.push(counter);
+          });
+        });
+        this.counterElement = counterElements;
       }
     },
 
     /**
-     * Update the elements of same buttons at the same time
+     * Update the elements of same likers at the same time
      */
-    _updateSameLikers: function () {
-      this.sameLikers = $document.find(
-        ".wp_" +
-          this.settings.type.toLowerCase() +
-          "_likers_" +
-          this.settings.ID
-      );
+    _updateSameLikers() {
+      const selector = `.wp_${this.settings.type.toLowerCase()}_likers_${this.settings.ID}`;
+      this.sameLikers = document.querySelectorAll(selector);
       // Update general elements
       if (this.sameLikers.length > 1) {
         this.likersElement = this.sameLikers;
@@ -1863,229 +2576,962 @@
     /**
      * Get likers wrapper element
      */
-    _getLikersElement: function () {
+    _getLikersElement() {
       return this.likersElement;
     },
 
     /**
      * Control actions
+     * PRO VERSION: Enhanced with factor-based button text handling (up/down)
      */
-    _updateButton: function (btnText, status) {
-      if (this.buttonElement.hasClass("wp_ulike_put_image")) {
-        if (status == 4) {
-          this.buttonElement.addClass("image-unlike wp_ulike_btn_is_active");
-        } else {
-          this.buttonElement.toggleClass("image-unlike wp_ulike_btn_is_active");
-        }
+    _updateButton(btnText, status) {
+      forEachElement(this.buttonElement, (buttonEl) => {
+        if (!buttonEl) return;
 
-        if (this.siblingElement.length) {
-          this.siblingElement
-            .find(this.settings.buttonSelector)
-            .removeClass("image-unlike wp_ulike_btn_is_active");
-        }
-        if (this.siblingButton.length) {
-          this.siblingButton.removeClass("image-unlike wp_ulike_btn_is_active");
-        }
-      } else if (
-        this.buttonElement.hasClass("wp_ulike_put_text") &&
-        btnText !== null
-      ) {
-        if (this.settings.factor === "down") {
-          this.buttonElement.find("span").html(btnText.down);
-          if (this.siblingElement.length) {
-            this.siblingElement
-              .find(this.settings.buttonSelector)
-              .find("span")
-              .html(btnText.up);
+        if (buttonEl.classList.contains("wp_ulike_put_image")) {
+          if (status === 4) {
+            buttonEl.classList.add("image-unlike", "wp_ulike_btn_is_active");
+          } else {
+            buttonEl.classList.toggle("image-unlike");
+            buttonEl.classList.toggle("wp_ulike_btn_is_active");
           }
-        } else {
-          this.buttonElement.find("span").html(btnText.up);
-          if (this.siblingElement.length) {
-            this.siblingElement
-              .find(this.settings.buttonSelector)
-              .find("span")
-              .html(btnText.down);
+        } else if (
+          buttonEl.classList.contains("wp_ulike_put_text") &&
+          btnText !== null
+        ) {
+          const span = buttonEl.querySelector("span");
+          if (span) {
+            // PRO VERSION: Handle factor-based button text (up/down)
+            if (typeof btnText === "object" && btnText !== null) {
+              if (this.settings.factor === "down") {
+                span.innerHTML = btnText.down;
+                if (this.siblingElement && this.siblingElement.length) {
+                  forEachElement(this.siblingElement, (sibling) => {
+                    const siblingBtn = sibling.querySelector(this.settings.buttonSelector);
+                    if (siblingBtn) {
+                      const siblingSpan = siblingBtn.querySelector("span");
+                      if (siblingSpan) {
+                        siblingSpan.innerHTML = btnText.up;
+                      }
+                    }
+                  });
+                }
+              } else {
+                span.innerHTML = btnText.up;
+                if (this.siblingElement && this.siblingElement.length) {
+                  forEachElement(this.siblingElement, (sibling) => {
+                    const siblingBtn = sibling.querySelector(this.settings.buttonSelector);
+                    if (siblingBtn) {
+                      const siblingSpan = siblingBtn.querySelector("span");
+                      if (siblingSpan) {
+                        siblingSpan.innerHTML = btnText.down;
+                      }
+                    }
+                  });
+                }
+              }
+            } else {
+              span.innerHTML = btnText;
+            }
           }
         }
+      });
+
+      // Update sibling buttons (remove active state from siblings)
+      if (this.siblingElement && this.siblingElement.length) {
+        forEachElement(this.siblingElement, (sibling) => {
+          const siblingBtn = sibling.querySelector(this.settings.buttonSelector);
+          if (siblingBtn) {
+            siblingBtn.classList.remove("image-unlike", "wp_ulike_btn_is_active");
+          }
+        });
+      }
+      if (this.siblingButton && this.siblingButton.length) {
+        forEachElement(this.siblingButton, (siblingBtn) => {
+          siblingBtn.classList.remove("image-unlike", "wp_ulike_btn_is_active");
+        });
       }
     },
 
     /**
      * Send notification by 'WordpressUlikeNotifications' plugin
      */
-    _sendNotification: function (messageType, messageText) {
-      // Display Notification
-      $(document.body).WordpressUlikeNotifications({
-        messageType: messageType,
-        messageText: messageText,
-      });
-    },
-  });
-
-  // A really lightweight plugin wrapper around the constructor,
-  // preventing against multiple instantiations
-  $.fn[pluginName] = function (options) {
-    return this.each(function () {
-      if (!$.data(this, "plugin_" + pluginName)) {
-        $.data(this, "plugin_" + pluginName, new Plugin(this, options));
+    _sendNotification(messageType, messageText) {
+      if (typeof WordpressUlikeNotifications !== "undefined") {
+        new WordpressUlikeNotifications(document.body, {
+          messageType,
+          messageText,
+        });
       }
-    });
+    },
+
+    /**
+     * Track button view when it becomes visible
+     * Uses Intersection Observer for performance and global tracking to prevent duplicates
+     */
+    _trackButtonView() {
+      // Get button info
+      const itemId = this.settings.ID;
+      const type = this.settings.type;
+
+      if (!itemId || !type) {
+        return;
+      }
+
+      // Check if view tracking is enabled for this content type
+      const viewTrackingConfig = (typeof UlikeProCommonConfig !== 'undefined' && UlikeProCommonConfig.ViewTracking)
+        ? UlikeProCommonConfig.ViewTracking
+        : null;
+
+      if (viewTrackingConfig && viewTrackingConfig.enabledTypes) {
+        if (!viewTrackingConfig.enabledTypes.includes(type)) {
+          // View tracking is disabled for this content type
+          return;
+        }
+      }
+
+      // Check if already tracked globally (prevents duplicate tracking for sibling buttons)
+      if (ViewTrackingSystem.isTracked(itemId, type)) {
+        return;
+      }
+
+      // Get AJAX config
+      const ajaxUrl = (typeof UlikeProCommonConfig !== 'undefined' && UlikeProCommonConfig.AjaxUrl)
+        ? UlikeProCommonConfig.AjaxUrl
+        : (typeof wp_ulike_params !== 'undefined' ? wp_ulike_params.ajax_url : '');
+
+      const nonce = (typeof UlikeProCommonConfig !== 'undefined' && UlikeProCommonConfig.Nonce)
+        ? UlikeProCommonConfig.Nonce
+        : (typeof wp_ulike_params !== 'undefined' ? wp_ulike_params.nonce : '');
+
+      if (!ajaxUrl || !nonce) {
+        return;
+      }
+
+      // Track view function (queues for batching)
+      const trackView = () => {
+        // Don't track in preview/edit mode
+        if (document.body.classList.contains('elementor-editor-active') ||
+            document.body.classList.contains('block-editor-page') ||
+            window.location.search.indexOf('preview=true') !== -1) {
+          return;
+        }
+
+        // Queue view for batching (prevents duplicate requests for same item)
+        ViewTrackingSystem.queueView(itemId, type, ajaxUrl, nonce);
+
+        // Mark element as tracked locally
+        if (this.element.setAttribute) {
+          this.element.setAttribute('data-view-tracked', 'true');
+        }
+      };
+
+      // Use Intersection Observer if available (better performance)
+      if ('IntersectionObserver' in window) {
+        // Create observer with optimal settings for button visibility
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            // Only track when button is actually visible (not just intersecting)
+            if (entry.isIntersecting && entry.intersectionRatio > 0) {
+              trackView();
+              // Stop observing after first view
+              observer.disconnect();
+            }
+          });
+        }, {
+          threshold: [0.1, 0.5], // Trigger at 10% and 50% visibility
+          rootMargin: '0px' // Only track when actually in viewport (no pre-tracking)
+        });
+
+        // Observe the general element (button wrapper) or the element itself
+        const firstGeneralEl = this.generalElement.length > 0 ? this.generalElement[0] : null;
+        const targetElement = firstGeneralEl || this.element;
+
+        if (targetElement) {
+          observer.observe(targetElement);
+
+          // Store observer for cleanup
+          this._viewObserver = observer;
+        }
+      } else {
+        // Fallback for older browsers - track immediately (but still queue for batching)
+        trackView();
+      }
+    },
+
+    /**
+     * Cleanup method to prevent memory leaks
+     */
+    destroy() {
+      // Remove all event listeners
+      this._boundHandlers.forEach(({ element, event, handler }) => {
+        if (element && element.length !== undefined) {
+          forEachElement(element, (el) => {
+            if (el) el.removeEventListener(event, handler);
+          });
+        } else if (element) {
+          element.removeEventListener(event, handler);
+        }
+      });
+      this._boundHandlers = [];
+
+      // Clear all timeouts
+      this._timeouts.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      this._timeouts = [];
+
+      // Disconnect view observer if exists
+      if (this._viewObserver) {
+        this._viewObserver.disconnect();
+        this._viewObserver = null;
+      }
+
+      // Reset flags
+      this._isFetchingLikers = false;
+    },
   };
-})(jQuery, window, document);
+
+  // Global view tracking system (prevents duplicates and batches requests)
+  const ViewTrackingSystem = (function() {
+    // Track which items have been tracked (itemId_type as key)
+    const trackedItems = new Set();
+
+    // Queue for batching requests
+    const viewQueue = [];
+    let batchTimeout = null;
+    const BATCH_DELAY = 2000; // 2 seconds - batch requests together
+    const MAX_BATCH_SIZE = 10; // Send batch when queue reaches this size
+
+    /**
+     * Generate unique key for item
+     */
+    function getItemKey(itemId, type) {
+      return `${itemId}_${type}`;
+    }
+
+    /**
+     * Check if item is already tracked
+     */
+    function isTracked(itemId, type) {
+      return trackedItems.has(getItemKey(itemId, type));
+    }
+
+    /**
+     * Mark item as tracked
+     */
+    function markAsTracked(itemId, type) {
+      trackedItems.add(getItemKey(itemId, type));
+    }
+
+    /**
+     * Add view to queue for batching
+     */
+    function queueView(itemId, type, ajaxUrl, nonce) {
+      const key = getItemKey(itemId, type);
+
+      // Check if already in queue
+      const existingIndex = viewQueue.findIndex(item => item.key === key);
+      if (existingIndex !== -1) {
+        // Already queued, skip
+        return;
+      }
+
+      viewQueue.push({
+        key: key,
+        itemId: itemId,
+        type: type,
+        ajaxUrl: ajaxUrl,
+        nonce: nonce
+      });
+
+      // Send batch if queue is full
+      if (viewQueue.length >= MAX_BATCH_SIZE) {
+        sendBatch();
+      } else {
+        // Schedule batch send
+        scheduleBatch();
+      }
+    }
+
+    /**
+     * Schedule batch send
+     */
+    function scheduleBatch() {
+      if (batchTimeout) {
+        clearTimeout(batchTimeout);
+      }
+
+      batchTimeout = setTimeout(() => {
+        sendBatch();
+      }, BATCH_DELAY);
+    }
+
+    /**
+     * Send batched views
+     */
+    function sendBatch() {
+      if (batchTimeout) {
+        clearTimeout(batchTimeout);
+        batchTimeout = null;
+      }
+
+      if (viewQueue.length === 0) {
+        return;
+      }
+
+      // Get unique items from queue (in case of duplicates)
+      const uniqueItems = [];
+      const seen = new Set();
+
+      viewQueue.forEach(item => {
+        if (!seen.has(item.key)) {
+          seen.add(item.key);
+          uniqueItems.push(item);
+        }
+      });
+
+      // Clear queue
+      viewQueue.length = 0;
+
+      // Send batch request
+      if (uniqueItems.length > 0) {
+        const formData = new FormData();
+        formData.append('action', 'ulp_track_view_batch');
+        formData.append('nonce', uniqueItems[0].nonce);
+        formData.append('items', JSON.stringify(
+          uniqueItems.map(item => ({
+            id: item.itemId,
+            type: item.type
+          }))
+        ));
+
+        // Mark all as tracked
+        uniqueItems.forEach(item => {
+          markAsTracked(item.itemId, item.type);
+        });
+
+        // Send request (fire and forget)
+        fetch(uniqueItems[0].ajaxUrl, {
+          method: 'POST',
+          body: formData,
+          keepalive: true
+        }).catch(() => {
+          // Silently fail - tracking should not break user experience
+        });
+      }
+    }
+
+    /**
+     * Flush queue on page unload
+     */
+    function setupUnloadHandler() {
+      // Flush queue when page is about to unload
+      window.addEventListener('beforeunload', () => {
+        sendBatch();
+      });
+
+      // Also flush on page visibility change (when user switches tabs)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          sendBatch();
+        }
+      });
+    }
+
+    // Setup unload handler
+    if (typeof window !== 'undefined') {
+      setupUnloadHandler();
+    }
+
+    /**
+     * Public API
+     */
+    return {
+      isTracked: isTracked,
+      queueView: queueView,
+      sendBatch: sendBatch // Expose for manual flush if needed
+    };
+  })();
+
+  // Expose plugin to window for global access
+  window[pluginName] = Plugin;
+
+  // Expose as jQuery plugin for backward compatibility
+  if (typeof jQuery !== 'undefined' && jQuery && jQuery.fn) {
+    jQuery.fn[pluginName] = function (options) {
+      return this.each(function () {
+        if (!this.hasAttribute || !this.hasAttribute("data-ulike-initialized")) {
+          new Plugin(this, options);
+          if (this.setAttribute) {
+            this.setAttribute("data-ulike-initialized", "true");
+          }
+        }
+      });
+    };
+  }
+})(window, document);
 
 
 /* ================== public/assets/js/src/scripts.js =================== */
 
 
 /* Run :) */
-(function ($) {
-  $(function () {
-    // Init share buttons
-    $(".ulp-ajax-form").WordpressUlikeAjaxForms();
-    // Init goodshare
-    if (typeof window._goodshare !== "undefined") {
-      window._goodshare.reNewAllInstance();
+(function (window, document, undefined) {
+  "use strict";
+
+  // Helper function to trigger custom events
+  const triggerEvent = (element, eventName, data) => {
+    const event = new CustomEvent(eventName, {
+      bubbles: true,
+      cancelable: true,
+      detail: data
+    });
+
+    element.dispatchEvent(event);
+  };
+
+  // Helper function to get data attribute value
+  const getDataAttribute = (element, name) => {
+    const camelName = name.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+    if (element.dataset && element.dataset[camelName] !== undefined) {
+      return element.dataset[camelName];
     }
-  });
+    const value = element.getAttribute(`data-${name}`);
+    if (value === null) {
+      return undefined;
+    }
+    if (value === "true") return true;
+    if (value === "false") return false;
+    if (value === "" || value === "null") return null;
+    if (!isNaN(value) && value !== "") return Number(value);
+    return value;
+  };
+
+  // Helper function to find elements within a node (like jQuery's find)
+  const findInNodes = (nodes, selector) => {
+    const results = [];
+    const nodeList = nodes.length !== undefined ? nodes : [nodes];
+    
+    for (let i = 0; i < nodeList.length; i++) {
+      const node = nodeList[i];
+      if (node.nodeType === 1) { // Element node
+        // Check if the node itself matches
+        if (node.matches && node.matches(selector)) {
+          results.push(node);
+        }
+        // Find children
+        const children = node.querySelectorAll ? node.querySelectorAll(selector) : [];
+        for (let j = 0; j < children.length; j++) {
+          results.push(children[j]);
+        }
+      }
+    }
+    
+    return results;
+  };
+
+  // Helper function to initialize WordpressUlikeAjaxForms
+  const initWordpressUlikeAjaxForms = (elements) => {
+    if (!elements || (elements.length !== undefined && elements.length === 0)) return;
+    
+    const elementList = elements.length !== undefined ? Array.from(elements) : [elements];
+    
+    elementList.forEach((element) => {
+      if (element && element.nodeType === 1) {
+        if (typeof WordpressUlikeAjaxForms !== "undefined" && typeof WordpressUlikeAjaxForms === "function") {
+          new WordpressUlikeAjaxForms(element);
+        }
+      }
+    });
+  };
+
+  // Helper function to initialize WordpressUlike
+  const initWordpressUlike = (elements) => {
+    if (!elements || (elements.length !== undefined && elements.length === 0)) return;
+    
+    const elementList = elements.length !== undefined ? Array.from(elements) : [elements];
+    
+    elementList.forEach((element) => {
+      if (element && element.nodeType === 1) {
+        // Check if already initialized
+        if (element.hasAttribute && element.hasAttribute("data-ulike-initialized")) {
+          return;
+        }
+        
+        if (typeof WordpressUlike !== "undefined" && typeof WordpressUlike === "function") {
+          new WordpressUlike(element);
+        }
+        
+        // Mark as initialized
+        if (element.setAttribute) {
+          element.setAttribute("data-ulike-initialized", "true");
+        }
+      }
+    });
+  };
+
+  // Helper function for fade out animation
+  const fadeOut = (element, callback) => {
+    if (!element) return;
+    
+    element.style.transition = "opacity 300ms";
+    element.style.opacity = "0";
+    
+    setTimeout(() => {
+      element.style.display = "none";
+      if (callback) callback();
+    }, 300);
+  };
 
   /**
-   * otp digit separator
+   * Enhanced OTP digit input handler with improved UX
+   * Supports: paste, arrow keys, backspace, auto-focus, visual feedback
    */
-  function ulpOtpInput() {
-    const inputs = document.querySelectorAll("#ulp-2fa-code > *[id]");
-    for (let i = 0; i < inputs.length; i++) {
-      inputs[i].addEventListener("keydown", function (event) {
-        if (event.key === "Backspace") {
-          inputs[i].value = "";
-          if (i !== 0) inputs[i - 1].focus();
+  // Store initialized OTP containers to prevent duplicate initialization
+  const initializedOtpContainers = new WeakSet();
+
+  function ulpOtpInput(container) {
+    // Support both container element and global selector
+    const targetContainer = container || document;
+    const containerEl = targetContainer.querySelector ? 
+      targetContainer.querySelector("#ulp-2fa-code") : 
+      (targetContainer.id === "ulp-2fa-code" ? targetContainer : null);
+    
+    if (!containerEl) {
+      // Fallback: try to find all 2FA code containers
+      const containers = document.querySelectorAll("#ulp-2fa-code");
+      containers.forEach(cont => {
+        if (!initializedOtpContainers.has(cont)) {
+          initializeOtpContainer(cont);
+        }
+      });
+      return;
+    }
+
+    // Skip if already initialized
+    if (initializedOtpContainers.has(containerEl)) {
+      return;
+    }
+
+    initializeOtpContainer(containerEl);
+  }
+
+  function initializeOtpContainer(containerEl) {
+    const inputs = Array.from(containerEl.querySelectorAll("input.ulp-digit-input"));
+    
+    if (!inputs || inputs.length === 0) return;
+
+    // Mark as initialized
+    initializedOtpContainers.add(containerEl);
+
+    // Helper function to clear error states
+    const clearErrors = () => {
+      containerEl.classList.remove("ulp-otp-error");
+      inputs.forEach(inp => inp.classList.remove("ulp-digit-error"));
+    };
+
+    // Handle paste event on container
+    containerEl.addEventListener("paste", (e) => {
+        e.preventDefault();
+        clearErrors();
+        const pastedData = (e.clipboardData || window.clipboardData).getData("text").trim();
+        const digits = pastedData.replace(/\D/g, "").slice(0, inputs.length);
+        
+        // Visual feedback: briefly highlight all inputs being filled
+        containerEl.classList.add("ulp-otp-pasting");
+        setTimeout(() => containerEl.classList.remove("ulp-otp-pasting"), 300);
+        
+        digits.split("").forEach((digit, index) => {
+          if (inputs[index]) {
+            inputs[index].value = digit;
+            inputs[index].classList.add("ulp-digit-filled");
+          }
+        });
+        
+        // If all digits pasted, blur last input and auto-submit
+        if (digits.length === inputs.length) {
+          const lastInput = inputs[inputs.length - 1];
+          if (lastInput) {
+            lastInput.blur();
+            containerEl.classList.add("ulp-otp-complete");
+            
+            // Auto-submit after short delay
+            setTimeout(() => {
+              const form = lastInput.closest("form");
+              if (form) {
+                form.requestSubmit();
+              }
+            }, 400);
+          }
         } else {
-          if (i === inputs.length - 1 && inputs[i].value !== "") {
-            return true;
-          } else if (event.keyCode > 47 && event.keyCode < 58) {
-            inputs[i].value = event.key;
-            if (i !== inputs.length - 1) inputs[i + 1].focus();
-            event.preventDefault();
-          } else if (event.keyCode > 64 && event.keyCode < 91) {
-            inputs[i].value = String.fromCharCode(event.keyCode);
-            if (i !== inputs.length - 1) inputs[i + 1].focus();
-            event.preventDefault();
+          // Focus the next empty input
+          const nextEmptyIndex = Math.min(digits.length, inputs.length - 1);
+          if (inputs[nextEmptyIndex]) {
+            inputs[nextEmptyIndex].focus();
           }
         }
       });
+
+    // Handle input for each digit field
+    inputs.forEach((input, index) => {
+      // Add visual feedback class when input has value
+      const updateVisualState = () => {
+        if (input.value) {
+          input.classList.add("ulp-digit-filled");
+        } else {
+          input.classList.remove("ulp-digit-filled");
+        }
+      };
+
+      // Handle keydown events
+      input.addEventListener("keydown", (event) => {
+        // Handle backspace
+        if (event.key === "Backspace") {
+          containerEl.classList.remove("ulp-otp-complete");
+          clearErrors();
+          
+          if (input.value) {
+            input.value = "";
+            updateVisualState();
+          } else if (index > 0) {
+            inputs[index - 1].focus();
+            inputs[index - 1].value = "";
+            updateVisualState();
+          }
+          event.preventDefault();
+          return;
+        }
+
+        // Handle arrow keys
+        if (event.key === "ArrowLeft" && index > 0) {
+          inputs[index - 1].focus();
+          event.preventDefault();
+          return;
+        }
+        if (event.key === "ArrowRight" && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+          event.preventDefault();
+          return;
+        }
+
+        // Handle delete key
+        if (event.key === "Delete") {
+          input.value = "";
+          updateVisualState();
+          event.preventDefault();
+          return;
+        }
+
+        // Handle Enter key - submit form if all fields are filled
+        if (event.key === "Enter") {
+          const allFilled = inputs.every(inp => inp.value);
+          if (allFilled) {
+            const form = input.closest("form");
+            if (form) {
+              form.requestSubmit();
+            }
+          }
+          event.preventDefault();
+          return;
+        }
+
+        // Handle numeric input (0-9)
+        if (/^[0-9]$/.test(event.key)) {
+          clearErrors();
+          input.value = event.key;
+          updateVisualState();
+          
+          // Move to next input if not the last one
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          } else {
+            // Last digit entered - blur input and auto-submit after brief delay
+            // This matches behavior of Google, GitHub, Microsoft, and other major services
+            input.blur();
+            
+            // Add completion class to container for visual feedback
+            containerEl.classList.add("ulp-otp-complete");
+            
+            // Auto-submit after short delay (allows user to see completion)
+            const allFilled = inputs.every(inp => inp.value);
+            if (allFilled) {
+              setTimeout(() => {
+                const form = input.closest("form");
+                if (form) {
+                  // Use requestSubmit to trigger form validation if needed
+                  form.requestSubmit();
+                }
+              }, 400); // 400ms delay - standard for major services
+            }
+          }
+          event.preventDefault();
+          return;
+        }
+
+        // Block non-numeric characters
+        if (!/^(Backspace|Delete|ArrowLeft|ArrowRight|Tab|Enter)$/.test(event.key) && 
+            !event.ctrlKey && !event.metaKey) {
+          event.preventDefault();
+        }
+      });
+
+      // Handle input event for paste and other input methods
+      input.addEventListener("input", (event) => {
+        clearErrors();
+        const value = event.target.value;
+        // Only allow single digit
+        if (value.length > 1) {
+          const lastDigit = value.slice(-1);
+          input.value = /^[0-9]$/.test(lastDigit) ? lastDigit : "";
+        } else if (value && !/^[0-9]$/.test(value)) {
+          input.value = "";
+        }
+        updateVisualState();
+        
+        // Auto-advance if valid digit entered
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      // Handle focus - select text for easy replacement
+      input.addEventListener("focus", () => {
+        input.select();
+        input.classList.add("ulp-digit-focused");
+        containerEl.classList.remove("ulp-otp-complete");
+        clearErrors();
+      });
+
+      // Handle blur
+      input.addEventListener("blur", () => {
+        input.classList.remove("ulp-digit-focused");
+      });
+
+      // Initialize visual state
+      updateVisualState();
+    });
+
+    // Auto-focus first input if all are empty
+    const allEmpty = inputs.every(input => !input.value);
+    if (allEmpty && inputs[0]) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        inputs[0].focus();
+      }, 100);
     }
   }
 
   /**
-   * jquery detecting div of certain class has been added to DOM
+   * vanilla js detecting div of certain class has been added to DOM
    */
   function ulpOnElementInserted(containerSelector, elementSelector, callback) {
-    var onMutationsObserved = function (mutations) {
-      mutations.forEach(function (mutation) {
+    const onMutationsObserved = (mutations) => {
+      mutations.forEach((mutation) => {
         if (mutation.addedNodes.length) {
-          var elements = $(mutation.addedNodes).find(elementSelector);
-          for (var i = 0, len = elements.length; i < len; i++) {
-            callback(elements[i]);
-          }
+          // Find elements matching selector in added nodes
+          const elements = findInNodes(mutation.addedNodes, elementSelector);
+          elements.forEach((element) => {
+            callback(element);
+          });
         }
       });
     };
 
-    var target = $(containerSelector)[0];
-    var config = {
+    const target = document.querySelector(containerSelector);
+    if (!target) return;
+
+    const config = {
       childList: true,
       subtree: true,
     };
-    var MutationObserver =
+    const MutationObserver =
       window.MutationObserver || window.WebKitMutationObserver;
-    var observer = new MutationObserver(onMutationsObserved);
+    if (!MutationObserver) return;
+
+    const observer = new MutationObserver(onMutationsObserved);
     observer.observe(target, config);
   }
 
-  // Init ulike buttons
-  $(".wpulike").WordpressUlike();
+  // Initialize on DOM ready
+  const init = () => {
+    // Init share buttons / forms
+    const ajaxForms = document.querySelectorAll(".ulp-ajax-form");
+    initWordpressUlikeAjaxForms(ajaxForms);
+
+    // Init goodshare
+    if (typeof window._goodshare !== "undefined" && window._goodshare.reNewAllInstance) {
+      window._goodshare.reNewAllInstance();
+    }
+
+    // Init ulike buttons
+    const ulikeElements = document.querySelectorAll(".wpulike");
+    initWordpressUlike(ulikeElements);
+
+    // Init OTP inputs
+    ulpOtpInput();
+  };
+
+  // Run on DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 
   // On wp ulike element added
   ulpOnElementInserted("body", ".wpulike", function (element) {
-    $(element).WordpressUlike();
+    initWordpressUlike(element);
   });
 
   // On share button element added
   ulpOnElementInserted("body", ".ulp-social-wrapper", function (element) {
     // Init goodshare
-    if (typeof window._goodshare !== "undefined") {
+    if (typeof window._goodshare !== "undefined" && window._goodshare.reNewAllInstance) {
       window._goodshare.reNewAllInstance();
     }
   });
 
   // On form element added
   ulpOnElementInserted("body", ".ulp-ajax-form", function (element) {
-    $(element).WordpressUlikeAjaxForms();
+    initWordpressUlikeAjaxForms(element);
+    // Initialize OTP inputs in the new form
+    ulpOtpInput(element);
+  });
+
+  // Handle OTP form submission errors
+  document.addEventListener("UlpAjaxFormEnded", (event) => {
+    const response = event.detail?.[1];
+    if (!response || response.success) return;
+
+    const msg = response.data?.message?.toLowerCase() || "";
+    const otpKeywords = ["otp", "one-time password", "tfa", "two factor", "verification code", "incorrect"];
+    if (!otpKeywords.some(keyword => msg.includes(keyword))) return;
+
+    const formElement = event.detail?.[0];
+    if (!formElement) return;
+
+    formElement.querySelectorAll("#ulp-2fa-code").forEach((container) => {
+      container.classList.remove("ulp-otp-complete");
+      container.classList.add("ulp-otp-error");
+      container.querySelectorAll("input.ulp-digit-input").forEach((input) => {
+        input.classList.add("ulp-digit-error");
+        input.classList.remove("ulp-digit-filled", "ulp-digit-success");
+      });
+    });
   });
 
   // On recaptcha element added
   ulpOnElementInserted("body", ".ulp-recaptcha-field", function (element) {
-    $(document).trigger("UlpRecaptchaReload", [this.element]);
+    triggerEvent(document, "UlpRecaptchaReload", element);
   });
 
-  $(".ulp-2fa-remove").on("click", function (e) {
+  // On 2FA code container added
+  ulpOnElementInserted("body", "#ulp-2fa-code", function (element) {
+    ulpOtpInput(element);
+  });
+
+  // Handle 2FA remove button clicks
+  document.addEventListener("click", (e) => {
+    const removeButton = e.target.closest(".ulp-2fa-remove");
+    if (!removeButton) return;
+
     e.preventDefault();
     if (confirm("Are you sure you want to make this change?")) {
-      var $self = $(this),
-        $itemElement = $self.closest(".ulp-2fa-item");
+      const itemElement = removeButton.closest(".ulp-2fa-item");
+      const nonce = getDataAttribute(removeButton, "nonce");
+      const key = getDataAttribute(removeButton, "key");
 
-      $.ajax({
-        data: {
-          action: "ulp_two_factor_remove",
-          nonce: $self.data("nonce"),
-          key: $self.data("key"),
-        },
-        dataType: "json",
-        type: "POST",
-        url: UlikeProCommonConfig.AjaxUrl,
-        success: function (response) {
-          if (response.success) {
-            $itemElement.fadeOut();
+      const formData = new FormData();
+      formData.append("action", "ulp_two_factor_remove");
+      formData.append("nonce", nonce);
+      formData.append("key", key);
+
+      fetch(UlikeProCommonConfig.AjaxUrl, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          if (response.success && itemElement) {
+            fadeOut(itemElement);
           }
           // Display Notification
-          $(document.body).WordpressUlikeNotifications({
-            messageType: response.data.status,
-            messageText: response.data.message,
-          });
-        },
-      });
-    }
-  });
-
-  // switch between forms
-  $(document).on("click", "a[data-form-toggle]", function (e) {
-    e.preventDefault();
-    var $self = $(this),
-      $contentEl = $self.closest('.ulp-ajax-form'),
-      $formEl = $contentEl.find('form');
-
-      $formEl.addClass("ulp-loading");
-
-      $.ajax({
-        data: {
-          action: "ulp_forms_toggle",
-          request: $self.data("form-toggle"),
-        },
-        dataType: "json",
-        type: "POST",
-        url: UlikeProCommonConfig.AjaxUrl,
-        success: function (response) {
-          if (response.success) {
-            var $fragmentEl = $(response.data.content).WordpressUlikeAjaxForms();
-            $contentEl.replaceWith($fragmentEl);
-          } else {
-            $(document.body).WordpressUlikeNotifications({
+          if (typeof WordpressUlikeNotifications !== "undefined") {
+            new WordpressUlikeNotifications(document.body, {
               messageType: response.data.status,
               messageText: response.data.message,
             });
           }
-          $formEl.removeClass("ulp-loading");
+        })
+        .catch((error) => {
+          console.error("WP ULike Pro 2FA Remove error:", error);
+        });
+    }
+  });
+
+  // Handle form toggle clicks
+  document.addEventListener("click", (e) => {
+    const toggleLink = e.target.closest("a[data-form-toggle]");
+    if (!toggleLink) return;
+
+    e.preventDefault();
+    const contentEl = toggleLink.closest(".ulp-ajax-form");
+    if (!contentEl) return;
+
+    const formEl = contentEl.querySelector("form");
+    if (!formEl) return;
+
+    formEl.classList.add("ulp-loading");
+
+    const request = getDataAttribute(toggleLink, "form-toggle");
+    const formData = new FormData();
+    formData.append("action", "ulp_forms_toggle");
+    formData.append("request", request);
+
+    fetch(UlikeProCommonConfig.AjaxUrl, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        formEl.classList.remove("ulp-loading");
+
+        if (response.success) {
+          // Create temporary container to parse HTML
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = response.data.content;
+          const fragmentEl = tempDiv.firstElementChild;
+
+          if (fragmentEl) {
+            // Initialize WordpressUlikeAjaxForms on new element
+            initWordpressUlikeAjaxForms(fragmentEl);
+            // Replace content element
+            if (contentEl.parentNode) {
+              contentEl.parentNode.replaceChild(fragmentEl, contentEl);
+            }
+            // Initialize OTP inputs in the new form (with small delay to ensure DOM is ready)
+            setTimeout(() => {
+              ulpOtpInput(fragmentEl);
+            }, 50);
+          }
+        } else {
+          // Display Notification
+          if (typeof WordpressUlikeNotifications !== "undefined") {
+            new WordpressUlikeNotifications(document.body, {
+              messageType: response.data.status,
+              messageText: response.data.message,
+            });
+          }
         }
+      })
+      .catch((error) => {
+        console.error("WP ULike Pro Form Toggle error:", error);
+        formEl.classList.remove("ulp-loading");
       });
   });
 
-})(jQuery);
+  // Expose ulpOtpInput globally for use in other scripts
+  window.ulpOtpInput = ulpOtpInput;
+
+})(window, document);

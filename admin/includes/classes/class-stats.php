@@ -260,14 +260,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 		 * @param string $table
 		 * @return string|null
 		 */
-		public function get_first_log_datetime( $table ){
-			$table  = $this->wpdb->prefix . $table;
-			return $this->wpdb->get_var( "
-				SELECT DATE(`date_time`)
-				FROM `$table`
-				LIMIT 1"
-			);
+	public function get_first_log_datetime( $table ){
+		// SECURITY: Whitelist allowed table names
+		$allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+		if ( ! in_array( $table, $allowed_tables, true ) ) {
+			$table = 'ulike'; // Default fallback
 		}
+		$table_name = esc_sql( $this->wpdb->prefix . $table );
+		return $this->wpdb->get_var( "
+			SELECT DATE(`date_time`)
+			FROM `{$table_name}`
+			LIMIT 1"
+		);
+	}
 
 		/**
 		 * Get The Linear Logs Data From Tables
@@ -277,21 +282,31 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 		 * @since 2.0
 		 * @return String
 		 */
-		public function select_linear_data( $table ){
+	public function select_linear_data( $table ){
+		// SECURITY: Whitelist allowed table names
+		$allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+		if ( ! in_array( $table, $allowed_tables, true ) ) {
+			$table = 'ulike'; // Default fallback
+		}
+		
+		$result = array();
+		$table_name = esc_sql( $this->wpdb->prefix . $table );
+		$range  = $this->getMySqlDateRange('date_time');
+		
+		// SECURITY: Validate date range is safe (should only contain date comparisons)
+		if ( ! preg_match( '/^(1|DATE\([^)]+\)\s*(=|>=|<=|BETWEEN)\s*[\'"]?\d{4}-\d{2}-\d{2}[\'"]?(\s+AND\s+[\'"]?\d{4}-\d{2}-\d{2}[\'"]?)?)$/', $range ) && $range !== '1' ) {
+			$range = '1'; // Fallback to neutral condition if invalid
+		}
 
-			$result = array();
-			$table  = $this->wpdb->prefix . $table;
-			$range  = $this->getMySqlDateRange('date_time');
-
-			if( empty( $this->selectedStatus ) ){
-				$dataInfo = $this->wpdb->get_results( "
-					SELECT DATE(`date_time`) AS labels,
-					COUNT(`date_time`) AS counts
-					FROM `$table`
-					WHERE $range
-					GROUP BY labels ORDER BY labels ASC",
-					ARRAY_A
-				);
+		if( empty( $this->selectedStatus ) ){
+			$dataInfo = $this->wpdb->get_results( "
+				SELECT DATE(`date_time`) AS labels,
+				COUNT(`date_time`) AS counts
+				FROM `{$table_name}`
+				WHERE {$range}
+				GROUP BY labels ORDER BY labels ASC",
+				ARRAY_A
+			);
 				$result['all']['datasets'] = $this->charts_options( 'all' );
 				if( ! empty( $dataInfo ) ) {
 					$result['all']['rawInfo'] = $this->mergeTableInfo( $dataInfo );
@@ -300,12 +315,15 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				}
 			} else {
 				foreach ( $this->selectedStatus as $key => $status ) {
+					// SECURITY: Whitelist allowed status values
+					$allowed_statuses = array( 'like', 'unlike', 'dislike', 'undislike' );
+					$status = in_array( $status, $allowed_statuses, true ) ? $status : 'like';
 					$dataInfo = $this->wpdb->get_results( $this->wpdb->prepare( "
 							SELECT DATE(`date_time`) AS labels,
 							COUNT(`date_time`) AS counts
-							FROM `$table`
-							WHERE $range
-							AND `status` LIKE %s
+							FROM `{$table_name}`
+							WHERE {$range}
+							AND `status` = %s
 							GROUP BY labels ORDER BY labels ASC",
 							$status
 						),
@@ -340,17 +358,44 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 		 * @param string $dateTimeTable
 		 * @return string
 		 */
-		private function getMySqlDateRange( $dateTimeTable ){
-			if( empty( $this->dateRange ) ){
-				return 1;
-			}
-
-			if( $this->dateRange['start'] === $this->dateRange['end'] ){
-				return sprintf( 'DATE(`%s`) = \'%s\'', $dateTimeTable, $this->dateRange['start'] );
-			}
-
-			return sprintf( 'DATE(`%1$s`) >= \'%2$s\' AND DATE(`%1$s`) <= \'%3$s\'', $dateTimeTable, $this->dateRange['start'], $this->dateRange['end'] );
+	private function getMySqlDateRange( $dateTimeTable ){
+		// SECURITY: Validate dateTimeTable parameter (should be a column name)
+		$dateTimeTable = sanitize_key( $dateTimeTable );
+		if ( empty( $dateTimeTable ) ) {
+			$dateTimeTable = 'date_time';
 		}
+		
+		if( empty( $this->dateRange ) ){
+			return '1';
+		}
+
+		// SECURITY: Sanitize and validate date values
+		$start = isset( $this->dateRange['start'] ) ? sanitize_text_field( $this->dateRange['start'] ) : '';
+		$end = isset( $this->dateRange['end'] ) ? sanitize_text_field( $this->dateRange['end'] ) : '';
+		
+		// Validate date format (YYYY-MM-DD)
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $start ) ) {
+			$start = '';
+		}
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $end ) ) {
+			$end = '';
+		}
+		
+		if ( empty( $start ) || empty( $end ) ) {
+			return '1'; // Return neutral condition if dates are invalid
+		}
+		
+		// SECURITY: Escape date values for safe use in SQL
+		$start_escaped = esc_sql( $start );
+		$end_escaped = esc_sql( $end );
+		$dateTimeTable_escaped = esc_sql( $dateTimeTable );
+
+		if( $start === $end ){
+			return sprintf( 'DATE(`%s`) = \'%s\'', $dateTimeTable_escaped, $start_escaped );
+		}
+
+		return sprintf( 'DATE(`%1$s`) >= \'%2$s\' AND DATE(`%1$s`) <= \'%3$s\'', $dateTimeTable_escaped, $start_escaped, $end_escaped );
+	}
 
 		/**
 		 * Set date range with our format
@@ -515,12 +560,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				"date"  => 'all'
 			);
 
-			$parsed_args = wp_parse_args( $args, $defaults );
+		$parsed_args = wp_parse_args( $args, $defaults );
 
-			// Extract variables
-			extract( $parsed_args );
+		// Extract variables safely instead of using extract()
+		$table = isset( $parsed_args['table'] ) ? $parsed_args['table'] : 'ulike';
+		$date = isset( $parsed_args['date'] ) ? $parsed_args['date'] : 'all';
 
-			$cache_key = sanitize_key( sprintf( 'count_logs_for_%s_table_in_%s_daterange', $table, $date ) );
+		$cache_key = sanitize_key( sprintf( 'count_logs_for_%s_table_in_%s_daterange', $table, $date ) );
 
 			if( $date === 'all' ){
 				$count_all_logs = wp_ulike_get_meta_data( 1, 'statistics', $cache_key, true );
@@ -610,12 +656,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				"rel_type"    => '',
 				"period"      => 'all'
 			);
-			// Parse args
-			$settings = wp_parse_args( $args, $defaults );
-			// Extract settings
-			extract($settings);
+		// Parse args
+		$settings = wp_parse_args( $args, $defaults );
+		// Extract settings safely instead of using extract()
+		$numberOf = isset( $settings['numberOf'] ) ? absint( $settings['numberOf'] ) : 15;
+		$rel_type = isset( $settings['rel_type'] ) ? $settings['rel_type'] : '';
+		$period = isset( $settings['period'] ) ? $settings['period'] : 'all';
 
-			$posts = wp_ulike_get_most_liked_posts( $numberOf, $rel_type, 'post', $period, array( 'like', 'dislike' ) );
+		$posts = wp_ulike_get_most_liked_posts( $numberOf, $rel_type, 'post', $period, array( 'like', 'dislike' ) );
 
 			if( empty( $posts ) ){
 				$period_info = is_array( $period ) ? implode( ' - ', $period ) : $period;
@@ -660,12 +708,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				"numberOf"    => 15,
 				"period"      => 'all'
 			);
-			// Parse args
-			$settings 		= wp_parse_args( $args, $defaults );
-			// Extract settings
-			extract($settings);
+		// Parse args
+		$settings 		= wp_parse_args( $args, $defaults );
+		// Extract settings safely instead of using extract()
+		$numberOf = isset( $settings['numberOf'] ) ? absint( $settings['numberOf'] ) : 15;
+		$period = isset( $settings['period'] ) ? $settings['period'] : 'all';
 
-			$comments = wp_ulike_get_most_liked_comments( $numberOf, '', $period, array( 'like', 'dislike' ) );
+		$comments = wp_ulike_get_most_liked_comments( $numberOf, '', $period, array( 'like', 'dislike' ) );
 
 			if( empty( $comments ) ){
 				$period_info = is_array( $period ) ? implode( ' - ', $period ) : $period;
@@ -712,12 +761,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				"numberOf"    => 15,
 				"period"      => 'all'
 			);
-			// Parse args
-			$settings = wp_parse_args( $args, $defaults );
-			// Extract settings
-			extract($settings);
+		// Parse args
+		$settings = wp_parse_args( $args, $defaults );
+		// Extract settings safely instead of using extract()
+		$numberOf = isset( $settings['numberOf'] ) ? absint( $settings['numberOf'] ) : 15;
+		$period = isset( $settings['period'] ) ? $settings['period'] : 'all';
 
-			$posts = wp_ulike_get_most_liked_posts( $numberOf, array( 'topic', 'reply' ), 'topic', $period, array( 'like', 'dislike' ) );
+		$posts = wp_ulike_get_most_liked_posts( $numberOf, array( 'topic', 'reply' ), 'topic', $period, array( 'like', 'dislike' ) );
 
 			if( empty( $posts ) ){
 				$period_info = is_array( $period ) ? implode( ' - ', $period ) : $period;
@@ -761,18 +811,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats' ) ) {
 				"numberOf"    => 15,
 				"period"      => 'all'
 			);
-			// Parse args
-			$settings 		= wp_parse_args( $args, $defaults );
-			// Extract settings
-			extract($settings);
+		// Parse args
+		$settings 		= wp_parse_args( $args, $defaults );
+		// Extract settings safely instead of using extract()
+		$numberOf = isset( $settings['numberOf'] ) ? absint( $settings['numberOf'] ) : 15;
+		$period = isset( $settings['period'] ) ? $settings['period'] : 'all';
 
-	        if ( is_multisite() ) {
-	            $bp_prefix = 'base_prefix';
-	        } else {
-	            $bp_prefix = 'prefix';
-			}
+        if ( is_multisite() ) {
+            $bp_prefix = 'base_prefix';
+        } else {
+            $bp_prefix = 'prefix';
+		}
 
-			$activities = wp_ulike_get_most_liked_activities( $numberOf, $period, array( 'like', 'dislike' ) );
+		$activities = wp_ulike_get_most_liked_activities( $numberOf, $period, array( 'like', 'dislike' ) );
 
 			if( empty( $activities ) ){
 				$period_info = is_array( $period ) ? implode( ' - ', $period ) : $period;

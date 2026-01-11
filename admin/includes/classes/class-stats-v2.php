@@ -17,7 +17,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 	class WP_Ulike_Pro_Stats_V2{
 
 		// Private variables
-		private $wpdb, $tables, $dateRange, $selectedStatus;
+		private $wpdb, $tables, $dateRange, $selectedStatus, $button_views;
 
 		/**
 		 * Instance of this class.
@@ -38,6 +38,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 				'activities' => 'ulike_activities',
 				'topics'     => 'ulike_forums',
 			);
+			// Initialize views tracker
+			if ( class_exists( 'WP_Ulike_Pro_Views' ) ) {
+				$this->button_views = WP_Ulike_Pro_Views::get_instance();
+			}
 		}
 
 		/**
@@ -187,7 +191,12 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		 */
 		public function select_charts_data( $table ) {
 			$output = array();
-			$table  = $this->wpdb->prefix . $table;
+			// Whitelist allowed table names to prevent SQL injection
+			$allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+			if ( ! in_array( $table, $allowed_tables, true ) ) {
+				$table = 'ulike'; // Default fallback
+			}
+			$table  = esc_sql( $this->wpdb->prefix . $table );
 
 			// Generate a unique cache key based on table, status, and date range
 			$cache_key = 'charts_data_' . md5( $table . serialize( $this->selectedStatus ) . serialize( $this->dateRange ) );
@@ -219,22 +228,35 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 					}
 				}
 			} else {
-				// Prepare each status safely.
-				$selectedStatus = array();
+				// Sanitize status values and build safe IN clause
+				$status_placeholders = array();
+				$status_values = array();
 				foreach ( $this->selectedStatus as $status ) {
-					$selectedStatus[] = $this->wpdb->prepare( '%s', $status );
+					$status_sanitized = sanitize_text_field( $status );
+					// Whitelist allowed status values
+					$allowed_statuses = array( 'like', 'dislike', 'unlike', 'undislike' );
+					if ( in_array( $status_sanitized, $allowed_statuses, true ) ) {
+						$status_placeholders[] = '%s';
+						$status_values[] = $status_sanitized;
+					}
 				}
 
-				$dataInfo = $this->wpdb->get_results( "
-					SELECT DATE(`date_time`) AS labels,
-						status,
-						COUNT(`date_time`) AS counts
-					FROM `$table`
-					WHERE $range
-					AND `status` IN (" . implode( ',', $selectedStatus ) . ")
-					GROUP BY labels, status
-					ORDER BY labels, status ASC;
-				" );
+				if ( ! empty( $status_placeholders ) ) {
+					$placeholders_string = implode( ',', $status_placeholders );
+					$query = "
+						SELECT DATE(`date_time`) AS labels,
+							status,
+							COUNT(`date_time`) AS counts
+						FROM `{$table}`
+						WHERE {$range}
+						AND `status` IN ({$placeholders_string})
+						GROUP BY labels, status
+						ORDER BY labels, status ASC";
+
+					$dataInfo = $this->wpdb->get_results( $this->wpdb->prepare( $query, $status_values ) );
+				} else {
+					$dataInfo = array();
+				}
 
 				foreach ( $dataInfo as $row ) {
 					$date   = $row->labels;
@@ -266,24 +288,43 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			return $output;
 		}
 
-		/**
-		 * Get MySQL date range format.
-		 *
-		 * @param string $table
-		 * @return string
-		 */
-		private function getMySqlDateRange( $table ) {
-			$table = esc_sql( $table );
+	/**
+	 * Get MySQL date range format.
+	 *
+	 * @param string $table
+	 * @return string
+	 */
+	private function getMySqlDateRange( $table ) {
+		$table = esc_sql( $table );
 
-			// Return early if date range is set
-			if ( ! empty( $this->dateRange ) ) {
-				$start = $this->dateRange['start'];
-				$end = $this->dateRange['end'];
+		// Return early if date range is set
+		if ( ! empty( $this->dateRange ) ) {
+			// Sanitize date values - ensure they are valid date format
+			$start = isset( $this->dateRange['start'] ) ? sanitize_text_field( $this->dateRange['start'] ) : '';
+			$end = isset( $this->dateRange['end'] ) ? sanitize_text_field( $this->dateRange['end'] ) : '';
 
-				return $start === $end
-					? sprintf( "DATE(`date_time`) = '%s'", $start )
-					: sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $start, $end );
+			// Validate date format (YYYY-MM-DD)
+			if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $start ) ) {
+				$start = '';
 			}
+			if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $end ) ) {
+				$end = '';
+			}
+
+			if ( empty( $start ) || empty( $end ) ) {
+				return '1=1'; // Return neutral condition if dates are invalid
+			}
+
+			// Escape date values for safe use in SQL (since this string is inserted into other queries)
+			$start_escaped = esc_sql( $start );
+			$end_escaped = esc_sql( $end );
+
+			if ( $start === $end ) {
+				return sprintf( "DATE(`date_time`) = '%s'", $start_escaped );
+			} else {
+				return sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $start_escaped, $end_escaped );
+			}
+		}
 
 			// Cache for the latest date query
 			$cache_key = 'latest_date_' . $table;
@@ -298,32 +339,56 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 				$latest_date = current_time( 'mysql' );
 			}
 
-			// Calculate the 30 days range
-			$latest_date_timestamp = strtotime( $latest_date );
-			$date_30_days_before   = date( 'Y-m-d', $latest_date_timestamp - DAY_IN_SECONDS * 30 );
-			$latest_date           = date( 'Y-m-d', $latest_date_timestamp );
+		// Calculate the 30 days range
+		$latest_date_timestamp = strtotime( $latest_date );
+		if ( false === $latest_date_timestamp ) {
+			$latest_date_timestamp = current_time( 'timestamp' );
+		}
+		$date_30_days_before   = date( 'Y-m-d', $latest_date_timestamp - DAY_IN_SECONDS * 30 );
+		$latest_date_formatted = date( 'Y-m-d', $latest_date_timestamp );
 
-			return sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $date_30_days_before, $latest_date );
+		// Escape date values for safe use in SQL (since this string is inserted into other queries)
+		$date_30_days_before_escaped = esc_sql( $date_30_days_before );
+		$latest_date_formatted_escaped = esc_sql( $latest_date_formatted );
+
+		return sprintf( "DATE(`date_time`) BETWEEN '%s' AND '%s'", $date_30_days_before_escaped, $latest_date_formatted_escaped );
 		}
 
 
-		/**
-		 * Set date range with our format
-		 *
-		 * @param array $rawDate
-		 * @return void
-		 */
-		private function setDateRange( $rawDate ){
-			if ( empty( $rawDate['start'] ) ) {
-				$this->dateRange = [];
-				return;
+	/**
+	 * Set date range with our format
+	 *
+	 * @param array $rawDate
+	 * @return void
+	 */
+	private function setDateRange( $rawDate ){
+		if ( empty( $rawDate['start'] ) ) {
+			$this->dateRange = [];
+			return;
+		}
+
+		// Sanitize and validate start date
+		$start_raw = sanitize_text_field( $rawDate['start'] );
+		$start_timestamp = strtotime( $start_raw );
+		if ( false === $start_timestamp ) {
+			$this->dateRange = [];
+			return;
+		}
+		$this->dateRange['start'] = date( "Y-m-d", $start_timestamp );
+
+		// Sanitize and validate end date
+		if ( ! empty( $rawDate['end'] ) ) {
+			$end_raw = sanitize_text_field( $rawDate['end'] );
+			$end_timestamp = strtotime( $end_raw );
+			if ( false !== $end_timestamp ) {
+				$this->dateRange['end'] = date( "Y-m-d", $end_timestamp );
+			} else {
+				$this->dateRange['end'] = $this->dateRange['start'];
 			}
-
-			$this->dateRange['start'] = date( "Y-m-d", strtotime( $rawDate['start'] ) );
-			$this->dateRange['end'] = !empty( $rawDate['end'] )
-				? date( "Y-m-d", strtotime( $rawDate['end'] ) )
-				: $this->dateRange['start'];
+		} else {
+			$this->dateRange['end'] = $this->dateRange['start'];
 		}
+	}
 
 
 		/**
@@ -332,22 +397,26 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 		 * @return Object
 		 */
 		public function select_data( $table ){
+			// Whitelist allowed table names to prevent SQL injection
+			$allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+			if ( ! in_array( $table, $allowed_tables, true ) ) {
+				$table = 'ulike'; // Default fallback
+			}
 
-			$table_name = "{$this->wpdb->prefix}{$table}";
-			$data_limit = apply_filters( 'wp_ulike_stats_data_limit', 30 );
+			$table_name = esc_sql( $this->wpdb->prefix . $table );
+			$data_limit = absint( apply_filters( 'wp_ulike_stats_data_limit', 30 ) );
 			$date_range = $this->getMySqlDateRange( $table_name );
 
-			// Prepare the main query with the fetched latest date
-			$query  = $this->wpdb->prepare( "
+			// Build query with properly escaped values
+			$query  = "
 				SELECT DATE(date_time) AS labels,
 				count(date_time) AS counts
-				FROM `$table_name`
-				WHERE $date_range
+				FROM `{$table_name}`
+				WHERE {$date_range}
 				GROUP BY labels
 				ORDER BY labels ASC
-				LIMIT %d",
-				$data_limit
-			);
+				LIMIT {$data_limit}";
+
 			$result = $this->wpdb->get_results( $query );
 
 			if( empty( $result ) ) {
@@ -419,8 +488,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			$parsed_args = wp_parse_args( $args, $defaults );
 
-			// Extract variables
-			extract( $parsed_args );
+			// Extract variables safely instead of using extract()
+			$table = isset( $parsed_args['table'] ) ? $parsed_args['table'] : 'ulike';
+			$date = isset( $parsed_args['date'] ) ? $parsed_args['date'] : 'all';
 
 			$cache_key = sanitize_key( sprintf( 'count_logs_for_%s_table_in_%s_daterange', $table, is_array($date) ? implode('_', $date) : $date ) );
 
@@ -464,8 +534,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			$parsed_args = wp_parse_args( $args, $defaults );
 
-			// Extract variables
-			extract( $parsed_args );
+			// Extract variables safely instead of using extract()
+			$table = isset( $parsed_args['table'] ) ? $parsed_args['table'] : 'ulike';
+			$date = isset( $parsed_args['date'] ) ? $parsed_args['date'] : 'all';
 
 			$cache_key = sanitize_key( sprintf( 'count_total_interactions_for_%s_table_in_%s_daterange', $table, is_array($date) ? implode('_', $date) : $date ) );
 
@@ -588,7 +659,6 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if($posts && $posts->have_posts()) {
 				$is_distinct        = wp_ulike_setting_repo::isDistinct('post');
-				$total_interactions = $this->count_total_interactions(array("table" => 'ulike', "date" => $settings['period'] ?? 'all'));
 
 				while($posts->have_posts()) {
 					$posts->the_post();
@@ -621,8 +691,34 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						$thumbnail = WP_ULIKE_PRO_ADMIN_URL . '/assets/img/no-image.svg';
 					}
 
-					$comment_number  = get_comments_number($post_id);
-					$engagement_rate = ( ( $like_count + $dislike_count + $comment_number ) / $total_interactions ) * 100;
+					$comment_number = get_comments_number($post_id);
+
+					// Calculate engagement rate and views
+					$period = $settings['period'] ?? 'all';
+					$engagement_data = $this->calculate_engagement_rate( $post_id, 'post', $like_count, $dislike_count, $period );
+					$total_views = $engagement_data['total_views'];
+					$engagement_rate = $engagement_data['engagement_rate'];
+
+					// Calculate engagement growth (period-over-period)
+					$engagement_growth = $this->calculate_engagement_growth( $post_id, 'post', $like_count, $dislike_count, $period, $engagement_rate );
+
+					// Build meta_data array conditionally
+					$meta_data = [
+						'Published'  => get_the_date( '', $post_id ),
+						'Comments'   => $comment_number,
+					];
+
+					// Only include Views if it has a value
+					if ( $total_views > 0 ) {
+						$meta_data['Views'] = $total_views;
+					}
+
+					// Build engagement array (separate from meta_data for React app)
+					$engagement = array();
+					if ( $engagement_rate > 0 ) {
+						$engagement['rate'] = round( $engagement_rate, 2 );
+						$engagement['growth'] = $engagement_growth;
+					}
 
 					$result[] = [
 						'id'             => $post_id,
@@ -632,11 +728,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						'likes_count'    => $like_count,
 						'dislikes_count' => $dislike_count,
 						'engaged_users'  => $engaged_users_info,
-						'meta_data'      => [
-							'Published'  => get_the_date( '', $post_id ),
-							'Comments'   => get_comments_number($post_id),
-							'Engagement' => number_format($engagement_rate, 2). "%",
-						],
+						'meta_data'      => $meta_data,
+						'engagement'     => $engagement,
 					];
 				}
 				wp_reset_postdata(); // VERY VERY IMPORTANT
@@ -673,7 +766,6 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if( $comments ) {
 				$is_distinct        = wp_ulike_setting_repo::isDistinct('comment');
-				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_comments', "date" => $settings['period'] ?? 'all'));
 
 				foreach ( $comments as $comment ) {
 
@@ -698,8 +790,34 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						];
 					}
 
-					$comment_number  = get_comments_number( $comment->comment_post_ID );
-					$engagement_rate = ( ( $like_count + $dislike_count + $comment_number ) / $total_interactions ) * 100;
+					$comment_number = get_comments_number( $comment->comment_post_ID );
+
+					// Calculate engagement rate and views
+					$period = $settings['period'] ?? 'all';
+					$engagement_data = $this->calculate_engagement_rate( $comment->comment_ID, 'comment', $like_count, $dislike_count, $period );
+					$total_views = $engagement_data['total_views'];
+					$engagement_rate = $engagement_data['engagement_rate'];
+
+					// Calculate engagement growth (period-over-period)
+					$engagement_growth = $this->calculate_engagement_growth( $comment->comment_ID, 'comment', $like_count, $dislike_count, $period, $engagement_rate );
+
+					// Build meta_data array conditionally
+					$meta_data = [
+						'Published'  => get_comment_date( '', $comment->comment_ID ),
+						'By'         => esc_attr( $comment->comment_author ),
+					];
+
+					// Only include Views if it has a value
+					if ( $total_views > 0 ) {
+						$meta_data['Views'] = $total_views;
+					}
+
+					// Build engagement array (separate from meta_data for React app)
+					$engagement = array();
+					if ( $engagement_rate > 0 ) {
+						$engagement['rate'] = round( $engagement_rate, 2 );
+						$engagement['growth'] = $engagement_growth;
+					}
 
 					$result[] = [
 						'id'             => $comment->comment_ID,
@@ -709,11 +827,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						'likes_count'    => $like_count,
 						'dislikes_count' => $dislike_count,
 						'engaged_users'  => $engaged_users_info,
-						'meta_data'      => [
-							'Published'  => get_comment_date( '', $comment->comment_ID ),
-							'By'         => esc_attr( $comment->comment_author ),
-							'Engagement' => number_format($engagement_rate, 2). "%",
-						],
+						'meta_data'      => $meta_data,
+						'engagement'     => $engagement,
 					];
 				}
 			}
@@ -753,7 +868,6 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if($topics && $topics->have_posts()) {
 				$is_distinct = wp_ulike_setting_repo::isDistinct('topic');
-				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_forums', "date" => $settings['period'] ?? 'all'));
 
 				while($topics->have_posts()) {
 					$topics->the_post();
@@ -780,13 +894,38 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						];
 					}
 
-					$engagement_rate = ( ( $like_count + $dislike_count ) / $total_interactions ) * 100;
+					// Calculate engagement rate and views
+					$period = $settings['period'] ?? 'all';
+					$engagement_data = $this->calculate_engagement_rate( $topic_id, 'topic', $like_count, $dislike_count, $period );
+					$total_views = $engagement_data['total_views'];
+					$engagement_rate = $engagement_data['engagement_rate'];
+
+					// Calculate engagement growth (period-over-period)
+					$engagement_growth = $this->calculate_engagement_growth( $topic_id, 'topic', $like_count, $dislike_count, $period, $engagement_rate );
 
 					$author_avatar = NULL;
 					if ( ! bbp_is_topic_anonymous( $topic_id ) ) {
 						$author_avatar = get_avatar_url( bbp_get_topic_author_id( $topic_id ), 100 );
 					} else {
 						$author_avatar = get_avatar_url( get_post_meta( $topic_id, '_bbp_anonymous_email', true ), 100 );
+					}
+
+					// Build meta_data array conditionally
+					$meta_data = [
+						'Published'  => bbp_get_topic_post_date( $topic_id ),
+						'By'         => bbp_get_topic_author_display_name( $topic_id ),
+					];
+
+					// Only include Views if it has a value
+					if ( $total_views > 0 ) {
+						$meta_data['Views'] = $total_views;
+					}
+
+					// Build engagement array (separate from meta_data for React app)
+					$engagement = array();
+					if ( $engagement_rate > 0 ) {
+						$engagement['rate'] = round( $engagement_rate, 2 );
+						$engagement['growth'] = $engagement_growth;
 					}
 
 					$result[] = [
@@ -797,11 +936,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						'likes_count'    => $like_count,
 						'dislikes_count' => $dislike_count,
 						'engaged_users'  => $engaged_users_info,
-						'meta_data'      => [
-							'Published'  => bbp_get_topic_post_date( $topic_id ),
-							'By'         => bbp_get_topic_author_display_name( $topic_id ),
-							'Engagement' => number_format($engagement_rate, 2). "%",
-						],
+						'meta_data'      => $meta_data,
+						'engagement'     => $engagement,
 					];
 				}
 				wp_reset_postdata(); // VERY VERY IMPORTANT
@@ -842,7 +978,6 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			if( $activities ) {
 				$is_distinct = wp_ulike_setting_repo::isDistinct('activity');
-				$total_interactions = $this->count_total_interactions(array("table" => 'ulike_activities', "date" => $settings['period'] ?? 'all'));
 
 				foreach ( $activities as $activity ) {
 
@@ -867,8 +1002,34 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						];
 					}
 
-					$author          = get_user_by( 'id', $activity->user_id );
-					$engagement_rate = ( ( $like_count + $dislike_count ) / $total_interactions ) * 100;
+					$author = get_user_by( 'id', $activity->user_id );
+
+					// Calculate engagement rate and views
+					$period = $settings['period'] ?? 'all';
+					$engagement_data = $this->calculate_engagement_rate( $activity->id, 'activity', $like_count, $dislike_count, $period );
+					$total_views = $engagement_data['total_views'];
+					$engagement_rate = $engagement_data['engagement_rate'];
+
+					// Calculate engagement growth (period-over-period)
+					$engagement_growth = $this->calculate_engagement_growth( $activity->id, 'activity', $like_count, $dislike_count, $period, $engagement_rate );
+
+					// Build meta_data array conditionally
+					$meta_data = [
+						'Published'  => wp_ulike_date_i18n( $activity->date_recorded ),
+						'By'         => esc_attr( $author->display_name ),
+					];
+
+					// Only include Views if it has a value
+					if ( $total_views > 0 ) {
+						$meta_data['Views'] = $total_views;
+					}
+
+					// Build engagement array (separate from meta_data for React app)
+					$engagement = array();
+					if ( $engagement_rate > 0 ) {
+						$engagement['rate'] = round( $engagement_rate, 2 );
+						$engagement['growth'] = $engagement_growth;
+					}
 
 					$result[] = [
 						'id'             => $activity->id,
@@ -878,11 +1039,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 						'likes_count'    => $like_count,
 						'dislikes_count' => $dislike_count,
 						'engaged_users'  => $engaged_users_info,
-						'meta_data'      => [
-							'Published'  => wp_ulike_date_i18n( $activity->date_recorded ),
-							'By'         => esc_attr( $author->display_name ),
-							'Engagement' => number_format($engagement_rate, 2). "%",
-						],
+						'meta_data'      => $meta_data,
+						'engagement'     => $engagement,
 					];
 				}
 			}
@@ -1041,65 +1199,93 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			);
 		}
 
-		// Method to count device types across all relevant tables in the last 6 months
-		public function count_device_types() {
-			// Check cache first
-			$device_counts = wp_cache_get('device_types', WP_ULIKE_PRO_DOMAIN);
-			if ($device_counts !== false) {
-				return $device_counts;
+		// Method to count device types across all relevant tables
+		public function count_device_types( $dateRange = [], $type = 'device' ) {
+			// Set the date range if provided
+			if (!empty($dateRange)) {
+				$this->setDateRange($dateRange);
 			}
 
-			// Get the date 6 months ago
-			$six_months_ago = date('Y-m-d H:i:s', strtotime('-6 months'));
+ 			// Allowed columns - whitelist to prevent SQL injection
+			$allowed_types = ['device', 'os', 'browser'];
+			if (!in_array($type, $allowed_types, true)) {
+				$type = 'device'; // fallback
+			}
 
-			// Tables to query
-			$tables = [
-				"{$this->wpdb->prefix}ulike",
-				"{$this->wpdb->prefix}ulike_comments",
-				"{$this->wpdb->prefix}ulike_activities",
-				"{$this->wpdb->prefix}ulike_forums"
-			];
+			// Sanitize column name for SQL
+			$type = esc_sql( $type );
+
+			// Check cache first
+			$cache_key = "{$type}_types_" . md5(json_encode($this->dateRange));
+			$counts = wp_cache_get($cache_key, WP_ULIKE_PRO_DOMAIN);
+			if ($counts !== false) {
+				return $counts;
+			}
 
 			// Initialize result array
-			$device_counts = [];
+			$counts = [];
 
 			// Query each table
-			foreach ($tables as $table) {
-				$query = $this->wpdb->prepare(
-					"SELECT device, COUNT(DISTINCT user_id) AS count FROM $table WHERE date_time > %s AND device IS NOT NULL GROUP BY device",
-					$six_months_ago
-				);
+			foreach ($this->tables as $content_type => $table_name) {
+				$table = esc_sql( $this->wpdb->prefix . $table_name );
+				$date_condition = $this->getMySqlDateRange($table);
+
+				// Build query with properly escaped column name
+				$query = "
+					SELECT
+						TRIM(SUBSTRING_INDEX(`{$type}`, ' ', GREATEST(CHAR_LENGTH(`{$type}`) - CHAR_LENGTH(REPLACE(`{$type}`, ' ', '')), 1))) AS device_group,
+						COUNT(DISTINCT user_id) AS device_count
+					FROM `{$table}`
+					WHERE {$date_condition}
+						AND `{$type}` != ''
+						AND `{$type}` IS NOT NULL
+					GROUP BY device_group
+					ORDER BY device_count DESC
+				";
 
 				$results = $this->wpdb->get_results($query, ARRAY_A);
 
 				foreach ($results as $row) {
-					$device = $row['device'];
-					$count = (int) $row['count'];
+					$value = $row['device_group'];
+					$count = (int) $row['device_count'];
 
-					if (isset($device_counts[$device])) {
-						$device_counts[$device] += $count;
+					if (isset($counts[$value])) {
+						$counts[$value] += $count;
 					} else {
-						$device_counts[$device] = $count;
+						$counts[$value] = $count;
 					}
 				}
 			}
 
-			wp_cache_set('device_types', $device_counts, WP_ULIKE_PRO_DOMAIN, 10);
+			// Cache for 10 seconds
+			wp_cache_set($cache_key, $counts, WP_ULIKE_PRO_DOMAIN, 10);
 
-			return $device_counts;
+			return $counts;
 		}
 
-		public function count_country_codes( $dateRange = [], $selected_status = [] ) {
+		public function count_country_codes( $dateRange = [], $selected_status = [], $types = [] ) {
 			// Set the date range if provided
 			if (!empty($dateRange)) {
 				$this->setDateRange($dateRange);
 			}
 
 			// Generate a unique cache key based on the date range
-			$cache_key = 'country_counts_' . md5(json_encode($this->dateRange));
+			$cache_key = 'country_counts_' . md5(json_encode([
+				'dateRange' => $this->dateRange,
+				'status'    => $selected_status,
+				'types'     => $types,
+			]));
 			$country_counts = wp_cache_get($cache_key, WP_ULIKE_PRO_DOMAIN);
 			if (false !== $country_counts) {
-				return json_decode($country_counts, true);
+				$decoded = json_decode($country_counts, true);
+				// Calculate growth if not already included
+				if (!empty($decoded)) {
+					$first_key = key($decoded);
+					if ($first_key && !isset($decoded[$first_key]['growth'])) {
+						$decoded = $this->add_country_growth($decoded, $dateRange, $selected_status, $types);
+					}
+				}
+				return $decoded;
 			}
 
 			// Initialize result array
@@ -1107,6 +1293,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 
 			// Loop through each table and fetch country codes
 			foreach ($this->tables as $content_type => $table_name) {
+				// check type filter
+				if( ! empty( $types ) && ! in_array( $content_type, $types ) ){
+					continue;
+				}
+
 				$table = "{$this->wpdb->prefix}{$table_name}";
 				$date_condition = $this->getMySqlDateRange($table);
 
@@ -1178,12 +1369,479 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 				}
 			}
 
-			// Cache the result for 12 hours
+			// Calculate and add growth for each country
+			// Use the actual dateRange that was used (either provided or from class property)
+			$actual_dateRange = ! empty( $dateRange ) ? $dateRange : ( ! empty( $this->dateRange ) ? $this->dateRange : null );
+			$country_counts = $this->add_country_growth($country_counts, $actual_dateRange, $selected_status, $types);
+
+			// Cache the result for 10 seconds
 			wp_cache_set($cache_key, json_encode($country_counts), WP_ULIKE_PRO_DOMAIN, 10);
 
 			return $country_counts;
 		}
 
+		/**
+		 * Calculate growth percentage for each country (period-over-period comparison)
+		 * Similar to Google Analytics active users map growth calculation
+		 *
+		 * @param array $current_counts Current period country counts
+		 * @param array $dateRange      Current date range
+		 * @param array $selected_status Selected status filter
+		 * @param array $types          Selected content types
+		 * @return array                Country counts with growth added
+		 */
+		private function add_country_growth( $current_counts, $dateRange = [], $selected_status = [], $types = [] ) {
+			// Determine current period - use provided dateRange or current class property
+			$current_period = ! empty( $dateRange ) ? $dateRange : $this->dateRange;
+
+			// If no date range at all, use default: last 30 days
+			if ( empty( $current_period ) ) {
+				$end = current_time( 'Y-m-d' );
+				$start = date( 'Y-m-d', strtotime( '-30 days' ) );
+				$current_period = array( 'start' => $start, 'end' => $end );
+			}
+
+			// Calculate previous period of same length
+			$previous_dateRange = $this->calculate_previous_period( $current_period );
+
+			// Get previous period country counts (cached separately for performance)
+			$previous_counts = $this->get_country_counts_for_period( $previous_dateRange, $selected_status, $types );
+
+			// Calculate growth for each country
+			foreach ( $current_counts as $country_code => $data ) {
+				$current_total = 0;
+				$previous_total = 0;
+
+				// Get current period total (handle both 'total' key and status-based structure)
+				if ( isset( $data['total'] ) ) {
+					$current_total = (int) $data['total'];
+				} else {
+					// Sum all status counts if no 'total' key
+					$current_total = array_sum( array_map( 'intval', $data ) );
+				}
+
+				// Get previous period total
+				if ( isset( $previous_counts[$country_code] ) ) {
+					if ( isset( $previous_counts[$country_code]['total'] ) ) {
+						$previous_total = (int) $previous_counts[$country_code]['total'];
+					} else {
+						// Sum all status counts if no 'total' key
+						$previous_total = array_sum( array_map( 'intval', $previous_counts[$country_code] ) );
+					}
+				}
+
+				// Calculate growth percentage: ((current - previous) / previous) * 100
+				$growth = 0;
+				if ( $previous_total > 0 ) {
+					$growth = ( ( $current_total - $previous_total ) / $previous_total ) * 100;
+				} elseif ( $current_total > 0 && $previous_total == 0 ) {
+					// If previous period had no data but current does, it's 100% growth
+					$growth = 100;
+				}
+
+				// Add growth to the country data
+				$current_counts[$country_code]['growth'] = round( $growth, 2 );
+			}
+
+			return $current_counts;
+		}
+
+		/**
+		 * Get country counts for a specific date range (used for previous period calculation)
+		 * Optimized with caching to avoid duplicate queries
+		 *
+		 * @param array $dateRange      Date range array with 'start' and 'end'
+		 * @param array $selected_status Selected status filter
+		 * @param array $types          Selected content types
+		 * @return array                Country counts for the period
+		 */
+		private function get_country_counts_for_period( $dateRange, $selected_status = [], $types = [] ) {
+			// Cache key for previous period
+			$cache_key = 'country_counts_prev_' . md5( json_encode( [
+				'dateRange' => $dateRange,
+				'status'    => $selected_status,
+				'types'     => $types,
+			] ) );
+
+			$cached = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
+			if ( false !== $cached ) {
+				return json_decode( $cached, true );
+			}
+
+			// Store current date range to restore later
+			$original_dateRange = $this->dateRange;
+
+			// Set the previous period date range
+			$this->setDateRange( $dateRange );
+
+			// Initialize result array
+			$country_counts = [];
+
+			// Loop through each table and fetch country codes
+			foreach ( $this->tables as $content_type => $table_name ) {
+				// check type filter
+				if ( ! empty( $types ) && ! in_array( $content_type, $types ) ) {
+					continue;
+				}
+
+				$table = "{$this->wpdb->prefix}{$table_name}";
+				$date_condition = $this->getMySqlDateRange( $table );
+
+				// Prepare query based on the selected status
+				$status_condition = '';
+				if ( ! empty( $selected_status ) ) {
+					// Map selected statuses to prepared query format
+					$selectedStatus = array_map( function( $status ) {
+						return $this->wpdb->prepare( '%s', $status );
+					}, $selected_status );
+
+					// Add status filter to the query
+					$status_condition = "AND `status` IN (" . implode( ',', $selectedStatus ) . ")";
+				}
+
+				// Prepare the query
+				$query = "
+					SELECT country_code, COUNT(DISTINCT user_id) AS count
+				";
+
+				// Add status to the query if statuses are provided
+				if ( ! empty( $selected_status ) ) {
+					$query .= ", `status`";
+				}
+
+				$query .= "
+					FROM `$table`
+					WHERE $date_condition
+					AND country_code IS NOT NULL
+					AND country_code != ''
+					$status_condition
+					GROUP BY country_code";
+
+				// Add status to GROUP BY if statuses are provided
+				if ( ! empty( $selected_status ) ) {
+					$query .= ", `status`";
+				}
+
+				// Fetch results
+				$results = $this->wpdb->get_results( $query, ARRAY_A );
+
+				// Sum up the counts across all content types
+				foreach ( $results as $row ) {
+					$country_code = $row['country_code'];
+					$count = (int) $row['count'];
+
+					if ( empty( $selected_status ) ) {
+						// If no selected status, group by total
+						if ( ! isset( $country_counts[$country_code] ) ) {
+							$country_counts[$country_code] = [];
+						}
+						if ( isset( $country_counts[$country_code]['total'] ) ) {
+							$country_counts[$country_code]['total'] += $count;
+						} else {
+							$country_counts[$country_code]['total'] = $count;
+						}
+					} else {
+						// If selected statuses exist, group by both country_code and status
+						$status = $row['status'];
+						if ( ! isset( $country_counts[$country_code] ) ) {
+							$country_counts[$country_code] = [];
+						}
+						if ( isset( $country_counts[$country_code][$status] ) ) {
+							$country_counts[$country_code][$status] += $count;
+						} else {
+							$country_counts[$country_code][$status] = $count;
+						}
+					}
+				}
+			}
+
+			// Restore original date range
+			$this->dateRange = $original_dateRange;
+
+			// Cache the result
+			wp_cache_set( $cache_key, json_encode( $country_counts ), WP_ULIKE_PRO_DOMAIN, 10 );
+
+			return $country_counts;
+		}
+
+		/**
+		 * Calculate previous period date range based on current date range
+		 * Simple and optimized: calculates previous period of same length
+		 *
+		 * @param array $current_period Current date range array with 'start' and 'end'
+		 * @return array                Previous period date range
+		 */
+		private function calculate_previous_period( $current_period ) {
+			if ( ! isset( $current_period['start'] ) || ! isset( $current_period['end'] ) ) {
+				// Default: last 30 days vs previous 30 days
+				$end = current_time( 'Y-m-d' );
+				$start = date( 'Y-m-d', strtotime( '-30 days' ) );
+				$current_period = array( 'start' => $start, 'end' => $end );
+			}
+
+			$start = strtotime( $current_period['start'] );
+			$end = strtotime( $current_period['end'] );
+
+			// Calculate number of days in current period
+			$days_diff = ( $end - $start ) / DAY_IN_SECONDS;
+
+			// Previous period ends 1 day before current period starts
+			$prev_end = date( 'Y-m-d', strtotime( $current_period['start'] . ' -1 day' ) );
+			// Previous period starts (days_diff) days before prev_end
+			$prev_start = date( 'Y-m-d', strtotime( $prev_end . ' -' . $days_diff . ' days' ) );
+
+			return array(
+				'start' => $prev_start,
+				'end'   => $prev_end
+			);
+		}
+
+
+		/**
+		 * Calculate engagement rate and views for an item
+		 * Smart calculation: Only counts likes/dislikes from the period where views exist
+		 * This ensures accurate, logical engagement rates for marketing purposes
+		 *
+		 * @param int    $item_id      Item ID
+		 * @param string $type          Content type (post, comment, activity, topic)
+		 * @param int    $like_count    Like count (all-time, will be filtered if needed)
+		 * @param int    $dislike_count Dislike count (all-time, will be filtered if needed)
+		 * @param mixed  $period        Period setting (array with start/end or string)
+		 * @return array                Array with 'total_views' and 'engagement_rate'
+		 */
+		private function calculate_engagement_rate( $item_id, $type, $like_count, $dislike_count, $period = 'all' ) {
+			$total_views = 0;
+			$engagement_rate = 0;
+
+			if ( ! $this->button_views || ! $this->button_views->is_tracking_enabled( $type ) ) {
+				return array(
+					'total_views'     => $total_views,
+					'engagement_rate' => $engagement_rate
+				);
+			}
+
+			// Get views and determine the period where views exist
+			$view_period_start = null;
+			if ( is_array( $period ) && isset( $period['start'] ) && isset( $period['end'] ) ) {
+				// Date range: use the provided range
+				$views_data = $this->button_views->get_views_by_date_range( $type, $period['start'], $period['end'], $item_id );
+				$total_views = array_sum( $views_data );
+				$view_period_start = $period['start'];
+			} else {
+				// Period string or 'all'
+				$period_string = $period === 'all' ? 'all' : current_time( 'Y-m-d' );
+				$total_views = $this->button_views->get_total_views( $item_id, $type, $period_string );
+
+				// Smart period matching: For 'all' period, find when view tracking started
+				// This ensures we only compare likes and views from the same time period
+				if ( $period === 'all' && $total_views > 0 ) {
+					$first_view_date = $this->button_views->get_first_view_date( $item_id, $type );
+					if ( $first_view_date ) {
+						$view_period_start = $first_view_date;
+					}
+				} elseif ( $period !== 'all' ) {
+					// For specific periods, get the period start date
+					$view_period_start = $this->get_period_start_date( $period );
+				}
+			}
+
+			// Calculate engagement rate only if we have views
+			if ( $total_views > 0 ) {
+				// Smart filtering: Only count likes/dislikes from the period where views exist
+				// This prevents inflated percentages from historical likes vs new view tracking
+				$filtered_like_count = $like_count;
+				$filtered_dislike_count = $dislike_count;
+
+				if ( $view_period_start ) {
+					$effective_start_date = $view_period_start;
+					
+					// Performance optimization: Only apply max_lookback_days limit for 'all' period
+					// For user-provided date ranges or period strings, respect the exact dates requested
+					if ( $period === 'all' ) {
+						// Maximum lookback: 90 days (3 months) - optimal for top items dashboard
+						// This provides recent engagement data while maintaining fast query performance
+						// 90 days captures meaningful trends without the overhead of year-long queries
+						// 
+						// Filter to allow customization: 'wp_ulike_pro_engagement_max_lookback_days'
+						// Default: 90 days. Recommended range: 30-365 days
+						$max_lookback_days = apply_filters( 'wp_ulike_pro_engagement_max_lookback_days', 90, $item_id, $type );
+						$max_lookback_days = absint( $max_lookback_days ); // Ensure positive integer
+						$max_lookback_days = max( 1, min( 365, $max_lookback_days ) ); // Clamp between 1-365 days
+						
+						$max_lookback_date = date( 'Y-m-d', strtotime( '-' . $max_lookback_days . ' days' ) );
+						
+						// Use the later date: either view_period_start or max_lookback_date
+						// This ensures we don't query too far back, even if view tracking started years ago
+						// Note: For 'all' period, this creates a "recent engagement rate" (all-time views vs recent likes)
+						// which is more actionable for marketers than pure all-time engagement
+						$effective_start_date = $view_period_start < $max_lookback_date ? $max_lookback_date : $view_period_start;
+					}
+					// For date ranges and period strings, use the exact dates - no limit applied
+					
+					// Determine end date: use period end date if provided, otherwise use today
+					$effective_end_date = current_time( 'Y-m-d' );
+					if ( is_array( $period ) && isset( $period['end'] ) ) {
+						// For user-provided date ranges, respect the exact end date
+						$effective_end_date = $period['end'];
+					}
+					
+					// Get likes/dislikes count from the effective start date to effective end date
+					$is_distinct = wp_ulike_setting_repo::isDistinct( $type );
+					$period_array = array( 'start' => $effective_start_date, 'end' => $effective_end_date );
+
+					$filtered_like_count = wp_ulike_get_counter_value( $item_id, $type, 'like', $is_distinct, $period_array );
+					$filtered_dislike_count = wp_ulike_get_counter_value( $item_id, $type, 'dislike', $is_distinct, $period_array );
+				}
+
+				// Calculate engagement rate: (Likes + Dislikes) / Views * 100
+				// Note: Engagement rate is a standard metric and can exceed 100% for viral content
+				// where multiple users engage with the same content (e.g., 150% = 1.5 engagements per view)
+				$total_engagements = $filtered_like_count + $filtered_dislike_count;
+				$engagement_rate = ( $total_engagements / $total_views ) * 100;
+			}
+
+			return array(
+				'total_views'     => $total_views,
+				'engagement_rate' => $engagement_rate
+			);
+		}
+
+		/**
+		 * Calculate engagement growth (period-over-period comparison)
+		 * Compares current period engagement rate with previous period
+		 *
+		 * @param int    $item_id      Item ID
+		 * @param string $type          Content type (post, comment, activity, topic)
+		 * @param int    $like_count    Like count
+		 * @param int    $dislike_count Dislike count
+		 * @param mixed  $period        Period setting (array with start/end or string)
+		 * @param float  $current_rate  Current period engagement rate
+		 * @return float                Growth percentage (positive = growth, negative = decline)
+		 */
+		private function calculate_engagement_growth( $item_id, $type, $like_count, $dislike_count, $period, $current_rate ) {
+			if ( ! $this->button_views || ! $this->button_views->is_tracking_enabled( $type ) ) {
+				return 0;
+			}
+
+			// For 'all' period, calculate growth based on last 7 days vs previous 7 days
+			// This provides meaningful trend analysis for top items while engagement rate shows all-time data
+			// 7 days is ideal for showing recent momentum and trending content
+			if ( $period === 'all' ) {
+				// Calculate current period (last 7 days) engagement rate
+				$current_period = array(
+					'start' => date( 'Y-m-d', strtotime( '-7 days' ) ),
+					'end' => current_time( 'Y-m-d' )
+				);
+				$current_engagement = $this->calculate_engagement_rate( $item_id, $type, $like_count, $dislike_count, $current_period );
+				$current_rate_7days = $current_engagement['engagement_rate'];
+
+				// Calculate previous period (8-14 days ago) engagement rate
+				$previous_period = array(
+					'start' => date( 'Y-m-d', strtotime( '-14 days' ) ),
+					'end' => date( 'Y-m-d', strtotime( '-8 days' ) )
+				);
+				$previous_engagement = $this->calculate_engagement_rate( $item_id, $type, $like_count, $dislike_count, $previous_period );
+				$previous_rate = $previous_engagement['engagement_rate'];
+
+				// Calculate growth percentage: ((current - previous) / previous) * 100
+				if ( $previous_rate > 0 ) {
+					$growth = ( ( $current_rate_7days - $previous_rate ) / $previous_rate ) * 100;
+					return round( $growth, 2 );
+				}
+
+				// If previous period had no engagement, but current does, it's 100% growth
+				if ( $current_rate_7days > 0 && $previous_rate == 0 ) {
+					return 100;
+				}
+
+				return 0;
+			}
+
+			// For non-'all' periods, use the passed $current_rate parameter
+			if ( $current_rate <= 0 ) {
+				return 0;
+			}
+
+			// Determine previous period based on current period
+			$previous_period = null;
+
+			if ( is_array( $period ) && isset( $period['start'] ) && isset( $period['end'] ) ) {
+				// For date ranges, calculate previous period of same length
+				$start = strtotime( $period['start'] );
+				$end = strtotime( $period['end'] );
+				$days_diff = ( $end - $start ) / DAY_IN_SECONDS;
+
+				$prev_end = date( 'Y-m-d', strtotime( $period['start'] . ' -1 day' ) );
+				$prev_start = date( 'Y-m-d', strtotime( $prev_end . ' -' . $days_diff . ' days' ) );
+
+				$previous_period = array( 'start' => $prev_start, 'end' => $prev_end );
+			} else {
+				// For period strings, get previous equivalent period
+				switch ( $period ) {
+					case 'today':
+						$previous_period = date( 'Y-m-d', strtotime( '-1 day' ) );
+						break;
+					case 'week':
+						$previous_period = array(
+							'start' => date( 'Y-m-d', strtotime( '-14 days' ) ),
+							'end' => date( 'Y-m-d', strtotime( '-8 days' ) )
+						);
+						break;
+					case 'month':
+						$previous_period = array(
+							'start' => date( 'Y-m-d', strtotime( '-60 days' ) ),
+							'end' => date( 'Y-m-d', strtotime( '-31 days' ) )
+						);
+						break;
+					case 'year':
+						$previous_period = array(
+							'start' => date( 'Y-m-d', strtotime( '-730 days' ) ),
+							'end' => date( 'Y-m-d', strtotime( '-366 days' ) )
+						);
+						break;
+					default:
+						return 0;
+				}
+			}
+
+			// Calculate previous period engagement rate
+			$previous_engagement = $this->calculate_engagement_rate( $item_id, $type, $like_count, $dislike_count, $previous_period );
+			$previous_rate = $previous_engagement['engagement_rate'];
+
+			// Calculate growth percentage: ((current - previous) / previous) * 100
+			if ( $previous_rate > 0 ) {
+				$growth = ( ( $current_rate - $previous_rate ) / $previous_rate ) * 100;
+				return round( $growth, 2 );
+			}
+
+			// If previous period had no engagement, but current does, it's 100% growth
+			if ( $current_rate > 0 && $previous_rate == 0 ) {
+				return 100;
+			}
+
+			return 0;
+		}
+
+		/**
+		 * Get period start date for period strings
+		 *
+		 * @param string $period Period string (today, week, month, year)
+		 * @return string|null Start date (Y-m-d format) or null
+		 */
+		private function get_period_start_date( $period ) {
+			switch ( $period ) {
+				case 'today':
+					return current_time( 'Y-m-d' );
+				case 'week':
+					return date( 'Y-m-d', strtotime( '-7 days' ) );
+				case 'month':
+					return date( 'Y-m-d', strtotime( '-30 days' ) );
+				case 'year':
+					return date( 'Y-m-d', strtotime( '-365 days' ) );
+				default:
+					return null;
+			}
+		}
 
 		/**
 		 * Get translated role name

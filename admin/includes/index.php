@@ -18,5 +18,9 @@ new WP_Ulike_Pro_Shortcoder();
 // License Controller
 new WP_Ulike_Pro_License();
 
+// Tools Controller
+include_once( 'classes/class-tools.php' );
+new WP_Ulike_Pro_Tools();
+
 include_once( 'classes/class-update-prepare.php' );
 new WP_Ulike_Pro_Update_Prepare();

@@ -219,23 +219,42 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         $params = $request->get_params();
         $info   = $this->get_table_info( $params['type'] );
 
+        // SECURITY: Validate table name - whitelist allowed tables
+        $allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+        if( empty( $info ) || ! isset( $info['table'] ) || ! in_array( $info['table'], $allowed_tables, true ) ){
+            return new WP_Error( 'invalid-table', esc_html__( 'Invalid table type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
+
+        // SECURITY: Validate column name - whitelist allowed columns
+        $allowed_columns = array( 'post_id', 'comment_id', 'activity_id', 'topic_id' );
+        if( empty( $info['column'] ) || ! in_array( $info['column'], $allowed_columns, true ) ){
+            return new WP_Error( 'invalid-column', esc_html__( 'Invalid column type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
+
         $table  = esc_sql( $wpdb->prefix . $info['table'] );
-        $column = $info['column'];
+        $column = esc_sql( $info['column'] );
         $data   = NULL;
+
+        // SECURITY: Sanitize item_id
+        $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
+        if( $item_id <= 0 ){
+            return new WP_Error( 'invalid-item-id', esc_html__( 'Invalid item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
 
         if( $params['output'] === 'logs' ){
             $data = $wpdb->get_row(
                 $wpdb->prepare( "
-                    SELECT * FROM `$table`
-                    WHERE `$column` = %d",
-                    $params['item_id']
+                    SELECT * FROM `{$table}`
+                    WHERE `{$column}` = %d",
+                    $item_id
                 )
             );
         } else {
+            // SECURITY: Use sanitized item_id
             $data = array(
-                'like_amount'    => wp_ulike_meta_counter_value( $params['item_id'], $params['type'], 'like',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
-                'dislike_amount' => wp_ulike_meta_counter_value( $params['item_id'], $params['type'], 'dislike',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
-                'likers_list'    => wp_ulike_get_likers_list_per_post( $info['table'], $column, $params['item_id'], NULL )
+                'like_amount'    => wp_ulike_meta_counter_value( $item_id, $params['type'], 'like',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
+                'dislike_amount' => wp_ulike_meta_counter_value( $item_id, $params['type'], 'dislike',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
+                'likers_list'    => wp_ulike_get_likers_list_per_post( $info['table'], $column, $item_id, NULL )
             );
         }
 
@@ -247,7 +266,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
                 'data'    => $data
             ), 200 );
         } else {
-            return new WP_Error( 'not-found', esc_html__( 'Item not found!', WP_ULIKE_PRO_DOMAIN ) );
+            return new WP_Error( 'not-found', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ) );
         }
     }
 
@@ -414,28 +433,46 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         $params = $request->get_params();
         $info   = $this->get_table_info( $params['type'] );
 
-        $query  = sprintf( '
-                SELECT `status`
-                FROM %s
-                WHERE `user_id` = \'%s\' AND `%s` = \'%s\' ORDER BY `id` DESC
-            ',
-            $wpdb->prefix . $info['table'],
-            $params['id'],
-            $info['column'],
-            $params['item_id']
-        );
+        // SECURITY: Validate table name - whitelist allowed tables
+        $allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
+        if( empty( $info ) || ! isset( $info['table'] ) || ! in_array( $info['table'], $allowed_tables, true ) ){
+            return new WP_Error( 'invalid-table', esc_html__( 'Invalid table type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
 
-        $data  = $wpdb->get_var( stripslashes( $query ) );
+        // SECURITY: Validate column name - whitelist allowed columns
+        $allowed_columns = array( 'post_id', 'comment_id', 'activity_id', 'topic_id' );
+        if( empty( $info['column'] ) || ! in_array( $info['column'], $allowed_columns, true ) ){
+            return new WP_Error( 'invalid-column', esc_html__( 'Invalid column type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
+
+        // SECURITY: Sanitize and validate user ID and item ID
+        $user_id = isset( $params['id'] ) ? absint( $params['id'] ) : 0;
+        $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
+
+        if( $user_id <= 0 || $item_id <= 0 ){
+            return new WP_Error( 'invalid-params', esc_html__( 'Invalid user ID or item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+        }
+
+        // SECURITY: Escape table and column names
+        $table_name = esc_sql( $wpdb->prefix . $info['table'] );
+        $column = esc_sql( $info['column'] );
+
+        // SECURITY: Use prepared statement to prevent SQL injection
+        $data = $wpdb->get_var( $wpdb->prepare(
+            "SELECT `status` FROM `{$table_name}` WHERE `user_id` = %d AND `{$column}` = %d ORDER BY `id` DESC LIMIT 1",
+            $user_id,
+            $item_id
+        ) );
 
         if ( !empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
                 'message' => esc_html__( 'Ok, we found it.', WP_ULIKE_PRO_DOMAIN ),
-                'data'    => $data
+                'data'    => sanitize_text_field( $data )
             ), 200 );
         }
 
-        return new WP_Error( 'status-not-exist', esc_html__( 'User status not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'status-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 404 ) );
     }
 
     /**
@@ -467,7 +504,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             ), 200 );
         }
 
-        return new WP_Error( 'user-data-not-exist', esc_html__( 'User data not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'user-data-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
     }
 
 
@@ -501,7 +538,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             ), 200 );
         }
 
-        return new WP_Error( 'user-data-not-exist', esc_html__( 'User data not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'user-data-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
     }
 
     /**
@@ -588,7 +625,9 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
                 $get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
                 if( !empty( $get_keys ) ){
                     foreach ( $get_keys as $key => $value ) {
-                        if( array_search( $token_key, $value  ) ){
+                        // SECURITY: Use hash_equals for constant-time comparison to prevent timing attacks
+                        // Also check if value is array and has 'token' key to prevent errors
+                        if( is_array( $value ) && isset( $value['token'] ) && hash_equals( $value['token'], $token_key ) ){
                             return true;
                         }
                     }

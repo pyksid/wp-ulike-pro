@@ -977,12 +977,6 @@ function wp_ulike_pro_get_user_profile_permalink( $user_id = '' ){
 	$user    = new WP_Ulike_Pro_User();
 	$url     = $user->get_profile_link( $user_id );
 
-	if ( empty( $url ) ) {
-		//if empty profile slug - generate it and re-get profile URL
-		$user->generate_profile_slug( $user_id );
-		$url = $user->get_profile_link( $user_id );
-	}
-
 	return ! empty( $page_id ) && !empty( $url ) ? esc_url( $url ) : get_site_url();
 }
 
@@ -1004,8 +998,12 @@ function wp_ulike_pro_pagination( $args = array() ) {
 		"next_text"    => 'Next'
 	);
 	$parsed_args  = wp_parse_args( $args, $defaults );
-	// Extract values
-	extract( $parsed_args );
+	// Extract values safely instead of using extract()
+	$total_pages = isset( $parsed_args['total_pages'] ) ? $parsed_args['total_pages'] : '';
+	$per_page = isset( $parsed_args['per_page'] ) ? absint( $parsed_args['per_page'] ) : 10;
+	$custom_query = isset( $parsed_args['custom_query'] ) ? $parsed_args['custom_query'] : NULL;
+	$prev_text = isset( $parsed_args['prev_text'] ) ? sanitize_text_field( $parsed_args['prev_text'] ) : 'Prev';
+	$next_text = isset( $parsed_args['next_text'] ) ? sanitize_text_field( $parsed_args['next_text'] ) : 'Next';
 
 	// Fix zero division issue
 	if( ! $per_page ){
@@ -1204,7 +1202,6 @@ function wp_ulike_pro_get_comments_query( $args ){
 	//Main data
 	$defaults = array(
 		"type"       => 'comment',
-		"rel_type"   => '',
 		"is_popular" => false,
 		"status"     => 'like',
 		"user_id"    => '',
@@ -1215,15 +1212,6 @@ function wp_ulike_pro_get_comments_query( $args ){
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
 
-	if( empty( $parsed_args['rel_type'] ) ){
-		// Get post types
-		$parsed_args['rel_type'] =  get_post_types_by_support( array(
-			'title',
-			'editor',
-			'thumbnail'
-		) );
-	}
-
 	$get_items  = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
 
 	if( empty( $get_items ) ){
@@ -1232,8 +1220,7 @@ function wp_ulike_pro_get_comments_query( $args ){
 
 	$query_args = array(
 		'comment__in' => $get_items,
-		'orderby'     => 'comment__in',
-		'post_type'   => $parsed_args['rel_type']
+		'orderby'     => 'comment__in'
 	);
 
 	$comments_query = new WP_Comment_Query;
@@ -1394,15 +1381,33 @@ function wp_ulike_pro_is_valid_otp( $otp, $secrets ) {
 	if( empty( $otp ) || ! is_array( $otp ) ){
 		return false;
 	}
-	// check digit length
-	foreach ($otp as $digit) {
-		if( ! is_numeric( $digit ) ){
+
+	// filter out empty values and ensure each digit is valid
+	// Note: Use !== '' instead of !empty() because "0" is a valid digit but empty("0") returns true
+	$otp = array_filter( $otp, function( $digit ) {
+		// Ensure $digit is a string before trimming
+		if ( ! is_string( $digit ) && ! is_numeric( $digit ) ) {
 			return false;
 		}
+		$digit = trim( (string) $digit );
+		return $digit !== '' && is_numeric( $digit ) && strlen( $digit ) === 1;
+	} );
+
+	// re-index array after filtering
+	$otp = array_values( $otp );
+
+	// ensure we have exactly 6 digits
+	if( count( $otp ) !== 6 ){
+		return false;
 	}
 
 	$tfa  = new RobThree\Auth\TwoFactorAuth();
 	$code = (string) implode( "", $otp );
+
+	// ensure code is exactly 6 digits
+	if( strlen( $code ) !== 6 ){
+		return false;
+	}
 
 	foreach ( $secrets as $secret_value => $secret_args ) {
 		if( ! empty( $secret_value ) && $tfa->verifyCode( $secret_value, $code ) ){
@@ -1422,64 +1427,29 @@ function wp_ulike_pro_get_two_factor_field() {
 	ob_start();
 ?>
 <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-    <h3 class="ulp-form-title">
+    <h3 class="ulp-form-title" id="ulp-2fa-title">
         <?php echo wp_ulike_get_option( 'two_factor_field_title', esc_html__( 'Enter the six-digit code from the application', WP_ULIKE_PRO_DOMAIN ) ); ?>
     </h3>
 </div>
 <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-    <div id="ulp-2fa-code" class="ulp-flex ulp-flex-center-xs">
+    <div id="ulp-2fa-code" class="ulp-flex ulp-flex-center-xs" role="group" aria-labelledby="ulp-2fa-title" aria-describedby="ulp-2fa-description">
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-1-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'First digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-2-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Second digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-3-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Third digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-4-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Fourth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-5-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Fifth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-6-digit"
-            name="otp[]" autocomplete="off" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Sixth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+    </div>
+    <div id="ulp-2fa-description" class="ulp-screen-reader-text">
+        <?php esc_html_e( 'Enter the 6-digit verification code from your authenticator app', WP_ULIKE_PRO_DOMAIN ); ?>
     </div>
 </div>
-<script>
-function ulpOtpInput() {
-    const inputs = document.querySelectorAll('#ulp-2fa-code > *[id]');
-
-    function handleInput(event, index) {
-        const input = inputs[index];
-
-        if (event.key === "Backspace") {
-            input.value = '';
-            if (index !== 0) inputs[index - 1].focus();
-        } else {
-            const isNumeric = event.keyCode > 47 && event.keyCode < 58;
-            const isAlphabetic = event.keyCode > 64 && event.keyCode < 91;
-
-            if (index === inputs.length - 1 && input.value !== '') {
-                return true;
-            } else if (isNumeric || isAlphabetic) {
-                input.value = isNumeric ? event.key : String.fromCharCode(event.keyCode);
-                if (index !== inputs.length - 1) inputs[index + 1].focus();
-                event.preventDefault();
-            }
-        }
-    }
-
-    inputs.forEach((input, index) => {
-        input.addEventListener('keydown', (event) => {
-            handleInput(event, index);
-        });
-    });
-}
-
-ulpOtpInput();
-
-// init form ajax
-jQuery(function() {
-    jQuery(".ulp-ajax-form").WordpressUlikeAjaxForms();
-});
-</script>
 <?php
 	return ob_get_clean();
 }
@@ -1640,14 +1610,16 @@ function wp_ulike_pro_notice_count( $notice_type = '' ) {
 	$notice_count = 0;
 	$all_notices  = $ulp_session->get( 'notices', array() );
 
-	if ( isset( $all_notices[ $notice_type ] ) ) {
+	if ( isset( $all_notices[ $notice_type ] ) && is_array( $all_notices[ $notice_type ] ) ) {
 
 		$notice_count = count( $all_notices[ $notice_type ] );
 
 	} elseif ( empty( $notice_type ) ) {
 
 		foreach ( $all_notices as $notices ) {
-			$notice_count += count( $notices );
+			if ( is_countable( $notices ) ) {
+				$notice_count += count( $notices );
+			}
 		}
 	}
 
@@ -1702,15 +1674,26 @@ function wp_ulike_pro_set_user_auth_cookie( $user_id ) {
  * @param string $name
  * @param string $value
  * @param integer $expire
- * @param string $path
+ * @param string|bool $path_or_secure Path for cookie, or secure flag if 5th param is provided
+ * @param bool $httponly HttpOnly flag (only used if 4th param is bool/secure flag)
  * @return void
  */
-function wp_ulike_pro_setcookie( $name, $value = '', $expire = 0, $path = '/' ){
+function wp_ulike_pro_setcookie( $name, $value = '', $expire = 0, $path_or_secure = '/', $httponly = true ){
 	if ( empty( $value ) ) {
 		$expire = time() - YEAR_IN_SECONDS;
 	}
-	if ( empty( $path ) ) {
-		list( $path ) = explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) );
+
+	// Handle backward compatibility: if 4th param is bool, it's the secure flag
+	if ( is_bool( $path_or_secure ) ) {
+		$secure = $path_or_secure;
+		$path = '/';
+		$httponly = is_bool( $httponly ) ? $httponly : true;
+	} else {
+		$path = $path_or_secure;
+		$secure = is_ssl();
+		if ( empty( $path ) ) {
+			list( $path ) = explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		}
 	}
 
 	$levels = ob_get_level();
@@ -1719,7 +1702,7 @@ function wp_ulike_pro_setcookie( $name, $value = '', $expire = 0, $path = '/' ){
 	}
 
 	nocache_headers();
-	setcookie( $name, $value, $expire, $path, COOKIE_DOMAIN, is_ssl(), true );
+	setcookie( $name, $value, $expire, $path, COOKIE_DOMAIN, $secure, $httponly );
 }
 
 /**
@@ -1986,4 +1969,106 @@ if( ! function_exists( 'wp_ulike_pro_get_latest_user_activity_date' ) ) {
 
 		return $latest_date;
 	}
+}
+
+/**
+ * Check rate limit for form submissions
+ *
+ * This function provides rate limiting protection for various form operations
+ * (login, signup, password reset) using fingerprint-based identification.
+ * Uses WordPress transients which are automatically cached and cleaned up.
+ *
+ * @param string $action The action type (e.g., 'login', 'signup', 'password_reset')
+ * @param int    $max_attempts Maximum number of attempts allowed (default: 5)
+ * @param int    $time_window Time window in seconds (default: 15 minutes)
+ * @param string $error_message Custom error message (optional)
+ * @return void
+ * @throws \Exception If rate limit is exceeded
+ */
+function wp_ulike_pro_check_rate_limit( $action, $max_attempts = 5, $time_window = 900, $error_message = '' ) {
+
+	$fingerprint = wp_ulike_generate_fingerprint();
+	// Sanitize transient key (WordPress transient keys have 172 char limit, this should be ~52 chars)
+	$transient_key = 'ulp_rate_limit_' . sanitize_key( $action ) . '_' . sanitize_key( $fingerprint );
+
+	// Allow filters to customize limits per action
+	$max_attempts = apply_filters( 'wp_ulike_pro_' . $action . '_max_attempts', $max_attempts );
+	$time_window = apply_filters( 'wp_ulike_pro_' . $action . '_time_window', $time_window );
+
+	$attempts = get_transient( $transient_key );
+
+	if ( false === $attempts ) {
+		$attempts = 0;
+	}
+
+	if ( $attempts >= $max_attempts ) {
+		// Get remaining time from transient timeout
+		// WordPress automatically caches options via get_option(), so this is efficient
+		$timeout_key = '_transient_timeout_' . $transient_key;
+		$expiration = get_option( $timeout_key, 0 );
+		$remaining_time = max( 0, $expiration - time() );
+		$minutes = max( 1, ceil( $remaining_time / 60 ) );
+
+		if ( empty( $error_message ) ) {
+			$error_message = sprintf( esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ), $minutes );
+		} else {
+			$error_message = sprintf( $error_message, $minutes );
+		}
+
+		throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'rate_limit_exceeded', $error_message ) );
+	}
+
+	// Increment attempts - WordPress handles expiration automatically
+	// Uses object cache if available, otherwise falls back to database
+	set_transient( $transient_key, $attempts + 1, $time_window );
+}
+
+/**
+ * Clear rate limit for a specific action
+ *
+ * @param string $action The action type (e.g., 'login', 'signup', 'password_reset')
+ * @return void
+ */
+function wp_ulike_pro_clear_rate_limit( $action ) {
+	$fingerprint = wp_ulike_generate_fingerprint();
+
+	$transient_key = 'ulp_rate_limit_' . sanitize_key( $action ) . '_' . sanitize_key( $fingerprint );
+	delete_transient( $transient_key );
+}
+
+/**
+ * SECURITY: Validate if a redirect URL is safe (same domain)
+ *
+ * @param string $url The URL to validate
+ * @return bool True if safe, false otherwise
+ */
+function wp_ulike_pro_is_safe_redirect( $url ) {
+	if ( empty( $url ) ) {
+		return false;
+	}
+
+	$parsed = wp_parse_url( $url );
+	$home_parsed = wp_parse_url( home_url() );
+
+	// Must have a host
+	if ( ! isset( $parsed['host'] ) || ! isset( $home_parsed['host'] ) ) {
+		return false;
+	}
+
+	// Must be same domain
+	if ( $parsed['host'] !== $home_parsed['host'] ) {
+		return false;
+	}
+
+	// Additional check: ensure it's not a dangerous path
+	$dangerous_paths = array( 'wp-admin', 'wp-login.php', 'wp-content/uploads' );
+	$path = isset( $parsed['path'] ) ? $parsed['path'] : '';
+
+	foreach ( $dangerous_paths as $dangerous ) {
+		if ( strpos( $path, $dangerous ) !== false ) {
+			return false;
+		}
+	}
+
+	return true;
 }

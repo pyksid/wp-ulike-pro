@@ -10,18 +10,23 @@ class WP_Ulike_Pro_User {
 	 * @param int $user_id
 	 * @param bool $force
 	 */
-	function generate_profile_slug( $user_id, $force = false ) {
+	function generate_profile_slug( $user_id, $force = false, $skip_check = false ) {
 		$userdata = get_userdata( $user_id );
 
 		if ( empty( $userdata ) ) {
 			return;
 		}
 
-		$current_profile_slug = $this->get_profile_slug( $user_id );
-
-		$user_in_url = '';
 		$permalink_base = WP_Ulike_Pro_Options::getProfilePermalinkBase();
 
+		// Get current slug - skip get_profile_slug() call if we're being called from it (to avoid recursion)
+		if ( $skip_check ) {
+			$current_profile_slug = get_user_meta( $user_id, "ulp_user_profile_url_slug_{$permalink_base}", true );
+		} else {
+			$current_profile_slug = $this->get_profile_slug( $user_id );
+		}
+
+		$user_in_url = '';
 		// User ID
 		if ( $permalink_base == 'user_id' ) {
 			$user_in_url = $user_id;
@@ -60,7 +65,8 @@ class WP_Ulike_Pro_User {
 			while ( 1 ) {
 				$username = $_username . ( empty( $append ) ? '' : " $append" );
 				$slug_exists_user_id = WP_Ulike_Pro_Permalinks::slug_exists_user_id( $profile_slug . ( empty( $append ) ? '' : "{$separate}{$append}" ) );
-				if ( empty( $slug_exists_user_id ) || $user_id == $slug_exists_user_id ) {
+				// SECURITY: Use strict comparison for user IDs
+				if ( empty( $slug_exists_user_id ) || (int) $user_id === (int) $slug_exists_user_id ) {
 					break;
 				}
 				$append++;
@@ -80,13 +86,14 @@ class WP_Ulike_Pro_User {
 				}
 			}
 
-
+			// Trim separator from ends of the slug
 			$user_in_url = trim( $user_in_url, $separate );
 		}
 
 		$user_in_url = apply_filters( 'ulp_change_user_profile_slug', $user_in_url, $user_id );
 
-		if ( $force || empty( $current_profile_slug ) || $current_profile_slug != $user_in_url ) {
+		// Only save if we have a valid slug and conditions are met
+		if ( ! empty( $user_in_url ) && ( $force || empty( $current_profile_slug ) || $current_profile_slug != $user_in_url ) ) {
 			update_user_meta( $user_id, "ulp_user_profile_url_slug_{$permalink_base}", $user_in_url );
 		}
 	}
@@ -101,7 +108,15 @@ class WP_Ulike_Pro_User {
 		$permalink_base = WP_Ulike_Pro_Options::getProfilePermalinkBase();
 		$profile_slug   = get_user_meta( $user_id, "ulp_user_profile_url_slug_{$permalink_base}", true );
 
-		//get default username permalink if it's empty then return false
+		// If slug doesn't exist, try to generate it first
+		if ( empty( $profile_slug ) ) {
+			// Try to generate the slug (skip_check = true to avoid recursion)
+			$this->generate_profile_slug( $user_id, false, true );
+			// Check again after generation
+			$profile_slug = get_user_meta( $user_id, "ulp_user_profile_url_slug_{$permalink_base}", true );
+		}
+
+		// If still empty, fall back to user ID (except for user_login)
 		if ( empty( $profile_slug ) ) {
 			if ( $permalink_base != 'user_login' ) {
 				$profile_slug = $user_id;
@@ -176,13 +191,21 @@ class WP_Ulike_Pro_User {
 		$permalink_base = WP_Ulike_Pro_Options::getProfilePermalinkBase();
 
 		// Search by Profile Slug
+		// Note: $value comes from URL and may be encoded. Slugs in DB are stored encoded.
+		// We need to try both encoded and decoded comparisons for compatibility
 		$args = array(
 			'fields' => array( 'ID' ),
 			'meta_query' => array(
 				'relation' => 'OR',
 				array(
 					'key'       =>  'ulp_user_profile_url_slug_' . $permalink_base,
-					'value'     => strtolower($value),
+					'value'     => $value, // Try exact match first (encoded)
+					'compare'   => '=',
+				),
+				array(
+					'key'       =>  'ulp_user_profile_url_slug_' . $permalink_base,
+					// UTF-8: Try decoded comparison (for backward compatibility)
+					'value'     => rawurldecode( $value ),
 					'compare'   => '=',
 				),
 			),

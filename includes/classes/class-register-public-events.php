@@ -39,6 +39,10 @@ class WP_Ulike_Pro_Register_Public_Events
 		// Ajax
 		add_action( 'wp_ajax_nopriv_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
 		add_action( 'wp_ajax_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
+
+		// Button Views Batch Tracking (for performance)
+		add_action( 'wp_ajax_nopriv_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
+		add_action( 'wp_ajax_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
 	}
 
 	/**
@@ -112,6 +116,15 @@ class WP_Ulike_Pro_Register_Public_Events
 	public function forms_toggle()
 	{
 		new WP_Ulike_Pro_Forms_Toggle;
+    }
+
+	/**
+	* Track button view batch
+	*/
+	public function track_button_view_batch()
+	{
+		$button_views = WP_Ulike_Pro_Views::get_instance();
+		$button_views->ajax_track_view_batch();
     }
 
 }

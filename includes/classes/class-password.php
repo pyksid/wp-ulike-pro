@@ -15,15 +15,15 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 	 */
 	private function setFormData(){
 		// Reset Password
-		$this->data['username'] = isset( $_POST['username'] ) ? sanitize_user( $_POST['username'] ) : NULL;
+		$this->data['username'] = isset( $_POST['username'] ) ? sanitize_user( wp_unslash( $_POST['username'] ) ) : NULL;
 		// Change Password
-		$this->data['newpassword'] = isset( $_POST['newpassword'] ) ? sanitize_text_field( $_POST['newpassword'] ) : NULL;
-		$this->data['repassword']  = isset( $_POST['repassword'] ) ? sanitize_text_field( $_POST['repassword'] ) : NULL;
-		$this->data['rp_key']      = isset( $_POST['rp_key'] ) ? sanitize_text_field( $_POST['rp_key'] ) : NULL;
+		$this->data['newpassword'] = isset( $_POST['newpassword'] ) ? sanitize_text_field( wp_unslash( $_POST['newpassword'] ) ) : NULL;
+		$this->data['repassword']  = isset( $_POST['repassword'] ) ? sanitize_text_field( wp_unslash( $_POST['repassword'] ) ) : NULL;
+		$this->data['rp_key']      = isset( $_POST['rp_key'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_key'] ) ) : NULL;
 		// General params
-		$this->data['security'] = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : NULL;
+		$this->data['security'] = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : NULL;
 		// Set form ID for action usage
-		$this->data['_form_id'] = isset( $_POST['_form_id'] ) ? sanitize_text_field ( $_POST['_form_id'] ) : 1;
+		$this->data['_form_id'] = isset( $_POST['_form_id'] ) ? sanitize_text_field ( wp_unslash( $_POST['_form_id'] ) ) : 1;
 	}
 
 
@@ -59,6 +59,12 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 
             $this->afterAction();
 
+			// Clear rate limit on successful password reset request
+			// Only clear if it was a password reset request (not password change)
+			if( empty( $this->data['rp_key'] ) ){
+				wp_ulike_pro_clear_rate_limit( 'password_reset' );
+			}
+
 			$this->response( array(
                 'message'  => $this->data['message'],
                 'status'   => 'success',
@@ -81,7 +87,7 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 	private function change_password(){
 
 		if( empty( $this->data['newpassword'] ) || empty( $this->data['repassword'] ) ){
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields.', WP_ULIKE_PRO_DOMAIN ) ) );
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ) ) );
 		}
 
 		if( $this->data['repassword'] !== $this->data['newpassword'] ){
@@ -125,27 +131,33 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 
 		if ( empty( $this->data['username'] ) || ! is_string( $this->data['username'] ) ) {
 			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'empty_username', esc_html__( 'Enter a username or email address.', WP_ULIKE_PRO_DOMAIN ) ) );
-		} elseif ( strpos( $this->data['username'], '@' ) ) {
+		}
+
+		// Prevent user enumeration - always show the same message whether user exists or not
+		// This follows WordPress core security best practices
+		$user_data = false;
+		if ( strpos( $this->data['username'], '@' ) ) {
 			$user_data = get_user_by( 'email', trim( wp_unslash( $this->data['username'] ) ) );
-			if ( empty( $user_data ) ) {
-				throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalidcombo', esc_html__( 'There is no account with that username or email address.', WP_ULIKE_PRO_DOMAIN ) ) );
-			}
 		} else {
 			$login     = trim( $this->data['username'] );
 			$user_data = get_user_by( 'login', $login );
 		}
 
-		if ( ! $user_data ) {
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalidcombo', esc_html__( 'There is no account with that username or email address.', WP_ULIKE_PRO_DOMAIN ) ) );
+		// Only send email if user actually exists
+		// Don't throw exception if user doesn't exist to prevent user enumeration
+		if ( $user_data ) {
+			// Add user id param for use in after action hook
+			$this->data['user_id'] = $user_data->ID;
+
+			$mail = new WP_Ulike_Pro_Mail();
+			// Even if email fails, don't reveal user existence
+			// The generic success message will be shown regardless
+			$mail->send( $user_data->user_email, 'reset-password', array( 'user_id' => $user_data->ID ) );
 		}
 
-		// Add user id param for use in after action hook
-		$this->data['user_id'] = $user_data->ID;
-
-		$mail = new WP_Ulike_Pro_Mail();
-		if ( ! $mail->send( $user_data->user_email, 'reset-password', array( 'user_id' => $user_data->ID ) ) ){
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'email_error', esc_html__( 'The email could not be sent.', WP_ULIKE_PRO_DOMAIN ) ) );
-		}
+		// Always return successfully to prevent user enumeration
+		// The process() method will show the same success message regardless
+		// This matches WordPress core behavior for password reset
 
 	}
 
@@ -165,6 +177,7 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 		do_action_ref_array( 'wp_ulike_pro_after_reset_password_process', array( &$this ) );
     }
 
+
 	/**
 	* Validate the Favorite
 	*/
@@ -172,6 +185,12 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 		// Return false in preview mode
 		if( WP_Ulike_Pro::is_preview_mode() ){
 			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+		}
+
+		// Check rate limiting (only for password reset requests, not password change)
+		// 3 attempts per hour
+		if( empty( $this->data['rp_key'] ) ){
+			wp_ulike_pro_check_rate_limit( 'password_reset', 3, HOUR_IN_SECONDS, esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ) );
 		}
 
 		// Return false when nonce invalid

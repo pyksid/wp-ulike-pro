@@ -11,7 +11,8 @@ class WP_Ulike_Pro_Validation {
 	 * @return mixed|string
 	 */
 	public static function safe_name_in_url( $name ) {
-		$name = strtolower( $name );
+		// UTF-8: Use mb_strtolower for proper UTF-8 handling
+		$name = mb_strtolower( $name, 'UTF-8' );
 		$name = preg_replace("/'/","", $name );
 		$name = stripslashes( $name );
 		$name = self::normalize($name);

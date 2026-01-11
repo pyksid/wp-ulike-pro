@@ -15,14 +15,19 @@ if( is_user_logged_in() && ! WP_Ulike_Pro::is_preview_mode() ){
 // custom redirect
 $redirect_to = $wp_ulike_form_args->redirect_to;
 if( ! empty( $_GET['redirect_to'] ) ){
-  $redirect_to = $_GET['redirect_to'];
+  // SECURITY: Validate redirect URL to prevent open redirect attacks
+  $redirect_to_raw = wp_unslash( $_GET['redirect_to'] );
+  $redirect_to = wp_validate_redirect( $redirect_to_raw, home_url() );
+  if ( ! $redirect_to ) {
+    $redirect_to = $wp_ulike_form_args->redirect_to; // Fallback to default
+  }
 }
 
 ?>
 
 <div class="ulp-form ulp-form-center ulp-ajax-form ulp-signup">
     <form id="ulp-signup-<?php echo esc_attr( $wp_ulike_form_args->form_id ); ?>" method="post" action=""
-        autocomplete="off">
+        autocomplete="off" aria-label="<?php esc_attr_e( 'Signup form', 'wp-ulike-pro' ); ?>">
 
         <?php wp_ulike_pro_print_notices(); ?>
 
@@ -67,8 +72,8 @@ if( ! empty( $_GET['redirect_to'] ) ){
 
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
-                    <input id="ulp-email" type="email" class="ulp-floating-input" name="email" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>" required />
+                    <input id="ulp-email" type="email" class="ulp-floating-input" name="email"
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>" required autocomplete="email" />
                     <label for="ulp-email" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>">
                         <span class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->email ); ?></span>
@@ -77,14 +82,28 @@ if( ! empty( $_GET['redirect_to'] ) ){
             </div>
 
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-                <div class="ulp-floating">
-                    <input id="ulp-password" type="password" class="ulp-floating-input" name="password" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="new-password" />
+                <div class="ulp-floating ulp-password-wrapper">
+                    <input id="ulp-password" type="password" class="ulp-floating-input" name="password"
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="new-password"
+                        aria-describedby="ulp-password-strength-description ulp-password-requirements" />
                     <label for="ulp-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>">
                         <span
                             class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->password ); ?></span>
                     </label>
+                    <button type="button" class="ulp-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'wp-ulike-pro' ); ?>" aria-pressed="false" tabindex="-1">
+                        <span class="ulp-password-toggle-icon" aria-hidden="true"></span>
+                        <span class="ulp-hidden-visually"><?php esc_html_e( 'Show password', 'wp-ulike-pro' ); ?></span>
+                    </button>
+                    <span id="ulp-password-strength-description" class="ulp-hidden-visually"><?php esc_html_e( 'Password strength indicator', 'wp-ulike-pro' ); ?></span>
+                    <div id="ulp-password-requirements" class="ulp-password-requirements" role="status" aria-live="polite">
+                        <div class="ulp-password-strength">
+                            <div class="ulp-password-strength-bar">
+                                <div class="ulp-password-strength-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ulp-password-strength-text"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

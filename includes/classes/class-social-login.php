@@ -81,17 +81,33 @@ class WP_Ulike_Pro_Social_Login {
 				throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
 			}
 
+			// SECURITY: Rate limiting
+			wp_ulike_pro_check_rate_limit(
+				'social_login',
+				10,
+				15 * MINUTE_IN_SECONDS,
+				esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN )
+			);
+
 			// set callback url for provider
-			$this->config['callback'] =  WP_Ulike_Pro_Permalinks::get_social_login_callback_url( $_GET['provider'] ?? $storage->get('provider') );
+			$provider = isset( $_GET['provider'] ) ? sanitize_text_field( wp_unslash( $_GET['provider'] ) ) : $storage->get('provider');
+
+			// SECURITY: Validate provider against whitelist and get original case
+			$provider = $this->validate_provider( $provider );
+
+			$this->config['callback'] =  WP_Ulike_Pro_Permalinks::get_social_login_callback_url( $provider );
 			$hybridauth  = $this->load_hybridauth();
 
-			if (isset($_GET['provider'])) {
-				// Validate provider exists in the $config
-				if (in_array($_GET['provider'], $hybridauth->getProviders())) {
+			if ( isset( $_GET['provider'] ) ) {
+				$provider = sanitize_text_field( wp_unslash( $_GET['provider'] ) );
+				// SECURITY: Validate provider again and get original case
+				$provider = $this->validate_provider( $provider );
+				// Validate provider exists in the $config (case-sensitive check)
+				if ( in_array( $provider, $hybridauth->getProviders(), true ) ) {
 					// Store the provider for the callback event
-					$storage->set('provider', $_GET['provider']);
+					$storage->set('provider', $provider);
 				} else {
-					throw new \Exception( __( 'No provider class found!', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( esc_html__( 'No provider class found!', WP_ULIKE_PRO_DOMAIN ) );
 				}
 			}
 
@@ -105,26 +121,23 @@ class WP_Ulike_Pro_Social_Login {
 			}
 
 		} catch ( \Exception $e ) {
+			// SECURITY: Improved error handling - show specific error message
 			if ( ! empty( $hybridauth ) ) {
-				$hybridauth->disconnectAllAdapters();
+				try {
+					$hybridauth->disconnectAllAdapters();
+				} catch ( \Exception $disconnect_error ) {
+					// Silently fail on disconnect errors
+				}
 			}
 
-			wp_ulike_pro_add_notice( __( 'Provider authentication error', WP_ULIKE_PRO_DOMAIN ), 'error' );
+			// Show error message to user
+			wp_ulike_pro_add_notice( esc_html( $e->getMessage() ), 'error' );
 			// redirect to current page and show notice
 			$this->redirect();
 		}
 
-		// convert Hybrid_User_Profile to an associative array with snake_case keys
-		$profile_data = (array) $ha_profile;
-
-		if ( ! empty( $profile_data ) ) {
-			foreach ( $profile_data as $key => $value ) {
-
-				unset( $profile_data[ $key ] );
-
-				$profile_data[ WP_Ulike_Pro_Validation::decamelize( $key ) ] = $value;
-			}
-		}
+		// SECURITY: Sanitize profile data from OAuth provider
+		$profile_data = $this->sanitize_profile_data( (array) $ha_profile );
 
 		$profile = new \WP_Ulike_Pro_Social_Login_Provider_Profile( $provider_id, $profile_data );
 
@@ -132,7 +145,8 @@ class WP_Ulike_Pro_Social_Login {
 		try {
 			$user_id = $this->process_profile( $profile, $provider_id );
 		} catch ( \Exception $e ) {
-			wp_ulike_pro_add_notice( $e->getMessage(), 'error' );
+			// SECURITY: Improved error handling
+			wp_ulike_pro_add_notice( esc_html( $e->getMessage() ), 'error' );
 		}
 
 		// extra level of security for hosts that may leak HybridAuth sessions to other visitors >:(
@@ -163,8 +177,14 @@ class WP_Ulike_Pro_Social_Login {
 		$user       = get_user_by( 'id', $user_id );
 		$return_url = $user_id ? wp_ulike_pro_get_user_profile_permalink( $user->ID ) : $ulp_session->get( 'current_url' );
 
+		// SECURITY: Validate redirect URL to prevent open redirect attacks
+		if ( $return_url && ! wp_ulike_pro_is_safe_redirect( $return_url ) ) {
+			$return_url = home_url();
+		}
+
 		// unset current url
 		$ulp_session->__unset( 'current_url' );
+		$ulp_session->__unset( 'social_login_start_time' );
 
 		wp_safe_redirect( esc_url_raw( $return_url ) );
 		exit;
@@ -192,8 +212,20 @@ class WP_Ulike_Pro_Social_Login {
 
 		// look up if the user already exists on WP
 
+		// SECURITY: Validate provider before using in query
+		$provider_id = $this->validate_provider( $provider_id );
+
+		// SECURITY: Sanitize identifier and build meta key safely
+		$identifier = sanitize_text_field( $profile->get_identifier() );
+		if ( empty( $identifier ) ) {
+			throw new \Exception( esc_html__( 'Invalid user identifier from provider.', WP_ULIKE_PRO_DOMAIN ) );
+		}
+
+		// Use provider_id as-is (original case) to match how it's stored in update_user_profile()
+		$meta_key = '_ulp_social_login_' . $provider_id . '_identifier';
+
 		// first, try to identify user based on the social identifier
-		$user_id = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value = %s", '_ulp_social_login_' . $provider_id . '_identifier', $profile->get_identifier() ) );
+		$user_id = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value = %s LIMIT 1", $meta_key, $identifier ) );
 
 		if ( $user_id ) {
 
@@ -206,11 +238,17 @@ class WP_Ulike_Pro_Social_Login {
 
 		// same email as in their social profile
 		if ( ! $user && $profile->has_email() ) {
+			// SECURITY: Validate email before use
+			$email = $profile->get_email();
+			if ( ! is_email( $email ) ) {
+				// Skip invalid emails
+			} else {
+				$email = sanitize_email( $email );
+				$user = get_user_by( 'email', $email );
 
-			$user = get_user_by( 'email', $profile->get_email() );
-
-			if ( $user ) {
-				$found_via = 'email';
+				if ( $user ) {
+					$found_via = 'email';
+				}
 			}
 		}
 
@@ -286,6 +324,9 @@ class WP_Ulike_Pro_Social_Login {
 			wp_ulike_pro_add_notice( 'Your account is now linked to your profile.', 'notice' );
 		}
 
+		// Clear rate limit on successful social login
+		wp_ulike_pro_clear_rate_limit( 'social_login' );
+
 		return $user->ID;
 	}
 
@@ -296,13 +337,20 @@ class WP_Ulike_Pro_Social_Login {
 	 */
 	private function create_new_user( $profile ) {
 
+		// SECURITY: Validate email before creating user
+		$email = $profile->has_email() ? $profile->get_email() : '';
+		if ( $email && ! is_email( $email ) ) {
+			$email = ''; // Clear invalid email
+		}
+		$email = sanitize_email( $email );
+
 		$userdata = apply_filters( 'wp_ulike_pro_social_login_new_user_data', array(
 			'role'       => 'subscriber',
-			'user_login' => $profile->has_email() ? sanitize_email( $profile->get_email() ) : $profile->get_username(),
-			'user_email' => $profile->get_email(),
+			'user_login' => $email ? sanitize_email( $email ) : sanitize_user( $profile->get_username(), true ),
+			'user_email' => $email,
 			'user_pass'  => wp_generate_password(),
-			'first_name' => $profile->get_first_name(),
-			'last_name'  => $profile->get_last_name(),
+			'first_name' => sanitize_text_field( $profile->get_first_name() ),
+			'last_name'  => sanitize_text_field( $profile->get_last_name() ),
 		), $profile );
 
 		// ensure username is not blank - if it is, use first and last name to generate a username
@@ -413,10 +461,20 @@ class WP_Ulike_Pro_Social_Login {
 			return;
 		}
 
-		// set current url in session to use it for redirection
-		$ulp_session->set( 'current_url', self::getCurrentUrl() );
+		// Store session start time for rate limiting and session validation
+		$ulp_session->set( 'social_login_start_time', time() );
 
-		return WP_Ulike_Pro_Permalinks::get_social_login_callback_url( $provider );
+		// set current url in session to use it for redirection
+		$current_url = self::getCurrentUrl();
+		if ( wp_ulike_pro_is_safe_redirect( $current_url ) ) {
+			$ulp_session->set( 'current_url', $current_url );
+		} else {
+			$ulp_session->set( 'current_url', home_url() );
+		}
+
+		$callback_url = WP_Ulike_Pro_Permalinks::get_social_login_callback_url( $provider );
+
+		return $callback_url;
 	}
 
 	/**
@@ -440,6 +498,110 @@ class WP_Ulike_Pro_Social_Login {
 		}
 
 		return $current_url;
+	}
+
+	/**
+	 * SECURITY: Validate provider against whitelist
+	 *
+	 * @param string $provider Provider name
+	 * @return string Provider name in original case (as stored in options)
+	 * @throws \Exception If provider is invalid
+	 */
+	private function validate_provider( $provider ) {
+		if ( empty( $provider ) ) {
+			throw new \Exception( esc_html__( 'No provider specified.', WP_ULIKE_PRO_DOMAIN ) );
+		}
+
+		// Get allowed providers (must match options panel network names exactly)
+		$allowed_providers = apply_filters( 'wp_ulike_pro_allowed_social_providers', array(
+			'Facebook',
+			'GitHub',
+			'Google',
+			'Twitter',
+			'Amazon',
+			'LinkedIn',
+			'Apple',
+			'WordPress',
+			'Yahoo',
+			'Slack',
+			'Medium',
+			'Dribbble',
+			'Paypal',
+		) );
+
+		// Case-insensitive validation - find matching provider from allowed list
+		$provider_lower = strtolower( trim( $provider ) );
+		$matched_provider = null;
+
+		foreach ( $allowed_providers as $allowed ) {
+			if ( strtolower( $allowed ) === $provider_lower ) {
+				$matched_provider = $allowed;
+				break;
+			}
+		}
+
+		if ( $matched_provider === null ) {
+			throw new \Exception( esc_html__( 'Invalid provider specified.', WP_ULIKE_PRO_DOMAIN ) );
+		}
+
+		// Return the original case provider name (as stored in options) for HybridAuth compatibility
+		return $matched_provider;
+	}
+
+	/**
+	 * SECURITY: Sanitize profile data from OAuth provider
+	 *
+	 * @param array $profile_data Raw profile data from HybridAuth
+	 * @return array Sanitized profile data
+	 */
+	private function sanitize_profile_data( $profile_data ) {
+		if ( empty( $profile_data ) || ! is_array( $profile_data ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+
+		// Define field types for proper sanitization
+		$email_fields = array( 'email', 'user_email' );
+		$url_fields = array( 'url', 'web_site_url', 'profile_url', 'photo_url', 'website_url' );
+		$text_fields = array( 'display_name', 'first_name', 'last_name', 'description', 'username', 'identifier' );
+
+		foreach ( $profile_data as $key => $value ) {
+			if ( $value === null ) {
+				continue;
+			}
+
+			$sanitized_key = WP_Ulike_Pro_Validation::decamelize( $key );
+
+			if ( is_string( $value ) ) {
+				// Sanitize based on field type
+				if ( in_array( $sanitized_key, $email_fields, true ) ) {
+					$value = sanitize_email( $value );
+					// Validate email
+					if ( ! is_email( $value ) ) {
+						continue; // Skip invalid emails
+					}
+				} elseif ( in_array( $sanitized_key, $url_fields, true ) ) {
+					$value = esc_url_raw( $value );
+				} elseif ( in_array( $sanitized_key, $text_fields, true ) ) {
+					$value = sanitize_text_field( $value );
+				} else {
+					// Default sanitization for unknown fields
+					$value = sanitize_text_field( $value );
+				}
+			} elseif ( is_array( $value ) ) {
+				$value = array_map( 'sanitize_text_field', $value );
+			} elseif ( is_numeric( $value ) ) {
+				$value = absint( $value );
+			} else {
+				// Skip unknown types
+				continue;
+			}
+
+			$sanitized[ $sanitized_key ] = $value;
+		}
+
+		return $sanitized;
 	}
 
 }

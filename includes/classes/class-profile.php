@@ -14,14 +14,14 @@ final class WP_Ulike_Pro_Profile extends wp_ulike_ajax_listener_base {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['security']    = isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : NULL;
-		$this->data['first_name']  = isset( $_POST['firstname'] ) ? sanitize_text_field( $_POST['firstname'] ) : NULL;
-		$this->data['last_name']   = isset( $_POST['lastname'] ) ? sanitize_text_field( $_POST['lastname'] ) : NULL;
-		$this->data['user_email']  = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : NULL;
-		$this->data['user_url']    = isset( $_POST['website'] ) ? sanitize_text_field( $_POST['website'] ) : NULL;
-		$this->data['description'] = isset( $_POST['bio'] ) ? sanitize_text_field( $_POST['bio'] ) : NULL;
+		$this->data['security']    = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : NULL;
+		$this->data['first_name']  = isset( $_POST['firstname'] ) ? sanitize_text_field( wp_unslash( $_POST['firstname'] ) ) : NULL;
+		$this->data['last_name']   = isset( $_POST['lastname'] ) ? sanitize_text_field( wp_unslash( $_POST['lastname'] ) ) : NULL;
+		$this->data['user_email']  = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : NULL;
+		$this->data['user_url']    = isset( $_POST['website'] ) ? esc_url_raw( wp_unslash( $_POST['website'] ) ) : NULL;
+		$this->data['description'] = isset( $_POST['bio'] ) ? sanitize_textarea_field( wp_unslash( $_POST['bio'] ) ) : NULL;
 		// Set form ID for action usage
-		$this->data['_form_id']    = isset( $_POST['_form_id'] ) ? sanitize_text_field ( $_POST['_form_id'] ) : 1;
+		$this->data['_form_id']    = isset( $_POST['_form_id'] ) ? sanitize_text_field ( wp_unslash( $_POST['_form_id'] ) ) : 1;
 	}
 
 	/**
@@ -50,7 +50,7 @@ final class WP_Ulike_Pro_Profile extends wp_ulike_ajax_listener_base {
 			$user_id = wp_update_user( $user_args );
 
 			if ( is_wp_error( $user_id ) ) {
-				throw new \Exception( $user_id->get_error_message() );
+				throw new \Exception( wp_ulike_pro_clean_tags( $user_id->get_error_message() ) );
 			}
 
             $this->afterAction();

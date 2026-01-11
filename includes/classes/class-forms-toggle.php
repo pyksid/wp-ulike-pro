@@ -16,7 +16,8 @@ final class WP_Ulike_Pro_Forms_Toggle extends wp_ulike_ajax_listener_base {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['request'] = ! empty( $_REQUEST['request'] )  ? $_REQUEST['request'] : NULL;
+		$this->data['request'] = isset( $_REQUEST['request'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['request'] ) ) : NULL;
+		$this->data['security'] = isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : NULL;
 	}
 
 	/**
@@ -35,6 +36,12 @@ final class WP_Ulike_Pro_Forms_Toggle extends wp_ulike_ajax_listener_base {
 			}
 
 			$content = '';
+
+			// Whitelist validation already done in validates(), but double-check for safety
+			$allowed_requests = array( 'signup', 'login', 'reset-password' );
+			if( ! in_array( $this->data['request'], $allowed_requests, true ) ){
+				throw new \Exception( $permission_denied );
+			}
 
 			switch ($this->data['request']) {
 				case 'signup':
@@ -85,8 +92,17 @@ final class WP_Ulike_Pro_Forms_Toggle extends wp_ulike_ajax_listener_base {
 	* Validate the Favorite
 	*/
 	private function validates(){
-		// Return false when ID not exist
-		if( empty( $this->data['request'] ) ) return false;
+
+		// Return false when request not exist
+		if( empty( $this->data['request'] ) ) {
+			return false;
+		}
+
+		// Validate request is in allowed list
+		$allowed_requests = array( 'signup', 'login', 'reset-password' );
+		if( ! in_array( $this->data['request'], $allowed_requests, true ) ){
+			return false;
+		}
 
 		return true;
 	}

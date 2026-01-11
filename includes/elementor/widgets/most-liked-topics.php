@@ -182,7 +182,7 @@ class MostLikedTopics extends Widget_Base {
         $this->add_control(
             'display_content',
             array(
-                'label'        => esc_html__('Display content',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => sprintf( esc_html__('Display %s',WP_ULIKE_PRO_DOMAIN ), esc_html__('content', WP_ULIKE_PRO_DOMAIN) ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
                 'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
@@ -194,7 +194,7 @@ class MostLikedTopics extends Widget_Base {
         $this->add_control(
             'display_info',
             array(
-                'label'        => esc_html__('Display info',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => sprintf( esc_html__('Display %s',WP_ULIKE_PRO_DOMAIN ), esc_html__('info', WP_ULIKE_PRO_DOMAIN) ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
                 'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),

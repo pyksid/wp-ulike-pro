@@ -164,7 +164,7 @@ class PostsButton extends Widget_Base {
         $this->add_control(
             'enable_dynamic_id',
             array(
-                'label'        => esc_html__('Enable Custom Dynamic ID',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => esc_html__('Enable Custom ID',WP_ULIKE_PRO_DOMAIN ),
                 'description'  => esc_html__('By activating this option, the IDs of the buttons are created dynamically according to the Item ID set.',WP_ULIKE_PRO_DOMAIN ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),

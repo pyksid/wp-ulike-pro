@@ -39,10 +39,10 @@ class WP_Ulike_Pro_reCAPTCHA_Enqueue {
             $site_key = wp_ulike_get_option( 'v2_recaptcha_sitekey' );
 
             wp_register_script( 'ulp-google-recapthca-api', "https://www.google.com/recaptcha/api.js?onload=ulpOnloadCallback&render=explicit&hl=$language_code" );
-            wp_add_inline_script( 'ulp-google-recapthca-api', "var ulpOnloadCallback=function(){try{jQuery('.ulp-google-recaptcha').each(function(i){grecaptcha.render(jQuery(this).attr('id'),{'sitekey':jQuery(this).attr('data-sitekey'),'theme':jQuery(this).attr('data-theme')})})}catch(error){console.log(error)}};function ulp_recaptcha_refresh(){jQuery('.ulp-google-recaptcha').html('');grecaptcha.reset()}");
+            wp_add_inline_script( 'ulp-google-recapthca-api', "var ulpOnloadCallback=function(){try{var elements=document.querySelectorAll('.ulp-google-recaptcha');elements.forEach(function(el){var id=el.getAttribute('id');var sitekey=el.getAttribute('data-sitekey');var theme=el.getAttribute('data-theme');if(id&&sitekey){grecaptcha.render(id,{'sitekey':sitekey,'theme':theme||'light'})}})}catch(error){console.log(error)}};function ulp_recaptcha_refresh(){var elements=document.querySelectorAll('.ulp-google-recaptcha');elements.forEach(function(el){el.innerHTML=''});if(typeof grecaptcha!=='undefined'){grecaptcha.reset()}}");
         }
 
-        wp_enqueue_script( 'ulp-recaptcha', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/recaptcha.js', array( 'jquery', 'ulp-google-recapthca-api' ), WP_ULIKE_PRO_VERSION, true );
+        wp_enqueue_script( 'ulp-recaptcha', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/recaptcha.js', array( 'ulp-google-recapthca-api' ), WP_ULIKE_PRO_VERSION, true );
         wp_localize_script( 'ulp-recaptcha', 'UlikeProRecaptchaData', array(
             'recaptchaVersion'   => $version,
             'recaptchaSiteKey'  => $site_key,

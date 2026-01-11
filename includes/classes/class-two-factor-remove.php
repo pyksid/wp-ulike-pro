@@ -16,8 +16,8 @@ final class WP_Ulike_Pro_Two_Factor_Remove extends wp_ulike_ajax_listener_base {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['key']   = ! empty( $_REQUEST['key'] )  ? $_REQUEST['key'] : NULL;
-		$this->data['nonce'] = ! empty( $_REQUEST['nonce'] )  ? $_REQUEST['nonce'] : NULL;
+		$this->data['key']   = isset( $_REQUEST['key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['key'] ) ) : NULL;
+		$this->data['nonce'] = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : NULL;
 	}
 
 	/**

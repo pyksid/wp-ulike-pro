@@ -32,41 +32,47 @@ class WP_Ulike_Pro_Admin_Assets {
      */
     public function load_scripts( $hook ) {
 
-        // Add local avatars uploader in profile page
-        if( WP_Ulike_Pro_Options::isLocalAvatars()  && $hook == 'profile.php' ){
-            wp_enqueue_script( 'ulp-uploader',
+        // Add local avatars uploader in profile page (Standalone vanilla JS version)
+        // Styles are in uploader.scss and compiled to uploader.css
+        if( WP_Ulike_Pro_Options::isLocalAvatars() && $hook == 'profile.php' ){
+            // Register modal script (minified build from public source)
+            wp_register_script( 
+                'ulp-modal', 
+                WP_ULIKE_PRO_ADMIN_URL . '/assets/js/modal.min.js', 
+                array(), 
+                WP_ULIKE_PRO_VERSION, 
+                true 
+            );
+            
+            // Enqueue script with modal as dependency
+            wp_enqueue_script( 
+                'ulp-uploader',
                 WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/uploader.min.js',
-                array( 'jquery' ),
+                array( 'ulp-modal' ), // Modal is required dependency
                 WP_ULIKE_PRO_VERSION,
                 true
             );
-            wp_enqueue_style(
-                'ulp-uploader',
-                WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/uploader.min.css',
-                array(),
-                WP_ULIKE_PRO_VERSION
-            );
-            // Get lang code
-            $language = get_locale();
-            if ( strlen( $language ) > 0 ) {
-                $language = explode( '_', $language )[0];
-            }
-            //localize script
+
+            // Enqueue modal styles (minified build from public source)
+            wp_enqueue_style( 'ulp-modal', WP_ULIKE_PRO_ADMIN_URL . '/assets/css/modal.min.css', array(), WP_ULIKE_PRO_VERSION );
+
+            // Enqueue uploader styles (compiled from uploader.scss)
+            wp_enqueue_style( 'ulp-uploader', WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/uploader.min.css', array(), WP_ULIKE_PRO_VERSION );
+
+            // Get upload directory URL (WP_ULIKE_SLUG from parent plugin)
+            $upload_dir = wp_upload_dir();
+            $upload_slug = defined( 'WP_ULIKE_SLUG' ) ? WP_ULIKE_SLUG : 'wp-ulike';
+            $upload_url = trailingslashit( $upload_dir['baseurl'] ) . $upload_slug . '/avatars/';
+            
+            // Get formatted avatar config for JavaScript
+            $avatar_config_js = WP_Ulike_Pro_Options::getAvatarConfigForJs();
+            
+            // Localize config
             wp_localize_script( 'ulp-uploader', 'fileUploaderCommonConfig', array(
                 'AjaxUrl' => admin_url( 'admin-ajax.php' ),
-                'Nonce'   => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
-                'avatar'  => WP_Ulike_Pro_Options::getAvatarConfigs( array(
-                    'url'      => array(),
-                    'icons'    => array(
-                        'menu'     => 'dashicons dashicons-admin-generic',
-                        'upload'   => 'dashicons dashicons-cloud-upload',
-                        'edit'     => 'dashicons dashicons-image-crop',
-                        'remove'   => 'dashicons dashicons-trash',
-                        'complete' => 'dashicons dashicons-yes',
-                        'retry'    => 'dashicons dashicons-no',
-                    )
-                ) ),
-                'Locale'  => $language
+                'Nonce' => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
+                'uploadUrl' => trailingslashit( $upload_url ),
+                'avatarConfig' => $avatar_config_js
             ) );
         }
 

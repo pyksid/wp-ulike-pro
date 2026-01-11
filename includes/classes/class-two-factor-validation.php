@@ -14,9 +14,10 @@ final class WP_Ulike_Pro_Two_Factor_Validation extends wp_ulike_ajax_listener_ba
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['secret'] = ! empty( $_POST['secret'] ) ? $_POST['secret'] : NULL;
-		$this->data['otp']    = ! empty( $_POST['otp'] ) ? $_POST['otp'] : NULL;
-		$this->data['nonce']  = ! empty( $_POST['nonce'] )  ? $_POST['nonce'] : NULL;
+		// Secret should be base32 (A-Z, 2-7), ensure uppercase for consistency
+		$this->data['secret'] = isset( $_POST['secret'] ) ? strtoupper( trim( sanitize_text_field( wp_unslash( $_POST['secret'] ) ) ) ) : NULL;
+		$this->data['otp']    = isset( $_POST['otp'] ) && is_array( $_POST['otp'] ) ? $_POST['otp'] : NULL;
+		$this->data['nonce']  = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : NULL;
 	}
 
 	/**

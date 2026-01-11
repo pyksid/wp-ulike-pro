@@ -20,54 +20,76 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	 *
 	 * @var string cookie name
 	 */
-	protected $_cookie;
+	protected $_cookie = ''; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
 	/**
 	 * Stores session expiry.
 	 *
-	 * @var string session due to expire timestamp
+	 * @var int session due to expire timestamp
 	 */
-	protected $_session_expiring;
+	protected $_session_expiring = 0; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
 	/**
 	 * Stores session due to expire timestamp.
 	 *
-	 * @var string session expiration timestamp
+	 * @var int session expiration timestamp
 	 */
-	protected $_session_expiration;
+	protected $_session_expiration = 0; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
 	/**
 	 * True when the cookie exists.
 	 *
 	 * @var bool Based on whether a cookie exists.
 	 */
-	protected $_has_cookie = false;
+	protected $_has_cookie = false; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
 	/**
 	 * Table name for session data.
 	 *
 	 * @var string Custom session table name
 	 */
-	protected $_table;
+	protected $_table = ''; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
 	/**
 	 * Constructor for the session class.
 	 */
 	public function __construct() {
 		global $wpdb;
-		$this->_cookie = apply_filters( 'wp_ulike_pro_cookie', 'ulp_session_' . COOKIEHASH );
+		/**
+		 * Filter the cookie name.
+		 *
+		 * @since 3.6.0
+		 *
+		 * @param string $cookie Cookie name.
+		 */
+		$this->_cookie = (string) apply_filters( 'wp_ulike_pro_cookie', 'ulp_session_' . COOKIEHASH );
 		$this->_table  = $wpdb->prefix . 'ulike_sessions';
+		$this->set_session_expiration();
 	}
 
 	/**
 	 * Init hooks and session data.
+	 *
+	 * @since 3.3.0
 	 */
 	public function init() {
-		$this->init_session_cookie();
+		$this->init_hooks();
+		$this->init_session();
+	}
 
+	/**
+	 * Initialize the hooks.
+	 */
+	protected function init_hooks() {
 		add_action( 'wp_ulike_pro_set_cookies', array( $this, 'set_user_session_cookie' ), 10 );
 		add_action( 'shutdown', array( $this, 'save_data' ), 20 );
 		add_action( 'wp_logout', array( $this, 'destroy_session' ) );
+		add_action( 'wp_ulike_pro_cleanup_expired_sessions', array( $this, 'cleanup_sessions' ) );
+
+		// Schedule automatic cleanup of expired sessions (runs daily)
+		if ( ! wp_next_scheduled( 'wp_ulike_pro_cleanup_expired_sessions' ) ) {
+			wp_schedule_event( time(), 'daily', 'wp_ulike_pro_cleanup_expired_sessions' );
+		}
 
 		if ( ! is_user_logged_in() ) {
 			add_filter( 'nonce_user_logged_out', array( $this, 'maybe_update_nonce_user_logged_out' ), 10, 2 );
@@ -75,44 +97,109 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	}
 
 	/**
+	 * Initialize the session from either the request or the cookie.
+	 */
+	private function init_session() {
+		$this->init_session_cookie();
+	}
+
+	/**
 	 * Setup cookie and user ID.
+	 *
+	 * @since 3.6.0
 	 */
 	public function init_session_cookie() {
 		$cookie = $this->get_session_cookie();
 
-		if ( $cookie ) {
-			// user ID will be an MD5 hash id this is a guest session.
-			$this->_user_id            = $cookie[0];
-			$this->_session_expiration = $cookie[1];
-			$this->_session_expiring   = $cookie[2];
-			$this->_has_cookie         = true;
-			$this->_data               = $this->get_session_data();
-
-			if ( ! $this->is_session_cookie_valid() ) {
-				$this->destroy_session();
-				$this->set_session_expiration();
-			}
-
-
-			// If the user logs in, update session.
-			if ( is_user_logged_in() && strval( get_current_user_id() ) !== $this->_user_id ) {
-				$guest_session_id = $this->_user_id;
-				$this->_user_id   = strval( get_current_user_id() );
-				$this->_dirty     = true;
-				$this->save_data( $guest_session_id );
-				$this->set_user_session_cookie( true );
-			}
-
-			// Update session if its close to expiring.
-			if ( time() > $this->_session_expiring ) {
-				$this->set_session_expiration();
-				$this->update_session_timestamp( $this->_user_id, $this->_session_expiration );
-			}
-		} else {
-			$this->set_session_expiration();
+		if ( ! $cookie ) {
+			// If there is no cookie, generate a new session/user ID.
 			$this->_user_id = $this->generate_user_id();
 			$this->_data    = $this->get_session_data();
+			return;
 		}
+
+		// User ID will be an MD5 hash id this is a guest session.
+		$this->_user_id            = $cookie[0];
+		$this->_session_expiration = (int) $cookie[1];
+		$this->_session_expiring   = (int) $cookie[2];
+		$this->_has_cookie         = true;
+
+		$this->restore_session_data();
+
+		/**
+		 * This clears the session if the cookie is invalid.
+		 *
+		 * Previously this also cleared the session when $this->_data was empty, and the session was not yet initialised,
+		 * however this caused a conflict with some session handlers which override this class.
+		 */
+		if ( ! $this->is_session_cookie_valid() ) {
+			$this->destroy_session();
+		}
+
+		// If the user logs in, update session.
+		if ( is_user_logged_in() && (string) get_current_user_id() !== $this->get_user_id() ) {
+			$this->migrate_guest_session_to_user_session();
+		}
+
+		// Update session if its close to expiring.
+		if ( $this->is_session_expiring() ) {
+			$this->set_session_expiration();
+			$this->update_session_timestamp( $this->get_user_id(), $this->_session_expiration );
+		}
+	}
+
+	/**
+	 * Migrates a guest session to the current user session.
+	 */
+	private function migrate_guest_session_to_user_session() {
+		$guest_session_id = $this->_user_id;
+		$user_session_id  = (string) get_current_user_id();
+
+		$this->_data    = $this->get_session( $guest_session_id, array() );
+		$this->_dirty   = true;
+		$this->_user_id = $user_session_id;
+		$this->save_data( $guest_session_id );
+
+		/**
+		 * Fires after a user has logged in, and their guest session id has been
+		 * deleted with its data migrated to a user id.
+		 *
+		 * This hook gives extensions the chance to connect the old session id to the
+		 * user id, if the key is being used externally.
+		 *
+		 * @since 8.8.0
+		 *
+		 * @param string $guest_session_id The former session ID, as generated by `::generate_user_id()`.
+		 * @param string $user_session_id The User ID that the former session was converted to.
+		 */
+		do_action( 'wp_ulike_pro_guest_session_to_user_id', $guest_session_id, $this->_user_id );
+	}
+
+	/**
+	 * Restore the session data from the database.
+	 *
+	 * @since 10.0.0
+	 */
+	private function restore_session_data() {
+		$session_data = $this->get_session_data();
+
+		/**
+		 * Filters the session data when restoring from storage during initialization.
+		 *
+		 * This filter allows you to:
+		 * 1. Modify the session data before it's loaded, including adding or removing specific session data entries
+		 * 2. Clear the entire session by returning an empty array
+		 *
+		 * Note: If the filtered data is empty, the session will be destroyed and the
+		 * guest's session cookie will be removed. This can be useful for high-traffic
+		 * sites that prioritize page caching over maintaining all session data.
+		 *
+		 * @since 9.9.0
+		 *
+		 * @param array $session_data The session data loaded from storage.
+		 * @return array Modified session data to be used for initialization.
+		 */
+		$this->_data = (array) apply_filters( 'wp_ulike_pro_restored_session_data', $session_data );
 	}
 
 	/**
@@ -127,12 +214,12 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 		}
 
 		// If user has logged out, session cookie is invalid.
-		if ( ! is_user_logged_in() && ! $this->is_user_guest( $this->_user_id ) ) {
+		if ( ! is_user_logged_in() && ! $this->is_user_guest( $this->get_user_id() ) ) {
 			return false;
 		}
 
-		// Session from a different user is not valid. (Although from a guest user will be valid)
-		if ( is_user_logged_in() && ! $this->is_user_guest( $this->_user_id ) && strval( get_current_user_id() ) !== $this->_user_id ) {
+		// Session from a different user is not valid. (Although from a guest user will be valid).
+		if ( is_user_logged_in() && ! $this->is_user_guest( $this->get_user_id() ) && (string) get_current_user_id() !== $this->get_user_id() ) {
 			return false;
 		}
 
@@ -140,29 +227,73 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	}
 
 	/**
+	 * Hash a value using wp_fast_hash (from WP 6.8 onwards).
+	 *
+	 * This method can be removed when the minimum version supported is 6.8.
+	 *
+	 * @param string $message Value to hash.
+	 * @return string Hashed value.
+	 */
+	private function hash( string $message ) {
+		if ( function_exists( 'wp_fast_hash' ) ) {
+			return wp_fast_hash( $message );
+		}
+		return hash_hmac( 'md5', $message, wp_hash( $message ) );
+	}
+
+	/**
+	 * Verify a hash using wp_verify_fast_hash (from WP 6.8 onwards).
+	 *
+	 * This method can be removed when the minimum version supported is 6.8.
+	 *
+	 * @param string $message Message to verify.
+	 * @param string $hash Hash to verify.
+	 * @return bool Whether the hash is valid.
+	 */
+	private function verify_hash( string $message, string $hash ) {
+		if ( function_exists( 'wp_verify_fast_hash' ) ) {
+			return wp_verify_fast_hash( $message, $hash );
+		}
+		return hash_equals( hash_hmac( 'md5', $message, wp_hash( $message ) ), $hash );
+	}
+
+	/**
 	 * Sets the session cookie on-demand (usually after adding an item to the cart).
+	 *
+	 * Since the cookie name (as of 2.1) is prepended with wp, cache systems like batcache will not cache pages when set.
+	 *
+	 * Warning: Cookies will only be set if this is called before the headers are sent.
 	 *
 	 * @param bool $set Should the session cookie be set.
 	 */
 	public function set_user_session_cookie( $set ) {
 		if ( $set ) {
-			$to_hash           = $this->_user_id . '|' . $this->_session_expiration;
-			$cookie_hash       = hash_hmac( 'md5', $to_hash, wp_hash( $to_hash ) );
-			$cookie_value      = $this->_user_id . '||' . $this->_session_expiration . '||' . $this->_session_expiring . '||' . $cookie_hash;
-			$this->_has_cookie = true;
+			$cookie_hash  = $this->hash( $this->get_user_id() . '|' . (string) $this->_session_expiration );
+			$cookie_value = $this->get_user_id() . '|' . (string) $this->_session_expiration . '|' . (string) $this->_session_expiring . '|' . $cookie_hash;
 
 			if ( ! isset( $_COOKIE[ $this->_cookie ] ) || $_COOKIE[ $this->_cookie ] !== $cookie_value ) {
-				wp_ulike_setcookie( $this->_cookie, $cookie_value, $this->_session_expiration, $this->use_secure_cookie(), true );
+				wp_ulike_pro_setcookie( $this->_cookie, $cookie_value, $this->_session_expiration, $this->use_secure_cookie(), true );
 			}
+
+			$this->_has_cookie = true;
 		}
 	}
 
 	/**
 	 * Should the session cookie be secure?
+	 *
+	 * @since 3.6.0
 	 * @return bool
 	 */
 	protected function use_secure_cookie() {
-		return  ( false !== strstr( get_option( 'home' ), 'https:' ) ) && is_ssl();
+		/**
+		 * Filter whether to use a secure cookie.
+		 *
+		 * @since 3.6.0
+		 *
+		 * @param bool $use_secure_cookie Whether to use a secure cookie.
+		 */
+		return (bool) apply_filters( 'wp_ulike_pro_session_use_secure_cookie', ( false !== strstr( get_option( 'home' ), 'https:' ) ) && is_ssl() );
 	}
 
 	/**
@@ -175,11 +306,65 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	}
 
 	/**
+	 * Checks if the session is expiring.
+	 *
+	 * @return bool Whether session is expiring.
+	 */
+	private function is_session_expiring() {
+		return time() > $this->_session_expiring;
+	}
+
+	/**
 	 * Set session expiration.
 	 */
 	public function set_session_expiration() {
-		$this->_session_expiring   = time() + intval( apply_filters( 'wp_ulike_pro_session_expiring', 60 * 60 * 47 ) ); // 47 Hours.
-		$this->_session_expiration = time() + intval( apply_filters( 'wp_ulike_pro_session_expiration', 60 * 60 * 48 ) ); // 48 Hours.
+		$default_expiring_seconds   = DAY_IN_SECONDS;
+		$default_expiration_seconds = is_user_logged_in() ? WEEK_IN_SECONDS : 2 * DAY_IN_SECONDS;
+		$max_expiration_seconds     = MONTH_IN_SECONDS;
+		$max_expiring_seconds       = $max_expiration_seconds - DAY_IN_SECONDS;
+		$session_limit_exceeded     = false;
+
+		/**
+		 * Filters the session expiration.
+		 *
+		 * @since 5.0.0
+		 * @param int $expiring_seconds The expiration time in seconds.
+		 */
+		$expiring_seconds = intval( apply_filters( 'wp_ulike_pro_session_expiring', $default_expiring_seconds ) ) ?: $default_expiring_seconds; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+
+		if ( $expiring_seconds > $max_expiring_seconds ) {
+			$expiring_seconds       = $max_expiring_seconds;
+			$session_limit_exceeded = true;
+		}
+		/**
+		 * Filters the session expiration.
+		 *
+		 * @since 5.0.0
+		 * @param int $expiration_seconds The expiration time in seconds.
+		 */
+		$expiration_seconds = intval( apply_filters( 'wp_ulike_pro_session_expiration', $default_expiration_seconds ) ) ?: $default_expiration_seconds; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+
+		// We limit the expiration time to 30 days to avoid performance issues and the session table growing too large.
+		if ( $expiration_seconds > $max_expiration_seconds ) {
+			$expiration_seconds     = $max_expiration_seconds;
+			$session_limit_exceeded = true;
+		}
+
+		if ( $session_limit_exceeded ) {
+			$transient_key = 'wp_ulike_pro_session_handler_warning';
+			if ( false === get_transient( $transient_key ) ) {
+				error_log( sprintf( 'WP ULike Pro: Keeping sessions for longer than %d days results in performance issues, expiry has been capped.', $max_expiration_seconds / DAY_IN_SECONDS ) );
+				set_transient( $transient_key, true, $max_expiration_seconds );
+			}
+		}
+
+		// If the expiring time is greater than the expiration time, set the expiring time to 90% of the expiration time.
+		if ( $expiring_seconds > $expiration_seconds ) {
+			$expiring_seconds = $expiration_seconds * 0.9;
+		}
+
+		$this->_session_expiring   = time() + $expiring_seconds;
+		$this->_session_expiration = time() + $expiration_seconds;
 	}
 
 	/**
@@ -208,56 +393,25 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	/**
 	 * Checks if this is an auto-generated user ID.
 	 *
-	 * @param string|int $user_id user ID to check.
-	 *
+	 * @param string $user_id User ID to check.
 	 * @return bool Whether user ID is randomly generated.
 	 */
 	private function is_user_guest( $user_id ) {
-		$user_id = strval( $user_id );
-
-		if ( empty( $user_id ) ) {
-			return true;
-		}
-
-		if ( 't_' === substr( $user_id, 0, 2 ) ) {
-			return true;
-		}
-
-		/**
-		 * Legacy checks. This is to handle sessions that were created from a previous release.
-		 * Maybe we can get rid of them after a few releases.
-		 */
-
-		// Almost all random $user_ids will have some letters in it, while all actual ids will be integers.
-		if ( strval( (int) $user_id ) !== $user_id ) {
-			return true;
-		}
-
-		// Performance hack to potentially save a DB query, when same user as $user_id is logged in.
-		if ( is_user_logged_in() && strval( get_current_user_id() ) === $user_id ) {
-			return false;
-		} else {
-			$user = get_userdata( $user_id );
-
-			if ( $user === false ) {
-				return true;
-			}
-		}
-
-		return false;
+		return empty( $user_id ) || 't_' === substr( $user_id, 0, 2 );
 	}
 
 	/**
 	 * Get session unique ID for requests if session is initialized or user ID if logged in.
 	 * Introduced to help with unit tests.
 	 *
+	 * @since 5.3.0
 	 * @return string
 	 */
 	public function get_user_unique_id() {
 		$user_id = '';
 
-		if ( $this->has_session() && $this->_user_id ) {
-			$user_id = $this->_user_id;
+		if ( $this->has_session() && $this->get_user_id() ) {
+			$user_id = $this->get_user_id();
 		} elseif ( is_user_logged_in() ) {
 			$user_id = (string) get_current_user_id();
 		}
@@ -273,16 +427,20 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	 * @return bool|array
 	 */
 	public function get_session_cookie() {
-		$cookie_value = isset( $_COOKIE[ $this->_cookie ] ) ? wp_unslash( $_COOKIE[ $this->_cookie ] ) : false; // @codingStandardsIgnoreLine.
+		$cookie_value = isset( $_COOKIE[ $this->_cookie ] ) ? wp_unslash( (string) $_COOKIE[ $this->_cookie ] ) : ''; // @codingStandardsIgnoreLine.
 
-		if ( empty( $cookie_value ) || ! is_string( $cookie_value ) ) {
+		if ( empty( $cookie_value ) ) {
 			return false;
 		}
 
+		// Check if the cookie value contains '||' instead of '|' to support older versions of the cookie. This can be removed in a future version.
+		if ( strpos( $cookie_value, '||' ) !== false ) {
+			$parsed_cookie = explode( '||', $cookie_value );
+		} else {
+			$parsed_cookie = explode( '|', $cookie_value );
+		}
 
-		$parsed_cookie = explode( '||', $cookie_value );
-
-		if ( count( $parsed_cookie ) < 4 ) {
+		if ( count( $parsed_cookie ) !== 4 ) {
 			return false;
 		}
 
@@ -292,11 +450,9 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 			return false;
 		}
 
-		// Validate hash.
-		$to_hash = $user_id . '|' . $session_expiration;
-		$hash    = hash_hmac( 'md5', $to_hash, wp_hash( $to_hash ) );
+		$verify_hash = $this->verify_hash( $user_id . '|' . $session_expiration, $cookie_hash );
 
-		if ( empty( $cookie_hash ) || ! hash_equals( $hash, $cookie_hash ) ) {
+		if ( ! $verify_hash ) {
 			return false;
 		}
 
@@ -309,7 +465,7 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	 * @return array
 	 */
 	public function get_session_data() {
-		return $this->has_session() ? (array) $this->get_session( $this->_user_id, array() ) : array();
+		return $this->has_session() ? (array) $this->get_session( $this->get_user_id(), array() ) : array();
 	}
 
 	/**
@@ -334,26 +490,33 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	/**
 	 * Save data and delete guest session.
 	 *
-	 * @param int $old_session_key session ID before user logs in.
+	 * @param string|mixed $old_session_key Optional session ID prior to user log-in.  If $old_session_key is not tied
+	 *                                      to a user, the session will be deleted with the assumption that it was migrated
+	 *                                      to the current session being saved.
 	 */
-	public function save_data( $old_session_key = 0 ) {
+	public function save_data( $old_session_key = '' ) {
 		// Dirty if something changed - prevents saving nothing new.
 		if ( $this->_dirty && $this->has_session() ) {
 			global $wpdb;
 
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO {$wpdb->prefix}ulike_sessions (`session_key`, `session_value`, `session_expiry`) VALUES (%s, %s, %d)
+					"INSERT INTO {$this->_table} (`session_key`, `session_value`, `session_expiry`) VALUES (%s, %s, %d)
  					ON DUPLICATE KEY UPDATE `session_value` = VALUES(`session_value`), `session_expiry` = VALUES(`session_expiry`)",
-					$this->_user_id,
+					$this->get_user_id(),
 					maybe_serialize( $this->_data ),
 					$this->_session_expiration
 				)
 			);
-
-			wp_cache_set( $this->get_cache_prefix() . $this->_user_id, $this->_data, 'ulike_session_id', $this->_session_expiration - time() );
+			wp_cache_set( $this->get_cache_prefix() . $this->get_user_id(), $this->_data, 'ulike_session_id', $this->_session_expiration - time() );
 			$this->_dirty = false;
-			if ( get_current_user_id() != $old_session_key && ! is_object( get_user_by( 'id', $old_session_key ) ) ) {
+
+			/**
+			 * Ideally, the removal of guest session data migrated to a logged-in user would occur within
+			 * self::init_session_cookie() upon user login detection initially occurs. However, since some third-party
+			 * extensions override this method, relocating this logic could break backward compatibility.
+			 */
+			if ( ! empty( $old_session_key ) && $this->get_user_id() !== $old_session_key && ! is_object( get_user_by( 'id', $old_session_key ) ) ) {
 				$this->delete_session( $old_session_key );
 			}
 		}
@@ -363,30 +526,36 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	 * Destroy all session data.
 	 */
 	public function destroy_session() {
-		$this->delete_session( $this->_user_id );
+		$this->delete_session( $this->get_user_id() );
 		$this->forget_session();
+		$this->set_session_expiration();
 	}
 
 	/**
 	 * Forget all session data without destroying it.
 	 */
 	public function forget_session() {
-		wp_ulike_setcookie( $this->_cookie, '', time() - YEAR_IN_SECONDS, $this->use_secure_cookie(), true );
+		wp_ulike_pro_setcookie( $this->_cookie, '', time() - YEAR_IN_SECONDS, $this->use_secure_cookie(), true );
 
 		$this->_data        = array();
 		$this->_dirty       = false;
-		$this->_user_id = $this->generate_user_id();
+		$this->_user_id     = $this->generate_user_id();
+		$this->_has_cookie  = false;
 	}
 
 	/**
 	 * When a user is logged out, ensure they have a unique nonce to manage cart and more using the user/session ID.
 	 * This filter runs everything `wp_verify_nonce()` and `wp_create_nonce()` gets called.
 	 *
-	 * @param int    $uid    User ID.
-	 * @param string $action The nonce action.
+	 * @since 5.3.0
+	 * @param int        $uid    User ID.
+	 * @param int|string $action The nonce action.
 	 * @return int|string
 	 */
 	public function maybe_update_nonce_user_logged_out( $uid, $action ) {
+		if ( is_string( $action ) && 0 === strpos( $action, 'wp_ulike_pro' ) ) {
+			return $this->has_session() && $this->get_user_id() ? $this->get_user_id() : $uid;
+		}
 		return $uid;
 	}
 
@@ -396,7 +565,7 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	public function cleanup_sessions() {
 		global $wpdb;
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $this->_table WHERE session_expiry < %d", time() ) ); // @codingStandardsIgnoreLine.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$this->_table} WHERE session_expiry < %d", time() ) ); // @codingStandardsIgnoreLine.
 
 		$group = 'ulike_session_id';
 		wp_cache_set( 'ulp_' . $group . '_cache_prefix', microtime(), $group );
@@ -405,25 +574,25 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	/**
 	 * Returns the session.
 	 *
-	 * @param string $user_id user ID.
-	 * @param mixed  $default Default session value.
-	 * @return string|array
+	 * @param string $user_id User ID.
+	 * @param mixed  $default_value Default session value.
+	 * @return mixed Returns either the session data or the default value. Returns false if WP setup is in progress.
 	 */
-	public function get_session( $user_id, $default = false ) {
+	public function get_session( $user_id, $default_value = false ) {
 		global $wpdb;
 
-		if ( defined('WP_SETUP_CONFIG') ) {
-			return false;
+		if ( defined( 'WP_SETUP_CONFIG' ) ) {
+			return $default_value;
 		}
 
 		// Try to get it from the cache, it will return false if not present or if object cache not in use.
 		$value = wp_cache_get( $this->get_cache_prefix() . $user_id, 'ulike_session_id' );
 
 		if ( false === $value ) {
-			$value = $wpdb->get_var( $wpdb->prepare( "SELECT session_value FROM $this->_table WHERE session_key = %s", $user_id ) ); // @codingStandardsIgnoreLine.
+			$value = $wpdb->get_var( $wpdb->prepare( "SELECT session_value FROM {$this->_table} WHERE session_key = %s", $user_id ) ); // @codingStandardsIgnoreLine.
 
 			if ( is_null( $value ) ) {
-				$value = $default;
+				$value = $default_value;
 			}
 
 			$cache_duration = $this->_session_expiration - time();
@@ -438,41 +607,36 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 	/**
 	 * Delete the session from the cache and database.
 	 *
-	 * @param int $user_id user ID.
+	 * @param string $user_id User session ID.
 	 */
 	public function delete_session( $user_id ) {
-		global $wpdb;
-
+		if ( ! $user_id ) {
+			return;
+		}
+		$GLOBALS['wpdb']->delete( $this->_table, array( 'session_key' => $user_id ) );
 		wp_cache_delete( $this->get_cache_prefix() . $user_id, 'ulike_session_id' );
-
-		$wpdb->delete(
-			$this->_table,
-			array(
-				'session_key' => $user_id,
-			)
-		);
 	}
 
 	/**
 	 * Update the session expiry timestamp.
 	 *
-	 * @param string $user_id user ID.
+	 * @param string $user_id User ID.
 	 * @param int    $timestamp Timestamp to expire the cookie.
 	 */
 	public function update_session_timestamp( $user_id, $timestamp ) {
-		global $wpdb;
+		if ( ! $user_id ) {
+			return;
+		}
+		$GLOBALS['wpdb']->update( $this->_table, array( 'session_expiry' => $timestamp ), array( 'session_key' => $user_id ), array( '%d' ) );
+	}
 
-		$wpdb->update(
-			$this->_table,
-			array(
-				'session_expiry' => $timestamp,
-			),
-			array(
-				'session_key' => $user_id,
-			),
-			array(
-				'%d',
-			)
-		);
+	/**
+	 * Check if a session exists in the database.
+	 *
+	 * @param string $user_id User ID.
+	 * @return bool
+	 */
+	private function session_exists( $user_id ) {
+		return $user_id && null !== $GLOBALS['wpdb']->get_var( $GLOBALS['wpdb']->prepare( "SELECT session_key FROM {$this->_table} WHERE session_key = %s", $user_id ) );
 	}
 }

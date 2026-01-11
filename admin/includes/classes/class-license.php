@@ -4,6 +4,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// Embedded validator include (harder to remove)
+if ( ! class_exists( 'WP_Ulike_Pro_License_Validator' ) && file_exists( __DIR__ . '/class-license-validator.php' ) ) {
+	require_once __DIR__ . '/class-license-validator.php';
+}
+
 class WP_Ulike_Pro_License {
 
 	const PAGE_ID = 'wp-ulike-pro-license';
@@ -58,8 +63,13 @@ class WP_Ulike_Pro_License {
 		WP_Ulike_Pro_API::deactivate_license();
 
 		delete_option( 'wp_ulike_pro_license_key' );
-		delete_transient( 'wp_ulike_pro_license_data' );
-		delete_transient( 'wp_ulike_pro_license_data_fallback' );
+		delete_option( 'wp_ulike_pro_license_checksum' );
+		delete_option( 'wp_ulike_pro_license_signature' );
+		// License data is stored as options (via set_transient which uses update_option)
+		delete_option( 'wp_ulike_pro_license_data' );
+		delete_option( 'wp_ulike_pro_license_data_fallback' );
+		// Also clear request lock
+		WP_Ulike_Pro_API::clear_request_lock( 'get_license_data' );
 	}
 
 	public static function get_hidden_license_key() {
@@ -80,10 +90,26 @@ class WP_Ulike_Pro_License {
 	}
 
 	public static function set_license_key( $license_key ) {
-		return update_option( 'wp_ulike_pro_license_key', $license_key );
+		$result = update_option( 'wp_ulike_pro_license_key', $license_key );
+
+		// Store checksum for integrity validation
+		if ( $result && ! empty( $license_key ) ) {
+			$checksum = hash( 'sha256', $license_key . wp_ulike_pro_get_audit_token() . home_url() );
+			update_option( 'wp_ulike_pro_license_checksum', $checksum );
+		}
+
+		return $result;
 	}
 
 	public function action_activate_license() {
+		// Check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', WP_ULIKE_PRO_DOMAIN ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+				'back_link' => true,
+				'response'  => 403,
+			] );
+		}
+
 		check_admin_referer( 'wp-ulike-pro-license' );
 
 		$license_key = wp_ulike_pro_unstable_get_super_global_value( $_POST, 'wp_ulike_pro_license_key' );
@@ -94,17 +120,26 @@ class WP_Ulike_Pro_License {
 			] );
 		}
 
-		$data = WP_Ulike_Pro_API::activate_license( $license_key );
-
-		if ( is_wp_error( $data ) ) {
-			wp_die( sprintf( '%s (%s) ', $data->get_error_message(), $data->get_error_code() ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+		// Sanitize and validate license key format (basic validation)
+		$license_key = sanitize_text_field( trim( $license_key ) );
+		if ( empty( $license_key ) || strlen( $license_key ) < 10 ) {
+			wp_die( esc_html__( 'Invalid license key format. Please check your key and try again.', WP_ULIKE_PRO_DOMAIN ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
 				'back_link' => true,
 			] );
 		}
 
-		if ( WP_Ulike_Pro_API::STATUS_VALID !== $data['license'] ) {
-			$error_msg = WP_Ulike_Pro_API::get_error_message( $data['error'] );
-			wp_die( $error_msg, esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+		$data = WP_Ulike_Pro_API::activate_license( $license_key );
+
+		if ( is_wp_error( $data ) ) {
+			wp_die( wp_kses_post( $data->get_error_message() ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+				'back_link' => true,
+			] );
+		}
+
+		if ( ! isset( $data['license'] ) || WP_Ulike_Pro_API::STATUS_VALID !== $data['license'] ) {
+			$error_key = isset( $data['error'] ) ? $data['error'] : 'unknown_error';
+			$error_msg = WP_Ulike_Pro_API::get_error_message( $error_key );
+			wp_die( wp_kses_post( $error_msg ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
 				'back_link' => true,
 			] );
 		}
@@ -112,21 +147,43 @@ class WP_Ulike_Pro_License {
 		self::set_license_key( $license_key );
 		WP_Ulike_Pro_API::set_license_data( $data );
 
-		$this->safe_redirect( wp_ulike_pro_unstable_get_super_global_value( $_POST, '_wp_http_referer' ) );
+		// Redirect with success message
+		$redirect_url = add_query_arg( 'activated', '1', self::get_url() );
+		$this->safe_redirect( $redirect_url );
 		die;
 	}
 
 	protected function safe_redirect( $url ) {
-		wp_safe_redirect( $url );
+		// Ensure URL is safe and within admin area
+		if ( ! $url || ! wp_http_validate_url( $url ) ) {
+			$url = self::get_url();
+		}
+
+		// Only allow redirects within admin area
+		if ( strpos( $url, admin_url() ) !== 0 ) {
+			$url = self::get_url();
+		}
+
+		wp_safe_redirect( esc_url_raw( $url ) );
 		die;
 	}
 
 	public function action_deactivate_license() {
+		// Check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', WP_ULIKE_PRO_DOMAIN ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+				'back_link' => true,
+				'response'  => 403,
+			] );
+		}
+
 		check_admin_referer( 'wp-ulike-pro-license' );
 
 		$this->deactivate();
 
-		$this->safe_redirect( wp_ulike_pro_unstable_get_super_global_value( $_POST, '_wp_http_referer' ) );
+		// Redirect with deactivated message
+		$redirect_url = add_query_arg( 'deactivated', '1', self::get_url() );
+		$this->safe_redirect( $redirect_url );
 		die;
 	}
 
@@ -206,7 +263,7 @@ class WP_Ulike_Pro_License {
 			return;
 		}
 
-		$license_data = WP_Ulike_Pro_API::get_license_data();
+		$license_data = WP_Ulike_Pro_API::get_license_data( false );
 		if ( empty( $license_data['license'] ) ) {
 			return;
 		}
@@ -297,7 +354,7 @@ class WP_Ulike_Pro_License {
 
 	public function register_page( $submenus ) {
 		$license_submenu_page = array( 'license' => array(
-			'title'       => esc_html__( 'License', WP_ULIKE_PRO_DOMAIN ),
+			'title'       => sprintf( '<span class="wp-ulike-menu-icon"><span class="dashicons dashicons-admin-network"></span> %s</span>', esc_html__( 'License', WP_ULIKE_PRO_DOMAIN ) ),
 			'parent_slug' => 'wp-ulike-settings',
 			'capability'  => 'manage_options',
 			'path'        => WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/license.php',
@@ -321,6 +378,9 @@ class WP_Ulike_Pro_License {
 		// Update old license info to the new value
 		$this->update_old_license_info();
 
+		// Migrate existing licenses to have checksum and signature (backward compatibility)
+		$this->migrate_existing_license_data();
+
 		add_filter( 'wp_ulike_admin_pages', [ $this, 'register_page' ], 10, 15 );
 		add_action( 'admin_post_wp_ulike_pro_activate_license', [ $this, 'action_activate_license' ] );
 		add_action( 'admin_post_wp_ulike_pro_deactivate_license', [ $this, 'action_deactivate_license' ] );
@@ -328,5 +388,41 @@ class WP_Ulike_Pro_License {
 		add_action( 'admin_notices', [ $this, 'admin_license_details' ], 25 );
 
 		add_filter( 'plugin_action_links_' . WP_ULIKE_PRO_BASENAME, [ $this, 'plugin_action_links' ], 50 );
+	}
+
+	/**
+	 * Migrate existing licenses to have checksum and signature
+	 * This ensures backward compatibility with licenses activated before this update
+	 */
+	private function migrate_existing_license_data() {
+		// Only run once per site
+		if ( get_option( 'wp_ulike_pro_license_migrated', false ) ) {
+			return;
+		}
+
+		$license_key = self::get_license_key();
+
+		// If license key exists but no checksum, create it
+		if ( ! empty( $license_key ) && empty( get_option( 'wp_ulike_pro_license_checksum', '' ) ) ) {
+			$checksum = hash( 'sha256', $license_key . wp_ulike_pro_get_audit_token() . home_url() );
+			update_option( 'wp_ulike_pro_license_checksum', $checksum );
+		}
+
+		// If license data exists but no signature, create it
+		$license_data = WP_Ulike_Pro_API::get_license_data( false );
+		if ( is_array( $license_data ) && ! empty( $license_data['license'] ) && empty( get_option( 'wp_ulike_pro_license_signature', '' ) ) ) {
+			$signature_fields = [
+				$license_data['license'] ?? '',
+				$license_data['payment_id'] ?? '',
+				$license_data['expires'] ?? '',
+				home_url(),
+				wp_ulike_pro_get_audit_token(),
+			];
+			$signature = hash( 'sha256', implode( '|', $signature_fields ) );
+			update_option( 'wp_ulike_pro_license_signature', $signature );
+		}
+
+		// Mark as migrated
+		update_option( 'wp_ulike_pro_license_migrated', true );
 	}
 }

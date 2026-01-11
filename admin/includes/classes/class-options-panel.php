@@ -111,7 +111,7 @@ class WP_Ulike_Pro_Options_Panel {
             'type'    => 'switcher',
             'default' => true,
             'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('By activating this option, the counter data is stored simultaneously in the standard meta table and you can use it to create custom queries.', WP_ULIKE_PRO_DOMAIN) . '<br>' . 'Meta Keys: <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
+            'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
             'help'    => 'If you are an old user, after activating this option, go to Developer Tools > Optimization section and once click on "Migrate Counter Metadata" button to move counter values from wp_ulike_meta table to meta table.'
         );
         $options[] = array(
@@ -119,7 +119,7 @@ class WP_Ulike_Pro_Options_Panel {
             'type'    => 'switcher',
             'default' => false,
             'title'   => esc_html__('Enable Attachments', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('By activating this option, you can add voting buttons for image attachments. This option only works when you use WordPress +5.6 and also have the standard `wp_get_attachment_image` function in your theme.', WP_ULIKE_PRO_DOMAIN),
+            'desc'    => esc_html__('Add like buttons to image attachments displayed on your site. Requires WordPress 5.6+ and a theme that uses the standard WordPress attachment image function.', WP_ULIKE_PRO_DOMAIN),
         );
 
         $options[] = array(
@@ -132,6 +132,7 @@ class WP_Ulike_Pro_Options_Panel {
             'ajax'       => true,
             'multiple'   => true,
             'title'      => esc_html__('Filter By Attachment ID', WP_ULIKE_PRO_DOMAIN),
+            'desc'       => esc_html__('Show like buttons only on specific image attachments. Leave empty to show on all attachments.', WP_ULIKE_PRO_DOMAIN),
             'options'    => 'wp_ulike_pro_search_attachments',
             'dependency' => array( 'enable_attachments', '==', 'true' )
         );
@@ -143,12 +144,13 @@ class WP_Ulike_Pro_Options_Panel {
                 array(
                     'id'    => 'name',
                     'type'  => 'text',
-                    'title' => esc_html__('class name', WP_ULIKE_PRO_DOMAIN)
+                    'title' => esc_html__('Class Name', WP_ULIKE_PRO_DOMAIN),
+                    'desc'  => esc_html__('Enter the CSS class name that identifies the attachment image.', WP_ULIKE_PRO_DOMAIN)
                 ),
             ),
             'title'      => esc_html__('Filter By Class Name', WP_ULIKE_PRO_DOMAIN),
             'dependency' => array( 'enable_attachments', '==', 'true' ),
-            'desc'       => esc_html__('Add attachment specified class names. (e.g. attachment-full)', WP_ULIKE_PRO_DOMAIN)
+            'desc'       => esc_html__('Show like buttons only on images with specific CSS classes. Add one class name per line (e.g., attachment-full, attachment-large).', WP_ULIKE_PRO_DOMAIN)
         );
 
         $options[] = array(
@@ -158,12 +160,13 @@ class WP_Ulike_Pro_Options_Panel {
                 array(
                     'id'    => 'name',
                     'type'  => 'text',
-                    'title' => esc_html__('image size', WP_ULIKE_PRO_DOMAIN)
+                    'title' => esc_html__('Image Size', WP_ULIKE_PRO_DOMAIN),
+                    'desc'  => esc_html__('Enter the WordPress image size name (e.g., thumbnail, medium, large, full).', WP_ULIKE_PRO_DOMAIN)
                 ),
             ),
             'title'      => esc_html__('Filter By Attachment Size', WP_ULIKE_PRO_DOMAIN),
             'dependency' => array( 'enable_attachments', '==', 'true' ),
-            'desc'       => esc_html__('Add attachment standard size. (e.g. large, thumbnail, etc.)', WP_ULIKE_PRO_DOMAIN)
+            'desc'       => esc_html__('Show like buttons only on images displayed at specific sizes. Add one size name per line (e.g., large, thumbnail, medium).', WP_ULIKE_PRO_DOMAIN)
         );
 
         return $options;
@@ -181,7 +184,7 @@ class WP_Ulike_Pro_Options_Panel {
             'type'    => 'switcher',
             'default' => true,
             'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('By activating this option, the counter data is stored simultaneously in the standard meta table and you can use it to create custom queries.', WP_ULIKE_PRO_DOMAIN) . '<br>' . 'Meta Keys: <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>' ,
+            'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
             'help'        => 'If you are an old user, after activating this option, go to Developer Tools > Optimization section and once click on "Migrate Counter Metadata" button to move counter values from wp_ulike_meta table to meta table.'
         );
 
@@ -202,13 +205,15 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'dislike_prefix',
                 'type'    => 'text',
                 'default' => '-',
-                'title'   => esc_html__('Dislike',WP_ULIKE_PRO_DOMAIN)
+                'title'   => sprintf( esc_html__('%s Prefix',WP_ULIKE_PRO_DOMAIN), esc_html__('Dislike', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Text shown before the count (e.g., "-" displays as "-125").', WP_ULIKE_PRO_DOMAIN)
             );
             $options[] = array(
                 'id'      => 'undislike_prefix',
                 'type'    => 'text',
                 'default' => '-',
-                'title'   => esc_html__('Undislike',WP_ULIKE_PRO_DOMAIN)
+                'title'   => sprintf( esc_html__('%s Prefix',WP_ULIKE_PRO_DOMAIN), esc_html__('Undislike', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Text shown before the count (e.g., "-" displays as "-125").', WP_ULIKE_PRO_DOMAIN)
             );
         }
 
@@ -216,12 +221,14 @@ class WP_Ulike_Pro_Options_Panel {
             $options[] = array(
                 'id'      => 'dislike_postfix',
                 'type'    => 'text',
-                'title'   => esc_html__('Dislike',WP_ULIKE_PRO_DOMAIN)
+                'title'   => sprintf( esc_html__('%s Suffix',WP_ULIKE_PRO_DOMAIN), esc_html__('Dislike', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Text shown after the count (e.g., " dislikes" displays as "125 dislikes").', WP_ULIKE_PRO_DOMAIN)
             );
             $options[] = array(
                 'id'      => 'undislike_postfix',
                 'type'    => 'text',
-                'title'   => esc_html__('Undislike',WP_ULIKE_PRO_DOMAIN)
+                'title'   => sprintf( esc_html__('%s Suffix',WP_ULIKE_PRO_DOMAIN), esc_html__('Undislike', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Text shown after the count (e.g., " dislikes" displays as "125 dislikes").', WP_ULIKE_PRO_DOMAIN)
             );
         }
 
@@ -244,13 +251,13 @@ class WP_Ulike_Pro_Options_Panel {
             'type'    => 'switcher',
             'default' => true,
             'title'   => esc_html__('Enable Shortcode Generator', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('Comes with pre-built wp ulike shortcode editor to manage your content.', WP_ULIKE_PRO_DOMAIN)
+            'desc'    => esc_html__('Add a visual shortcode builder in the post editor to easily insert and configure WP ULike buttons without writing code.', WP_ULIKE_PRO_DOMAIN)
         );
         $options[] =  array(
             'id'       => 'statistics_display_roles',
             'type'     => 'select',
-            'title'    => esc_html__( 'Display Stats Menu Capability', WP_ULIKE_PRO_DOMAIN),
-            'desc'     => esc_html__( 'Manage users\' access level to view this page',WP_ULIKE_PRO_DOMAIN ),
+            'title'    => esc_html__( 'Statistics Page Access', WP_ULIKE_PRO_DOMAIN),
+            'desc'     => esc_html__( 'Choose which user roles can access the Statistics page in the admin menu.',WP_ULIKE_PRO_DOMAIN ),
             'chosen'   => true,
             'multiple' => true,
             'options'  => $user_roles_list
@@ -258,12 +265,25 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'       => 'enable_meta_box',
             'type'     => 'select',
-            'title'    => esc_html__( 'Enable Meta Box',WP_ULIKE_PRO_DOMAIN ),
-            'desc'     => esc_html__( 'Display meta box panel in selected post types.',WP_ULIKE_PRO_DOMAIN ),
+            'title'    => esc_html__( 'Show Meta Box In Post Editor',WP_ULIKE_PRO_DOMAIN ),
+            'desc'     => esc_html__( 'Add a WP ULike meta box to the edit screen of selected post types, allowing you to view and manage likes directly from the editor.',WP_ULIKE_PRO_DOMAIN ),
             'chosen'   => true,
             'multiple' => true,
             'default'  => array('post', 'page'),
             'options'  => 'post_types'
+        );
+        $options[] = array(
+            'id'       => 'view_tracking_enabled_types',
+            'type'     => 'checkbox',
+            'title'    => esc_html__( 'Enable View Tracking', WP_ULIKE_PRO_DOMAIN ),
+            'desc'     => esc_html__( 'Track button views for accurate engagement rate calculations. Select which content types should have view tracking enabled.', WP_ULIKE_PRO_DOMAIN ),
+            'options'  => array(
+                'post'     => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
+                'comment'  => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+                'activity' => esc_html__( 'Activities', WP_ULIKE_PRO_DOMAIN ),
+                'topic'    => esc_html__( 'Topics', WP_ULIKE_PRO_DOMAIN )
+            ),
+            'default'  => array( 'post' )
         );
 
         return $options;
@@ -283,7 +303,8 @@ class WP_Ulike_Pro_Options_Panel {
                     array(
                         'id'      => 'dislike',
                         'type'    => 'text',
-                        'title'   => esc_html__('Button Text',WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__('Button label',WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => sprintf( esc_html__('Text displayed on the %s (e.g., "Dislike", "👎", "Downvote").', WP_ULIKE_PRO_DOMAIN), esc_html__('dislike button', WP_ULIKE_PRO_DOMAIN) ),
                         'default' => 'Dislike'
                     ),
                 )
@@ -294,7 +315,8 @@ class WP_Ulike_Pro_Options_Panel {
                     array(
                         'id'      => 'undislike',
                         'type'    => 'text',
-                        'title'   => esc_html__('Button Text',WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__('Button label',WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => sprintf( esc_html__('Text displayed on the button %s (e.g., "Disliked", "👎", "Remove Dislike").', WP_ULIKE_PRO_DOMAIN), esc_html__('after disliking', WP_ULIKE_PRO_DOMAIN) ),
                         'default' => 'Disliked'
                     ),
                 )
@@ -308,6 +330,7 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'           => 'dislike',
                         'type'         => 'upload',
                         'title'        => esc_html__('Button Image',WP_ULIKE_PRO_DOMAIN),
+                        'desc'         => esc_html__('Upload an image icon for the button state.', WP_ULIKE_PRO_DOMAIN),
                         'library'      => 'image',
                         'placeholder'  => 'http://'
                     ),
@@ -320,6 +343,7 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'           => 'undislike',
                         'type'         => 'upload',
                         'title'        => esc_html__('Button Image',WP_ULIKE_PRO_DOMAIN),
+                        'desc'         => esc_html__('Upload an image icon for the button state.', WP_ULIKE_PRO_DOMAIN),
                         'library'      => 'image',
                         'placeholder'  => 'http://'
                     ),
@@ -344,6 +368,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'enable_percentage_values',
                 'type'       => 'switcher',
                 'title'      => esc_html__('Enable Percentage Values', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Display vote counts as percentages instead of numbers. Shows the ratio of likes to total votes (e.g., "75%" instead of "75").', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'counter_display_condition|template', '!=|any', 'hidden|' . $percentage_list )
             )
         ) );
@@ -356,6 +381,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'height'     => '100px',
                 'default'    => '[wp_ulike_pro_login_form ajax_toggle=1 redirect_to="current_page"]',
                 'title'      => esc_html__('Modal Template', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Content displayed in the login modal popup when logged-out users try to vote. You can use shortcodes here.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'logged_out_display_type|enable_only_logged_in_users', '==|==', 'modal|true' )
             )
         ) );
@@ -367,6 +393,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'text',
                 'default'    => esc_html__('Likers', WP_ULIKE_PRO_DOMAIN),
                 'title'      => esc_html__('Likers Modal Title', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Heading text displayed at the top of the likers modal popup.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_likers_box|likers_style', '==|any', 'true|pile'  ),
             )
         ) );
@@ -389,7 +416,7 @@ class WP_Ulike_Pro_Options_Panel {
   </span>
 </a>',
                 'title'      => esc_html__('Likers Modal Template', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__('Allowed Variables:', WP_ULIKE_PRO_DOMAIN) . ' <code>{up_profile_url}</code> , <code>{bp_profile_url}</code> , <code>{um_profile_url}</code> , <code>{avatar_url}</code> , <code>{display_name}</code> , <code>{first_name}</code> , <code>{last_name}</code> , <code>{username}</code> , <code>{email}</code>, <code>{user_id}</code> , <code>{user_status}</code>',
+                'desc'       => esc_html__('Allowed Variables:', WP_ULIKE_PRO_DOMAIN) . ' <code>{up_profile_url}</code>, <code>{bp_profile_url}</code>, <code>{um_profile_url}</code>, <code>{avatar_url}</code>, <code>{display_name}</code>, <code>{first_name}</code>, <code>{last_name}</code>, <code>{username}</code>, <code>{email}</code>, <code>{user_id}</code>, <code>{user_status}</code>',
                 'dependency' => array( 'enable_likers_box|likers_style', '==|any', 'true|pile'  ),
             )
         ) );
@@ -407,39 +434,9 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'         => 'enable_serialize',
             'type'       => 'switcher',
-            'default'    => false,
-            'title'      => esc_html__('Enable Serialize Data type', WP_ULIKE_PRO_DOMAIN),
-            'desc'       => esc_html__('By activating this option, the metabox information will be serialized and stored in a single row. This will lead to fewer records in the database and more performance. But if you are an old user, you probably need to use the options below to convert the old metaboxes to the new serialize structure.', WP_ULIKE_PRO_DOMAIN)
-        );
-        $options[] = array(
-            'id'     => 'opt-integration',
-            'type'   => 'fieldset',
-            'title'  => esc_html__( 'Conversions', WP_ULIKE_PRO_DOMAIN),
-            'fields' => array(
-                array(
-                    'type'     => 'callback',
-                    'function' => 'wp_ulike_pro_ajax_button_callback',
-                    'args'     => array(
-                        'title'  => esc_html__( 'Upgrade Metabox Values', WP_ULIKE_PRO_DOMAIN),
-                        'label'  => esc_html__( 'Merge Rows', WP_ULIKE_PRO_DOMAIN),
-                        'desc'   => esc_html__( 'Convert the old meta boxes to the new serialize structure.', WP_ULIKE_PRO_DOMAIN),
-                        'type'   => 'post',
-                        'action' => 'upgrade_unserialize_post_meta'
-                    )
-                ),
-                array(
-                    'type'     => 'callback',
-                    'function' => 'wp_ulike_pro_ajax_button_callback',
-                    'args'     => array(
-                        'title'  => esc_html__( 'Delete Old Post Meta', WP_ULIKE_PRO_DOMAIN),
-                        'label'  => esc_html__( 'Delete All Rows', WP_ULIKE_PRO_DOMAIN),
-                        'desc'   => esc_html__( 'Drop all unserialized meta box rows after upgrade to serialize structure. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                        'type'   => 'delete_all',
-                        'action' => 'optimize_post_meta'
-                    )
-                ),
-            ),
-            'dependency' => array( 'enable_serialize', '==', 'true' )
+            'default'    => true,
+            'title'      => esc_html__('Enable Serialized Data Storage', WP_ULIKE_PRO_DOMAIN),
+            'desc'       => esc_html__('Store meta box data in a more efficient format, reducing database size and improving performance. If you\'re upgrading from an older version, use the conversion tools in Tools > Optimization to migrate your existing data.', WP_ULIKE_PRO_DOMAIN)
         );
 
         return $options;
@@ -456,19 +453,22 @@ class WP_Ulike_Pro_Options_Panel {
             'id'      => 'dislike_notice',
             'type'    => 'text',
             'default' => esc_html__('Sorry! You Disliked This.',WP_ULIKE_PRO_DOMAIN),
-            'title'   => esc_html__( 'Dislike Notice Message', WP_ULIKE_PRO_DOMAIN)
+            'title'   => sprintf( esc_html__( '%s Notice Message', WP_ULIKE_PRO_DOMAIN), esc_html__('Dislike', WP_ULIKE_PRO_DOMAIN) ),
+            'desc'    => esc_html__( 'Confirmation message shown after a user action.', WP_ULIKE_PRO_DOMAIN)
         );
         $options[] = array(
             'id'      => 'undislike_notice',
             'type'    => 'text',
             'default' => esc_html__('Thanks! You Undisliked This.',WP_ULIKE_PRO_DOMAIN),
-            'title'   => esc_html__( 'Undislike Notice Message', WP_ULIKE_PRO_DOMAIN)
+            'title'   => sprintf( esc_html__( '%s Notice Message', WP_ULIKE_PRO_DOMAIN), esc_html__('Undislike', WP_ULIKE_PRO_DOMAIN) ),
+            'desc'    => esc_html__( 'Confirmation message shown after a user action.', WP_ULIKE_PRO_DOMAIN)
         );
         $options[] = array(
             'id'      => 'dislike_button_aria_label',
             'type'    => 'text',
             'default' => esc_html__( 'Dislike Button',WP_ULIKE_PRO_DOMAIN),
-            'title'   => esc_html__( 'Dislike Button Aria Label', WP_ULIKE_PRO_DOMAIN)
+            'title'   => esc_html__( 'Dislike Button Aria Label', WP_ULIKE_PRO_DOMAIN),
+            'desc'    => esc_html__( 'Accessibility label for screen readers. Helps visually impaired users understand what the button does.', WP_ULIKE_PRO_DOMAIN)
         );
 
         // Notices
@@ -480,8 +480,8 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'      => 'required_fields_notice',
             'type'    => 'text',
-            'default' => esc_html__( 'Please enter required fields.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Enter Required Fields', WP_ULIKE_PRO_DOMAIN)
+            'default' => esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN)
         );
 
         $options[] = array(
@@ -494,8 +494,8 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'      => 'login_success_notice',
             'type'    => 'text',
-            'default' => esc_html__( 'Login successful.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Login Successful', WP_ULIKE_PRO_DOMAIN)
+            'default' => esc_html__( 'Login successful', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Login successful', WP_ULIKE_PRO_DOMAIN)
         );
 
         $options[] = array(
@@ -551,14 +551,14 @@ class WP_Ulike_Pro_Options_Panel {
             'id'      => 'error_occurred_notice',
             'type'    => 'text',
             'default' => esc_html__( 'An error has occurred! Please try again later.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Error Occurred', WP_ULIKE_PRO_DOMAIN)
+            'title'   => esc_html__( 'Error occurred', WP_ULIKE_PRO_DOMAIN)
         );
 
         $options[] = array(
             'id'      => 'signup_success_notice',
             'type'    => 'text',
-            'default' => esc_html__( 'Signup successful.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Signup Sucess', WP_ULIKE_PRO_DOMAIN)
+            'default' => esc_html__( 'Signup successful', WP_ULIKE_PRO_DOMAIN ),
+            'title'   => esc_html__( 'Signup successful', WP_ULIKE_PRO_DOMAIN)
         );
 
         $options[] = array(
@@ -626,7 +626,7 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'      => 'user_not_found',
             'type'    => 'text',
-            'default' => esc_html__( 'User Not Found!',WP_ULIKE_PRO_DOMAIN),
+            'default' => esc_html__( 'Not found!',WP_ULIKE_PRO_DOMAIN),
             'title'   => esc_html__( 'User Not Found Message', WP_ULIKE_PRO_DOMAIN)
         );
 
@@ -634,21 +634,21 @@ class WP_Ulike_Pro_Options_Panel {
             'id'      => 'avatar_upload_text',
             'type'    => 'text',
             'default' => esc_html__( 'Upload', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Avatar Upload Text', WP_ULIKE_PRO_DOMAIN)
+            'title'   => sprintf( esc_html__( 'Avatar %s Text', WP_ULIKE_PRO_DOMAIN), esc_html__('Upload', WP_ULIKE_PRO_DOMAIN) )
         );
 
         $options[] = array(
             'id'      => 'avatar_edit_text',
             'type'    => 'text',
             'default' => esc_html__( 'Edit', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Avatar Edit Text', WP_ULIKE_PRO_DOMAIN)
+            'title'   => sprintf( esc_html__( 'Avatar %s Text', WP_ULIKE_PRO_DOMAIN), esc_html__('Edit', WP_ULIKE_PRO_DOMAIN) )
         );
 
         $options[] = array(
             'id'      => 'avatar_delete_text',
             'type'    => 'text',
             'default' => esc_html__( 'Delete', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Avatar Delete Text', WP_ULIKE_PRO_DOMAIN)
+            'title'   => sprintf( esc_html__( 'Avatar %s Text', WP_ULIKE_PRO_DOMAIN), esc_html__('Delete', WP_ULIKE_PRO_DOMAIN) )
         );
 
         $options[] = array(
@@ -829,14 +829,14 @@ class WP_Ulike_Pro_Options_Panel {
             'id'      => 'rp_invalidkey',
             'type'    => 'text',
             'default' => esc_html__( 'Your password reset link appears to be invalid. Please request a new link below.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Your password reset link appears to be invalid.', WP_ULIKE_PRO_DOMAIN )
+            'title'   => esc_html__( 'Your password reset link appears to be invalid', WP_ULIKE_PRO_DOMAIN )
         );
 
         $options[] = array(
             'id'      => 'rp_expiredkey',
             'type'    => 'text',
             'default' => esc_html__( 'Your password reset link has expired. Please request a new link below.', WP_ULIKE_PRO_DOMAIN ),
-            'title'   => esc_html__( 'Your password reset link has expired.', WP_ULIKE_PRO_DOMAIN )
+            'title'   => esc_html__( 'Your password reset link has expired', WP_ULIKE_PRO_DOMAIN )
         );
 
         $options[] = array(
@@ -958,7 +958,7 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'      => 'invalid_input_secret_notice',
             'type'    => 'text',
-            'default' => esc_html__( 'The secret parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ),
+            'default' => esc_html__( 'The parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ),
             'title'   => esc_html__( 'Recaptcha Invalid Secret.', WP_ULIKE_PRO_DOMAIN)
         );
 
@@ -972,7 +972,7 @@ class WP_Ulike_Pro_Options_Panel {
         $options[] = array(
             'id'      => 'invalid_input_response_notice',
             'type'    => 'text',
-            'default' => esc_html__( 'The response parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ),
+            'default' => esc_html__( 'The parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ),
             'title'   => esc_html__( 'Recaptcha Invalid Input.', WP_ULIKE_PRO_DOMAIN)
         );
 
@@ -1029,19 +1029,22 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'    => 'select',
                 'chosen'  => true,
                 'ajax'    => true,
-                'title'   => esc_html__('Select Login Page', WP_ULIKE_PRO_DOMAIN),
+                'title'   => sprintf( esc_html__('Select %s Page', WP_ULIKE_PRO_DOMAIN), esc_html__('Login', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Choose the page that contains your login form shortcode. This page will be used for user authentication.', WP_ULIKE_PRO_DOMAIN),
                 'options' => 'pages'
             ),
             array(
                 'id'         => 'login_custom_redirect',
                 'type'       => 'text',
                 'title'      => esc_html__( 'Login Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => sprintf( esc_html__('URL where users are redirected after %s. Leave empty to redirect to the %s.', WP_ULIKE_PRO_DOMAIN), esc_html__('successful login', WP_ULIKE_PRO_DOMAIN), esc_html__('previous page', WP_ULIKE_PRO_DOMAIN) ),
                 'dependency' => array( 'login_core_page', '!=', '' )
             ),
             array(
                 'id'         => 'logout_custom_redirect',
                 'type'       => 'text',
                 'title'      => esc_html__( 'Logout Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => sprintf( esc_html__('URL where users are redirected after %s. Leave empty to redirect to the %s.', WP_ULIKE_PRO_DOMAIN), esc_html__('logging out', WP_ULIKE_PRO_DOMAIN), esc_html__('home page', WP_ULIKE_PRO_DOMAIN) ),
                 'dependency' => array( 'login_core_page', '!=', '' )
             ),
             array(
@@ -1057,19 +1060,22 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'    => 'select',
                 'chosen'  => true,
                 'ajax'    => true,
-                'title'   => esc_html__('Select Signup Page', WP_ULIKE_PRO_DOMAIN),
+                'title'   => sprintf( esc_html__('Select %s Page', WP_ULIKE_PRO_DOMAIN), esc_html__('Signup', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Choose the page that contains your form shortcode.', WP_ULIKE_PRO_DOMAIN),
                 'options' => 'pages'
             ),
             array(
                 'id'         => 'signup_custom_redirect',
                 'type'       => 'text',
                 'title'      => esc_html__( 'Signup Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => sprintf( esc_html__('URL where users are redirected after %s. Leave empty to redirect to the %s.', WP_ULIKE_PRO_DOMAIN), esc_html__('successful registration', WP_ULIKE_PRO_DOMAIN), esc_html__('login page', WP_ULIKE_PRO_DOMAIN) ),
                 'dependency' => array( 'signup_core_page', '!=', '' )
             ),
             array(
                 'id'      => 'signup_status',
                 'type'    => 'select',
                 'title'   => esc_html__('Signup Status', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose whether new users are automatically approved or must verify their email address first.', WP_ULIKE_PRO_DOMAIN),
                 'default' => 'approved',
                 'options' => [
                     'approved'	=> __( 'Auto Approve', WP_ULIKE_PRO_DOMAIN ),
@@ -1082,6 +1088,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'switcher',
                 'default'    => false,
                 'title'      => esc_html__('Enable Auto Login After Signup', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Automatically log users in immediately after they complete registration. Only works when signup status is set to Auto Approve.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array(
                     array( 'signup_core_page', '!=', '' ),
                     array( 'signup_status', '==', 'approved' )
@@ -1093,6 +1100,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'chosen'  => true,
                 'ajax'    => true,
                 'title'   => esc_html__('Select Reset Password Page', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose the page that contains your form shortcode.', WP_ULIKE_PRO_DOMAIN),
                 'options' => 'pages'
             ),
             array(
@@ -1101,6 +1109,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'chosen'  => true,
                 'ajax'    => true,
                 'title'   => esc_html__('Select Edit Account Page', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose the page that contains your account edit form shortcode where users can update their profile information.', WP_ULIKE_PRO_DOMAIN),
                 'options' => 'pages'
             ),
             array(
@@ -1111,7 +1120,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'quicktags'     => true,
                 'sanitize'      => false,
                 'default'       => '<div class="ulp-avatar"><img src="{avatar_url}"></div> <span>Logged in as {display_name}. (<a href="{profile_url}">Profile</a>) (<a href="{logout_url}">Logout</a>)</span>',
-                'title'         => esc_html__( 'Logged In Message', WP_ULIKE_PRO_DOMAIN)
+                'title'         => esc_html__( 'Logged In Message', WP_ULIKE_PRO_DOMAIN),
+                'desc'          => esc_html__('Custom message displayed to logged-in users. You can use variables like {display_name}, {avatar_url}, {profile_url}, {logout_url}.', WP_ULIKE_PRO_DOMAIN)
             ),
             array(
                 'id'      => 'enable_2fa',
@@ -1133,7 +1143,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'switcher',
                 'default'    => false,
                 'title'      => esc_html__('Enable Global reCAPTCHA Scripts', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__( 'Enable this option if you use the Recaptcha gobally on all pages. Like when you use it on Modal login forms.', WP_ULIKE_PRO_DOMAIN ),
+                'desc'       => esc_html__( 'Load reCAPTCHA scripts on all pages. Enable this if you use reCAPTCHA in modal login forms or other areas outside the standard login/register pages.', WP_ULIKE_PRO_DOMAIN ),
                 'dependency' => array( 'enable_recaptcha', '==', 'true' )
             ),
             array(
@@ -1290,7 +1300,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'    => 'select',
                 'default' => 'normal',
                 'title'   => esc_html__( 'Size', WP_ULIKE_PRO_DOMAIN ),
-                'desc'    => esc_html__( 'The type of reCAPTCHA to serve.', WP_ULIKE_PRO_DOMAIN ),
+                'desc'    => esc_html__( 'Choose the size of the reCAPTCHA widget. Compact is smaller and suitable for mobile devices.', WP_ULIKE_PRO_DOMAIN ),
                 'options' => array(
                     'compact'   => esc_html__( 'Compact', WP_ULIKE_PRO_DOMAIN ),
                     'normal'    => esc_html__( 'Normal', WP_ULIKE_PRO_DOMAIN )
@@ -1323,7 +1333,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'enable_social_login',
                 'type'       => 'switcher',
                 'default'    => false,
-                'title'      => esc_html__('Enable Social Logins', WP_ULIKE_PRO_DOMAIN)
+                'title'      => esc_html__('Enable Social Logins', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Allow users to log in or register using their social media accounts instead of creating a new account.', WP_ULIKE_PRO_DOMAIN)
             ),
             array(
                 'id'         => 'social_logins',
@@ -1360,13 +1371,13 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'    => 'login_label',
                         'type'  => 'text',
                         'title' => esc_html__( 'Login Button Text',WP_ULIKE_PRO_DOMAIN),
-                        'desc'  => esc_html__('Controls the text displayed on the login button.', WP_ULIKE_PRO_DOMAIN)
+                        'desc'  => esc_html__( 'Controls the text displayed on the button.',WP_ULIKE_PRO_DOMAIN)
                     ),
                     array(
                         'id'    => 'link_label',
                         'type'  => 'text',
                         'title' => esc_html__( 'Link Button Text',WP_ULIKE_PRO_DOMAIN),
-                        'desc'  => esc_html__( 'Controls the text displayed on the link account button.',WP_ULIKE_PRO_DOMAIN)
+                        'desc'  => esc_html__( 'Controls the text displayed on the button.',WP_ULIKE_PRO_DOMAIN)
                     ),
                     array(
                         'id'    => 'key',
@@ -1384,7 +1395,8 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'      => 'disable',
                         'type'    => 'switcher',
                         'default' => false,
-                        'title'   => esc_html__('Disable Social Connect', WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__('Disable This Network', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Temporarily disable this social network without deleting its configuration.', WP_ULIKE_PRO_DOMAIN),
                     ),
                     array(
                         'type'       => 'submessage',
@@ -1470,7 +1482,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'social_login_view',
                 'type'    => 'button_set',
                 'default' => 'icon_text',
-                'title'   => esc_html__( 'View', WP_ULIKE_PRO_DOMAIN),
+                'title'   => esc_html__( 'Button Display Style', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose how buttons are displayed: with icon and text, icon only, or text only.', WP_ULIKE_PRO_DOMAIN),
                 'options' => array(
                     'icon_text' => esc_html__( 'Icon & Text', WP_ULIKE_PRO_DOMAIN),
                     'icon'      => esc_html__( 'Icon', WP_ULIKE_PRO_DOMAIN),
@@ -1482,7 +1495,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'social_login_skin',
                 'type'    => 'button_set',
                 'default' => 'gradient',
-                'title'   => esc_html__( 'Skin', WP_ULIKE_PRO_DOMAIN),
+                'title'   => esc_html__( 'Button Style', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose the visual style for buttons.', WP_ULIKE_PRO_DOMAIN),
                 'options' => array(
                     'gradient' => esc_html__( 'Gradient', WP_ULIKE_PRO_DOMAIN),
                     'minimal'  => esc_html__( 'Minimal', WP_ULIKE_PRO_DOMAIN),
@@ -1495,7 +1509,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'      => 'social_login_shape',
                 'type'    => 'button_set',
-                'title'   => esc_html__( 'Shape', WP_ULIKE_PRO_DOMAIN),
+                'title'   => esc_html__( 'Button Shape', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Choose the corner style for social login buttons.', WP_ULIKE_PRO_DOMAIN),
                 'default' => 'rounded',
                 'options' => array(
                     'square'  => esc_html__( 'Square', WP_ULIKE_PRO_DOMAIN),
@@ -1508,7 +1523,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'social_login_color',
                 'type'    => 'button_set',
                 'default' => 'official',
-                'title'   => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN),
+                'title'   => esc_html__( 'Button Colors', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Use official brand colors for each social network, or apply custom colors to all buttons.', WP_ULIKE_PRO_DOMAIN),
                 'options' => array(
                     'official' => esc_html__( 'Official', WP_ULIKE_PRO_DOMAIN),
                     'custom'   => esc_html__( 'Custom', WP_ULIKE_PRO_DOMAIN)
@@ -1518,7 +1534,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'         => 'social_login_layout',
                 'type'       => 'fieldset',
-                'title'      => esc_html__('Layout', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__('Button Layout', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Control the width of social login buttons across different screen sizes using a 12-column grid system.', WP_ULIKE_PRO_DOMAIN),
                 'fields'     => $this->responsive_width_fields( '12', '12', '12' ),
                 'dependency' => array( 'enable_social_login', '==', 'true' )
             ),
@@ -1526,12 +1543,13 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'social_login_auto_display',
                 'type'    => 'radio',
                 'title'   => esc_html__( 'Auto Display', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Automatically show social login buttons on your login form. Choose where they appear or use a custom hook.', WP_ULIKE_PRO_DOMAIN),
                 'default' => 'after_login_form',
                 'options' => array(
                     'none'              => esc_html__( 'None', WP_ULIKE_PRO_DOMAIN),
                     'after_login_form'  => esc_html__( 'After Login Form', WP_ULIKE_PRO_DOMAIN),
                     'before_login_form' => esc_html__( 'Before Login Form', WP_ULIKE_PRO_DOMAIN),
-                    'custom_hook'       => esc_html__( 'Cutom Hook', WP_ULIKE_PRO_DOMAIN)
+                    'custom_hook'       => esc_html__( 'Custom Hook', WP_ULIKE_PRO_DOMAIN)
                 ),
                 'dependency' => array( 'enable_social_login', '==', 'true' )
             ),
@@ -1539,7 +1557,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'social_login_auto_custom_hook',
                 'type'       => 'text',
                 'title'      => esc_html__( 'Enter Hook Name',WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__('Please enter your desired action name in this field so that the social buttons are automatically displayed there.', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Enter a WordPress action hook name where you want social buttons to appear automatically.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_social_login|social_login_auto_display', '==|==', 'true|custom_hook' )
             ),
             array(
@@ -1549,8 +1567,9 @@ class WP_Ulike_Pro_Options_Panel {
                 'media_buttons' => false,
                 'quicktags'     => true,
                 'sanitize'      => false,
-                'default'       => '<div style="align-items: center; display: flex; flex: 0 0 auto; justify-content: center; width:100%; margin:30px 0;"> <div style="border-top: 1px solid #b2b2b2;flex: 1 1 auto;"></div> <div style="margin: 0 10px;">OR</div> <div style="border-top: 1px solid #b2b2b2;flex: 1 1 auto;"></div> </div>',
+                'default'       => '<div style="display: flex; align-items: center; justify-content: center; width: 100%; margin: 30px 0;"> <div style="border-top: 1px solid #b2b2b2; flex: 1 1 auto;"></div> <div style="margin: 0 15px; color: #666; font-weight: 500; white-space: nowrap;">OR</div> <div style="border-top: 1px solid #b2b2b2; flex: 1 1 auto;"></div> </div>',
                 'title'         => esc_html__( 'Before Content',WP_ULIKE_PRO_DOMAIN),
+                'desc'          => esc_html__('HTML content displayed before the buttons. Useful for adding separators or text.', WP_ULIKE_PRO_DOMAIN),
                 'dependency'    => array( 'enable_social_login', '==', 'true' )
             ),
             array(
@@ -1561,6 +1580,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'quicktags'     => true,
                 'sanitize'      => false,
                 'title'         => esc_html__( 'After Content',WP_ULIKE_PRO_DOMAIN),
+                'desc'          => esc_html__('HTML content displayed after the buttons.', WP_ULIKE_PRO_DOMAIN),
                 'dependency'    => array( 'enable_social_login', '==', 'true' )
             )
         );
@@ -1597,14 +1617,16 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'enable_user_profiles',
                 'type'    => 'switcher',
                 'default' => false,
-                'title'   => esc_html__('Enable User Profiles', WP_ULIKE_PRO_DOMAIN),
+                'title'   => sprintf( esc_html__('Enable %s', WP_ULIKE_PRO_DOMAIN), esc_html__('User Profiles', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'    => esc_html__('Create custom user profile pages where users can view and manage their information, activity, and preferences.', WP_ULIKE_PRO_DOMAIN),
             ),
             array(
                 'id'         => 'user_profiles_core_page',
                 'type'       => 'select',
                 'chosen'     => true,
                 'ajax'       => true,
-                'title'      => esc_html__('Select Profile Page', WP_ULIKE_PRO_DOMAIN),
+                'title'      => sprintf( esc_html__('Select %s Page', WP_ULIKE_PRO_DOMAIN), esc_html__('Profile', WP_ULIKE_PRO_DOMAIN) ),
+                'desc'       => esc_html__('Choose the page that contains the profile shortcode. This page will serve as the base URL for all user profiles.', WP_ULIKE_PRO_DOMAIN),
                 'options'    => 'pages',
                 'dependency' => array( 'enable_user_profiles', '==', 'true' )
             ),
@@ -1627,7 +1649,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'enable_author_redirect',
                 'type'       => 'switcher',
                 'default'    => false,
-                'title'      => esc_html__('Redirect author page to their profile', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__('Redirect Author Pages to Profiles', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Automatically redirect WordPress default author archive pages to the corresponding user profile page.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_user_profiles', '==', 'true' )
             ),
             array(
@@ -1635,6 +1658,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'select',
                 'default'    => 'everyone',
                 'title'      => esc_html__('User Profile Access', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Control who can view user profile pages. Choose whether profiles are public or restricted to logged-in users only.', WP_ULIKE_PRO_DOMAIN),
                 'options'    => array(
                     'everyone'        => esc_html__('Everyone', WP_ULIKE_PRO_DOMAIN),
                     'logged_in_users' => esc_html__('Logged In Users', WP_ULIKE_PRO_DOMAIN)
@@ -1646,6 +1670,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'text',
                 'default'    => home_url(),
                 'title'      => esc_html__( 'Custom Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('URL where unauthorized users are redirected when trying to access restricted profiles.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_user_profiles|user_profiles_access', '==|==', 'true|logged_in_users' )
             ),
             array(
@@ -1678,12 +1703,14 @@ class WP_Ulike_Pro_Options_Panel {
                                 'id'      => 'display_avatar',
                                 'type'    => 'switcher',
                                 'default' => true,
-                                'title'   => esc_html__('Show user avatar', WP_ULIKE_PRO_DOMAIN),
+                                'title'   => esc_html__('Show User Avatar', WP_ULIKE_PRO_DOMAIN),
+                                'desc'    => esc_html__('Display the user\'s profile picture on their profile page.', WP_ULIKE_PRO_DOMAIN),
                             ),
                             array(
                                 'id'         => 'avatar_size',
                                 'type'       => 'spinner',
-                                'title'      => esc_html__('Avatar image size', WP_ULIKE_PRO_DOMAIN),
+                                'title'      => esc_html__('Avatar Dimension', WP_ULIKE_PRO_DOMAIN),
+                                'desc'       => esc_html__('Set the width and height of the avatar image in pixels.', WP_ULIKE_PRO_DOMAIN),
                                 'step'       => 2,
                                 'min'        => 32,
                                 'max'        => 512,
@@ -1695,33 +1722,38 @@ class WP_Ulike_Pro_Options_Panel {
                                 'id'      => 'display_info',
                                 'type'    => 'switcher',
                                 'default' => true,
-                                'title'   => esc_html__('Show user info section', WP_ULIKE_PRO_DOMAIN),
+                                'title'   => esc_html__('Show User Info Section', WP_ULIKE_PRO_DOMAIN),
+                                'desc'    => esc_html__('Display the user information section containing name, bio, and other details.', WP_ULIKE_PRO_DOMAIN),
                             ),
                             array(
                                 'id'         => 'display_name',
                                 'type'       => 'switcher',
                                 'default'    => true,
-                                'title'      => esc_html__('Show display name', WP_ULIKE_PRO_DOMAIN),
+                                'title'      => esc_html__('Show Display Name', WP_ULIKE_PRO_DOMAIN),
+                                'desc'       => esc_html__('Display the user\'s display name in the profile header.', WP_ULIKE_PRO_DOMAIN),
                                 'dependency' => array( 'display_info', '==', 'true' )
                             ),
                             array(
                                 'id'         => 'display_bio',
                                 'type'       => 'switcher',
                                 'default'    => true,
-                                'title'      => esc_html__('Show user description', WP_ULIKE_PRO_DOMAIN),
+                                'title'      => esc_html__('Show User Description', WP_ULIKE_PRO_DOMAIN),
+                                'desc'       => esc_html__('Display the user\'s biographical information (bio) on their profile.', WP_ULIKE_PRO_DOMAIN),
                                 'dependency' => array( 'display_info', '==', 'true' )
                             ),
                             array(
                                 'id'         => 'display_custom_message',
                                 'type'       => 'switcher',
                                 'default'    => false,
-                                'title'      => esc_html__('Show a custom message if user bio is empty', WP_ULIKE_PRO_DOMAIN),
+                                'title'      => esc_html__('Show Custom Message When Bio is Empty', WP_ULIKE_PRO_DOMAIN),
+                                'desc'       => esc_html__('Display a custom message instead of leaving the bio section blank when the user hasn\'t added a description.', WP_ULIKE_PRO_DOMAIN),
                                 'dependency' => array( 'display_bio|display_info', '==|==', 'true|true' )
                             ),
                             array(
                                 'id'            => 'custom_message',
                                 'type'          => 'wp_editor',
-                                'title'         => esc_html__('Custom message', WP_ULIKE_PRO_DOMAIN),
+                                'title'         => esc_html__('Custom Message', WP_ULIKE_PRO_DOMAIN),
+                                'desc'          => esc_html__('Message displayed when the user bio is empty. You can use HTML and shortcodes here.', WP_ULIKE_PRO_DOMAIN),
                                 'height'        => '100px',
                                 'media_buttons' => false,
                                 'tinymce'       => false,
@@ -1747,7 +1779,8 @@ class WP_Ulike_Pro_Options_Panel {
                             'id'      => 'display_badges',
                             'type'    => 'switcher',
                             'default' => true,
-                            'title'   => esc_html__('Show badges section', WP_ULIKE_PRO_DOMAIN),
+                            'title'   => esc_html__('Show Badges Section', WP_ULIKE_PRO_DOMAIN),
+                            'desc'    => esc_html__('Display a section showing user statistics and achievements as badge items.', WP_ULIKE_PRO_DOMAIN),
                         ),
                         array(
                             'id'        => 'badges',
@@ -1758,6 +1791,7 @@ class WP_Ulike_Pro_Options_Panel {
                                     'id'         => 'badge_type',
                                     'type'       => 'button_set',
                                     'title'      => esc_html__( 'Badge Type', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'       => esc_html__('Choose between a pre-built badge with image and text, or create a custom HTML badge.', WP_ULIKE_PRO_DOMAIN),
                                     'options'    => array(
                                         'default' => esc_html__('Default', WP_ULIKE_PRO_DOMAIN),
                                         'custom'  => esc_html__('Custom', WP_ULIKE_PRO_DOMAIN)
@@ -1767,20 +1801,23 @@ class WP_Ulike_Pro_Options_Panel {
                                 array(
                                     'id'            => 'title',
                                     'type'          => 'wp_editor',
-                                    'title'         => esc_html__('Title', WP_ULIKE_PRO_DOMAIN),
+                                    'title'         => esc_html__('Badge Title', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'          => esc_html__('Main text displayed on the badge. You can use shortcodes here to show dynamic content like like counts.', WP_ULIKE_PRO_DOMAIN),
                                     'height'        => '85px',
                                     'dependency'    => array( 'badge_type', '==', 'default' ),
                                 ),
                                 array(
                                     'id'         => 'subtitle',
                                     'type'       => 'text',
-                                    'title'      => esc_html__('Subtitle', WP_ULIKE_PRO_DOMAIN),
+                                    'title'      => esc_html__('Badge Subtitle', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'       => esc_html__('Secondary text displayed below the title, typically used for descriptions.', WP_ULIKE_PRO_DOMAIN),
                                     'dependency' => array( 'badge_type', '==', 'default' ),
                                 ),
                                 array(
                                     'id'         => 'image',
                                     'type'       => 'media',
-                                    'title'      => esc_html__('Image', WP_ULIKE_PRO_DOMAIN),
+                                    'title'      => esc_html__('Badge Image', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'       => esc_html__('Icon or image displayed on the badge. Recommended size: 64x64 pixels.', WP_ULIKE_PRO_DOMAIN),
                                     'dependency' => array( 'badge_type', '==', 'default' ),
                                 ),
                                 array(
@@ -1802,34 +1839,16 @@ class WP_Ulike_Pro_Options_Panel {
                                         'badge_type' => 'default',
                                         'title'      => '[wp_ulike_pro_user_info status=like] Likes',
                                         'subtitle'   => 'Total up votes',
-                                        'image'      => array(
-                                            'url'    => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/svg/profile/thumb-up.svg',
-                                            'width'  => 64,
-                                            'height' => 64,
-                                            'title'  => 'Total Likes',
-                                        ),
                                     ),
                                     array(
                                         'badge_type' => 'default',
                                         'title'      => '[wp_ulike_pro_user_info status=dislike] Dislikes',
                                         'subtitle'   => 'Total down votes',
-                                        'image'      => array(
-                                            'url'    => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/svg/profile/thumb-down.svg',
-                                            'width'  => 64,
-                                            'height' => 64,
-                                            'title'  => 'Total Disikes'
-                                        ),
                                     ),
                                     array(
                                         'badge_type' => 'default',
                                         'title'      => '[wp_ulike_pro_user_info type=last_activity after_text=ago empty_text=Inactive]',
                                         'subtitle'   => 'Last Activity',
-                                        'image'      => array(
-                                            'url'    => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/svg/profile/history.svg',
-                                            'width'  => 64,
-                                            'height' => 64,
-                                            'title'  => 'Last Activity'
-                                        ),
                                     ),
                                 ),
                             ),
@@ -1847,7 +1866,7 @@ class WP_Ulike_Pro_Options_Panel {
                         array(
                             'id'         => 'tabs_side',
                             'type'       => 'button_set',
-                            'title'      => esc_html__( 'Select Tabs Side', WP_ULIKE_PRO_DOMAIN),
+                            'title'      => sprintf( esc_html__( 'Select %s', WP_ULIKE_PRO_DOMAIN), esc_html__('Tabs Side', WP_ULIKE_PRO_DOMAIN) ),
                             'default'    => 'top',
                             'options'    => array(
                                 'top'   => esc_html__('Top', WP_ULIKE_PRO_DOMAIN),
@@ -1863,27 +1882,29 @@ class WP_Ulike_Pro_Options_Panel {
                                 array(
                                     'id'      => 'title',
                                     'type'    => 'text',
-                                    'title'   => esc_html__('Title', WP_ULIKE_PRO_DOMAIN)
+                                    'title'   => esc_html__('Tab Title', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'    => esc_html__('Text displayed on the tab button in the profile navigation.', WP_ULIKE_PRO_DOMAIN)
                                 ),
                                 array(
                                     'id'     => 'content',
                                     'type'   => 'wp_editor',
-                                    'title'  => esc_html__('Content', WP_ULIKE_PRO_DOMAIN),
+                                    'title'  => esc_html__('Tab Content', WP_ULIKE_PRO_DOMAIN),
                                     'height' => '100px',
-                                    'desc'   => esc_html__( 'A simple HTML/Text structure where you can use different shortcodes.', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'   => esc_html__( 'Content displayed when this tab is active. You can use HTML, text, and shortcodes here.', WP_ULIKE_PRO_DOMAIN),
                                 ),
                                 array(
                                     'id'      => 'has_link',
                                     'type'    => 'link',
                                     'default' => false,
                                     'title'   => esc_html__('Create Link Tab', WP_ULIKE_PRO_DOMAIN),
-                                    'desc'    => esc_html__('Using this option, you can add custom external link for profile nav tabs.', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'    => esc_html__('Make this tab link to an external URL instead of showing content. Useful for linking to external pages or resources.', WP_ULIKE_PRO_DOMAIN),
                                 ),
                                 array(
                                     'id'      => 'restrict',
                                     'type'    => 'switcher',
                                     'default' => false,
                                     'title'   => esc_html__('Show only for profile owner', WP_ULIKE_PRO_DOMAIN),
+                                    'desc'    => esc_html__('Hide this tab from visitors and only show it to the profile owner when viewing their own profile.', WP_ULIKE_PRO_DOMAIN),
                                 )
                             ),
                             'dependency' => array( 'display_tabs', '==', 'true' ),
@@ -1955,12 +1976,6 @@ class WP_Ulike_Pro_Options_Panel {
                                 'type'    => 'subheading',
                                 'content' => esc_html__('Badges', WP_ULIKE_PRO_DOMAIN),
                             ),
-                            array(
-                                'id'         => 'badges_width',
-                                'type'       => 'fieldset',
-                                'title'      => esc_html__('Badge item width', WP_ULIKE_PRO_DOMAIN),
-                                'fields'     => $this->responsive_width_fields( '3', '4', '12' )
-                            ),
                         )
                     ),
                 ),
@@ -1976,6 +1991,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'    => 'switcher',
                 'default' => false,
                 'title'   => esc_html__('Enable Upload Local Avatar', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Allow users to upload and manage their own profile pictures instead of using only Gravatar.', WP_ULIKE_PRO_DOMAIN),
             ),
             array(
                 'id'         => 'use_gravatars',
@@ -1989,6 +2005,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'default_avatar',
                 'type'       => 'media',
                 'title'      => esc_html__('Default Avatar', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Default profile picture shown when a user hasn\'t uploaded a custom avatar and Gravatars are disabled.', WP_ULIKE_PRO_DOMAIN),
                 'library'    => 'image',
                 'default'    => array(
                     'url'    => WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/png/default-avatar.png',
@@ -2001,7 +2018,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'         => 'max_avatar_size',
                 'type'       => 'slider',
-                'title'      => esc_html__( 'Avatar Maximum File Size', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__( 'Avatar size', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Maximum file size allowed when users upload avatar images. Larger files will be rejected.', WP_ULIKE_PRO_DOMAIN),
                 'default'    => 2,
                 'max'        => 50,
                 'step'       => 1,
@@ -2011,7 +2029,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'         => 'max_avatar_width',
                 'type'       => 'slider',
-                'title'      => esc_html__( 'Avatar Maximum Width ', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__( 'Avatar Maximum Width', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Maximum width in pixels for uploaded avatars. Images wider than this will be automatically resized.', WP_ULIKE_PRO_DOMAIN),
                 'default'    => 512,
                 'unit'       => 'px',
                 'dependency' => array( 'enable_local_avatars', '==', 'true' ),
@@ -2030,20 +2049,22 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'      => 'enable_admin_limit_access',
                 'type'    => 'switcher',
                 'default' => false,
-                'title'   => esc_html__('Enable Dashboard Limit Access', WP_ULIKE_PRO_DOMAIN),
+                'title'   => esc_html__('Restrict WordPress Dashboard Access', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Limit access to the WordPress admin dashboard based on user roles. Users without access will be redirected.', WP_ULIKE_PRO_DOMAIN),
             ),
             array(
                 'id'         => 'hide_admin_bar',
                 'type'       => 'switcher',
                 'default'    => true,
                 'title'      => esc_html__('Hide Admin Bar', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Hide the WordPress admin bar from the front-end for users who don\'t have dashboard access.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_admin_limit_access', '==', 'true' )
             ),
             array(
                 'id'         => 'dashboard_access_roles',
                 'type'       => 'checkbox',
-                'title'      => esc_html__('Dashboard User Access', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__('Dashboard access can be restricted to users of certain roles only.', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__('Dashboard Access Roles', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Select which user roles can access the WordPress admin dashboard. Users with other roles will be redirected.', WP_ULIKE_PRO_DOMAIN),
                 'options'    => wp_ulike_pro_get_user_roles_list( array( 'Administrator', 'Subscriber' ) ),
                 'dependency' => array( 'enable_admin_limit_access', '==', 'true' )
             ),
@@ -2051,7 +2072,8 @@ class WP_Ulike_Pro_Options_Panel {
                 'id'         => 'dashboard_custom_redirect',
                 'type'       => 'text',
                 'default'    => home_url(),
-                'title'      => esc_html__( 'Custom Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'title'      => esc_html__( 'Dashboard Redirect URL', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('URL where users without dashboard access are redirected when they try to access the admin area.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_admin_limit_access', '==', 'true' )
             ),
         );
@@ -2140,11 +2162,13 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'    => 'switcher',
                 'default' => false,
                 'title'   => esc_html__('Enable REST API', WP_ULIKE_PRO_DOMAIN),
+                'desc'    => esc_html__('Expose WP ULike data through WordPress REST API endpoints, allowing external applications to access like counts, user votes, and statistics.', WP_ULIKE_PRO_DOMAIN),
             ),
             array(
                 'id'         => 'authentication_type',
                 'type'       => 'button_set',
                 'title'      => esc_html__( 'Authentication Type', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Choose how API requests are authenticated. User Login uses WordPress user credentials, Custom Keys uses API tokens.', WP_ULIKE_PRO_DOMAIN),
                 'default'    => 'login',
                 'options'    => array(
                     'login' => esc_html__('User Login', WP_ULIKE_PRO_DOMAIN),
@@ -2155,8 +2179,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'         => 'rest_api_permission_for_readable_routes',
                 'type'       => 'select',
-                'title'      => esc_html__( 'Access to readable routes', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__( 'Manage users\' access level to REST API.',WP_ULIKE_PRO_DOMAIN ),
+                'title'      => esc_html__( 'Read-Only Route Access', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__( 'Choose which user roles can access API endpoints that retrieve data (GET requests).',WP_ULIKE_PRO_DOMAIN ),
                 'chosen'     => true,
                 'multiple'   => true,
                 'default'    => array( 'administrator' ),
@@ -2166,8 +2190,8 @@ class WP_Ulike_Pro_Options_Panel {
             array(
                 'id'         => 'rest_api_permission_for_writable_routes',
                 'type'       => 'select',
-                'title'      => esc_html__( 'Access to writable routes', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__( 'Manage users\' access level to REST API.',WP_ULIKE_PRO_DOMAIN ),
+                'title'      => esc_html__( 'Write Route Access', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__( 'Choose which user roles can access API endpoints that modify data (POST/PUT/DELETE requests).',WP_ULIKE_PRO_DOMAIN ),
                 'chosen'     => true,
                 'chosen'     => true,
                 'multiple'   => true,
@@ -2180,6 +2204,7 @@ class WP_Ulike_Pro_Options_Panel {
                 'type'       => 'switcher',
                 'default'    => false,
                 'title'      => esc_html__('Enable Auto User ID', WP_ULIKE_PRO_DOMAIN),
+                'desc'       => esc_html__('Automatically use the authenticated user\'s ID for API requests when no user ID is specified.', WP_ULIKE_PRO_DOMAIN),
                 'dependency' => array( 'enable_rest_api|rest_api_permission_for_writable_routes', '==|!=', 'true|' ),
             ),
             array(
@@ -2202,386 +2227,18 @@ class WP_Ulike_Pro_Options_Panel {
             return $this->get_permission_notice();
         }
 
+        $tools_url = admin_url( 'admin.php?page=wp-ulike-pro-tools' );
+
         return array(
             array(
                 'type'    => 'submessage',
-                'style'   => 'warning',
-                'content' => '<strong>Warning:</strong> All options in this panel work directly on optimizing and modifying database table rows. It is best to have a backup before doing anything.',
-            ),
-            array(
-                'id'     => 'opt-posts',
-                'type'   => 'fieldset',
-                'title'  => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Records', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Likes Logs. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'truncate_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Orphaned Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Drop all rows in the logs table where its related table row no longer exists. (Don\'t try this option if you\'re using custom IDs)', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'delete_orphaned_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta Counter Data. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Dulicate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Delete all duplicate rows generated by the spam users.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'delete_duplicate_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Optimize Table Overhead', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Overhead is a temporary disk space that is used by your database to store queries. Over time, a table’s overhead will increase.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'optimize_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Migrate Counter Metadata', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Migrate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You are about to migrate counter values to wordpress meta table.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'migrate_metadata'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Reset Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Reset Counter', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Reset all counters without affecting stats information.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'post',
-                            'action' => 'reset_counter'
-                        )
-                    )
-                ),
-            ),
-            array(
-                'id'     => 'opt-comments',
-                'type'   => 'fieldset',
-                'title'  => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Records', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Likes Logs. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'truncate_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Orphaned Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Drop all rows in the logs table where its related table row no longer exists. (Don\'t try this option if you\'re using custom IDs)', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'delete_orphaned_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta Counter Data. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Dulicate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Delete all duplicate rows generated by the spam users.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'delete_duplicate_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Optimize Table Overhead', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Overhead is a temporary disk space that is used by your database to store queries. Over time, a table’s overhead will increase.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'optimize_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Migrate Counter Metadata', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Migrate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You are about to migrate counter values to wordpress meta table.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'migrate_metadata'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Reset Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Reset Counter', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Reset all counters without affecting stats information.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'comment',
-                            'action' => 'reset_counter'
-                        )
-                    )
-                ),
-            ),
-            array(
-                'id'     => 'opt-activity',
-                'type'   => 'fieldset',
-                'title'  => esc_html__( 'BuddyPress', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Records', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Likes Logs. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'truncate_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Orphaned Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Drop all rows in the logs table where its related table row no longer exists. (Don\'t try this option if you\'re using custom IDs)', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'delete_orphaned_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta Counter Data. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Dulicate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Delete all duplicate rows generated by the spam users.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'delete_duplicate_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Optimize Table Overhead', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Overhead is a temporary disk space that is used by your database to store queries. Over time, a table’s overhead will increase.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'optimize_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Reset Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Reset Counter', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Reset all counters without affecting stats information.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'activity',
-                            'action' => 'reset_counter'
-                        )
-                    )
-                ),
-            ),
-            array(
-                'id'     => 'opt-topic',
-                'type'   => 'fieldset',
-                'title'  => esc_html__( 'bbPress', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Records', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Likes Logs. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'truncate_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Orphaned Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Drop all rows in the logs table where its related table row no longer exists. (Don\'t try this option if you\'re using custom IDs)', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'delete_orphaned_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta Counter Data. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Dulicate Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Delete all duplicate rows generated by the spam users.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'delete_duplicate_rows'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Optimize Table Overhead', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Overhead is a temporary disk space that is used by your database to store queries. Over time, a table’s overhead will increase.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'optimize_table'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Reset Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Reset Counter', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Reset all counters without affecting stats information.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'topic',
-                            'action' => 'reset_counter'
-                        )
-                    )
-                ),
-            ),
-            array(
-                'id'     => 'opt-general',
-                'type'   => 'fieldset',
-                'title'  => esc_html__( 'Other cases', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Meta User Status', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete All Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta User Status.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'user',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete All Meta Statistics Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete All Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'You Are About To Delete All Meta Stats Values.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'statistics',
-                            'action' => 'delete_meta_group'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete Empty Post Meta Rows', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'Drop all Metabox rows in the post meta table where its value is empty.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'optimize',
-                            'action' => 'optimize_post_meta'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Create default pages', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Create Pages', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'This tool will install all the missing pages. Pages already defined and set up will not be replaced.', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'create',
-                            'action' => 'manage_default_pages'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'  => esc_html__( 'Delete default pages', WP_ULIKE_PRO_DOMAIN),
-                            'label'  => esc_html__( 'Delete Pages', WP_ULIKE_PRO_DOMAIN),
-                            'desc'   => esc_html__( 'This tool will delete all the default pages', WP_ULIKE_PRO_DOMAIN),
-                            'type'   => 'delete',
-                            'action' => 'manage_default_pages'
-                        )
-                    ),
+                'style'   => 'info',
+                'content' => sprintf(
+                    '<p><strong>%s</strong></p><p>%s</p><p><a href="%s" class="button button-primary">%s</a></p>',
+                    esc_html__( 'Optimization Tools Have Moved', WP_ULIKE_PRO_DOMAIN ),
+                    esc_html__( 'All optimization and maintenance tools have been moved to the new Tools menu for better organization and improved user experience. You can now find all database optimization, cache management, repair tools, and more in one dedicated location.', WP_ULIKE_PRO_DOMAIN ),
+                    esc_url( $tools_url ),
+                    esc_html__( 'Go to Tools Page', WP_ULIKE_PRO_DOMAIN )
                 ),
             )
         );
@@ -2615,16 +2272,19 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'       => 'slug',
                         'type'     => 'text',
                         'title'    => esc_html__( 'Slug',WP_ULIKE_PRO_DOMAIN) . ' *',
+                        'desc'     => esc_html__('A unique identifier for this share button set. Used in the shortcode to display these buttons (e.g., slug="my_share").', WP_ULIKE_PRO_DOMAIN),
                     ),
                     array(
                         'id'     => 'buttons',
                         'type'   => 'group',
-                        'title'  => esc_html__('Share Buttons ', WP_ULIKE_PRO_DOMAIN)  . ' *',
+                        'title'  => esc_html__('Share buttons', WP_ULIKE_PRO_DOMAIN)  . ' *',
+                        'desc'   => esc_html__('Add one or more social networks to include in this share button set.', WP_ULIKE_PRO_DOMAIN),
                         'fields' => array(
                             array(
                                 'id'       => 'network',
                                 'type'     => 'select',
-                                'title'    => esc_html__( 'Network', WP_ULIKE_PRO_DOMAIN),
+                                'title'    => esc_html__( 'Social networks', WP_ULIKE_PRO_DOMAIN),
+                                'desc'     => esc_html__('Choose which social media platform this button will share to.', WP_ULIKE_PRO_DOMAIN),
                                 'chosen'   => true,
                                 'settings'   => array(
                                     'width' => '50%'
@@ -2658,7 +2318,8 @@ class WP_Ulike_Pro_Options_Panel {
                             array(
                                 'id'      => 'label',
                                 'type'    => 'text',
-                                'title'   => esc_html__( 'Label',WP_ULIKE_PRO_DOMAIN),
+                                'title'   => esc_html__( 'Button Label',WP_ULIKE_PRO_DOMAIN),
+                                'desc'    => sprintf( esc_html__('Custom text displayed on the %s. Leave empty to use the default network name.', WP_ULIKE_PRO_DOMAIN), esc_html__('share button', WP_ULIKE_PRO_DOMAIN) ),
                             ),
                         )
                     ),
@@ -2666,7 +2327,8 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'      => 'view',
                         'type'    => 'button_set',
                         'default' => 'icon_text',
-                        'title'   => esc_html__( 'View', WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__( 'Button Display Style', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Choose how buttons are displayed: with icon and text, icon only, or text only.', WP_ULIKE_PRO_DOMAIN),
                         'options' => array(
                             'icon_text' => esc_html__( 'Icon & Text', WP_ULIKE_PRO_DOMAIN),
                             'icon'      => esc_html__( 'Icon', WP_ULIKE_PRO_DOMAIN),
@@ -2677,7 +2339,8 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'      => 'skin',
                         'type'    => 'button_set',
                         'default' => 'gradient',
-                        'title'   => esc_html__( 'Skin', WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__( 'Button Style', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Choose the visual style for buttons.', WP_ULIKE_PRO_DOMAIN),
                         'options' => array(
                             'gradient' => esc_html__( 'Gradient', WP_ULIKE_PRO_DOMAIN),
                             'minimal'  => esc_html__( 'Minimal', WP_ULIKE_PRO_DOMAIN),
@@ -2689,7 +2352,8 @@ class WP_Ulike_Pro_Options_Panel {
                     array(
                         'id'      => 'shape',
                         'type'    => 'button_set',
-                        'title'   => esc_html__( 'Shape', WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__( 'Button Shape', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Choose the corner style for share buttons.', WP_ULIKE_PRO_DOMAIN),
                         'default' => 'rounded',
                         'options' => array(
                             'square'  => esc_html__( 'Square', WP_ULIKE_PRO_DOMAIN),
@@ -2701,7 +2365,8 @@ class WP_Ulike_Pro_Options_Panel {
                         'id'      => 'color',
                         'type'    => 'button_set',
                         'default' => 'official',
-                        'title'   => esc_html__( 'Color', WP_ULIKE_PRO_DOMAIN),
+                        'title'   => esc_html__( 'Button Colors', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Use official brand colors for each social network, or apply custom colors to all buttons.', WP_ULIKE_PRO_DOMAIN),
                         'options' => array(
                             'official' => esc_html__( 'Official', WP_ULIKE_PRO_DOMAIN),
                             'custom'   => esc_html__( 'Custom', WP_ULIKE_PRO_DOMAIN)
@@ -2714,7 +2379,8 @@ class WP_Ulike_Pro_Options_Panel {
                         'media_buttons' => false,
                         'quicktags'     => true,
                         'sanitize'      => false,
-                        'title'         => esc_html__( 'Before Content',WP_ULIKE_PRO_DOMAIN)
+                        'title'         => esc_html__( 'Before Content',WP_ULIKE_PRO_DOMAIN),
+                        'desc'          => esc_html__('HTML content displayed before the buttons. Useful for adding separators or text.', WP_ULIKE_PRO_DOMAIN)
                     ),
                     array(
                         'id'            => 'after',
@@ -2723,19 +2389,21 @@ class WP_Ulike_Pro_Options_Panel {
                         'media_buttons' => false,
                         'quicktags'     => true,
                         'sanitize'      => false,
-                        'title'         => esc_html__( 'After Content',WP_ULIKE_PRO_DOMAIN)
+                        'title'         => esc_html__( 'After Content',WP_ULIKE_PRO_DOMAIN),
+                        'desc'          => esc_html__('HTML content displayed after the buttons.', WP_ULIKE_PRO_DOMAIN)
                     ),
                     array(
                         'id'      => 'auto_display',
                         'type'    => 'radio',
                         'title'   => esc_html__( 'Auto Display', WP_ULIKE_PRO_DOMAIN),
+                        'desc'    => esc_html__('Automatically show share buttons in relation to the like button, or use a custom hook for placement.', WP_ULIKE_PRO_DOMAIN),
                         'default' => 'none',
                         'options' => array(
                             'none'          => esc_html__( 'None', WP_ULIKE_PRO_DOMAIN),
                             'after_button'  => esc_html__( 'After Button', WP_ULIKE_PRO_DOMAIN),
                             'before_button' => esc_html__( 'Before Button', WP_ULIKE_PRO_DOMAIN),
                             'modal_display' => esc_html__( 'Modal After Vote', WP_ULIKE_PRO_DOMAIN),
-                            'custom_hook'   => esc_html__( 'Cutom Hook', WP_ULIKE_PRO_DOMAIN)
+                            'custom_hook'   => esc_html__( 'Custom Hook', WP_ULIKE_PRO_DOMAIN)
                         )
                     ),
                     array(
@@ -2870,7 +2538,7 @@ class WP_Ulike_Pro_Options_Panel {
                             'id'      => 'subject',
                             'type'    => 'text',
                             'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Please activate your account',WP_ULIKE_PRO_DOMAIN),
+                            'default' => esc_html__( 'Please check your email to activate your account.',WP_ULIKE_PRO_DOMAIN),
                         ),
                         array(
                             'id'      => 'body',
@@ -2914,7 +2582,7 @@ class WP_Ulike_Pro_Options_Panel {
                 array(
                     'id'      => 'appears_email',
                     'type'    => 'text',
-                    'title'   => esc_html__( 'Mail appears from address',WP_ULIKE_PRO_DOMAIN),
+                    'title'   => esc_html__( 'Mail appears from',WP_ULIKE_PRO_DOMAIN),
                     'default' => get_bloginfo('admin_email'),
                 ),
                 array(

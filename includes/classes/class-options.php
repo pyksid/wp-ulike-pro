@@ -487,6 +487,21 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 				'remove' => self::getOption( 'avatar_delete_text', esc_html__( 'Delete', WP_ULIKE_PRO_DOMAIN ) ),
 				'logout' => self::getOption( 'avatar_logout_text', esc_html__( 'Log Out', WP_ULIKE_PRO_DOMAIN ) )
 			),
+			'messages' => array(
+				'chooseProfilePicture' => esc_html__( 'Choose profile picture', WP_ULIKE_PRO_DOMAIN ),
+				'confirmRemoveAvatar' => esc_html__( 'Are you sure you want to remove your avatar?', WP_ULIKE_PRO_DOMAIN ),
+				'pleaseSelectImage' => esc_html__( 'Please select an image file', WP_ULIKE_PRO_DOMAIN ),
+				'fileSizeMustBeLess' => esc_html__( 'File size must be less than %sMB', WP_ULIKE_PRO_DOMAIN ),
+				'imageMustBeAtLeast' => esc_html__( 'Image must be at least %sx%s pixels', WP_ULIKE_PRO_DOMAIN ),
+				'modalSystemNotAvailable' => esc_html__( 'Modal system not available', WP_ULIKE_PRO_DOMAIN ),
+				'failedToProcessImage' => esc_html__( 'Failed to process image', WP_ULIKE_PRO_DOMAIN ),
+				'uploadUrlNotConfigured' => esc_html__( 'Upload URL not configured', WP_ULIKE_PRO_DOMAIN ),
+				'avatarUploadedSuccessfully' => esc_html__( 'Avatar uploaded successfully', WP_ULIKE_PRO_DOMAIN ),
+				'uploadFailed' => esc_html__( 'Upload failed', WP_ULIKE_PRO_DOMAIN ),
+				'invalidResponseFromServer' => esc_html__( 'Invalid response from server', WP_ULIKE_PRO_DOMAIN ),
+				'avatarRemoved' => esc_html__( 'Avatar removed', WP_ULIKE_PRO_DOMAIN ),
+				'failedToRemoveAvatar' => esc_html__( 'Failed to remove avatar', WP_ULIKE_PRO_DOMAIN )
+			),
 			'icons'    => array(
 				'menu'     => 'ulp-icon-settings',
 				'upload'   => 'ulp-icon-upload',
@@ -500,6 +515,44 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 
 		return apply_filters( 'wp_ulike_pro_avatar_configs', wp_parse_args( $args, $defaults ) );
     }
+
+	/**
+	 * Get formatted avatar config for JavaScript localization
+	 *
+	 * @return array
+	 */
+	public static function getAvatarConfigForJs(){
+		$avatar_configs = self::getAvatarConfigs();
+
+		return array(
+			'maxSize' => $avatar_configs['maxSize'] * 1024 * 1024, // Convert MB to bytes
+			'minWidth' => 256, // Minimum image width
+			'minHeight' => 256, // Minimum image height
+			'cropSize' => $avatar_configs['maxWidth'], // Crop to max width (square)
+			'quality' => $avatar_configs['quality'] / 100, // Convert percentage to decimal (60% = 0.6)
+			'captions' => array(
+				'changePhoto' => ! empty( $avatar_configs['captions']['upload'] ) ? $avatar_configs['captions']['upload'] : esc_html__( 'Change photo', 'wp-ulike-pro' ),
+				'removePhoto' => ! empty( $avatar_configs['captions']['remove'] ) ? $avatar_configs['captions']['remove'] : esc_html__( 'Remove photo', 'wp-ulike-pro' ),
+				'save' => esc_html__( 'Save', 'wp-ulike-pro' ),
+				'cancel' => esc_html__( 'Cancel', 'wp-ulike-pro' )
+			),
+			'messages' => array(
+				'chooseProfilePicture' => ! empty( $avatar_configs['messages']['chooseProfilePicture'] ) ? $avatar_configs['messages']['chooseProfilePicture'] : esc_html__( 'Choose profile picture', 'wp-ulike-pro' ),
+				'confirmRemoveAvatar' => ! empty( $avatar_configs['messages']['confirmRemoveAvatar'] ) ? $avatar_configs['messages']['confirmRemoveAvatar'] : esc_html__( 'Are you sure you want to remove your avatar?', 'wp-ulike-pro' ),
+				'pleaseSelectImage' => ! empty( $avatar_configs['messages']['pleaseSelectImage'] ) ? $avatar_configs['messages']['pleaseSelectImage'] : esc_html__( 'Please select an image file', 'wp-ulike-pro' ),
+				'fileSizeMustBeLess' => ! empty( $avatar_configs['messages']['fileSizeMustBeLess'] ) ? $avatar_configs['messages']['fileSizeMustBeLess'] : esc_html__( 'File size must be less than %sMB', 'wp-ulike-pro' ),
+				'imageMustBeAtLeast' => ! empty( $avatar_configs['messages']['imageMustBeAtLeast'] ) ? $avatar_configs['messages']['imageMustBeAtLeast'] : esc_html__( 'Image must be at least %sx%s pixels', 'wp-ulike-pro' ),
+				'modalSystemNotAvailable' => ! empty( $avatar_configs['messages']['modalSystemNotAvailable'] ) ? $avatar_configs['messages']['modalSystemNotAvailable'] : esc_html__( 'Modal system not available', 'wp-ulike-pro' ),
+				'failedToProcessImage' => ! empty( $avatar_configs['messages']['failedToProcessImage'] ) ? $avatar_configs['messages']['failedToProcessImage'] : esc_html__( 'Failed to process image', 'wp-ulike-pro' ),
+				'uploadUrlNotConfigured' => ! empty( $avatar_configs['messages']['uploadUrlNotConfigured'] ) ? $avatar_configs['messages']['uploadUrlNotConfigured'] : esc_html__( 'Upload URL not configured', 'wp-ulike-pro' ),
+				'avatarUploadedSuccessfully' => ! empty( $avatar_configs['messages']['avatarUploadedSuccessfully'] ) ? $avatar_configs['messages']['avatarUploadedSuccessfully'] : esc_html__( 'Avatar uploaded successfully', 'wp-ulike-pro' ),
+				'uploadFailed' => ! empty( $avatar_configs['messages']['uploadFailed'] ) ? $avatar_configs['messages']['uploadFailed'] : esc_html__( 'Upload failed', 'wp-ulike-pro' ),
+				'invalidResponseFromServer' => ! empty( $avatar_configs['messages']['invalidResponseFromServer'] ) ? $avatar_configs['messages']['invalidResponseFromServer'] : esc_html__( 'Invalid response from server', 'wp-ulike-pro' ),
+				'avatarRemoved' => ! empty( $avatar_configs['messages']['avatarRemoved'] ) ? $avatar_configs['messages']['avatarRemoved'] : esc_html__( 'Avatar removed', 'wp-ulike-pro' ),
+				'failedToRemoveAvatar' => ! empty( $avatar_configs['messages']['failedToRemoveAvatar'] ) ? $avatar_configs['messages']['failedToRemoveAvatar'] : esc_html__( 'Failed to remove avatar', 'wp-ulike-pro' )
+			)
+		);
+	}
 
 	/**
 	 * Get availabe social login providers data

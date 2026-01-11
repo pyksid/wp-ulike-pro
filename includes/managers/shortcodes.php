@@ -37,9 +37,11 @@ function  wp_ulike_pro_profile_shortcode( $atts ){
         wp_set_current_user( $wp_ulike_user_profile_id );
     }
 
-    // enqueue scripts
-    wp_enqueue_script( 'ulp-uploader' );
-    wp_enqueue_style( 'ulp-uploader' );
+    // enqueue scripts (New standalone avatar uploader)
+    if( WP_Ulike_Pro_Options::isLocalAvatars() ){
+        wp_enqueue_script( 'ulp-uploader' );
+        wp_enqueue_style( 'ulp-uploader' );
+    }
 
     // Load template
     return wp_ulike_pro_get_public_template( 'profile', $args['user_id'] );
@@ -69,7 +71,14 @@ function  wp_ulike_pro_user_info_shortcode( $atts ){
         "empty_text"  => ''
     ), $atts );
 
-    extract( $args );
+    // Extract variables safely instead of using extract()
+    $user_id = isset( $args['user_id'] ) ? $args['user_id'] : '';
+    $type = isset( $args['type'] ) ? $args['type'] : '';
+    $table = isset( $args['table'] ) ? $args['table'] : '';
+    $status = isset( $args['status'] ) ? $args['status'] : '';
+    $before_text = isset( $args['before_text'] ) ? $args['before_text'] : '';
+    $after_text = isset( $args['after_text'] ) ? $args['after_text'] : '';
+    $empty_text = isset( $args['empty_text'] ) ? $args['empty_text'] : '';
 
     // Modify user ID
     $user_id = empty( $user_id ) ? $wp_ulike_user_profile_id : $user_id;
@@ -110,7 +119,10 @@ function  wp_ulike_pro_user_info_shortcode( $atts ){
         $data   = array();
 
         foreach ( $tables as $t_key => $t_value ) {
-            $get_query = $wpdb->get_row( sprintf( "SELECT * FROM %s WHERE `user_id` = '%s' ORDER BY id DESC LIMIT 1 ", $wpdb->prefix . $t_value, $user_id ), ARRAY_A );
+            // SECURITY: Use prepared statement to prevent SQL injection
+            $table_name = esc_sql( $wpdb->prefix . $t_value );
+            $user_id_safe = absint( $user_id );
+            $get_query = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY id DESC LIMIT 1", $user_id_safe ), ARRAY_A );
             if( ! empty( $get_query ) ){
                 $data[] = $get_query;
             }
@@ -205,7 +217,10 @@ function  wp_ulike_pro_login_form_shortcode( $atts ){
     global $wp_ulike_form_args;
 
     // check if requested for lostpassword
-    if( isset( $_GET['action'] ) && in_array(  $_GET['action'], array( 'checkemail', 'lostpassword', 'changepassword' ) ) ){
+    // SECURITY: Sanitize action parameter
+    $action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+    $allowed_actions = array( 'checkemail', 'lostpassword', 'changepassword' );
+    if( ! empty( $action ) && in_array( $action, $allowed_actions, true ) ){
         return wp_ulike_pro_reset_password_form_shortcode( $atts );
     }
 
@@ -363,9 +378,11 @@ function  wp_ulike_pro_account_form_shortcode( $atts ){
     // Set global var
     $wp_ulike_form_args = (object) $args;
 
-    // enqueue scripts
-    wp_enqueue_script( 'ulp-uploader' );
-    wp_enqueue_style( 'ulp-uploader' );
+    // enqueue scripts (New standalone avatar uploader)
+    if( WP_Ulike_Pro_Options::isLocalAvatars() ){
+        wp_enqueue_script( 'ulp-uploader' );
+        wp_enqueue_style( 'ulp-uploader' );
+    }
 
     // Load template
     return wp_ulike_pro_get_public_template( 'form/profile' );
@@ -449,7 +466,7 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
 
         <?php if( in_array( $view, array( 'icon_text', 'text' ) ) ): ?>
         <div class="ulp-share-btn-text">
-            <span class="ulp-share-btn-title"><?php echo $label; ?></span>
+            <span class="ulp-share-btn-title"><?php echo esc_html( $label ); ?></span>
         </div>
         <?php endif; ?>
 
@@ -531,13 +548,13 @@ function  wp_ulike_pro_two_factor_shortcode( $atts ){
     <div class="ulp-flex-row ulp-flex-middle-xs">
         <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
             <h3 class="ulp-title">
-                <?php echo $args['title']; ?>
+                <?php echo esc_html( $args['title'] ); ?>
             </h3>
         </div>
         <?php if( empty( $secrets ) || ( ! empty( $secrets ) && count( $secrets ) < $args['limit_accounts'] ) ) : ?>
         <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
             <p class="ulp-description">
-                <?php echo $args['description']; ?>
+                <?php echo wp_kses_post( $args['description'] ); ?>
             </p>
         </div>
         <div class="ulp-flex-col-xl-4 ulp-flex-col-md-4 ulp-flex-col-xs-12">
@@ -564,7 +581,7 @@ function  wp_ulike_pro_two_factor_shortcode( $atts ){
         </div>
         <?php else : ?>
         <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-            <p class="ulp-description"><?php echo $args['limit_message']; ?></p>
+            <p class="ulp-description"><?php echo wp_kses_post( $args['limit_message'] ); ?></p>
         </div>
         <?php endif; ?>
         <?php

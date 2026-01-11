@@ -12,7 +12,13 @@ if( is_user_logged_in() && ! WP_Ulike_Pro::is_preview_mode() ){
   return;
 }
 
-$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'lostpassword';
+// SECURITY: Sanitize action parameter
+$action = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : 'lostpassword';
+// Whitelist allowed actions
+$allowed_actions = array( 'lostpassword', 'changepassword' );
+if ( ! in_array( $action, $allowed_actions, true ) ) {
+	$action = 'lostpassword';
+}
 
 $btn_label = $wp_ulike_form_args->reset_button;
 $msg_text  = $wp_ulike_form_args->reset_message;
@@ -26,7 +32,7 @@ if ( $action == 'changepassword' ) {
 ?>
 <div class="ulp-form ulp-form-center ulp-ajax-form ulp-reset-password">
     <form id="ulp-reset-password-<?php echo esc_attr( $wp_ulike_form_args->form_id ); ?>" method="post" action=""
-        autocomplete="off">
+        autocomplete="off" aria-label="<?php esc_attr_e( 'Password reset form', 'wp-ulike-pro' ); ?>">
 
         <?php wp_ulike_pro_print_notices(); ?>
 
@@ -37,44 +43,76 @@ if ( $action == 'changepassword' ) {
             <div
                 class="ulp-flex-col-xl-12 ulp-message <?php echo esc_attr( $msg_class ); ?> ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-flex">
-                    <span><?php echo $msg_text; ?></span>
+                    <span><?php echo wp_kses_post( $msg_text ); ?></span>
                 </div>
             </div>
 
-            <?php if( $action === 'changepassword' ) : ?>
+            <?php if( $action === 'changepassword' ) :
+                // Check if reset pass was activated and extract username for accessibility
+                $rp_cookie  = 'wp-resetpass-' . COOKIEHASH;
+                $rp_login = '';
+                $rp_key = '';
+                // SECURITY: Sanitize cookie value
+                if ( isset( $_COOKIE[$rp_cookie] ) && 0 < strpos( $_COOKIE[$rp_cookie], ':' ) ) {
+                    $cookie_value = sanitize_text_field( wp_unslash( $_COOKIE[ $rp_cookie ] ) );
+                    list( $rp_login, $rp_key ) = explode( ':', $cookie_value, 2 );
+                    // SECURITY: Validate key format
+                    if ( ! empty( $rp_key ) && preg_match( '/^[a-zA-Z0-9]+$/', $rp_key ) ) {
+                        // Add hidden rp_key field
+            ?>
+            <input type="hidden" name="rp_key" value="<?php echo esc_attr( $rp_key ); ?>" />
+            <?php
+                    }
+                }
+                // Add visually hidden username field BEFORE password fields for accessibility
+                if ( ! empty( $rp_login ) ) {
+            ?>
+            <input type="text" name="username" value="<?php echo esc_attr( $rp_login ); ?>" autocomplete="username" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" aria-hidden="true" tabindex="-1" />
+            <?php
+                }
+            ?>
 
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-                <div class="ulp-floating">
+                <div class="ulp-floating ulp-password-wrapper">
                     <input id="ulp-new-password" type="password" class="ulp-floating-input" name="newpassword"
-                        type="text" placeholder="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>" spellcheck="false" required autocomplete="new-password" />
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>" spellcheck="false" required autocomplete="new-password"
+                        aria-describedby="ulp-new-password-strength-description" />
                     <label for="ulp-new-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->new_pass ); ?>">
                         <span
                             class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->new_pass ); ?></span>
                     </label>
+                    <button type="button" class="ulp-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'wp-ulike-pro' ); ?>" aria-pressed="false" tabindex="-1">
+                        <span class="ulp-password-toggle-icon" aria-hidden="true"></span>
+                        <span class="ulp-hidden-visually"><?php esc_html_e( 'Show password', 'wp-ulike-pro' ); ?></span>
+                    </button>
+                    <span id="ulp-new-password-strength-description" class="ulp-hidden-visually"><?php esc_html_e( 'Password strength indicator', 'wp-ulike-pro' ); ?></span>
+                    <div class="ulp-password-requirements" role="status" aria-live="polite">
+                        <div class="ulp-password-strength">
+                            <div class="ulp-password-strength-bar">
+                                <div class="ulp-password-strength-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ulp-password-strength-text"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-                <div class="ulp-floating">
-                    <input id="ulp-re-password" type="password" class="ulp-floating-input" name="repassword" type="text"
+                <div class="ulp-floating ulp-password-wrapper">
+                    <input id="ulp-re-password" type="password" class="ulp-floating-input" name="repassword"
                         placeholder="<?php echo esc_attr( $wp_ulike_form_args->re_new_pass ); ?>" spellcheck="false" required autocomplete="new-password" />
                     <label for="ulp-re-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->re_new_pass ); ?>">
                         <span
                             class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->re_new_pass ); ?></span>
                     </label>
+                    <button type="button" class="ulp-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'wp-ulike-pro' ); ?>" aria-pressed="false" tabindex="-1">
+                        <span class="ulp-password-toggle-icon" aria-hidden="true"></span>
+                        <span class="ulp-hidden-visually"><?php esc_html_e( 'Show password', 'wp-ulike-pro' ); ?></span>
+                    </button>
                 </div>
             </div>
-
-            <?php
-            // Check if reset pass was activated
-            $rp_cookie  = 'wp-resetpass-' . COOKIEHASH;
-            if ( isset( $_COOKIE[$rp_cookie] ) && 0 < strpos( $_COOKIE[$rp_cookie], ':' ) ) {
-                list( $rp_login, $rp_key ) = explode( ':', wp_unslash( $_COOKIE[ $rp_cookie ] ), 2 );
-            ?>
-            <input type="hidden" name="rp_key" value="<?php echo esc_attr( $rp_key ); ?>" />
-            <?php } ?>
 
             <?php else: ?>
 

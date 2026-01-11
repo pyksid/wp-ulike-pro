@@ -517,13 +517,47 @@ add_action( 'init', 'wp_ulike_pro_general_hooks_init' );
  * @return void
  */
 function wp_ulike_pro_general_hooks_wp(){
-    if( WP_Ulike_Pro_Options::getAvailabeSocialLogins() && ! empty( $_GET['ulp-api'] ) && ! empty( $_GET['provider'] ) ){
-        global $ulp_session;
-        // if session exists it means this request submitted by our forms.
-        if( $ulp_session->get( 'current_url' ) ){
-            $social_login = new WP_Ulike_Pro_Social_Login;
-            $social_login->connectUser();
+    // SECURITY: Sanitize GET parameters
+    $ulp_api = isset( $_GET['ulp-api'] ) ? sanitize_text_field( wp_unslash( $_GET['ulp-api'] ) ) : '';
+    $provider = isset( $_GET['provider'] ) ? sanitize_text_field( wp_unslash( $_GET['provider'] ) ) : '';
+    
+    if( WP_Ulike_Pro_Options::getAvailabeSocialLogins() && ! empty( $ulp_api ) && ! empty( $provider ) ){
+        // SECURITY: Whitelist allowed providers
+        $allowed_providers = array( 'facebook', 'google', 'twitter', 'apple', 'microsoft', 'telegram', 'steam', 'openid' );
+        if ( ! in_array( strtolower( $provider ), $allowed_providers, true ) ) {
+            wp_safe_redirect( home_url() );
+            exit;
         }
+        
+        global $ulp_session;
+        
+        // SECURITY: Validate session before processing
+        $current_url = $ulp_session->get( 'current_url' );
+        if ( empty( $current_url ) ) {
+            return;
+        }
+
+        // SECURITY: Validate session is recent (within 10 minutes)
+        $session_start = $ulp_session->get( 'social_login_start_time' );
+        if ( $session_start && ( time() - $session_start ) > 600 ) {
+            $ulp_session->__unset( 'current_url' );
+            $ulp_session->__unset( 'social_login_start_time' );
+            wp_ulike_pro_add_notice( esc_html__( 'Session expired. Please try again.', WP_ULIKE_PRO_DOMAIN ), 'error' );
+            wp_safe_redirect( home_url() );
+            exit;
+        }
+
+        // SECURITY: Validate redirect URL is safe
+        if ( ! wp_ulike_pro_is_safe_redirect( $current_url ) ) {
+            $ulp_session->__unset( 'current_url' );
+            wp_ulike_pro_add_notice( esc_html__( 'Invalid redirect URL.', WP_ULIKE_PRO_DOMAIN ), 'error' );
+            wp_safe_redirect( home_url() );
+            exit;
+        }
+
+        // if session exists and is valid, process social login
+        $social_login = new WP_Ulike_Pro_Social_Login;
+        $social_login->connectUser();
     }
 }
 add_action( 'wp', 'wp_ulike_pro_general_hooks_wp' );
@@ -696,9 +730,9 @@ function wp_ulike_pro_validate_recaptcha( $args ){
 
     $error_codes = array(
         'missing-input-secret'   => WP_Ulike_Pro_Options::getNoticeMessage( 'missing_input_secret', esc_html__( 'The secret parameter is missing.', WP_ULIKE_PRO_DOMAIN ) ),
-        'invalid-input-secret'   => WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_input_secret', esc_html__( 'The secret parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ) ),
+        'invalid-input-secret'   => WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_input_secret', esc_html__( 'The parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ) ),
         'missing-input-response' => WP_Ulike_Pro_Options::getNoticeMessage( 'missing_input_response', esc_html__( 'Please confirm you are not a robot', WP_ULIKE_PRO_DOMAIN ) ),
-        'invalid-input-response' => WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_input_response', esc_html__( 'The response parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ) ),
+        'invalid-input-response' => WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_input_response', esc_html__( 'The parameter is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ) ),
         'bad-request'            => WP_Ulike_Pro_Options::getNoticeMessage( 'bad_request', esc_html__( 'The request is invalid or malformed.', WP_ULIKE_PRO_DOMAIN ) ),
         'timeout-or-duplicate'   => WP_Ulike_Pro_Options::getNoticeMessage( 'timeout_or_duplicate', esc_html__( 'The response is no longer valid: either is too old or has been used previously.', WP_ULIKE_PRO_DOMAIN ) ),
         'undefined'              => WP_Ulike_Pro_Options::getNoticeMessage( 'undefined', esc_html__( 'Undefined reCAPTCHA error.', WP_ULIKE_PRO_DOMAIN) ),
@@ -758,14 +792,18 @@ function wp_ulike_pro_validate_two_factor( $args ){
         return;
     }
 
-    // check user exist
+    // Try to get user data for 2FA check
+    // Don't throw exception if user doesn't exist - let wp_signon() handle that
+    // This prevents bypassing rate limiting and user enumeration
     $user_data = get_user_by( 'login', $args->data['username'] );
     if ( ! $user_data ) {
         // check for user email
         $user_data = get_user_by( 'email', $args->data['username'] );
-        if ( ! $user_data ) {
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'login_failed', esc_html__( 'Invalid username or incorrect password!', WP_ULIKE_PRO_DOMAIN ) ) );
-        }
+    }
+
+    // If user doesn't exist, skip 2FA validation - wp_signon() will handle authentication
+    if ( ! $user_data ) {
+        return;
     }
 
     // get otp code
@@ -787,10 +825,6 @@ function wp_ulike_pro_validate_two_factor( $args ){
                 'fragments'         => array(
                     '.ulp-login form .ulp-form-row > [class^="ulp-flex-"]:not([class^="ulp-submit-field"],[class^="ulp-recaptcha-field"])' => array(
                         'method'  => 'hidden'
-                    ),
-                    '.ulp-login form .ulp-form-row' => array(
-                        'content' => wp_ulike_pro_get_two_factor_field(),
-                        'method'  => 'prepend'
                     ),
                     '.ulp-login form .ulp-form-row' => array(
                         'content' => wp_ulike_pro_get_two_factor_field(),
@@ -864,7 +898,7 @@ add_action( 'wp_ulike_pro_forms_after_hook', 'wp_ulike_pro_forms_end_hook', 10, 
 function wp_ulike_pro_register_mycred_hook( $installed ) {
     // Add pro widget
     $installed['wp_ulike_pro'] = array(
-        'title'       => WP_ULIKE_NAME . ' : ' .  esc_html__( 'Points for dis-liking content', WP_ULIKE_PRO_DOMAIN ),
+        'title'       => WP_ULIKE_NAME . ' : ' .  esc_html__( 'Points for Disliking content', WP_ULIKE_PRO_DOMAIN ),
         'description' => esc_html__( 'This hook award / deducts points from users who Dislike/Undislike any content of WordPress, bbPress, BuddyPress & ...', WP_ULIKE_PRO_DOMAIN ),
         'callback'    => array( 'WP_Ulike_Pro_myCRED' )
     );
@@ -922,14 +956,16 @@ add_filter( 'wp_get_attachment_image', 'wp_ulike_pro_add_votings_for_attachments
  * @return void
  */
 function wp_ulike_pro_add_pile_up_likers_list( $args, $settings ){
-    // Extract settings
-    extract( $settings );
+    // SECURITY: Extract settings safely instead of using extract()
+    $table = isset( $settings['table'] ) ? $settings['table'] : '';
+    $column = isset( $settings['column'] ) ? $settings['column'] : '';
+    $setting = isset( $settings['setting'] ) ? $settings['setting'] : '';
 
     // If pile modal template selected
     if( $args['likers_style'] == 'pile' ){
         echo sprintf(
             '<div class="wp_ulike_likers_wrapper wp_ulike_pile_list_container wp_%s_likers_%s">%s</div>',
-            $args['type'], $args['ID'], wp_ulike_get_likers_template( $table, $column, $args['ID'], $setting, array( 'style' => 'pile' ) )
+            esc_attr( $args['type'] ), esc_attr( $args['ID'] ), wp_ulike_get_likers_template( $table, $column, $args['ID'], $setting, array( 'style' => 'pile' ) )
         );
 	}
 

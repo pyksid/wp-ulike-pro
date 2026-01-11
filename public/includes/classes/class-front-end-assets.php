@@ -40,12 +40,20 @@ class WP_Ulike_Pro_Front_End_Assets {
             WP_Ulike_Pro_reCAPTCHA_Enqueue::wp_enqueue_scripts();
         }
 
+        // Get view tracking enabled types
+        $view_tracking_enabled = wp_ulike_get_option( 'view_tracking_enabled_types', array( 'post') );
+        if ( empty( $view_tracking_enabled ) || ! is_array( $view_tracking_enabled ) ) {
+            $view_tracking_enabled = array( 'post' );
+        }
+
         $localize_args = array(
             'AjaxUrl' => add_query_arg( WP_Ulike_Pro::is_preview_mode() ? array( 'preview' => true ) : array(), admin_url( 'admin-ajax.php' ) ),
             'Nonce'   => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
-            'TabSide' => wp_ulike_get_option( 'user_profiles_appearance|tabs_side', 'top' )
+            'TabSide' => wp_ulike_get_option( 'user_profiles_appearance|tabs_side', 'top' ),
+            'ViewTracking' => array(
+                'enabledTypes' => $view_tracking_enabled
+            )
         );
-        $script_dependencies = array( 'jquery' );
 
         if( ! WP_Ulike_Pro::is_preview_mode() ){
             // Add social share buttons script
@@ -54,30 +62,50 @@ class WP_Ulike_Pro_Front_End_Assets {
                 wp_enqueue_script( 'ulp-share-buttons', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/share.min.js', array(), WP_ULIKE_PRO_VERSION, true );
             }
 
-            // Avatar uploader scripts
+            // Avatar uploader scripts (Standalone vanilla JS version)
+            // Styles are in uploader.scss and compiled to uploader.css
             if( WP_Ulike_Pro_Options::isLocalAvatars() ){
-                wp_register_script( 'ulp-uploader', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/uploader.min.js', array( 'jquery' ), WP_ULIKE_PRO_VERSION, true );
+                // Register avatar uploader with main bundle as dependency
+                // The main bundle (WP_ULIKE_PRO_DOMAIN) includes _modal.js
+                wp_register_script(
+                    'ulp-uploader',
+                    WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/uploader.min.js',
+                    array( WP_ULIKE_PRO_DOMAIN ), // Main bundle includes modal
+                    WP_ULIKE_PRO_VERSION,
+                    true
+                );
+
+                // Register style (compiled from uploader.scss)
                 wp_register_style( 'ulp-uploader', WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/uploader.min.css', array(), WP_ULIKE_PRO_VERSION );
-                // Get lang code
-                $language = get_locale();
-                if ( strlen( $language ) > 0 ) {
-                    $language = explode( '_', $language )[0];
+
+                // Get upload directory URL (WP_ULIKE_SLUG from parent plugin)
+                $upload_dir = wp_upload_dir();
+                $upload_slug = defined( 'WP_ULIKE_SLUG' ) ? WP_ULIKE_SLUG : 'wp-ulike';
+                $upload_url = trailingslashit( $upload_dir['baseurl'] ) . $upload_slug . '/avatars/';
+
+                // Get formatted avatar config for JavaScript
+                $avatar_config_js = WP_Ulike_Pro_Options::getAvatarConfigForJs();
+
+                // Localize config
+                wp_localize_script( 'ulp-uploader', 'fileUploaderCommonConfig', array(
+                    'AjaxUrl' => add_query_arg( WP_Ulike_Pro::is_preview_mode() ? array( 'preview' => true ) : array(), admin_url( 'admin-ajax.php' ) ),
+                    'Nonce' => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
+                    'uploadUrl' => trailingslashit( $upload_url ),
+                    'avatarConfig' => $avatar_config_js
+                ) );
+
+                // Enqueue only on profile pages
+                if ( function_exists( 'wp_ulike_pro_is_profile_page' ) && wp_ulike_pro_is_profile_page() ) {
+                    wp_enqueue_script( 'ulp-uploader' );
+                    wp_enqueue_style( 'ulp-uploader' );
                 }
-                // Set localize args
-                $localize_args['avatar'] = WP_Ulike_Pro_Options::getAvatarConfigs();
-                $localize_args['Locale'] = $language;
-                //localize script
-                wp_localize_script( 'ulp-uploader', 'fileUploaderCommonConfig', $localize_args );
-                // Unset custom args
-                unset( $localize_args['avatar'] );
-                unset( $localize_args['Locale'] );
             }
         }
 
         wp_enqueue_style( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/wp-ulike-pro.min.css', array( WP_ULIKE_SLUG ), WP_ULIKE_PRO_VERSION );
 
         //Add wp_ulike script file with special functions.
-        wp_enqueue_script( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js', $script_dependencies, WP_ULIKE_PRO_VERSION, true );
+        wp_enqueue_script( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js', array(), WP_ULIKE_PRO_VERSION, true );
 
 
         //localize script

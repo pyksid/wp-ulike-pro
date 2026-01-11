@@ -10,12 +10,12 @@
  * Plugin Name:       WP ULike Pro
  * Plugin URI:        https://wpulike.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description:       WP ULike PRO boosts engagement with voting, user profiles, schema, and analytics—optimizing your site's performance effortlessly.
- * Version:           1.9.3
+ * Version:           2.0.0
  * Author:            TechnoWich
  * Author URI:        https://technowich.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain:       wp-ulike-pro
  * Domain Path:       /languages
- * Tested up to: 	  6.7
+ * Tested up to: 	  6.9
 */
 
 // If this file is called directly, abort.
@@ -24,8 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define path and text domain
-define( 'WP_ULIKE_PRO_VERSION'      , '1.9.3'   );
-define( 'WP_ULIKE_PRO_DB_VERSION'   , '1.0.1' 	);
+define( 'WP_ULIKE_PRO_VERSION'      , '2.0.0' 	);
+define( 'WP_ULIKE_PRO_DB_VERSION'   , '1.0.3' 	);
 define( 'WP_ULIKE_PRO__FILE__'      , __FILE__  );
 
 define( 'WP_ULIKE_PRO_DOMAIN'       , 'wp-ulike-pro' );
@@ -64,14 +64,14 @@ function wp_ulike_pro_load_plugin() {
 		return;
 	}
 
-	$version_required = '4.7.9';
+	$version_required = '4.8.2';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_required, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_fail_load_out_of_date' );
 
 		return;
 	}
 
-	$version_recommendation = '4.7.9';
+	$version_recommendation = '4.8.2';
 	if ( ! version_compare( WP_ULIKE_VERSION, $version_recommendation, '>=' ) ) {
 		add_action( 'admin_notices', 'wp_ulike_pro_admin_notice_upgrade_recommendation' );
 	}

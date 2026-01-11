@@ -15,14 +15,19 @@ if( is_user_logged_in() && ! WP_Ulike_Pro::is_preview_mode() ){
 // custom redirect
 $redirect_to = $wp_ulike_form_args->redirect_to;
 if( ! empty( $_GET['redirect_to'] ) ){
-  $redirect_to = $_GET['redirect_to'];
+  // SECURITY: Validate redirect URL to prevent open redirect attacks
+  $redirect_to_raw = wp_unslash( $_GET['redirect_to'] );
+  $redirect_to = wp_validate_redirect( $redirect_to_raw, home_url() );
+  if ( ! $redirect_to ) {
+    $redirect_to = $wp_ulike_form_args->redirect_to; // Fallback to default
+  }
 }
 
 ?>
 
 <div class="ulp-form ulp-form-center ulp-ajax-form ulp-login">
     <form id="ulp-login-<?php echo esc_attr( $wp_ulike_form_args->form_id ); ?>" method="post" action=""
-        autocomplete="off">
+        autocomplete="off" aria-label="<?php esc_attr_e( 'Login form', 'wp-ulike-pro' ); ?>">
 
         <?php wp_ulike_pro_print_notices(); ?>
 
@@ -43,14 +48,20 @@ if( ! empty( $_GET['redirect_to'] ) ){
             </div>
 
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
-                <div class="ulp-floating">
-                    <input id="ulp-password" type="password" class="ulp-floating-input" name="password" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="current-password"/>
+                <div class="ulp-floating ulp-password-wrapper">
+                    <input id="ulp-password" type="password" class="ulp-floating-input" name="password"
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>" spellcheck="false" required autocomplete="current-password"
+                        aria-describedby="ulp-password-description"/>
                     <label for="ulp-password" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->password ); ?>">
                         <span
                             class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->password ); ?></span>
                     </label>
+                    <button type="button" class="ulp-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'wp-ulike-pro' ); ?>" aria-pressed="false" tabindex="-1">
+                        <span class="ulp-password-toggle-icon" aria-hidden="true"></span>
+                        <span class="ulp-hidden-visually"><?php esc_html_e( 'Show password', 'wp-ulike-pro' ); ?></span>
+                    </button>
+                    <span id="ulp-password-description" class="ulp-hidden-visually"><?php esc_html_e( 'Password field', 'wp-ulike-pro' ); ?></span>
                 </div>
             </div>
 
@@ -66,7 +77,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
             <div class="ulp-flex-col-xl-6 ulp-flex-col-md-6 ulp-flex-col-xs-12">
                 <div class="ulp-flex ulp-flex-end-md ulp-flex-center-xs">
                     <a
-                        <?php echo wp_ulike_is_true( $wp_ulike_form_args->ajax_toggle ) ? 'data-form-toggle="reset-password"' : ''; ?> href="<?php echo esc_url( $wp_ulike_form_args->reset_url ); ?>"><?php echo esc_html( $wp_ulike_form_args->reset_password ); ?></a>
+                        <?php echo wp_ulike_is_true( $wp_ulike_form_args->ajax_toggle ) ? 'data-form-toggle="reset-password"' : ''; ?> href="<?php echo esc_url( $wp_ulike_form_args->reset_url ); ?>" aria-label="<?php echo esc_attr( $wp_ulike_form_args->reset_password ); ?>"><?php echo esc_html( $wp_ulike_form_args->reset_password ); ?></a>
                 </div>
             </div>
 

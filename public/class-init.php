@@ -57,15 +57,14 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
     private function includes() {
 
       // Auto-load classes on demand
-      if ( function_exists( "__autoload" ) ) {
-        spl_autoload_register( "__autoload" );
-      }
       spl_autoload_register( array( $this, 'autoload' ) );
 
       // Load plugin text domain
       $this->load_plugin_textdomain();
       // maybe upgrade database
-      $this->maybe_upgrade_database();
+      if ( self::is_admin_backend() ) {
+        $this->maybe_upgrade_database();
+      }
 
       // load packages
       include_once( WP_ULIKE_PRO_DIR . '/vendor/autoload.php' );
@@ -105,14 +104,26 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
         require_once WP_ULIKE_PRO_DIR . 'public/class-activator.php';
       }
 
-      // Check database upgrade if needed
-      if ( version_compare( $current_version, '1.0.1', '<' ) ) {
-        WP_Ulike_Pro_Activator::activate();
-      }
+      // Define upgrade path with version and method mapping
+      $upgrades = array(
+        '1.0.1' => 'install_tables',
+        '1.0.2' => 'upgrade_0',
+        '1.0.3' => 'upgrade_1',
+      );
 
-      // Check database upgrade if needed
-      if ( version_compare( $current_version, '1.0.2', '<' ) ) {
-        WP_Ulike_Pro_Activator::upgrade_0();
+      // Execute upgrades sequentially, stopping on failure
+      foreach ( $upgrades as $version => $method ) {
+        if ( version_compare( $current_version, $version, '<' ) ) {
+          $result = WP_Ulike_Pro_Activator::$method();
+          if ( false === $result ) {
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+              error_log( sprintf( 'WP ULike Pro: Database upgrade to version %s failed. Current version: %s', $version, $current_version ) );
+            }
+            break; // Stop on failure to prevent partial upgrades
+          }
+          // Update current version after successful upgrade
+          $current_version = $version;
+        }
       }
     }
 

@@ -129,8 +129,18 @@ class WP_Ulike_Pro_Social_Login_Provider_Profile {
 	private function get_profile_value( $key ) {
 
 		if ( isset( $this->profile[ $key ] ) ) {
+			$value = $this->profile[ $key ];
 
-			return $this->profile[ $key ];
+			// SECURITY: Additional sanitization for sensitive fields
+			if ( $key === 'email' && is_string( $value ) ) {
+				$value = sanitize_email( $value );
+				// Return null for invalid emails
+				if ( ! is_email( $value ) ) {
+					return null;
+				}
+			}
+
+			return $value;
 
 		} else {
 
@@ -206,7 +216,11 @@ class WP_Ulike_Pro_Social_Login_Provider_Profile {
 		}
 
 		if ( $this->has_email() && ! $user_data->email ) {
-			$update_data['email'] = $this->get_email();
+			// SECURITY: Validate email before updating
+			$email = $this->get_email();
+			if ( is_email( $email ) ) {
+				$update_data['email'] = sanitize_email( $email );
+			}
 		}
 
 		// Bail out if no data to update

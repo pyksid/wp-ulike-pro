@@ -45,7 +45,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 			) );
 
 			ULF::createSection( $this->prefix, array(
-				'title'     => esc_html__( 'Display Button', WP_ULIKE_PRO_DOMAIN ),
+				'title'     => sprintf( esc_html__( 'Display %s', WP_ULIKE_PRO_DOMAIN ), esc_html__('Button', WP_ULIKE_PRO_DOMAIN) ),
 				'view'      => 'normal',
 				'shortcode' => 'wp_ulike',
 				'fields'    => array(
@@ -121,7 +121,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 			) );
 
 			ULF::createSection( $this->prefix, array(
-				'title'     => esc_html__( 'Display User Info', WP_ULIKE_PRO_DOMAIN ),
+				'title'     => sprintf( esc_html__( 'Display %s', WP_ULIKE_PRO_DOMAIN ), esc_html__('User Info', WP_ULIKE_PRO_DOMAIN) ),
 				'view'      => 'normal',
 				'shortcode' => 'wp_ulike_pro_user_info',
 				'fields'    => array(
@@ -150,7 +150,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 					array(
 						'id'          => 'table',
 						'type'        => 'select',
-						'title'       => esc_html__( 'Select Table Type', WP_ULIKE_PRO_DOMAIN ),
+						'title'       => sprintf( esc_html__( 'Select %s', WP_ULIKE_PRO_DOMAIN ), esc_html__('Table Type', WP_ULIKE_PRO_DOMAIN) ),
 						'placeholder' => 'Select a type',
 						'options'     => array(
 							'post'     => esc_html__( 'Post', WP_ULIKE_PRO_DOMAIN ),
@@ -214,7 +214,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 					array(
 						'id'          => 'type',
 						'type'        => 'select',
-						'title'       => esc_html__( 'Select Table Type', WP_ULIKE_PRO_DOMAIN ),
+						'title'       => sprintf( esc_html__( 'Select %s', WP_ULIKE_PRO_DOMAIN ), esc_html__('Table Type', WP_ULIKE_PRO_DOMAIN) ),
 						'options'     => array(
 							'post'     => esc_html__( 'Post', WP_ULIKE_PRO_DOMAIN ),
 							'comment'  => esc_html__( 'Comment', WP_ULIKE_PRO_DOMAIN ),
@@ -233,7 +233,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 					array(
 						'id'          => 'status',
 						'type'        => 'select',
-						'title'       => esc_html__( 'Select status', WP_ULIKE_PRO_DOMAIN ),
+						'title'       => esc_html__( 'Select Status', WP_ULIKE_PRO_DOMAIN ),
 						'placeholder' => 'Select a type',
 						'options'     => array(
 							'like'      => esc_html__( 'Like', WP_ULIKE_PRO_DOMAIN ),
@@ -633,7 +633,7 @@ if ( ! class_exists( 'WP_Ulike_Shortcoder' ) ) {
 					array(
 						'id'    => 'ago_text',
 						'type'  => 'text',
-						'title' => esc_html__( 'Ago text', WP_ULIKE_PRO_DOMAIN )
+						'title' => esc_html__( 'Ago Text', WP_ULIKE_PRO_DOMAIN )
 					),
 					array(
 						'id'    => 'limit_accounts',

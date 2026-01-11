@@ -96,7 +96,7 @@ class WP_Ulike_Pro_Admin_Customizer {
                 array(
                     'id'               => 'header_avatar_size',
                     'type'             => 'dimensions',
-                    'title'            => esc_html__('Avatar Max/Min Size', WP_ULIKE_PRO_DOMAIN),
+                    'title'            => esc_html__('Avatar size', WP_ULIKE_PRO_DOMAIN),
                     'output_prefix'    => 'max',
                     'output'           => '.fileuploader-theme-avatar',
                     'output_important' => true

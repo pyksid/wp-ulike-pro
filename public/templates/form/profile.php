@@ -44,8 +44,8 @@ global $wp_ulike_form_args;
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-email" value="<?php echo esc_attr( $wp_ulike_form_args->user->user_email ); ?>"
-                        type="email" class="ulp-floating-input" name="email" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>" required />
+                        type="email" class="ulp-floating-input" name="email"
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>" required autocomplete="email" />
                     <label for="ulp-email" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->email ); ?>">
                         <span class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->email ); ?></span>
@@ -56,8 +56,8 @@ global $wp_ulike_form_args;
             <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
                 <div class="ulp-floating">
                     <input id="ulp-website" value="<?php echo esc_attr( $wp_ulike_form_args->user->user_url ); ?>"
-                        type="url" class="ulp-floating-input" name="website" type="text"
-                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->website ); ?>" />
+                        type="url" class="ulp-floating-input" name="website"
+                        placeholder="<?php echo esc_attr( $wp_ulike_form_args->website ); ?>" autocomplete="url" />
                     <label for="ulp-website" class="ulp-floating-label"
                         data-content="<?php echo esc_attr( $wp_ulike_form_args->website ); ?>">
                         <span class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->website ); ?></span>

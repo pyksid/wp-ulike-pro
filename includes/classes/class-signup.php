@@ -22,8 +22,13 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 		$this->data['security']  = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : NULL;
 		// Set form ID for action usage
 		$this->data['_form_id']  = isset( $_POST['_form_id'] ) ? sanitize_text_field ( wp_unslash( $_POST['_form_id'] ) ) : 1;
-		// Custom redirect url
-		$this->data['_redirect_to']  = isset( $_POST['_redirect_to'] ) ? esc_url( wp_unslash(  $_POST['_redirect_to'] ) ) : NULL;
+		// Custom redirect url - validate to prevent open redirect attacks
+		$redirect_to = isset( $_POST['_redirect_to'] ) ? wp_unslash( $_POST['_redirect_to'] ) : NULL;
+		if ( ! empty( $redirect_to ) ) {
+			// Validate redirect URL is safe (same domain or relative path)
+			$redirect_to = wp_validate_redirect( $redirect_to, home_url() );
+		}
+		$this->data['_redirect_to'] = ! empty( $redirect_to ) ? esc_url( $redirect_to ) : NULL;
 	}
 
 	/**
@@ -89,7 +94,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 				$mail->send( $this->data['email'], 'welcome', array( 'user_id' => $user_id ) );
 
 				// message
-				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', esc_html__( 'Signup successful.', WP_ULIKE_PRO_DOMAIN ) );
+				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', esc_html__( 'Signup successful', WP_ULIKE_PRO_DOMAIN ) );
 			}
 
 			// Add user id param for use in after action hook
@@ -100,6 +105,9 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 			}
 
             $this->afterAction();
+
+			// Clear rate limit on successful signup
+			wp_ulike_pro_clear_rate_limit( 'signup' );
 
 			$this->response( array(
                 'message'  => $message,
@@ -131,6 +139,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 		do_action_ref_array( 'wp_ulike_pro_after_signup_process', array( &$this ) );
     }
 
+
 	/**
 	* Validate the Favorite
 	*/
@@ -140,6 +149,9 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
 		}
 
+		// Check rate limiting (3 signups per hour)
+		wp_ulike_pro_check_rate_limit( 'signup', 3, HOUR_IN_SECONDS, esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ) );
+
 		// Return false when nonce invalid
 		if( ! wp_verify_nonce( $this->data['security'], 'wp-ulike-pro-forms-nonce') && ! wp_ulike_is_cache_exist() ){
             throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
@@ -147,7 +159,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 
 		// Return false when nonce invalid
 		if( empty( $this->data['username'] ) || empty( $this->data['password'] ) || empty( $this->data['email'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ) ) );
 		}
 
 		if ( ! get_option( 'users_can_register' ) ) {

@@ -665,8 +665,8 @@ class WP_Ulike_Pro_Meta_Box {
                         'function' => 'wp_ulike_pro_ajax_button_callback',
                         'args'     => array(
                             'title'     => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'     => esc_html__( 'Delete Records', WP_ULIKE_PRO_DOMAIN),
-                            'desc'      => esc_html__( 'You Are About To Delete All Likes Logs. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN),
+                            'label'     => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
+                            'desc'      => sprintf( esc_html__( 'You Are About To Delete All %s. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN), esc_html__('Likes Logs', WP_ULIKE_PRO_DOMAIN) ),
                             'type'      => wp_json_encode( array( 'method' => 'logs', 'id' => $_GET['post'] ) ),
                             'inline_js' => true,
                             'action'    => 'post_metabox_truncate'
@@ -678,7 +678,7 @@ class WP_Ulike_Pro_Meta_Box {
                         'args'     => array(
                             'title'     => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
                             'label'     => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'      => sprintf( '<span>%s</span><br><strong>* %s</strong>', esc_html__( 'You Are About To Delete All Meta Counter Data. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN), esc_html__( 'After completing this operation, go to the "Optimization" section in the settings panel and delete all meta user status.', WP_ULIKE_PRO_DOMAIN) ),
+                            'desc'      => sprintf( '<span>%s</span><br><strong>* %s</strong>', sprintf( esc_html__( 'You Are About To Delete All %s. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN), esc_html__('Meta Counter Data', WP_ULIKE_PRO_DOMAIN) ), esc_html__( 'After completing this operation, go to the "Optimization" section in the settings panel and delete all meta user status.', WP_ULIKE_PRO_DOMAIN) ),
                             'type'      => wp_json_encode( array( 'method' => 'meta', 'id' => $_GET['post'] ) ),
                             'inline_js' => true,
                             'action'    => 'post_metabox_truncate'

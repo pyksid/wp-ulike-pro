@@ -147,7 +147,7 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_avatar',
             array(
-                'label'        => esc_html__('Display avatar',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => sprintf( esc_html__('Display %s',WP_ULIKE_PRO_DOMAIN ), esc_html__('avatar', WP_ULIKE_PRO_DOMAIN) ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
                 'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
@@ -183,7 +183,7 @@ class BestLikers extends Widget_Base {
         $this->add_control(
             'display_user_profile',
             array(
-                'label'        => esc_html__('Display user profile',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => sprintf( esc_html__('Display %s',WP_ULIKE_PRO_DOMAIN ), esc_html__('User Profile', WP_ULIKE_PRO_DOMAIN) ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
                 'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
@@ -198,7 +198,7 @@ class BestLikers extends Widget_Base {
                 'label'   => esc_html__( 'Profile URL type', WP_ULIKE_PRO_DOMAIN ),
                 'type'    => Controls_Manager::SELECT,
                 'options' => array(
-					'default'    => esc_html__( 'Default ', WP_ULIKE_PRO_DOMAIN ),
+					'default'    => esc_html__( 'Default', WP_ULIKE_PRO_DOMAIN ),
 					'author'     => esc_html__( 'Author Page', WP_ULIKE_PRO_DOMAIN ),
 					'buddypress' => esc_html__( 'BuddyPress', WP_ULIKE_PRO_DOMAIN ),
 					'um'         => esc_html__( 'Ultimate Member', WP_ULIKE_PRO_DOMAIN )

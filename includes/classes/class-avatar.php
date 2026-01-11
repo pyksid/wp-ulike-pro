@@ -57,8 +57,25 @@ class WP_Ulike_Pro_Avatar {
 		$avatar_url  = get_avatar_url( $user_id, $args );
 		// Fetch local avatar from meta and make sure it's properly set.
 		$avatar_data = get_user_meta( $user_id, 'ulp_avatar_data', true );
-		// Return avatar upload box
-		return sprintf('<input class="ulp_avatar_upload_field" type="file" name="files" data-fileuploader-default="%s" data-fileuploader-files=\'%s\'>', $avatar_url, ! empty( $avatar_data ) ? wp_json_encode( array ( $avatar_data ) ) : '');
+		
+		// Get AJAX URL and nonce
+		$ajax_url = admin_url( 'admin-ajax.php' );
+		$nonce    = wp_create_nonce( WP_ULIKE_PRO_DOMAIN );
+		
+		// Build avatar data for JSON
+		$avatar_files = ! empty( $avatar_data ) ? array( $avatar_data ) : array();
+		if ( ! empty( $avatar_url ) && empty( $avatar_files ) ) {
+			$avatar_files = array( array( 'url' => $avatar_url ) );
+		}
+		
+		// Return avatar upload box with new structure
+		return sprintf(
+			'<div class="ulp-avatar-container"><input class="ulp_avatar_upload_field" type="file" name="files" accept="image/*" data-ajax-url="%s" data-nonce="%s" data-default="%s" data-files=\'%s\'></div>',
+			esc_url( $ajax_url ),
+			esc_attr( $nonce ),
+			esc_url( $avatar_url ),
+			wp_json_encode( $avatar_files )
+		);
 	}
 
 	/**

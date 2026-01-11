@@ -16,8 +16,9 @@ final class WP_Ulike_Pro_Likers {
 	 * @return void
 	 */
 	private function setFormData(){
-		$this->data['id']   = ! empty( $_REQUEST['id'] )  ? (int) $_REQUEST['id'] : NULL;
-		$this->data['type'] = ! empty( $_REQUEST['type'] ) ? sanitize_text_field( $_REQUEST['type'] ) : NULL;
+		// SECURITY: Use wp_unslash and proper sanitization
+		$this->data['id']   = ! empty( $_REQUEST['id'] )  ? absint( wp_unslash( $_REQUEST['id'] ) ) : NULL;
+		$this->data['type'] = ! empty( $_REQUEST['type'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['type'] ) ) : NULL;
 	}
 
 	/**
