@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -402,32 +402,62 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
     // Default Args
     $args = shortcode_atts( array(
         "slug"             => '',
+        "buttons"          => '',  // JSON string or comma-separated list of networks
+        "view"             => '',  // Override view (icon_text, icon, text)
+        "skin"             => '',  // Override skin (gradient, flat, etc.)
+        "color"            => '',  // Override color (official, custom)
+        "shape"            => '',  // Override shape (square, rounded, circle)
         "data-url"         => '',
         "data-title"       => '',
         "data-description" => '',
         "data-image"       => ''
     ), $atts );
 
-    if( empty( $args['slug'] ) ){
-        return esc_html__( 'Please select a slug for social share!', WP_ULIKE_PRO_DOMAIN );
+    // Parse buttons if provided directly
+    $buttons = array();
+    if ( ! empty( $args['buttons'] ) ) {
+        // Try to decode as JSON first
+        $decoded = json_decode( $args['buttons'], true );
+        if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+            $buttons = $decoded;
+        } else {
+            // Fallback: treat as comma-separated list
+            $networks = array_map( 'trim', explode( ',', $args['buttons'] ) );
+            foreach ( $networks as $network ) {
+                if ( ! empty( $network ) ) {
+                    $buttons[] = array( 'network' => $network, 'label' => ucfirst( $network ) );
+                }
+            }
+        }
     }
 
+    // Get from options if buttons not provided directly
     $social_items = wp_ulike_get_option( 'social_share', array() );
+    $social_key = false;
+    $social_item = null;
 
-    if( empty( $social_items ) ){
-        return esc_html__( 'Social network are empty! Please check your configurations.', WP_ULIKE_PRO_DOMAIN );
+    if ( ! empty( $args['slug'] ) && ! empty( $social_items ) ) {
+        $social_key = array_search( $args['slug'], array_column( $social_items, 'slug' ) );
+        if ( $social_key !== false && ! empty( $social_items[ $social_key ] ) ) {
+            $social_item = $social_items[ $social_key ];
+            // Use buttons from options if not provided directly
+            if ( empty( $buttons ) && ! empty( $social_item['buttons'] ) ) {
+                $buttons = $social_item['buttons'];
+            }
+        }
     }
 
-    $social_key = array_search( $args['slug'], array_column( $social_items, 'slug' ) );
-
-    if( $social_key === false || empty( $social_items[ $social_key ]['buttons'] ) ){
-        return esc_html__( 'Social network are empty! Please check your configurations.', WP_ULIKE_PRO_DOMAIN );
+    // If still no buttons, return error
+    if ( empty( $buttons ) ) {
+        return esc_html__( 'Social network are empty! Please provide buttons parameter or configure in settings.', WP_ULIKE_PRO_DOMAIN );
     }
 
-    $view  = ! empty( $social_items[ $social_key ]['view'] ) ?  $social_items[ $social_key ]['view'] : 'icon_text';
-    $skin  = ! empty( $social_items[ $social_key ]['skin'] ) ?  $social_items[ $social_key ]['skin'] : 'gradient';
-    $color = ! empty( $social_items[ $social_key ]['color'] ) ?  $social_items[ $social_key ]['color'] : 'official';
-    $shape = ! empty( $social_items[ $social_key ]['shape'] ) ?  $social_items[ $social_key ]['shape'] : 'square';
+    // Determine display options (use params first, then options, then defaults)
+    $view  = ! empty( $args['view'] ) ? $args['view'] : ( ! empty( $social_item['view'] ) ? $social_item['view'] : 'icon_text' );
+    $skin  = ! empty( $args['skin'] ) ? $args['skin'] : ( ! empty( $social_item['skin'] ) ? $social_item['skin'] : 'gradient' );
+    $color = ! empty( $args['color'] ) ? $args['color'] : ( ! empty( $social_item['color'] ) ? $social_item['color'] : 'official' );
+    $shape = ! empty( $args['shape'] ) ? $args['shape'] : ( ! empty( $social_item['shape'] ) ? $social_item['shape'] : 'square' );
+    $slug  = ! empty( $args['slug'] ) ? $args['slug'] : 'preview';
 
     $attrs = '';
     foreach ($args as $attr_name => $attr_value) {
@@ -438,14 +468,15 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
 
     ob_start();
 
-    do_action( 'wp_ulike_pro_share_buttons_before', $args['slug'], $social_items[ $social_key ] );
+    $social_data = $social_item ? $social_item : array();
+    do_action( 'wp_ulike_pro_share_buttons_before', $slug, $social_data );
 
-    echo sprintf( '<div class="ulp-social-wrapper ulp-social-%s">', $args['slug'] );
+    echo sprintf( '<div class="ulp-social-wrapper ulp-social-%s">', esc_attr( $slug ) );
 
-    echo ! empty( $social_items[ $social_key ]['before'] ) ? do_shortcode( $social_items[ $social_key ]['before'] ) : '';
+    echo ! empty( $social_data['before'] ) ? do_shortcode( $social_data['before'] ) : '';
 
-    echo sprintf( '<div class="ulp-social ulp-social-share ulp-social-skin-%s ulp-social-buttons-color-%s ulp-social-shape-%s ulp-social-view-%s">', $skin, $color, $shape, $view );
-        foreach ( $social_items[ $social_key ]['buttons'] as $key => $value ) {
+    echo sprintf( '<div class="ulp-social ulp-social-share ulp-social-skin-%s ulp-social-buttons-color-%s ulp-social-shape-%s ulp-social-view-%s">', esc_attr( $skin ), esc_attr( $color ), esc_attr( $shape ), esc_attr( $view ) );
+        foreach ( $buttons as $key => $value ) {
                 // Check network exist
                 if( empty( $value['network'] ) ){
                     continue;
@@ -476,11 +507,11 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
     }
     echo '</div>';
 
-    echo ! empty( $social_items[ $social_key ]['after'] ) ? do_shortcode( $social_items[ $social_key ]['after'] ) : '';
+    echo ! empty( $social_data['after'] ) ? do_shortcode( $social_data['after'] ) : '';
 
     echo '</div>';
 
-    do_action( 'wp_ulike_pro_share_buttons_after', $args['slug'], $social_items[ $social_key ] );
+    do_action( 'wp_ulike_pro_share_buttons_after', $slug, $social_data );
 
     return ob_get_clean();
 }

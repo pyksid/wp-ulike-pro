@@ -10,10 +10,6 @@ new WP_Ulike_Pro_Options_Panel();
 new WP_Ulike_Pro_Meta_Box();
 // Generate comment metabox
 new WP_Ulike_Pro_Comment_Meta_Box();
-// Generate profile metabox
-new WP_Ulike_Pro_Profile_Meta_Box();
-// Init shortcoder
-new WP_Ulike_Pro_Shortcoder();
 
 // License Controller
 new WP_Ulike_Pro_License();

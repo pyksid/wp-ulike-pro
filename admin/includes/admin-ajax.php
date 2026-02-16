@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -32,34 +32,129 @@ function wp_ulike_pro_generate_api_key() {
 		) );
 	}
 
-	$get_keys   = get_option( 'wp_ulike_rest_api_keys', array() );
-	$get_keys[] = array(
-		'token' => wp_generate_password( 120, false ),
-		'date'  => current_time( 'mysql', true )
+	$get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
+	
+	// Ensure it's an array
+	if ( ! is_array( $get_keys ) ) {
+		$get_keys = array();
+	}
+	
+	// Generate new key - store token in variable to ensure consistency
+	$token = wp_generate_password( 120, false );
+	$date  = current_time( 'mysql', true );
+	
+	// Create key array with exact token
+	$new_key = array(
+		'token' => $token,
+		'date'  => $date
 	);
-
+	
+	// Add to array (newest at the end)
+	$get_keys[] = $new_key;
+	
+	// Save to database
 	update_option( 'wp_ulike_rest_api_keys', $get_keys );
 
-    $api_keys = '';
-    if( is_array( $get_keys ) ){
-        foreach ($get_keys as $key => $value) {
-            // Escape output to prevent XSS
-            $api_keys .= sprintf( '<tr><td>%s</td><td>%s</td></tr>', 
-                esc_html( $value['token'] ), 
-                esc_html( $value['date'] ) 
-            );
-        }
-    }
-
+	// Return the exact same token variable we generated and saved
+	// This ensures JavaScript receives the identical token that's in the database
 	wp_send_json_success( array(
 		'success' => 1,
 		'status'  => 'success',
-		'message' => esc_html__( 'API keys successfully generated.', WP_ULIKE_PRO_DOMAIN ),
-		'content' => $api_keys
+		'message' => esc_html__( 'API key successfully generated.', WP_ULIKE_PRO_DOMAIN ),
+		'key'     => array(
+			'token' => $token, // Exact token from variable, not from array
+			'date'  => $date
+		)
 	) );
 
 }
 add_action( 'wp_ajax_wp_ulike_generate_api_key', 'wp_ulike_pro_generate_api_key' );
+
+/**
+ * Delete API Key
+ *
+ * @return void
+ */
+function wp_ulike_pro_delete_api_key() {
+
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_ulike_generate_api_keys' ) || ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array(
+			'success' 	=> 0,
+			'status'    => 'error',
+			'message' 	=> esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ),
+		) );
+	}
+
+	if ( ! isset( $_POST['token'] ) || empty( $_POST['token'] ) ) {
+		wp_send_json_error( array(
+			'success' 	=> 0,
+			'status'    => 'error',
+			'message' 	=> esc_html__( 'Token is required.', WP_ULIKE_PRO_DOMAIN ),
+		) );
+	}
+
+	$token = sanitize_text_field( $_POST['token'] );
+	$token = trim( $token );
+	
+	if ( empty( $token ) ) {
+		wp_send_json_error( array(
+			'success' 	=> 0,
+			'status'    => 'error',
+			'message' 	=> esc_html__( 'Token is required.', WP_ULIKE_PRO_DOMAIN ),
+		) );
+	}
+	
+	$get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
+
+	if ( ! is_array( $get_keys ) || empty( $get_keys ) ) {
+		wp_send_json_error( array(
+			'success' 	=> 0,
+			'status'    => 'error',
+			'message' 	=> esc_html__( 'No API keys found.', WP_ULIKE_PRO_DOMAIN ),
+		) );
+	}
+
+	// Remove the key with matching token
+	$updated_keys = array();
+	$found = false;
+	
+	foreach ( $get_keys as $key => $value ) {
+		if ( ! is_array( $value ) || ! isset( $value['token'] ) ) {
+			// Keep invalid entries
+			$updated_keys[] = $value;
+			continue;
+		}
+		
+		$stored_token = trim( (string) $value['token'] );
+		
+		// Exact token match
+		if ( $stored_token === $token ) {
+			$found = true;
+			continue; // Skip this key (don't add to updated_keys)
+		}
+		
+		// Keep this key
+		$updated_keys[] = $value;
+	}
+
+	if ( ! $found ) {
+		wp_send_json_error( array(
+			'success' 	=> 0,
+			'status'    => 'error',
+			'message' 	=> esc_html__( 'API key not found.', WP_ULIKE_PRO_DOMAIN ),
+		) );
+	}
+
+	update_option( 'wp_ulike_rest_api_keys', $updated_keys );
+
+	wp_send_json_success( array(
+		'success' => 1,
+		'status'  => 'success',
+		'message' => esc_html__( 'API key successfully deleted.', WP_ULIKE_PRO_DOMAIN ),
+	) );
+
+}
+add_action( 'wp_ajax_wp_ulike_delete_api_key', 'wp_ulike_pro_delete_api_key' );
 
 /**
  * Search users for GDPR tab
@@ -127,7 +222,7 @@ function wp_ulike_pro_remove_user_votes_ajax() {
 	}
 
 	$user_ids = isset( $_POST['user_ids'] ) ? wp_unslash( $_POST['user_ids'] ) : array();
-	
+
 	// Ensure it's an array
 	if( is_string( $user_ids ) ){
 		$user_ids = json_decode( $user_ids, true );
@@ -250,7 +345,7 @@ function wp_ulike_pro_bulk_add_likes_ajax() {
 	}
 
 	$post_ids = isset( $_POST['post_ids'] ) ? wp_unslash( $_POST['post_ids'] ) : array();
-	
+
 	// Ensure it's an array
 	if ( is_string( $post_ids ) ) {
 		$post_ids = json_decode( $post_ids, true );
@@ -353,7 +448,7 @@ function wp_ulike_pro_bulk_update_likes_ajax() {
 	}
 
 	$posts_data = isset( $_POST['posts'] ) ? wp_unslash( $_POST['posts'] ) : array();
-	
+
 	// Ensure it's an array
 	if ( is_string( $posts_data ) ) {
 		$posts_data = json_decode( $posts_data, true );
@@ -409,7 +504,7 @@ function wp_ulike_pro_get_categories() {
 	if ( ! empty( $post_type ) ) {
 		// Get all taxonomies for this post type
 		$taxonomies = get_object_taxonomies( $post_type, 'objects' );
-		
+
 		// Build list of available hierarchical taxonomies
 		foreach ( $taxonomies as $taxonomy ) {
 			if ( $taxonomy->hierarchical && $taxonomy->public ) {
@@ -471,7 +566,7 @@ function wp_ulike_pro_get_categories() {
 		}
 	}
 
-	wp_send_json_success( array( 
+	wp_send_json_success( array(
 		'categories' => $categories,
 		'taxonomy_label' => $selected_taxonomy_label,
 		'taxonomy_name' => $selected_taxonomy_name,
@@ -557,7 +652,7 @@ function wp_ulike_pro_search_by_item_id() {
 
 	// Get distinct item_id and meta_group combinations
 	$query = "SELECT DISTINCT `item_id`, `meta_group` FROM `" . esc_sql( $meta_table ) . "` " . $where_clause;
-	
+
 	if ( ! empty( $where_values ) ) {
 		$query = $wpdb->prepare( $query, $where_values );
 	}
@@ -698,7 +793,7 @@ function wp_ulike_pro_ajax_button_field() {
 	// Catch any PHP errors or exceptions
 	$result = null;
 	$php_error = null;
-	
+
 	try {
 		$result = call_user_func( 'wp_ulike_pro_' . $action, $type );
 	} catch ( Exception $e ) {
@@ -706,7 +801,7 @@ function wp_ulike_pro_ajax_button_field() {
 	} catch ( Error $e ) {
 		$php_error = $e->getMessage();
 	}
-	
+
 	// If PHP error occurred, report it
 	if( $php_error !== null ){
 		wp_send_json_error( array(
@@ -715,7 +810,7 @@ function wp_ulike_pro_ajax_button_field() {
 			'message' 	=> sprintf( esc_html__( 'PHP Error: %s', WP_ULIKE_PRO_DOMAIN ), esc_html( $php_error ) ),
 		) );
 	}
-	
+
 	if( $result ){
 		// Check if result is an array with detailed information
 		if( is_array( $result ) && isset( $result['success'] ) ){

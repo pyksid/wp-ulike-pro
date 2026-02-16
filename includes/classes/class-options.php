@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
 */
 
@@ -475,9 +475,9 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	public static function getAvatarConfigs( $args = array() ){
 		//Main data
 		$defaults = array(
-			'maxSize'  => self::getOption( 'max_avatar_size', 2 ),
-			'maxWidth' => self::getOption( 'max_avatar_width', 512 ),
-			'quality'  => self::getOption( 'image_quality', 60 ),
+			'maxSize'  => (int) self::getOption( 'max_avatar_size', 2 ),
+			'maxWidth' => (int) self::getOption( 'max_avatar_width', 512 ),
+			'quality'  => (int) self::getOption( 'image_quality', 60 ),
 			'url'      => array(
 				'logout' => WP_Ulike_Pro_Permalinks::get_logout_url()
 			),

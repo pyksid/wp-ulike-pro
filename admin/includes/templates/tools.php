@@ -3,7 +3,7 @@
  * Tools page template
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -18,6 +18,7 @@ $tabs = array(
     'maintenance'  => esc_html__( 'Maintenance', WP_ULIKE_PRO_DOMAIN ),
     'bulk-actions' => esc_html__( 'Bulk Actions', WP_ULIKE_PRO_DOMAIN ),
     'gdpr'         => esc_html__( 'GDPR', WP_ULIKE_PRO_DOMAIN ),
+    'rest-api'     => esc_html__( 'REST API', WP_ULIKE_PRO_DOMAIN ),
     'debug'        => esc_html__( 'Debug Info', WP_ULIKE_PRO_DOMAIN )
 );
 
@@ -422,6 +423,125 @@ if ( $current_tab === 'maintenance' ) {
                 </div>
             <?php endif; ?>
 
+        <?php elseif ( $current_tab === 'rest-api' ) : ?>
+            <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
+                <div class="wp-ulike-pro-tools-card">
+                    <div class="wp-ulike-pro-tools-card-header">
+                        <h2><?php esc_html_e( 'License Required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                    </div>
+                    <div class="wp-ulike-pro-tools-card-content">
+                        <p><?php esc_html_e( 'You need an active license to access REST API settings.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                    </div>
+                </div>
+            <?php else : ?>
+                <?php
+                // Get current settings
+                $settings = WP_Ulike_Pro_Tools::get_rest_api_settings_data();
+                $enable_rest_api = $settings['enable_rest_api'];
+                $authentication_type = $settings['authentication_type'];
+                $read_permissions = $settings['rest_api_permission_for_readable_routes'];
+                $write_permissions = $settings['rest_api_permission_for_writable_routes'];
+                $enable_auto_user_id = $settings['enable_auto_user_id'];
+
+                // Get all user roles
+                $roles = wp_roles()->get_names();
+
+                // Show success message
+                if ( isset( $_GET['settings-updated'] ) && $_GET['settings-updated'] === 'true' ) {
+                    echo '<div class="notice notice-success is-dismissible" style="margin: 0 0 20px 0;"><p>' . esc_html__( 'Settings saved successfully.', WP_ULIKE_PRO_DOMAIN ) . '</p></div>';
+                }
+                ?>
+                <form method="post" action="" class="wp-ulike-pro-rest-api-settings-form">
+                    <?php wp_nonce_field( 'wp_ulike_rest_api_settings', 'wp_ulike_rest_api_settings_nonce' ); ?>
+                    <input type="hidden" name="wp_ulike_rest_api_settings_save" value="1">
+
+                    <div class="wp-ulike-pro-tools-card">
+                        <div class="wp-ulike-pro-tools-card-header">
+                            <h2><?php esc_html_e( 'REST API Settings', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                        </div>
+                        <div class="wp-ulike-pro-tools-card-content">
+                            <p><?php esc_html_e( 'Configure REST API access and authentication settings for external applications.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+
+                            <div class="wp-ulike-pro-rest-api-settings">
+                                <div class="wp-ulike-pro-rest-api-setting-group">
+                                    <label for="enable_rest_api" class="wp-ulike-pro-rest-api-label">
+                                        <input type="checkbox" name="enable_rest_api" id="enable_rest_api" value="1" <?php checked( $enable_rest_api, true ); ?>>
+                                        <strong><?php esc_html_e( 'Enable REST API', WP_ULIKE_PRO_DOMAIN ); ?></strong>
+                                    </label>
+                                    <p class="description"><?php esc_html_e( 'Expose WP ULike data through WordPress REST API endpoints, allowing external applications to access like counts, user votes, and statistics.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+
+                                <div class="wp-ulike-pro-rest-api-setting-group rest-api-dependent" style="<?php echo $enable_rest_api ? '' : 'display:none;'; ?>">
+                                    <label for="authentication_type" class="wp-ulike-pro-rest-api-label">
+                                        <?php esc_html_e( 'Authentication Type', WP_ULIKE_PRO_DOMAIN ); ?>
+                                    </label>
+                                    <div class="wp-ulike-pro-rest-api-radio-group">
+                                        <label>
+                                            <input type="radio" name="authentication_type" value="login" <?php checked( $authentication_type, 'login' ); ?>>
+                                            <?php esc_html_e( 'User Login', WP_ULIKE_PRO_DOMAIN ); ?>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="authentication_type" value="token" <?php checked( $authentication_type, 'token' ); ?>>
+                                            <?php esc_html_e( 'Custom Keys', WP_ULIKE_PRO_DOMAIN ); ?>
+                                        </label>
+                                    </div>
+                                    <p class="description"><?php esc_html_e( 'Choose how API requests are authenticated. User Login uses WordPress user credentials, Custom Keys uses API tokens.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+
+                                <div class="wp-ulike-pro-rest-api-setting-group rest-api-dependent login-auth-dependent" style="<?php echo ( $enable_rest_api && $authentication_type === 'login' ) ? '' : 'display:none;'; ?>">
+                                    <label for="rest_api_permission_for_readable_routes" class="wp-ulike-pro-rest-api-label">
+                                        <?php esc_html_e( 'Read-Only Route Access', WP_ULIKE_PRO_DOMAIN ); ?>
+                                    </label>
+                                    <select name="rest_api_permission_for_readable_routes[]" id="rest_api_permission_for_readable_routes" multiple="multiple" class="wp-ulike-pro-rest-api-select">
+                                        <?php foreach ( $roles as $role_key => $role_name ) : ?>
+                                            <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( in_array( $role_key, $read_permissions ), true ); ?>>
+                                                <?php echo esc_html( $role_name ); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description"><?php esc_html_e( 'Choose which user roles can access API endpoints that retrieve data (GET requests).', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+
+                                <div class="wp-ulike-pro-rest-api-setting-group rest-api-dependent login-auth-dependent" style="<?php echo ( $enable_rest_api && $authentication_type === 'login' ) ? '' : 'display:none;'; ?>">
+                                    <label for="rest_api_permission_for_writable_routes" class="wp-ulike-pro-rest-api-label">
+                                        <?php esc_html_e( 'Write Route Access', WP_ULIKE_PRO_DOMAIN ); ?>
+                                    </label>
+                                    <select name="rest_api_permission_for_writable_routes[]" id="rest_api_permission_for_writable_routes" multiple="multiple" class="wp-ulike-pro-rest-api-select">
+                                        <?php foreach ( $roles as $role_key => $role_name ) : ?>
+                                            <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( in_array( $role_key, $write_permissions ), true ); ?>>
+                                                <?php echo esc_html( $role_name ); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description"><?php esc_html_e( 'Choose which user roles can access API endpoints that modify data (POST/PUT/DELETE requests).', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+
+                                <div class="wp-ulike-pro-rest-api-setting-group rest-api-dependent" style="<?php echo $enable_rest_api ? '' : 'display:none;'; ?>">
+                                    <label for="enable_auto_user_id" class="wp-ulike-pro-rest-api-label">
+                                        <input type="checkbox" name="enable_auto_user_id" id="enable_auto_user_id" value="1" <?php checked( $enable_auto_user_id, true ); ?>>
+                                        <strong><?php esc_html_e( 'Enable Auto User ID', WP_ULIKE_PRO_DOMAIN ); ?></strong>
+                                    </label>
+                                    <p class="description"><?php esc_html_e( 'Automatically use the authenticated user\'s ID for API requests when no user ID is specified.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+                            </div>
+
+                            <p class="submit">
+                                <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', WP_ULIKE_PRO_DOMAIN ); ?>">
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="wp-ulike-pro-tools-card token-auth-dependent" style="<?php echo ( $enable_rest_api && $authentication_type === 'token' ) ? '' : 'display:none;'; ?>">
+                        <div class="wp-ulike-pro-tools-card-header">
+                            <h2><?php esc_html_e( 'API Keys Management', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                        </div>
+                        <div class="wp-ulike-pro-tools-card-content">
+                            <?php WP_Ulike_Pro_Tools::render_api_keys_section(); ?>
+                        </div>
+                    </div>
+                </form>
+            <?php endif; ?>
+
         <?php elseif ( $current_tab === 'debug' ) : ?>
             <div class="wp-ulike-pro-tools-card">
                 <div class="wp-ulike-pro-tools-card-header">
@@ -437,6 +557,10 @@ if ( $current_tab === 'maintenance' ) {
                     <p class="submit">
                         <button type="button" class="button button-primary" id="wp-ulike-copy-debug-info">
                             <?php esc_html_e( 'Copy to Clipboard', WP_ULIKE_PRO_DOMAIN ); ?>
+                        </button>
+                        <button type="button" class="button" id="wp-ulike-download-debug-info">
+                            <span class="dashicons dashicons-download" style="vertical-align: middle; margin-right: 4px;"></span>
+                            <?php esc_html_e( 'Download Logs', WP_ULIKE_PRO_DOMAIN ); ?>
                         </button>
                         <span class="wp-ulike-pro-copy-success">
                             <span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'Copied!', WP_ULIKE_PRO_DOMAIN ); ?>

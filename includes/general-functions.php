@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -1831,33 +1831,117 @@ function wp_ulike_pro_clean_tags($message) {
 
 
 /**
- * Get the country code based on the user's IP address.
+ * Get the MaxMind DB reader for GeoLite2-Country (lazy-loaded, one per request).
  *
- * @param string $ip_address
- * @return string|null
+ * Uses the same .mmdb file as before; filter wp_ulike_pro_geoip_db_path to override path.
+ *
+ * @return \MaxMind\Db\Reader|null
  */
-function wp_ulike_pro_get_country_code_from_ip( $ip_address ) {
-    try {
-        // Define the path to the GeoLite2 Country database
-        $geoip_db_path = WP_ULIKE_PRO_ADMIN_DIR . '/assets/data/GeoLite2-Country.mmdb';
+function wp_ulike_pro_get_geoip_db_reader() {
+    static $reader = null;
 
-        // Check if the file exists
-        if (!file_exists($geoip_db_path)) {
-            throw new Exception("GeoLite2 Country database not found.");
-        }
+    if ( $reader !== null ) {
+        return $reader;
+    }
 
-        // Create a GeoIP2 Reader instance
-        $reader = new \GeoIp2\Database\Reader($geoip_db_path);
+    $path = WP_ULIKE_PRO_ADMIN_DIR . '/assets/data/GeoLite2-Country.mmdb';
+    $path = apply_filters( 'wp_ulike_pro_geoip_db_path', $path );
 
-        // Get the country information
-        $record = $reader->country($ip_address);
-
-        // Return the country code
-        return $record->country->isoCode;
-    } catch (Exception $e) {
-        // Return null in case of an error
+    if ( ! is_file( $path ) || ! is_readable( $path ) ) {
         return null;
     }
+
+    try {
+        $reader = new \MaxMind\Db\Reader( $path );
+        return $reader;
+    } catch ( \Exception $e ) {
+        return null;
+    }
+}
+
+/**
+ * Get the country code based on the user's IP address (local DB, no API).
+ *
+ * Uses the GeoLite2-Country .mmdb file and the lightweight MaxMind DB reader.
+ * Results are cached via WordPress object cache (wp_cache).
+ *
+ * @param string $ip_address
+ * @return string|null Two-letter ISO country code, or null on failure/invalid IP.
+ */
+function wp_ulike_pro_get_country_code_from_ip( $ip_address ) {
+    $ip_address = trim( (string) $ip_address );
+    if ( $ip_address === '' ) {
+        return null;
+    }
+
+    if ( wp_ulike_pro_is_private_or_local_ip( $ip_address ) ) {
+        return null;
+    }
+
+    $cache_group = 'wp-ulike-pro-geoip-country';
+    $cache_key   = $ip_address;
+
+    $cached = wp_cache_get( $cache_key, $cache_group );
+    if ( $cached !== false ) {
+        return $cached;
+    }
+
+    $code   = null;
+    $reader = wp_ulike_pro_get_geoip_db_reader();
+    if ( $reader !== null ) {
+        try {
+            $record = $reader->get( $ip_address );
+            if ( is_array( $record ) && isset( $record['country']['iso_code'] ) ) {
+                $code = trim( (string) $record['country']['iso_code'] );
+                $code = ( strlen( $code ) === 2 ) ? strtoupper( $code ) : null;
+            }
+        } catch ( \Exception $e ) {
+            $code = null;
+        }
+    }
+
+    wp_cache_set( $cache_key, $code, $cache_group, DAY_IN_SECONDS );
+
+    return $code;
+}
+
+/**
+ * Check if an IP is private or local (no geolocation lookup needed).
+ *
+ * @param string $ip
+ * @return bool
+ */
+function wp_ulike_pro_is_private_or_local_ip( $ip ) {
+    if ( $ip === '127.0.0.1' || $ip === '::1' ) {
+        return true;
+    }
+    $packed = @inet_pton( $ip );
+    if ( $packed === false ) {
+        return true;
+    }
+    $len = strlen( $packed );
+    if ( $len === 4 ) {
+        $octets = array_values( unpack( 'C*', $packed ) );
+        if ( $octets[0] === 10 ) {
+            return true;
+        }
+        if ( $octets[0] === 172 && $octets[1] >= 16 && $octets[1] <= 31 ) {
+            return true;
+        }
+        if ( $octets[0] === 192 && $octets[1] === 168 ) {
+            return true;
+        }
+        return false;
+    }
+    if ( $len === 16 ) {
+        $first  = ord( $packed[0] );
+        $second = ord( $packed[1] );
+        if ( ( $first === 0xfc || $first === 0xfd ) || ( $first === 0xfe && ( $second & 0xc0 ) === 0x80 ) ) {
+            return true;
+        }
+        return false;
+    }
+    return true;
 }
 
 /**

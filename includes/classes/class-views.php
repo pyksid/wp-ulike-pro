@@ -5,7 +5,7 @@
  * Tracks button visits for conversion rate calculations
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 

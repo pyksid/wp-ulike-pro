@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -664,7 +664,8 @@ add_filter( 'wp_ulike_comment_text', 'wp_ulike_pro_update_comment_text', 10, 2 )
  * @return void
  */
 function wp_ulike_pro_rest_api_init(){
-    if ( wp_ulike_is_true( wp_ulike_get_option( 'enable_rest_api', false ) ) ) {
+    $enable_rest_api = WP_Ulike_Pro_Tools::get_rest_api_settings_data( 'enable_rest_api', false );
+    if ( $enable_rest_api ) {
         $instance = new WP_Ulike_Pro_Rest_API();
         $instance->register_routes();
     }

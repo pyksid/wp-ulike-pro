@@ -3,7 +3,7 @@
  * License template
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -460,23 +460,3 @@
 		<?php endif; ?>
 	</div>
 </div>
-
-<script>
-(function($) {
-	'use strict';
-
-	// Auto-hide toast notifications
-	setTimeout(function() {
-		$('.wp-ulike-pro-notice-toast').fadeOut(300, function() {
-			$(this).remove();
-		});
-	}, 5000);
-
-	// Smooth scroll to top on refresh
-	if (window.location.search.indexOf('refresh=1') !== -1) {
-		$('html, body').animate({
-			scrollTop: $('.wp-ulike-pro-license-container').offset().top - 20
-		}, 500);
-	}
-})(jQuery);
-</script>

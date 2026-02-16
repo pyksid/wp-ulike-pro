@@ -145,12 +145,24 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
     }
 
     /**
+     * Get REST API setting with fallback to old structure
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    private function get_rest_api_setting( $key, $default = null ) {
+        return WP_Ulike_Pro_Tools::get_rest_api_settings_data( $key, $default );
+    }
+
+    /**
      * Get current user id if option has been enabled.
      *
      * @return integer|null
      */
     private function get_final_user_id(){
-        return wp_ulike_get_option( 'enable_auto_user_id' ) && ! empty( $this->current_user->ID ) ? $this->current_user->ID : NULL;
+        $enable_auto_user_id = $this->get_rest_api_setting( 'enable_auto_user_id', false );
+        return $enable_auto_user_id && ! empty( $this->current_user->ID ) ? $this->current_user->ID : NULL;
     }
 
     /**
@@ -610,7 +622,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
      * @return bool
      */
     public function check_authentication( $option_name ){
-        $authentication_type = wp_ulike_get_option( 'authentication_type' );
+        $authentication_type = $this->get_rest_api_setting( 'authentication_type', 'login' );
 
         if( $authentication_type ===  'login' ){
             return $this->current_user_can( $option_name );
@@ -639,7 +651,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
     }
 
 	public function current_user_can( $access_name ){
-        $allowed_roles = wp_ulike_get_option( $access_name );
+        $allowed_roles = $this->get_rest_api_setting( $access_name, array( 'administrator' ) );
         if( ! empty( $allowed_roles ) ){
             if( empty( $this->current_user->roles ) ){
                 return false;

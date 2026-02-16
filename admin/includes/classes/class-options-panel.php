@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
 */
 
@@ -36,8 +36,7 @@ class WP_Ulike_Pro_Options_Panel {
         add_filter( 'wp_ulike_panel_forms', array( $this, 'forms_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_social_logins', array( $this, 'social_login' ), 10, 1 );
         add_filter( 'wp_ulike_panel_translations', array( $this, 'translations_section' ), 10, 1 );
-        add_filter( 'wp_ulike_panel_rest_api', array( $this, 'rest_api_section' ), 10, 1 );
-        add_filter( 'wp_ulike_panel_optimization', array( $this, 'optimization_section' ), 10, 1 );
+        add_filter( 'wp_ulike_panel_emails', array( $this, 'register_email_translations_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_post_type_options', array( $this, 'post_type_options' ), 10, 1 );
         add_filter( 'wp_ulike_panel_comment_type_options', array( $this, 'comment_type_options' ), 10, 1 );
 
@@ -45,16 +44,38 @@ class WP_Ulike_Pro_Options_Panel {
         // Custom options
         add_filter( 'wp_ulike_filter_counter_options', array( $this, 'filter_counter_options' ), 10, 2 );
 
-        // Actions
-        add_action( 'wp_ulike_panel_sections_ended', array( $this, 'actions' ) );
 
         // Hooks
-        add_action( 'ulf_wp_ulike_settings_saved', array( $this, 'options_saved' ) );
+        add_action( 'wp_ulike_settings_saved', array( $this, 'options_saved' ) );
+        add_action( 'admin_init', array( $this, 'maybe_migrate_profile_tabs_has_link' ), 5 );
     }
 
-    public function actions(){
-        $this->register_email_translations_section();
-        $this->register_backup_section();
+    /** One-time migration: remove invalid has_link values from profile tabs (legacy object vs string format). */
+    public function maybe_migrate_profile_tabs_has_link() {
+        if ( get_option( 'wp_ulike_pro_profile_tabs_has_link_migrated' ) ) {
+            return;
+        }
+
+        $settings = get_option( 'wp_ulike_settings', array() );
+        $tabs     = isset( $settings['user_profiles_appearance']['tabs'] ) ? $settings['user_profiles_appearance']['tabs'] : array();
+        if ( empty( $tabs ) || ! is_array( $tabs ) ) {
+            update_option( 'wp_ulike_pro_profile_tabs_has_link_migrated', true );
+            return;
+        }
+
+        foreach ( $tabs as $key => $tab ) {
+            if ( empty( $tab['has_link'] ) ) {
+                continue;
+            }
+            $url = is_string( $tab['has_link'] ) ? trim( $tab['has_link'] ) : trim( (string) ( $tab['has_link']['url'] ?? '' ) );
+            if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+                unset( $tabs[ $key ]['has_link'] );
+            }
+        }
+
+        $settings['user_profiles_appearance']['tabs'] = $tabs;
+        update_option( 'wp_ulike_settings', $settings );
+        update_option( 'wp_ulike_pro_profile_tabs_has_link_migrated', true );
     }
 
     public function options_saved(){
@@ -120,21 +141,6 @@ class WP_Ulike_Pro_Options_Panel {
             'default' => false,
             'title'   => esc_html__('Enable Attachments', WP_ULIKE_PRO_DOMAIN),
             'desc'    => esc_html__('Add like buttons to image attachments displayed on your site. Requires WordPress 5.6+ and a theme that uses the standard WordPress attachment image function.', WP_ULIKE_PRO_DOMAIN),
-        );
-
-        $options[] = array(
-            'id'         => 'filter_attachment_ids',
-            'type'       => 'select',
-            'chosen'     => true,
-            'settings'   => array(
-                'min_length' => 1
-            ),
-            'ajax'       => true,
-            'multiple'   => true,
-            'title'      => esc_html__('Filter By Attachment ID', WP_ULIKE_PRO_DOMAIN),
-            'desc'       => esc_html__('Show like buttons only on specific image attachments. Leave empty to show on all attachments.', WP_ULIKE_PRO_DOMAIN),
-            'options'    => 'wp_ulike_pro_search_attachments',
-            'dependency' => array( 'enable_attachments', '==', 'true' )
         );
 
         $options[] = array(
@@ -246,13 +252,6 @@ class WP_Ulike_Pro_Options_Panel {
         // Get all display roles
         $user_roles_list = wp_ulike_pro_get_user_roles_list( array( 'Administrator', 'Subscriber' ) );
 
-        $options[] = array(
-            'id'      => 'enable_shortcoder',
-            'type'    => 'switcher',
-            'default' => true,
-            'title'   => esc_html__('Enable Shortcode Generator', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('Add a visual shortcode builder in the post editor to easily insert and configure WP ULike buttons without writing code.', WP_ULIKE_PRO_DOMAIN)
-        );
         $options[] =  array(
             'id'       => 'statistics_display_roles',
             'type'     => 'select',
@@ -1895,7 +1894,6 @@ class WP_Ulike_Pro_Options_Panel {
                                 array(
                                     'id'      => 'has_link',
                                     'type'    => 'link',
-                                    'default' => false,
                                     'title'   => esc_html__('Create Link Tab', WP_ULIKE_PRO_DOMAIN),
                                     'desc'    => esc_html__('Make this tab link to an external URL instead of showing content. Useful for linking to external pages or resources.', WP_ULIKE_PRO_DOMAIN),
                                 ),
@@ -1971,10 +1969,6 @@ class WP_Ulike_Pro_Options_Panel {
                                 'type'       => 'fieldset',
                                 'title'      => esc_html__('User info column width', WP_ULIKE_PRO_DOMAIN),
                                 'fields'     => $this->responsive_width_fields( '9', '9', '12' )
-                            ),
-                            array(
-                                'type'    => 'subheading',
-                                'content' => esc_html__('Badges', WP_ULIKE_PRO_DOMAIN),
                             ),
                         )
                     ),
@@ -2141,106 +2135,6 @@ class WP_Ulike_Pro_Options_Panel {
                 ),
                 'default'     => $mobile
             ),
-        );
-    }
-
-    /**
-     * Update rest api section in setting panel
-     *
-     * @param array $options
-     * @return array
-     */
-    public function rest_api_section( $options ){
-        // Check license permission
-        if( ! $this->has_permission ){
-            return $this->get_permission_notice();
-        }
-
-        return array(
-            array(
-                'id'      => 'enable_rest_api',
-                'type'    => 'switcher',
-                'default' => false,
-                'title'   => esc_html__('Enable REST API', WP_ULIKE_PRO_DOMAIN),
-                'desc'    => esc_html__('Expose WP ULike data through WordPress REST API endpoints, allowing external applications to access like counts, user votes, and statistics.', WP_ULIKE_PRO_DOMAIN),
-            ),
-            array(
-                'id'         => 'authentication_type',
-                'type'       => 'button_set',
-                'title'      => esc_html__( 'Authentication Type', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__('Choose how API requests are authenticated. User Login uses WordPress user credentials, Custom Keys uses API tokens.', WP_ULIKE_PRO_DOMAIN),
-                'default'    => 'login',
-                'options'    => array(
-                    'login' => esc_html__('User Login', WP_ULIKE_PRO_DOMAIN),
-                    'token' => esc_html__('Custom Keys', WP_ULIKE_PRO_DOMAIN)
-                ),
-                'dependency' => array( 'enable_rest_api', '==', 'true' ),
-            ),
-            array(
-                'id'         => 'rest_api_permission_for_readable_routes',
-                'type'       => 'select',
-                'title'      => esc_html__( 'Read-Only Route Access', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__( 'Choose which user roles can access API endpoints that retrieve data (GET requests).',WP_ULIKE_PRO_DOMAIN ),
-                'chosen'     => true,
-                'multiple'   => true,
-                'default'    => array( 'administrator' ),
-                'options'    => 'roles',
-                'dependency' => array( 'enable_rest_api|authentication_type', '==|==', 'true|login' ),
-            ),
-            array(
-                'id'         => 'rest_api_permission_for_writable_routes',
-                'type'       => 'select',
-                'title'      => esc_html__( 'Write Route Access', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__( 'Choose which user roles can access API endpoints that modify data (POST/PUT/DELETE requests).',WP_ULIKE_PRO_DOMAIN ),
-                'chosen'     => true,
-                'chosen'     => true,
-                'multiple'   => true,
-                'default'    => array( 'administrator' ),
-                'options'    => 'roles',
-                'dependency' => array( 'enable_rest_api|authentication_type', '==|==', 'true|login' ),
-            ),
-            array(
-                'id'         => 'enable_auto_user_id',
-                'type'       => 'switcher',
-                'default'    => false,
-                'title'      => esc_html__('Enable Auto User ID', WP_ULIKE_PRO_DOMAIN),
-                'desc'       => esc_html__('Automatically use the authenticated user\'s ID for API requests when no user ID is specified.', WP_ULIKE_PRO_DOMAIN),
-                'dependency' => array( 'enable_rest_api|rest_api_permission_for_writable_routes', '==|!=', 'true|' ),
-            ),
-            array(
-                'type'       => 'callback',
-                'function'   => 'wp_ulike_pro_rest_api_keys_settings_callback',
-                'dependency' => array( 'enable_rest_api|authentication_type', '==|==', 'true|token' ),
-            ),
-        );
-    }
-
-    /**
-     * Update optimization section in setting panel
-     *
-     * @param array $options
-     * @return array
-     */
-    public function optimization_section( $options ){
-        // Check license permission
-        if( ! $this->has_permission ){
-            return $this->get_permission_notice();
-        }
-
-        $tools_url = admin_url( 'admin.php?page=wp-ulike-pro-tools' );
-
-        return array(
-            array(
-                'type'    => 'submessage',
-                'style'   => 'info',
-                'content' => sprintf(
-                    '<p><strong>%s</strong></p><p>%s</p><p><a href="%s" class="button button-primary">%s</a></p>',
-                    esc_html__( 'Optimization Tools Have Moved', WP_ULIKE_PRO_DOMAIN ),
-                    esc_html__( 'All optimization and maintenance tools have been moved to the new Tools menu for better organization and improved user experience. You can now find all database optimization, cache management, repair tools, and more in one dedicated location.', WP_ULIKE_PRO_DOMAIN ),
-                    esc_url( $tools_url ),
-                    esc_html__( 'Go to Tools Page', WP_ULIKE_PRO_DOMAIN )
-                ),
-            )
         );
     }
 
@@ -2451,177 +2345,152 @@ class WP_Ulike_Pro_Options_Panel {
 
     /**
      * Add email translations section
+     * Converted from ULF to array-based structure for Optiwich
      *
-     * @return void
+     * @param array $fields Existing fields (pro lock field from free version)
+     * @return array Email section fields
      */
-    public function register_email_translations_section(){
-        if( ! class_exists( 'ULF' ) ){
-            return;
+    public function register_email_translations_section( $fields ){
+        // Check license permission
+        if( ! $this->has_permission ){
+            return $this->get_permission_notice();
         }
 
-        /**
-         * Translations Section
-         */
-        ULF::createSection( 'wp_ulike_settings', array(
-            'title'  => esc_html__( 'Emails',WP_ULIKE_PRO_DOMAIN),
-            'parent' => 'translations',
-            'fields' => apply_filters( 'wp_ulike_panel_emails', array(
-                array(
-                    'type'    => 'submessage',
-                    'style'   => 'info',
-                    'content' => esc_html__('You can use the following variables in all templates:', WP_ULIKE_PRO_DOMAIN) .
-                    '<br><br><code>{site_url}</code> <code>{site_name}</code> <code>{admin_email}</code> <code>{login_url}</code> <code>{profile_url}</code> <code>{logout_url}</code> <code>{display_name}</code> <code>{first_name}</code> <code>{last_name}</code> <code>{username}</code> <code>{email}</code> <code>{password_reset_link}</code> <code>{account_activation_link}</code>'
-                ),
-                array(
-                    'id'     => 'welcome_email',
-                    'type'   => 'fieldset',
-                    'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
-                    'fields' => array(
-                        array(
-                            'id'      => 'subject',
-                            'type'    => 'text',
-                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Welcome to {site_name}!',WP_ULIKE_PRO_DOMAIN),
-                        ),
-                        array(
-                            'id'      => 'body',
-                            'type'    => 'wp_editor',
-                            'default' => WP_Ulike_Pro_Mail::get_template( 'welcome' ),
-                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
-                        ),
+        return array(
+            array(
+                'type'    => 'submessage',
+                'style'   => 'info',
+                'content' => esc_html__('You can use the following variables in all templates:', WP_ULIKE_PRO_DOMAIN) .
+                '<br><br><code>{site_url}</code> <code>{site_name}</code> <code>{admin_email}</code> <code>{login_url}</code> <code>{profile_url}</code> <code>{logout_url}</code> <code>{display_name}</code> <code>{first_name}</code> <code>{last_name}</code> <code>{username}</code> <code>{email}</code> <code>{password_reset_link}</code> <code>{account_activation_link}</code>'
+            ),
+            array(
+                'id'     => 'welcome_email',
+                'type'   => 'fieldset',
+                'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
+                'fields' => array(
+                    array(
+                        'id'      => 'subject',
+                        'type'    => 'text',
+                        'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                        'default' => esc_html__( 'Welcome to {site_name}!',WP_ULIKE_PRO_DOMAIN),
+                    ),
+                    array(
+                        'id'      => 'body',
+                        'type'    => 'wp_editor',
+                        'default' => WP_Ulike_Pro_Mail::get_template( 'welcome' ),
+                        'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
                     ),
                 ),
-                array(
-                    'id'     => 'reset_password_email',
-                    'type'   => 'fieldset',
-                    'title'  => esc_html__( 'Password Reset Email',WP_ULIKE_PRO_DOMAIN),
-                    'fields' => array(
-                        array(
-                            'id'      => 'subject',
-                            'type'    => 'text',
-                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Reset your password',WP_ULIKE_PRO_DOMAIN),
-                        ),
-                        array(
-                            'id'      => 'body',
-                            'type'    => 'wp_editor',
-                            'default' => WP_Ulike_Pro_Mail::get_template( 'reset-password' ),
-                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN),
-                        ),
+            ),
+            array(
+                'id'     => 'reset_password_email',
+                'type'   => 'fieldset',
+                'title'  => esc_html__( 'Password Reset Email',WP_ULIKE_PRO_DOMAIN),
+                'fields' => array(
+                    array(
+                        'id'      => 'subject',
+                        'type'    => 'text',
+                        'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                        'default' => esc_html__( 'Reset your password',WP_ULIKE_PRO_DOMAIN),
+                    ),
+                    array(
+                        'id'      => 'body',
+                        'type'    => 'wp_editor',
+                        'default' => WP_Ulike_Pro_Mail::get_template( 'reset-password' ),
+                        'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN),
                     ),
                 ),
-                array(
-                    'id'     => 'change_password_email',
-                    'type'   => 'fieldset',
-                    'title'  => esc_html__( 'Password Changed Email',WP_ULIKE_PRO_DOMAIN),
-                    'fields' => array(
-                        array(
-                            'id'      => 'subject',
-                            'type'    => 'text',
-                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Your {site_name} password has been changed!',WP_ULIKE_PRO_DOMAIN),
-                        ),
-                        array(
-                            'id'      => 'body',
-                            'type'    => 'wp_editor',
-                            'default' => WP_Ulike_Pro_Mail::get_template( 'change-password' ),
-                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN),
-                        ),
+            ),
+            array(
+                'id'     => 'change_password_email',
+                'type'   => 'fieldset',
+                'title'  => esc_html__( 'Password Changed Email',WP_ULIKE_PRO_DOMAIN),
+                'fields' => array(
+                    array(
+                        'id'      => 'subject',
+                        'type'    => 'text',
+                        'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                        'default' => esc_html__( 'Your {site_name} password has been changed!',WP_ULIKE_PRO_DOMAIN),
+                    ),
+                    array(
+                        'id'      => 'body',
+                        'type'    => 'wp_editor',
+                        'default' => WP_Ulike_Pro_Mail::get_template( 'change-password' ),
+                        'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN),
                     ),
                 ),
-                array(
-                    'id'     => 'checkmail_email',
-                    'type'   => 'fieldset',
-                    'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
-                    'fields' => array(
-                        array(
-                            'id'      => 'subject',
-                            'type'    => 'text',
-                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Please check your email to activate your account.',WP_ULIKE_PRO_DOMAIN),
-                        ),
-                        array(
-                            'id'      => 'body',
-                            'type'    => 'wp_editor',
-                            'default' => WP_Ulike_Pro_Mail::get_template( 'checkmail' ),
-                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
-                        ),
+            ),
+            array(
+                'id'     => 'checkmail_email',
+                'type'   => 'fieldset',
+                'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
+                'fields' => array(
+                    array(
+                        'id'      => 'subject',
+                        'type'    => 'text',
+                        'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                        'default' => esc_html__( 'Please check your email to activate your account.',WP_ULIKE_PRO_DOMAIN),
+                    ),
+                    array(
+                        'id'      => 'body',
+                        'type'    => 'wp_editor',
+                        'default' => WP_Ulike_Pro_Mail::get_template( 'checkmail' ),
+                        'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
                     ),
                 ),
-                array(
-                    'id'     => 'approved_email',
-                    'type'   => 'fieldset',
-                    'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
-                    'fields' => array(
-                        array(
-                            'id'      => 'subject',
-                            'type'    => 'text',
-                            'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
-                            'default' => esc_html__( 'Your account at {site_name} is now active',WP_ULIKE_PRO_DOMAIN),
-                        ),
-                        array(
-                            'id'      => 'body',
-                            'type'    => 'wp_editor',
-                            'default' => WP_Ulike_Pro_Mail::get_template( 'approved' ),
-                            'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
-                        ),
+            ),
+            array(
+                'id'     => 'approved_email',
+                'type'   => 'fieldset',
+                'title'  => esc_html__( 'Account Welcome Email',WP_ULIKE_PRO_DOMAIN),
+                'fields' => array(
+                    array(
+                        'id'      => 'subject',
+                        'type'    => 'text',
+                        'title'   => esc_html__( 'Subject Line',WP_ULIKE_PRO_DOMAIN),
+                        'default' => esc_html__( 'Your account at {site_name} is now active',WP_ULIKE_PRO_DOMAIN),
+                    ),
+                    array(
+                        'id'      => 'body',
+                        'type'    => 'wp_editor',
+                        'default' => WP_Ulike_Pro_Mail::get_template( 'approved' ),
+                        'title'   => esc_html__( 'Message Body',WP_ULIKE_PRO_DOMAIN)
                     ),
                 ),
-                array(
-                    'id'      => 'admin_email',
-                    'type'    => 'text',
-                    'title'   => esc_html__( 'Admin E-mail Address',WP_ULIKE_PRO_DOMAIN),
-                    'default' => get_bloginfo('admin_email'),
-                ),
-                array(
-                    'id'      => 'appears_from',
-                    'type'    => 'text',
-                    'title'   => esc_html__( 'Mail appears from',WP_ULIKE_PRO_DOMAIN),
-                    'default' => get_bloginfo( 'name' ),
-                ),
-                array(
-                    'id'      => 'appears_email',
-                    'type'    => 'text',
-                    'title'   => esc_html__( 'Mail appears from',WP_ULIKE_PRO_DOMAIN),
-                    'default' => get_bloginfo('admin_email'),
-                ),
-                array(
-                    'id'      => 'enable_html_email',
-                    'type'    => 'switcher',
-                    'default' => true,
-                    'title'   => esc_html__('Use HTML for E-mails?', WP_ULIKE_PRO_DOMAIN),
-                )
-            ) )
-        ) );
+            ),
+            array(
+                'id'      => 'admin_email',
+                'type'    => 'text',
+                'title'   => esc_html__( 'Admin E-mail Address',WP_ULIKE_PRO_DOMAIN),
+                'default' => get_bloginfo('admin_email'),
+            ),
+            array(
+                'id'      => 'appears_from',
+                'type'    => 'text',
+                'title'   => esc_html__( 'Mail appears from',WP_ULIKE_PRO_DOMAIN),
+                'default' => get_bloginfo( 'name' ),
+            ),
+            array(
+                'id'      => 'appears_email',
+                'type'    => 'text',
+                'title'   => esc_html__( 'Mail appears from',WP_ULIKE_PRO_DOMAIN),
+                'default' => get_bloginfo('admin_email'),
+            ),
+            array(
+                'id'      => 'enable_html_email',
+                'type'    => 'switcher',
+                'default' => true,
+                'title'   => esc_html__('Use HTML for E-mails?', WP_ULIKE_PRO_DOMAIN),
+            )
+        );
     }
 
-    /**
-     * Register backup section in setting panel
-     *
-     * @return void
-     */
-    public function register_backup_section(){
-        if( ! class_exists( 'ULF' ) ){
-            return;
-        }
-
-        $backup_option = ! $this->has_permission ? $this->get_permission_notice() : array( array( 'type' => 'backup' ) );
-
-        /**
-         * Backup Section
-         */
-        ULF::createSection( 'wp_ulike_settings', array(
-            'title'  => esc_html__( 'Backup',WP_ULIKE_PRO_DOMAIN),
-            'icon'   => 'fa fa-shield',
-            'fields' => $backup_option
-        ) );
-    }
 
     public function get_permission_notice(){
         return array(
             array(
-                'type'    => 'notice',
-                'style'   => 'danger',
+                'type'    => 'submessage',
+                'style'   => 'info',
                 'content' => sprintf( '<p>%s</p><a class="button" href="%s">%s</a>', esc_html__( 'Features of the Pro version are only available once you have registered your license. If you don\'t yet have a license key, get WP ULike Pro now.' , WP_ULIKE_PRO_DOMAIN ), self_admin_url( 'admin.php?page=wp-ulike-pro-license' ), esc_html__( 'Activate License', WP_ULIKE_PRO_DOMAIN ) ),
             )
         );

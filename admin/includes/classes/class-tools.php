@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -24,7 +24,47 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
          */
         function __construct() {
             add_filter( 'wp_ulike_admin_pages', array( $this, 'register_page' ), 5, 1 );
+            add_action( 'admin_init', array( $this, 'handle_rest_api_settings_save' ) );
         }
+
+        /**
+         * Handle REST API settings form submission
+         */
+        public function handle_rest_api_settings_save() {
+            if ( ! isset( $_POST['wp_ulike_rest_api_settings_save'] ) || ! wp_verify_nonce( $_POST['wp_ulike_rest_api_settings_nonce'], 'wp_ulike_rest_api_settings' ) ) {
+                return;
+            }
+
+            if ( ! current_user_can( 'manage_options' ) ) {
+                return;
+            }
+
+            $settings = array(
+                'enable_rest_api'                        => isset( $_POST['enable_rest_api'] ) ? 'true' : 'false',
+                'authentication_type'                   => isset( $_POST['authentication_type'] ) ? sanitize_text_field( $_POST['authentication_type'] ) : 'login',
+                'rest_api_permission_for_readable_routes' => isset( $_POST['rest_api_permission_for_readable_routes'] ) && is_array( $_POST['rest_api_permission_for_readable_routes'] ) ? array_map( 'sanitize_text_field', $_POST['rest_api_permission_for_readable_routes'] ) : array( 'administrator' ),
+                'rest_api_permission_for_writable_routes' => isset( $_POST['rest_api_permission_for_writable_routes'] ) && is_array( $_POST['rest_api_permission_for_writable_routes'] ) ? array_map( 'sanitize_text_field', $_POST['rest_api_permission_for_writable_routes'] ) : array( 'administrator' ),
+                'enable_auto_user_id'                   => isset( $_POST['enable_auto_user_id'] ) ? 'true' : 'false',
+            );
+
+            self::save_rest_api_settings( $settings );
+
+            // Redirect to prevent resubmission
+            wp_safe_redirect( add_query_arg( array( 'page' => 'wp-ulike-pro-tools', 'tab' => 'rest-api', 'settings-updated' => 'true' ), admin_url( 'admin.php' ) ) );
+            exit;
+        }
+
+
+        /**
+         * Get REST API settings for options panel (used by filter)
+         *
+         * @param array $options
+         * @return array
+         */
+        public function get_rest_api_settings_for_panel( $options ) {
+            return self::get_rest_api_settings();
+        }
+
 
         /**
          * Register Tools page in admin menu
@@ -453,13 +493,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info = array();
 
             // WordPress Info
+            $user_count = 0;
+            if ( function_exists( 'count_users' ) ) {
+                $cu = count_users();
+                $user_count = isset( $cu['total_users'] ) ? $cu['total_users'] : 0;
+            }
             $debug_info[] = "=== WordPress Information ===";
             $debug_info[] = "WordPress Version: " . get_bloginfo( 'version' );
             $debug_info[] = "Site URL: " . site_url();
             $debug_info[] = "Home URL: " . home_url();
             $debug_info[] = "Multisite: " . ( is_multisite() ? 'Yes' : 'No' );
             $debug_info[] = "Language: " . get_locale();
-            $debug_info[] = "User Count: " . count_users()['total_users'];
+            $debug_info[] = "User Count: " . $user_count;
+            $debug_info[] = "Memory limit: " . ( defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'N/A' );
             $debug_info[] = "";
 
             // Server Info
@@ -500,7 +546,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $curl_ssl = function_exists( 'curl_version' ) && isset( curl_version()['ssl_version'] ) ? curl_version()['ssl_version'] : 'N/A';
             $debug_info[] = "cURL SSL Version: " . $curl_ssl;
             $debug_info[] = "OpenSSL Version: " . ( defined( 'OPENSSL_VERSION_TEXT' ) ? OPENSSL_VERSION_TEXT : ( function_exists( 'openssl_version_text' ) ? openssl_version_text() : 'Not Available' ) );
-            $debug_info[] = "Is SSL: " . ( is_ssl() ? 'Yes' : 'No' );
+            $debug_info[] = "HTTPS: " . ( is_ssl() ? 'Yes' : 'No' );
+            $debug_info[] = "cURL: " . ( function_exists( 'curl_init' ) ? 'Supported' : 'Not supported' );
             $debug_info[] = "";
 
             // WordPress Debug
@@ -521,7 +568,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info[] = "=== Active Plugins (" . count( $active_plugins ) . ") ===";
             foreach ( $active_plugins as $plugin ) {
                 $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-                $debug_info[] = $plugin_data['Name'] . " - " . $plugin_data['Version'] . " (" . $plugin . ")";
+                $debug_info[] = $plugin_data['Name'] . " - " . $plugin_data['Version'];
             }
             $debug_info[] = "";
 
@@ -549,11 +596,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
                 $table_name = $wpdb->prefix . $table;
                 $exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name;
                 if ( $exists ) {
-                    // Use esc_sql for table name in query
                     $count = $wpdb->get_var( sprintf( "SELECT COUNT(*) FROM `%s`", esc_sql( $table_name ) ) );
-                    $debug_info[] = $table_name . ": Exists ($count rows)";
+                    $debug_info[] = $table . ": Exists ($count rows)";
                 } else {
-                    $debug_info[] = $table_name . ": Not exists";
+                    $debug_info[] = $table . ": Not exists";
                 }
             }
             $debug_info[] = "";
@@ -570,6 +616,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info[] = "DNS Lookup: " . ( function_exists( 'gethostbyname' ) ? 'Available' : 'Not Available' );
             $debug_info[] = "";
 
+            // Error Log
+            $debug_info[] = "=== Error Log ===";
+            $error_log_result = self::get_error_log_content();
+            if ( $error_log_result['success'] ) {
+                $debug_info[] = $error_log_result['content'];
+            }
+            $debug_info[] = "";
+
             // Timestamp
             $debug_info[] = "=== Generated ===";
             $debug_info[] = "Date: " . current_time( 'mysql' );
@@ -577,6 +631,227 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info[] = "Server Time: " . date( 'Y-m-d H:i:s' );
 
             return implode( "\n", $debug_info );
+        }
+
+        /**
+         * Get error log file path (WordPress debug.log or PHP error_log).
+         *
+         * @return string
+         */
+        private static function get_error_log_path() {
+            if ( defined( 'WP_DEBUG_LOG' ) && is_string( WP_DEBUG_LOG ) ) {
+                return WP_DEBUG_LOG;
+            }
+            $wp_log = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR . '/debug.log' : '';
+            if ( $wp_log && file_exists( $wp_log ) ) {
+                return $wp_log;
+            }
+            $ini_log = ini_get( 'error_log' );
+            if ( ! empty( $ini_log ) && file_exists( $ini_log ) ) {
+                return $ini_log;
+            }
+            return $wp_log ? $wp_log : (string) $ini_log;
+        }
+
+        /**
+         * Get error log file content for debug info (similar to Advanced Database Cleaner).
+         * Respects a max size limit to avoid memory/time issues.
+         *
+         * @return array{success: bool, message?: string, path?: string, content?: string}
+         */
+        private static function get_error_log_content() {
+            $max_size  = 1 * 1024 * 1024; // 1 MB
+            $file_path = self::get_error_log_path();
+
+            if ( empty( $file_path ) || ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
+                return array( 'success' => false );
+            }
+
+            $size = @filesize( $file_path );
+            if ( $size === false || $size > $max_size ) {
+                return array( 'success' => false );
+            }
+
+            $content = @file_get_contents( $file_path );
+            if ( $content === false ) {
+                return array( 'success' => false );
+            }
+
+            return array(
+                'success' => true,
+                'path'    => $file_path,
+                'content' => $content,
+            );
+        }
+
+        /**
+         * Migrate old REST API settings to new structure
+         *
+         * @return array
+         */
+        public static function migrate_rest_api_settings() {
+            // Check if migration already done (persistent check)
+            $migrated = get_option( 'wp_ulike_rest_api_settings_migrated', false );
+            if ( $migrated ) {
+                return get_option( 'wp_ulike_rest_api_settings', array() );
+            }
+
+            // Get old settings from options panel structure
+            // wp_ulike_get_option retrieves from wp_ulike_settings option
+            $old_settings = wp_ulike_get_option( 'enable_rest_api', false );
+            $old_auth_type = wp_ulike_get_option( 'authentication_type', 'login' );
+            $old_read_perms = wp_ulike_get_option( 'rest_api_permission_for_readable_routes', array( 'administrator' ) );
+            $old_write_perms = wp_ulike_get_option( 'rest_api_permission_for_writable_routes', array( 'administrator' ) );
+            $old_auto_user_id = wp_ulike_get_option( 'enable_auto_user_id', false );
+
+            // Check if any old settings exist (if all are defaults, might be new install)
+            $has_old_settings = (
+                $old_settings !== false ||
+                $old_auth_type !== 'login' ||
+                ! empty( $old_read_perms ) ||
+                ! empty( $old_write_perms ) ||
+                $old_auto_user_id !== false
+            );
+
+            // Create new settings structure with proper type conversion
+            $new_settings = array(
+                'enable_rest_api'                        => wp_ulike_is_true( $old_settings ),
+                'authentication_type'                   => sanitize_text_field( $old_auth_type ? $old_auth_type : 'login' ),
+                'rest_api_permission_for_readable_routes' => is_array( $old_read_perms ) && ! empty( $old_read_perms ) ? array_map( 'sanitize_text_field', $old_read_perms ) : array( 'administrator' ),
+                'rest_api_permission_for_writable_routes' => is_array( $old_write_perms ) && ! empty( $old_write_perms ) ? array_map( 'sanitize_text_field', $old_write_perms ) : array( 'administrator' ),
+                'enable_auto_user_id'                   => wp_ulike_is_true( $old_auto_user_id ),
+            );
+
+            // Save new settings (even if no old settings, to mark migration as done)
+            update_option( 'wp_ulike_rest_api_settings', $new_settings );
+            update_option( 'wp_ulike_rest_api_settings_migrated', true );
+
+            return $new_settings;
+        }
+
+        /**
+         * Get REST API settings data
+         *
+         * @param string $key Optional key to get specific setting
+         * @param mixed $default Default value if key not found
+         * @return mixed
+         */
+        public static function get_rest_api_settings_data( $key = null, $default = null ) {
+            // Migrate if needed (only once)
+            static $migration_done = false;
+            if ( ! $migration_done ) {
+                self::migrate_rest_api_settings();
+                $migration_done = true;
+            }
+
+            $settings = get_option( 'wp_ulike_rest_api_settings', array() );
+
+            // Set defaults if empty
+            if ( empty( $settings ) ) {
+                $settings = array(
+                    'enable_rest_api'                        => false,
+                    'authentication_type'                   => 'login',
+                    'rest_api_permission_for_readable_routes' => array( 'administrator' ),
+                    'rest_api_permission_for_writable_routes' => array( 'administrator' ),
+                    'enable_auto_user_id'                   => false,
+                );
+            }
+
+            if ( $key !== null ) {
+                return isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
+            }
+
+            return $settings;
+        }
+
+        /**
+         * Save REST API settings
+         *
+         * @param array $settings
+         * @return bool
+         */
+        public static function save_rest_api_settings( $settings ) {
+            // Sanitize settings
+            $sanitized = array(
+                'enable_rest_api'                        => isset( $settings['enable_rest_api'] ) ? wp_ulike_is_true( $settings['enable_rest_api'] ) : false,
+                'authentication_type'                   => isset( $settings['authentication_type'] ) ? sanitize_text_field( $settings['authentication_type'] ) : 'login',
+                'rest_api_permission_for_readable_routes' => isset( $settings['rest_api_permission_for_readable_routes'] ) && is_array( $settings['rest_api_permission_for_readable_routes'] ) ? array_map( 'sanitize_text_field', $settings['rest_api_permission_for_readable_routes'] ) : array( 'administrator' ),
+                'rest_api_permission_for_writable_routes' => isset( $settings['rest_api_permission_for_writable_routes'] ) && is_array( $settings['rest_api_permission_for_writable_routes'] ) ? array_map( 'sanitize_text_field', $settings['rest_api_permission_for_writable_routes'] ) : array( 'administrator' ),
+                'enable_auto_user_id'                   => isset( $settings['enable_auto_user_id'] ) ? wp_ulike_is_true( $settings['enable_auto_user_id'] ) : false,
+            );
+
+            return update_option( 'wp_ulike_rest_api_settings', $sanitized );
+        }
+
+        /**
+         * Render API keys management section
+         *
+         * @return void
+         */
+        public static function render_api_keys_section() {
+            $get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
+            ?>
+            <p style="margin-top: 0;"><?php esc_html_e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+
+            <div class="wp-ulike-pro-api-keys-actions">
+                <input type="button" id="wp-ulike-pro-generate-api-key" class="button button-primary" value="<?php esc_attr_e( 'Generate New API Key', WP_ULIKE_PRO_DOMAIN ); ?>">
+                <?php wp_nonce_field( 'wp_ulike_generate_api_keys', 'wp-ulike-pro-api-keys-nonce-field' ); ?>
+            </div>
+
+            <?php
+            // Filter and validate keys
+            $valid_keys = array();
+            if ( ! empty( $get_keys ) && is_array( $get_keys ) ) {
+                foreach ( $get_keys as $key => $value ) {
+                    if ( is_array( $value ) && isset( $value['token'] ) && ! empty( $value['token'] ) ) {
+                        $valid_keys[] = $value;
+                    }
+                }
+            }
+            ?>
+            <?php if ( ! empty( $valid_keys ) ) : ?>
+                <div class="wp-ulike-pro-api-keys-list">
+                    <h3><?php esc_html_e( 'Generated API Keys', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+                    <div class="wp-ulike-pro-api-keys-items">
+                        <?php
+                        // Reverse array to show newest first (without preserving keys)
+                        $display_keys = array_reverse( $valid_keys );
+                        foreach ( $display_keys as $value ) :
+                            // Use exact token as stored (wp_generate_password doesn't include whitespace)
+                            $token = (string) $value['token'];
+                            if ( empty( $token ) ) continue;
+                        ?>
+                            <div class="wp-ulike-pro-api-key-item" data-token="<?php echo esc_attr( $token ); ?>">
+                                <div class="wp-ulike-pro-api-key-header">
+                                    <div class="wp-ulike-pro-api-key-info">
+                                        <div class="wp-ulike-pro-api-key-label-main"><?php esc_html_e( 'Secret Token', WP_ULIKE_PRO_DOMAIN ); ?></div>
+                                        <div class="wp-ulike-pro-api-key-date-info">
+                                            <span class="wp-ulike-pro-api-key-label-small"><?php esc_html_e( 'Created:', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                            <span class="wp-ulike-pro-api-key-date-value"><?php echo esc_html( isset( $value['date'] ) ? $value['date'] : '' ); ?></span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="wp-ulike-pro-delete-api-key button button-link-delete" data-token="<?php echo esc_attr( $token ); ?>" title="<?php esc_attr_e( 'Delete this API key', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                        <span class="dashicons dashicons-trash"></span>
+                                        <span class="screen-reader-text"><?php esc_html_e( 'Delete', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                    </button>
+                                </div>
+                                <div class="wp-ulike-pro-api-key-token-wrapper">
+                                    <code class="wp-ulike-pro-api-key-token-code"><?php echo esc_html( $token ); ?></code>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php else : ?>
+                <div class="wp-ulike-pro-api-keys-empty">
+                    <div class="wp-ulike-pro-api-keys-empty-icon">
+                        <span class="dashicons dashicons-admin-network"></span>
+                    </div>
+                    <h3><?php esc_html_e( 'No API Keys Yet', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+                    <p><?php esc_html_e( 'Generate your first API key to start using the REST API. API keys allow external applications to securely access your WP ULike data.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                </div>
+            <?php endif; ?>
+            <?php
         }
     }
 }

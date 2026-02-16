@@ -5,7 +5,7 @@ Tags: like, marketing, elementor, favorite, statistics
 Requires PHP: 7.2.5
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 2.0.0
+Stable tag: 2.1.1
 
 Boost user engagement and SEO with WP ULike Pro. Easily add "like" and "favorite" buttons and gain insights with advanced analytics—no coding needed.
 
@@ -59,6 +59,20 @@ Yes, the Pro version includes comprehensive export options. You can export chart
 Yes, WP ULike Pro is WCAG 2.1 Level AA compliant and includes comprehensive accessibility features.
 
 == Changelog ==
+
+= 2.1.1 =
+* Fix: Resolved various possible errors for improved stability.
+* Improvement: Added error log information into the debug info tool for better troubleshooting and diagnostics.
+* Improvement: Improved GeoIP lookup with enhanced reliability and accuracy.
+* Performance: General performance improvements across the plugin.
+
+= 2.1.0 =
+* Improvement: Moved REST API settings from Settings menu to Tools menu for better organization and easier access.
+* New: Added support for redesigned settings and customizer panel with enhanced functionality and improved user interface.
+* Improvement: Enhanced UI improvements in stats panel with better visual design and user experience.
+* Improvement: Removed deprecated shortcode generator and profile meta box for cleaner codebase and improved maintainability.
+* Improvement: Enhanced social share shortcode functionality with additional features and improved reliability.
+* Performance: Optimized plugin performance with code improvements and enhanced efficiency across various components.
 
 = 2.0.0 =
 * New: Introduced view tracking service for all content types with engagement rate calculation (Likes + Dislikes / Views * 100) and intelligent tracking using Intersection Observer API with batched requests.

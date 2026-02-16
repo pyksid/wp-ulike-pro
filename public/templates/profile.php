@@ -189,10 +189,10 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
         <?php if( ! empty( $options['custom_html'] ) ): ?>
         <!-- custom-info -->
         <div class="wp-ulike-pro-profile-custom-info">
-            <?php 
+            <?php
             // SECURITY: Sanitize output to prevent XSS attacks
             // Use wp_kses_post to allow safe HTML while preventing script injection
-            echo wp_kses_post( do_shortcode( $options['custom_html'] ) ); 
+            echo wp_kses_post( do_shortcode( $options['custom_html'] ) );
             ?>
         </div>
         <?php endif; ?>
@@ -209,7 +209,7 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
     // Select tab side
     $tab_side    = ! empty( $options['tabs_side'] ) ? $options['tabs_side'] . '_side' : 'top_side';
     $profile_url = wp_ulike_pro_get_user_profile_permalink( $get_user_id );
-    
+
     // If no current tab is specified, find the first available (non-restricted) tab
     if( empty( $current_tab ) ){
         foreach ($options['tabs'] as $tab_key => $tab_args):
@@ -239,8 +239,17 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
                         $tab_type = 'nav_internal';
                         $tab_slug = esc_attr( strtolower( preg_replace( '/\s+/', '-', $tab_args['title'] ) ) );
                         $tab_link = WP_Ulike_Pro_Permalinks::localize_url( $profile_url, $tab_slug, 'wp_ulike_profile_tab' );
-                        if( ! empty( $tab_args['has_link']['url'] ) ){
-                            $tab_link = esc_url( $tab_args['has_link']['url'] );
+                        // Resolve URL: prefer has_link['url'] if set, otherwise has_link (string); avoid access when empty
+                        $tab_link_url = '';
+                        if ( ! empty( $tab_args['has_link'] ) ) {
+                            if ( is_array( $tab_args['has_link'] ) && ! empty( $tab_args['has_link']['url'] ) ) {
+                                $tab_link_url = $tab_args['has_link']['url'];
+                            } elseif ( is_string( $tab_args['has_link'] ) ) {
+                                $tab_link_url = $tab_args['has_link'];
+                            }
+                        }
+                        if ( ! empty( $tab_link_url ) && filter_var( $tab_link_url, FILTER_VALIDATE_URL ) ) {
+                            $tab_link = esc_url( $tab_link_url );
                             $tab_type = 'nav_external';
                         }
 
@@ -259,7 +268,7 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
                     <div class="content_wrapper">
                         <?php
                     $content_exist = false;
-                    
+
                     foreach ($options['tabs'] as $tab_key => $tab_args):
                         if( ! empty( $tab_args['restrict'] ) && ( $get_user_id !== $wp_ulike_pro_logged_in_user_id ) ){
                             continue;

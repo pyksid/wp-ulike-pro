@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike-pro
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
 */
 
@@ -654,39 +654,6 @@ class WP_Ulike_Pro_Meta_Box {
                 )
             )
         ) );
-
-        if( ! empty( $_GET['post'] ) ){
-            // Delete data section
-            ULF::createSection( $this->option_domain, array(
-                'title'  => esc_html__('Delete Data', WP_ULIKE_PRO_DOMAIN),
-                'fields' => array(
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'     => esc_html__( 'Delete All Logs', WP_ULIKE_PRO_DOMAIN),
-                            'label'     => esc_html__( 'Delete Rows', WP_ULIKE_PRO_DOMAIN),
-                            'desc'      => sprintf( esc_html__( 'You Are About To Delete All %s. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN), esc_html__('Likes Logs', WP_ULIKE_PRO_DOMAIN) ),
-                            'type'      => wp_json_encode( array( 'method' => 'logs', 'id' => $_GET['post'] ) ),
-                            'inline_js' => true,
-                            'action'    => 'post_metabox_truncate'
-                        )
-                    ),
-                    array(
-                        'type'     => 'callback',
-                        'function' => 'wp_ulike_pro_ajax_button_callback',
-                        'args'     => array(
-                            'title'     => esc_html__( 'Delete Meta Counter Values', WP_ULIKE_PRO_DOMAIN),
-                            'label'     => esc_html__( 'Delete Values', WP_ULIKE_PRO_DOMAIN),
-                            'desc'      => sprintf( '<span>%s</span><br><strong>* %s</strong>', sprintf( esc_html__( 'You Are About To Delete All %s. This Action Is Not Reversible.', WP_ULIKE_PRO_DOMAIN), esc_html__('Meta Counter Data', WP_ULIKE_PRO_DOMAIN) ), esc_html__( 'After completing this operation, go to the "Optimization" section in the settings panel and delete all meta user status.', WP_ULIKE_PRO_DOMAIN) ),
-                            'type'      => wp_json_encode( array( 'method' => 'meta', 'id' => $_GET['post'] ) ),
-                            'inline_js' => true,
-                            'action'    => 'post_metabox_truncate'
-                        )
-                    )
-                )
-            ) );
-        }
 
     }
 
