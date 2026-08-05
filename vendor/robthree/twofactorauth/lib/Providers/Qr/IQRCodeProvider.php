@@ -22,3 +22,4 @@ interface IQRCodeProvider
      */
     public function getMimeType();
 }
+

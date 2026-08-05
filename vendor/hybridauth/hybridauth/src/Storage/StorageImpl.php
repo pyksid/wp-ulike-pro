@@ -36,3 +36,4 @@ class StorageImpl implements StorageInterface {
         $this->data = [];
     }
 }
+

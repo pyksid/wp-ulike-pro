@@ -63,3 +63,4 @@ class Blizzard extends OAuth2
         return $userProfile;
     }
 }
+

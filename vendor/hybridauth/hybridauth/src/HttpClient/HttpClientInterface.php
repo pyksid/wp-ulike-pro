@@ -56,3 +56,4 @@ interface HttpClientInterface
      */
     public function getResponseClientError();
 }
+

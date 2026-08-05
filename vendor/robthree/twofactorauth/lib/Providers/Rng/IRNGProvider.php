@@ -16,3 +16,4 @@ interface IRNGProvider
      */
     public function isCryptographicallySecure();
 }
+

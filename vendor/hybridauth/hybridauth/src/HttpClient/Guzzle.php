@@ -274,3 +274,4 @@ class Guzzle implements HttpClientInterface
         return $this->requestArguments;
     }
 }
+

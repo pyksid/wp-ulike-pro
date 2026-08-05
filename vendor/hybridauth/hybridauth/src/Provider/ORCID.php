@@ -240,3 +240,4 @@ class ORCID extends OAuth2
         return $profile;
     }
 }
+

@@ -3,7 +3,7 @@
  * Views Tracking Class
  *
  * Tracks button visits for conversion rate calculations
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -485,3 +485,4 @@ if ( ! class_exists( 'WP_Ulike_Pro_Views' ) ) {
         }
     }
 }
+

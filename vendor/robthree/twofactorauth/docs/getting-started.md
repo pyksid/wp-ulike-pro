@@ -56,3 +56,4 @@ $result = $tfa->verifyCode($secret, $_POST['verification']);
 If `$result` is `true` then your user has been able to successfully record the `$secret` in their authenticator app and it has generated an appropriate code.
 
 You can now save the `$secret` to your user record and use the same `verifyCode` method each time they log in.
+

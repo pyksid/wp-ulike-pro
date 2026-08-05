@@ -9,3 +9,4 @@ interface ITimeProvider
      */
     public function getTime();
 }
+

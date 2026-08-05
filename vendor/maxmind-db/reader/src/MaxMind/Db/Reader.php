@@ -402,3 +402,4 @@ class Reader
         fclose($this->fileHandle);
     }
 }
+

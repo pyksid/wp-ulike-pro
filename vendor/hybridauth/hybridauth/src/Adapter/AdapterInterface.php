@@ -153,3 +153,4 @@ interface AdapterInterface
      */
     public function getLogger();
 }
+

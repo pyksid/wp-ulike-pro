@@ -6,10 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WhichBrowser\\' => array($vendorDir . '/whichbrowser/parser/src'),
-    'Spatie\\SchemaOrg\\' => array($vendorDir . '/spatie/schema-org/src'),
     'RobThree\\Auth\\' => array($vendorDir . '/robthree/twofactorauth/lib'),
-    'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
     'MaxMind\\Db\\' => array($vendorDir . '/maxmind-db/reader/src/MaxMind/Db'),
     'Hybridauth\\' => array($vendorDir . '/hybridauth/hybridauth/src'),
 );
+

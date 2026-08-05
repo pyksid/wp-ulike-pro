@@ -312,3 +312,4 @@ class Group_Control_Posts extends Group_Control_Base {
 		return $this->build_query_args( $settings, $control_id_prefix );
 	}
 }
+

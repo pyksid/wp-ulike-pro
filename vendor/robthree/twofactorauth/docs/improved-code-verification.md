@@ -30,3 +30,4 @@ You can store a timeslice alongside the secret and verify that any new timeslice
 i.e. if `verifyCode` returns true _and_ the returned timeslice is greater than the last used timeslice for this user/secret then this is the first time the code has been used and you should now store the higher timeslice to verify that the user.
 
 This is an effective defense against a [replay attack](https://en.wikipedia.org/wiki/Replay_attack).
+

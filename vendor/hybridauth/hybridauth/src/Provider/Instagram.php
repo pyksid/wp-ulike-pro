@@ -254,3 +254,4 @@ class Instagram extends OAuth2
         return $data;
     }
 }
+

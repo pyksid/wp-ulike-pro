@@ -2,7 +2,7 @@
 /**
  * WP ULIKE PRO BASE CLASS
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -98,32 +98,14 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
      * @return void
      */
     private function maybe_upgrade_database(){
-      $current_version = get_option( 'wp_ulike_pro_database_version', '1.0.0' );
+      $current_version = get_option( 'wp_ulike_pro_database_version', '' );
 
-      if( ! class_exists('WP_Ulike_Pro_Activator') ){
+      if ( ! class_exists( 'WP_Ulike_Pro_Activator' ) ) {
         require_once WP_ULIKE_PRO_DIR . 'public/class-activator.php';
       }
 
-      // Define upgrade path with version and method mapping
-      $upgrades = array(
-        '1.0.1' => 'install_tables',
-        '1.0.2' => 'upgrade_0',
-        '1.0.3' => 'upgrade_1',
-      );
-
-      // Execute upgrades sequentially, stopping on failure
-      foreach ( $upgrades as $version => $method ) {
-        if ( version_compare( $current_version, $version, '<' ) ) {
-          $result = WP_Ulike_Pro_Activator::$method();
-          if ( false === $result ) {
-            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-              error_log( sprintf( 'WP ULike Pro: Database upgrade to version %s failed. Current version: %s', $version, $current_version ) );
-            }
-            break; // Stop on failure to prevent partial upgrades
-          }
-          // Update current version after successful upgrade
-          $current_version = $version;
-        }
+      if ( version_compare( $current_version, WP_Ulike_Pro_Activator::DB_VERSION, '<' ) ) {
+        WP_Ulike_Pro_Activator::install_tables();
       }
     }
 

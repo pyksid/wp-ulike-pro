@@ -68,3 +68,4 @@ class SteemConnect extends OAuth2
         return $userProfile;
     }
 }
+

@@ -43,6 +43,12 @@ class WP_Ulike_Pro_Register_Public_Events
 		// Button Views Batch Tracking (for performance)
 		add_action( 'wp_ajax_nopriv_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
 		add_action( 'wp_ajax_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
+
+		// Engagements
+		add_action( 'wp_ajax_nopriv_wp_ulike_pro_engagement_process', array( $this, 'engagement_process' ) );
+		add_action( 'wp_ajax_wp_ulike_pro_engagement_process', array( $this, 'engagement_process' ) );
+		add_action( 'wp_ajax_nopriv_ulp_engagement_engagers', array( $this, 'engagement_engagers' ) );
+		add_action( 'wp_ajax_ulp_engagement_engagers', array( $this, 'engagement_engagers' ) );
 	}
 
 	/**
@@ -126,5 +132,21 @@ class WP_Ulike_Pro_Register_Public_Events
 		$button_views = WP_Ulike_Pro_Views::get_instance();
 		$button_views->ajax_track_view_batch();
     }
+
+	/**
+	 * Engagement vote / reaction process.
+	 */
+	public function engagement_process()
+	{
+		new WP_Ulike_Pro_Engagement_Listener();
+	}
+
+	/**
+	 * Engagement engagers pile (modal / lazy load).
+	 */
+	public function engagement_engagers()
+	{
+		new WP_Ulike_Pro_Engagement_Engagers_Listener();
+	}
 
 }

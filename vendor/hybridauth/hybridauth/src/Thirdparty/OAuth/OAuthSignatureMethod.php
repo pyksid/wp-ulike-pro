@@ -65,3 +65,4 @@ abstract class OAuthSignatureMethod
         return $result == 0;
     }
 }
+

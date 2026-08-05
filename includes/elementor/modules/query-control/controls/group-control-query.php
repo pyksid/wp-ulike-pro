@@ -545,3 +545,4 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 	}
 }
+

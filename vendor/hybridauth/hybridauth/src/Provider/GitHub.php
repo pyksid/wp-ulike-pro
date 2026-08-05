@@ -123,3 +123,4 @@ class GitHub extends OAuth2
         return $userProfile;
     }
 }
+

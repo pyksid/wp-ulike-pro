@@ -34,3 +34,4 @@ interface ExceptionInterface
     |   |    |   InvalidOpenidIdentifierException         extends InvalidArgumentException
 */
 }
+

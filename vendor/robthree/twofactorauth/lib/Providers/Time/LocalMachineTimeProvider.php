@@ -9,3 +9,4 @@ class LocalMachineTimeProvider implements ITimeProvider
         return time();
     }
 }
+

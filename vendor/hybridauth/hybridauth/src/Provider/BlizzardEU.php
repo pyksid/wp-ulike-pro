@@ -32,3 +32,4 @@ class BlizzardEU extends Blizzard
      */
     protected $accessTokenUrl = 'https://eu.battle.net/oauth/token';
 }
+

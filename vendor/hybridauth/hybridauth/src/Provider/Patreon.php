@@ -192,3 +192,4 @@ class Patreon extends OAuth2
         return $contacts;
     }
 }
+

@@ -38,3 +38,4 @@ class OpenSSLRNGProvider implements IRNGProvider
         return $this->requirestrong;
     }
 }
+

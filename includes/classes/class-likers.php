@@ -44,7 +44,7 @@ final class WP_Ulike_Pro_Likers {
 			// Final template
 			$template  = '';
 			// Get all likers list
-			$get_users = wp_ulike_get_likers_list_per_post( $this->settings_type->getTableName(), $this->settings_type->getColumnName(), $this->data['id'], NULL );
+			$get_users = wp_ulike_pro_get_likers_list_per_post( $this->settings_type->getTableName(), $this->settings_type->getColumnName(), $this->data['id'], NULL );
 
 			if( empty( $get_users ) ){
 				throw new \Exception( esc_html__( 'This item has not been liked by any user!', WP_ULIKE_PRO_DOMAIN ) );
@@ -53,6 +53,13 @@ final class WP_Ulike_Pro_Likers {
 			// Generate users list
 			$user_list  = '';
 			$modal_temp = WP_Ulike_Pro_Options::getLikersModalTemplate( $this->data['type'] );
+
+			// Prime users + meta in one round trip instead of one query per row
+			// in the loop below; a busy item can list hundreds of likers.
+			$prime_ids = array_unique( array_filter( array_map( 'absint', (array) $get_users ) ) );
+			if( ! empty( $prime_ids ) ){
+				cache_users( $prime_ids );
+			}
 
 			foreach ( $get_users as $user ) {
 				$user_info	= get_user_by( 'id', $user );

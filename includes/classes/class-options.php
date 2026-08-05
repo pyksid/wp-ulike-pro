@@ -2,7 +2,7 @@
 /**
  * Options manager
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -639,7 +639,7 @@ class WP_Ulike_Pro_Options extends wp_ulike_setting_repo {
 	 * @return string
 	 */
 	public static function getDislikeAriaLabel(){
-		return esc_attr( self::getOption( 'dislike_button_aria_label', esc_html__( 'Dislike Button', 'wp-ulike' ) ) );
+		return esc_attr( self::getOption( 'dislike_button_aria_label', esc_html__( 'Dislike Button', WP_ULIKE_PRO_DOMAIN ) ) );
 	}
 
 }

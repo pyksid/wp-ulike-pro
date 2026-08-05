@@ -157,3 +157,4 @@ class BaconQrCodeProvider implements IQRCodeProvider
         throw new \RuntimeException('Invalid colour value');
     }
 }
+

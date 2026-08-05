@@ -29,7 +29,7 @@ $adapters = $hybridauth->getConnectedAdapters();
             return false;
         }
     </script>
-    
+
 </head>
 <body>
     <h1>Sign in</h1>
@@ -63,3 +63,4 @@ $adapters = $hybridauth->getConnectedAdapters();
 
 </body>
 </html>
+

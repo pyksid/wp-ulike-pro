@@ -13,3 +13,4 @@ namespace Hybridauth\Exception;
 class UnexpectedApiResponseException extends UnexpectedValueException implements ExceptionInterface
 {
 }
+

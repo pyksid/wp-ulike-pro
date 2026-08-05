@@ -40,3 +40,4 @@ class StackExchangeOpenID extends OpenID
         $this->storage->set($this->providerId . '.user', $userProfile);
     }
 }
+

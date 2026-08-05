@@ -119,3 +119,4 @@ class Group_Control_Related extends Group_Control_Query {
 		];
 	}
 }
+

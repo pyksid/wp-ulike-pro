@@ -121,3 +121,4 @@ class Mastodon extends OAuth2
         return $response;
     }
 }
+

@@ -101,3 +101,4 @@ class WindowsLive extends OAuth2
         return $contacts;
     }
 }
+

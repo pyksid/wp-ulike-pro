@@ -7,7 +7,7 @@ Hybridauth is a community driven project, and it needs your help to keep the pro
 ### Report Problems
 
 A great way to help is to find and submit [bug reports](https://github.com/hybridauth/hybridauth/issues) or to fix the
-existing ones. 
+existing ones.
 
 When reporting new issues, please provide as much detail and context as possible, otherwise we will be left in the dark
 about the problem you having.
@@ -37,7 +37,7 @@ actually made to a file on your Pull Request.
 
 **Compatibility**
 
-Additional providers, minor enhancements, bugs and typos fixes are most welcome. Large and "breaking" changes should be 
+Additional providers, minor enhancements, bugs and typos fixes are most welcome. Large and "breaking" changes should be
 discussed ahead of time. **Please ask first**.
 
 Hybridauth 3 is compatible with **PHP 5.4** and therefore all code supplied must stick to this requirement.
@@ -47,3 +47,4 @@ Hybridauth 3 is compatible with **PHP 5.4** and therefore all code supplied must
 Hybridauth PHP Library is released under the terms of MIT License: By contributing your code to the project, you agree to
 license your contribution under the MIT License. (which means, once you donate your code to the community, it become freely
 available to everyone to use, or mis-use).
+

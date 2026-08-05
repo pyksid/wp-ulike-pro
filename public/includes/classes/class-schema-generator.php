@@ -2,7 +2,7 @@
 /**
  * Schema Genrator Class.
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -13,8 +13,6 @@ if ( ! defined('ABSPATH') ) {
     die();
 }
 
-use Spatie\SchemaOrg\Schema;
-
 /**
  *  Class to generate schema structures
  */
@@ -22,308 +20,495 @@ class WP_Ulike_Pro_Schema_Generator{
 
     protected $schema;
     protected $item_ID;
-    protected $wpdb;
 
     /**
      * __construct
      */
     function __construct( $item_ID ) {
-        global $wpdb;
-        $this->wpdb = $wpdb;
         $this->item_ID = $item_ID;
     }
 
     public function generateAutoSchema( $type ){
-        $this->schema = Schema::$type();
+        $this->schema = WP_Ulike_Pro_JsonLd::create( $type );
         $this->setProperties( $type );
         $this->printScript();
     }
 
     public function generateCustomFAQSchema(){
-        $fAQPage = Schema::fAQPage();
-        if( '' !== ( $item_faq = wp_ulike_pro_get_metabox_value('faq') ) ){
-            $faq_stack = array();
-            foreach ($item_faq as $key => $faq) {
-                if( empty( $faq ) ){
-                    continue;
-                }
-                $faq_stack[] = Schema::Question()
-                ->name( $faq['question'] )
-                ->acceptedAnswer( Schema::Answer()->text( $faq['answer'] ) );
-            }
-            $fAQPage->mainEntity( $faq_stack );
-            echo $fAQPage->toScript();
+        $item_faq = $this->getMetaValue( 'faq' );
+        if ( empty( $item_faq ) || ! is_array( $item_faq ) ) {
+            return;
         }
+
+        $faq_stack = array();
+        foreach ( $item_faq as $faq ) {
+            if ( empty( $faq ) || empty( $faq['question'] ) || empty( $faq['answer'] ) ) {
+                continue;
+            }
+            $faq_stack[] = WP_Ulike_Pro_JsonLd::nested(
+                'Question',
+                array(
+                    'name'           => $faq['question'],
+                    'acceptedAnswer' => WP_Ulike_Pro_JsonLd::nested(
+                        'Answer',
+                        array( 'text' => $faq['answer'] )
+                    ),
+                )
+            );
+        }
+
+        if ( empty( $faq_stack ) ) {
+            return;
+        }
+
+        $faq_page = WP_Ulike_Pro_JsonLd::create( 'FAQPage' );
+        $faq_page->mainEntity( $faq_stack );
+        echo $faq_page->toScript();
     }
 
     private function setProperties( $type ){
         // General Name Generator
-        $item_name = wp_ulike_pro_get_metabox_value('title');
-        $item_name = empty( $item_name ) ? the_title_attribute( 'echo=0' ) : $item_name;
+        $item_name = $this->getMetaValue( 'title' );
+        if ( null === $item_name || '' === $item_name || false === $item_name ) {
+            $item_name = wp_strip_all_tags( get_the_title( $this->item_ID ) );
+        }
         $this->schema->name( $item_name );
 
         // General Item Description
-        if( '' !== ( $item_description = wp_ulike_pro_get_metabox_value('description') ) ){
+        if ( ! empty( $item_description = $this->getMetaValue( 'description' ) ) ) {
             $this->schema->description( $item_description );
         }
 
         // General AggregateRating Generator
-        if( ! wp_ulike_pro_get_metabox_value('disable_star_ratings') ){
-            if( wp_ulike_is_true( wp_ulike_pro_get_metabox_value('enable_custom_rating') ) ){
-                $this->schema->AggregateRating(
-                    Schema::AggregateRating()
-                    ->worstRating( wp_ulike_pro_get_metabox_value('worst_rating') )
-                    ->bestRating( wp_ulike_pro_get_metabox_value('best_rating') )
-                    ->ratingValue( wp_ulike_pro_get_metabox_value('rating_value') )
-                    ->ratingCount( wp_ulike_pro_get_metabox_value('rating_count') )
+        if ( ! wp_ulike_pro_is_metabox_true( 'disable_star_ratings' ) ) {
+            if ( wp_ulike_pro_is_metabox_true( 'enable_custom_rating' ) ) {
+                $aggregate_rating = WP_Ulike_Pro_JsonLd::buildAggregateRating(
+                    array(
+                        'worstRating'  => $this->getMetaValue( 'worst_rating' ),
+                        'bestRating'   => $this->getMetaValue( 'best_rating' ),
+                        'ratingValue'  => $this->getMetaValue( 'rating_value' ),
+                        'ratingCount'  => $this->getMetaValue( 'rating_count' ),
+                    )
                 );
+                if ( $aggregate_rating ) {
+                    $this->schema->aggregateRating( $aggregate_rating );
+                }
             } else {
-                $this->schema->AggregateRating( $this->GetAggregateRating() );
+                $aggregate_rating = $this->GetAggregateRating();
+                if ( $aggregate_rating ) {
+                    $this->schema->aggregateRating( $aggregate_rating );
+                }
             }
         }
 
         // General Reviews
-        if( '' !== ( $item_reviews = wp_ulike_pro_get_metabox_value('reviews') ) && wp_ulike_is_true( wp_ulike_pro_get_metabox_value('enable_custom_reviews') ) ){
+        if ( ! empty( $item_reviews = $this->getMetaValue( 'reviews' ) ) && wp_ulike_pro_is_metabox_true( 'enable_custom_reviews' ) ) {
             $reviews_stack = array();
-            foreach ($item_reviews as $key => $review) {
-                if( empty( $review ) ){
+            foreach ( $item_reviews as $review ) {
+                if ( empty( $review ) ) {
                     continue;
                 }
-                $reviews_stack[] = Schema::Review()
-                ->author( $review['author'] )
-                ->datePublished( $review['published_date'] )
-                ->name( $review['name'] )
-                ->reviewBody( $review['review_body'] )
-                ->reviewRating( Schema::Rating()->ratingValue( $review['rating_value'] ) );
+                $rating_scale = $this->getRatingScale();
+                $review_entity = WP_Ulike_Pro_JsonLd::buildReview(
+                    array(
+                        'author'         => $review['author'],
+                        'published_date' => wp_ulike_pro_parse_schema_date( $review['published_date'] ),
+                        'name'           => $review['name'],
+                        'review_body'    => $review['review_body'],
+                        'rating_value'   => $review['rating_value'],
+                        'worst_rating'   => $rating_scale['worst'],
+                        'best_rating'    => $rating_scale['best'],
+                    )
+                );
+                if ( $review_entity ) {
+                    $reviews_stack[] = $review_entity;
+                }
             }
-            $this->schema->review( $reviews_stack );
+            if ( ! empty( $reviews_stack ) ) {
+                $this->schema->review( $reviews_stack );
+            }
         }
 
         switch ( $type ) {
             case 'Book':
-                $this->schema->author(
-                    Schema::person()
-                    ->name( wp_ulike_pro_get_metabox_value('author') )
-                );
-                $this->schema->url( wp_ulike_pro_get_metabox_value('url') );
+                $author = WP_Ulike_Pro_JsonLd::person( $this->getMetaValue( 'author' ) );
+                if ( $author ) {
+                    $this->schema->author( $author );
+                }
+                $this->schema->url( $this->schemaUrl() );
                 break;
 
             case 'Course':
-                $this->schema->provider(
-                    Schema::organization()
-                    ->name( wp_ulike_pro_get_metabox_value('name') )
-                );
+                $provider = WP_Ulike_Pro_JsonLd::organization( $this->getMetaValue( 'name' ) );
+                if ( $provider ) {
+                    $this->schema->provider( $provider );
+                }
                 break;
 
             case 'Event':
-                $this->schema->startDate( wp_ulike_pro_get_metabox_value('start_date') );
-                $this->schema->endDate( wp_ulike_pro_get_metabox_value('end_date') );
-                $this->schema->location(
-                    Schema::place()
-                    ->name( wp_ulike_pro_get_metabox_value('location') )
-                    ->address(
-                        Schema::PostalAddress()
-                        ->streetAddress( wp_ulike_pro_get_metabox_value('street_address') )
-                        ->addressLocality( wp_ulike_pro_get_metabox_value('address_locality') )
-                        ->addressRegion( wp_ulike_pro_get_metabox_value('address_region') )
-                        ->postalCode( wp_ulike_pro_get_metabox_value('postal_code') )
-                        ->addressCountry( wp_ulike_pro_get_metabox_value('address_country') )
+                $this->schema->startDate( $this->schemaDate( 'start_date' ) );
+                $this->schema->endDate( $this->schemaDate( 'end_date' ) );
+
+                $location = WP_Ulike_Pro_JsonLd::nested(
+                    'Place',
+                    array(
+                        'name'    => $this->getMetaValue( 'location' ),
+                        'address' => WP_Ulike_Pro_JsonLd::buildPostalAddress(
+                            array(
+                                'street_address'     => $this->getMetaValue( 'street_address' ),
+                                'address_locality'   => $this->getMetaValue( 'address_locality' ),
+                                'address_region'     => $this->getMetaValue( 'address_region' ),
+                                'postal_code'        => $this->getMetaValue( 'postal_code' ),
+                                'address_country'    => $this->getMetaValue( 'address_country' ),
+                            )
+                        ),
                     )
                 );
-                $this->schema->offers(
-                    Schema::Offer()
-                    ->price( wp_ulike_pro_get_metabox_value('price') )
-                    ->validFrom( wp_ulike_pro_get_metabox_value('valid_date') )
-                    ->url( wp_ulike_pro_get_metabox_value('url') )
-                    ->availability( wp_ulike_pro_get_metabox_value('availability') )
-                    ->priceCurrency( wp_ulike_pro_get_metabox_value('price_currency') )
+                if ( $location && $location->hasProperties() ) {
+                    $this->schema->location( $location );
+                }
+
+                $offer = WP_Ulike_Pro_JsonLd::buildOffer(
+                    array(
+                        'price'          => $this->getMetaValue( 'price' ),
+                        'valid_from'     => $this->schemaDate( 'valid_date' ),
+                        'url'            => $this->schemaUrl(),
+                        'availability'   => $this->getMetaValue( 'availability' ),
+                        'price_currency' => $this->getMetaValue( 'price_currency' ),
+                    )
                 );
+                if ( $offer ) {
+                    $this->schema->offers( $offer );
+                }
+
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
-                $this->schema->performer(
-                    Schema::PerformingGroup()
-                    ->name( wp_ulike_pro_get_metabox_value('author') )
+
+                $performer = WP_Ulike_Pro_JsonLd::nested(
+                    'PerformingGroup',
+                    array( 'name' => $this->getMetaValue( 'author' ) )
                 );
+                if ( $performer && $performer->hasProperties() ) {
+                    $this->schema->performer( $performer );
+                }
                 break;
 
             case 'Product':
-                $this->schema->sku( wp_ulike_pro_get_metabox_value('sku') );
-                $this->schema->mpn( wp_ulike_pro_get_metabox_value('mpn') );
-                $this->schema->brand(
-                    Schema::thing()
-                    ->name( wp_ulike_pro_get_metabox_value('author') )
+                $this->schema->sku( $this->getMetaValue( 'sku' ) );
+                $this->schema->mpn( $this->getMetaValue( 'mpn' ) );
+
+                $brand = WP_Ulike_Pro_JsonLd::brand( $this->getMetaValue( 'author' ) );
+                if ( $brand ) {
+                    $this->schema->brand( $brand );
+                }
+
+                $product_url = $this->schemaUrl();
+                if ( $product_url ) {
+                    $this->schema->url( $product_url );
+                }
+
+                $offer = WP_Ulike_Pro_JsonLd::buildOffer(
+                    array(
+                        'price'              => $this->getMetaValue( 'price' ),
+                        'price_valid_until'  => $this->schemaDate( 'valid_date' ),
+                        'url'                => $product_url,
+                        'availability'       => $this->getMetaValue( 'availability' ),
+                        'price_currency'     => $this->getMetaValue( 'price_currency' ),
+                    )
                 );
-                $this->schema->offers(
-                    Schema::Offer()
-                    ->price( wp_ulike_pro_get_metabox_value('price') )
-                    ->priceValidUntil( wp_ulike_pro_get_metabox_value('valid_date') )
-                    ->url( wp_ulike_pro_get_metabox_value('url') )
-                    ->availability( wp_ulike_pro_get_metabox_value('availability') )
-                    ->priceCurrency( wp_ulike_pro_get_metabox_value('price_currency') )
-                );
+                if ( $offer ) {
+                    $this->schema->offers( $offer );
+                }
+
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
                 break;
 
             case 'SoftwareApplication':
-                $this->schema->operatingSystem( wp_ulike_pro_get_metabox_value('operating_system') );
-                $this->schema->applicationCategory( wp_ulike_pro_get_metabox_value('application_category') );
-                $this->schema->offers(
-                    Schema::Offer()
-                    ->price( wp_ulike_pro_get_metabox_value('price') )
-                    ->priceCurrency( wp_ulike_pro_get_metabox_value('price_currency') )
+                $this->schema->operatingSystem( $this->getMetaValue( 'operating_system' ) );
+
+                $application_category = WP_Ulike_Pro_JsonLd::normalizeApplicationCategory(
+                    $this->getMetaValue( 'application_category' )
                 );
+                if ( '' !== $application_category ) {
+                    $this->schema->applicationCategory( $application_category );
+                }
+
+                $this->schema->softwareVersion( $this->getMetaValue( 'software_version' ) );
+                if ( wp_ulike_pro_is_metabox_true( 'is_accessible_for_free' ) ) {
+                    $this->schema->isAccessibleForFree( true );
+                }
+                $this->schema->url( $this->schemaUrl() );
+                $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
+
+                $offer = WP_Ulike_Pro_JsonLd::buildOffer(
+                    array(
+                        'price'          => $this->getMetaValue( 'price' ),
+                        'price_currency' => $this->getMetaValue( 'price_currency' ),
+                        'url'            => $this->schemaUrl(),
+                    )
+                );
+                if ( $offer ) {
+                    $this->schema->offers( $offer );
+                }
                 break;
 
             case 'CreativeWorkSeason':
-                $this->schema->actor( wp_ulike_pro_get_metabox_value('name') );
-                $this->schema->director( wp_ulike_pro_get_metabox_value('author') );
-                $this->schema->startDate( wp_ulike_pro_get_metabox_value('start_date') );
-                $this->schema->endDate( wp_ulike_pro_get_metabox_value('end_date') );
+                $actor = WP_Ulike_Pro_JsonLd::person( $this->getMetaValue( 'name' ) );
+                if ( $actor ) {
+                    $this->schema->actor( $actor );
+                }
+
+                $director = WP_Ulike_Pro_JsonLd::person( $this->getMetaValue( 'author' ) );
+                if ( $director ) {
+                    $this->schema->director( $director );
+                }
+
+                $this->schema->startDate( $this->schemaDate( 'start_date' ) );
+                $this->schema->endDate( $this->schemaDate( 'end_date' ) );
                 break;
 
             case 'CreativeWorkSeries':
-                $this->schema->issn( wp_ulike_pro_get_metabox_value('issn') );
-                $this->schema->startDate( wp_ulike_pro_get_metabox_value('start_date') );
-                $this->schema->endDate( wp_ulike_pro_get_metabox_value('end_date') );
+                $this->schema->issn( $this->getMetaValue( 'issn' ) );
+                $this->schema->startDate( $this->schemaDate( 'start_date' ) );
+                $this->schema->endDate( $this->schemaDate( 'end_date' ) );
                 break;
 
             case 'Episode':
-                $this->schema->director( wp_ulike_pro_get_metabox_value('author') );
+                $director = WP_Ulike_Pro_JsonLd::person( $this->getMetaValue( 'author' ) );
+                if ( $director ) {
+                    $this->schema->director( $director );
+                }
+
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
-                $this->schema->dateCreated( wp_ulike_pro_get_metabox_value('created_date') );
+                $this->schema->dateCreated( $this->schemaDate( 'created_date' ) );
                 break;
 
             case 'Movie':
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
-                $this->schema->dateCreated( wp_ulike_pro_get_metabox_value('created_date') );
-                $this->schema->director(
-                    Schema::person()
-                    ->name( wp_ulike_pro_get_metabox_value('author') )
-                );
+                $this->schema->dateCreated( $this->schemaDate( 'created_date' ) );
+
+                $director = WP_Ulike_Pro_JsonLd::person( $this->getMetaValue( 'author' ) );
+                if ( $director ) {
+                    $this->schema->director( $director );
+                }
                 break;
 
             case 'Game':
-                $this->schema->offers(
-                    Schema::Offer()
-                    ->price( wp_ulike_pro_get_metabox_value('price') )
-                    ->priceCurrency( wp_ulike_pro_get_metabox_value('price_currency') )
+                $offer = WP_Ulike_Pro_JsonLd::buildOffer(
+                    array(
+                        'price'          => $this->getMetaValue( 'price' ),
+                        'price_currency' => $this->getMetaValue( 'price_currency' ),
+                        'url'            => $this->schemaUrl(),
+                    )
                 );
+                if ( $offer ) {
+                    $this->schema->offers( $offer );
+                }
                 break;
 
             case 'MediaObject':
-                $this->schema->url( wp_ulike_pro_get_metabox_value('url') );
-                $this->schema->duration( wp_ulike_pro_get_metabox_value('duration') );
-                $this->schema->encodingFormat( wp_ulike_pro_get_metabox_value('encoding_format') );
+                $this->schema->url( $this->schemaUrl() );
+                $this->schema->duration( $this->getMetaValue( 'duration' ) );
+                $this->schema->encodingFormat( $this->getMetaValue( 'encoding_format' ) );
                 break;
 
             case 'MusicPlaylist':
-                $this->schema->numTracks( wp_ulike_pro_get_metabox_value('num_tracks') );
+                $this->schema->numTracks( $this->getMetaValue( 'num_tracks' ) );
 
-                $get_traks = wp_ulike_pro_get_metabox_value('tracks');
-                if( ! empty( $get_traks ) ){
+                $get_traks = $this->getMetaValue( 'tracks' );
+                if ( ! empty( $get_traks ) ) {
                     $music_stack = array();
-                    foreach ($get_traks as $key => $track) {
-                        if( empty( $track ) ){
+                    foreach ( $get_traks as $track ) {
+                        if ( empty( $track ) ) {
                             continue;
                         }
-                        $music_stack[] = Schema::MusicRecording()
-                        ->byArtist( $track['by_artist'] )
-                        ->duration( $track['duration'] )
-                        ->inAlbum( $track['in_album'] )
-                        ->url( $track['url'] )
-                        ->name( $track['name'] );
+
+                        $track_properties = array(
+                            'name' => $track['name'] ?? '',
+                            'url'  => $track['url'] ?? '',
+                        );
+
+                        $by_artist = WP_Ulike_Pro_JsonLd::person( $track['by_artist'] ?? '' );
+                        if ( $by_artist ) {
+                            $track_properties['byArtist'] = $by_artist;
+                        }
+
+                        $duration = trim( (string) ( $track['duration'] ?? '' ) );
+                        if ( '' !== $duration ) {
+                            $track_properties['duration'] = $duration;
+                        }
+
+                        $in_album = trim( (string) ( $track['in_album'] ?? '' ) );
+                        if ( '' !== $in_album ) {
+                            $track_properties['inAlbum'] = WP_Ulike_Pro_JsonLd::nested(
+                                'MusicAlbum',
+                                array( 'name' => $in_album )
+                            );
+                        }
+
+                        $recording = WP_Ulike_Pro_JsonLd::nested( 'MusicRecording', $track_properties );
+                        if ( $recording->hasProperties() ) {
+                            $music_stack[] = $recording;
+                        }
                     }
-                    $this->schema->track( $music_stack );
+                    if ( ! empty( $music_stack ) ) {
+                        $this->schema->track( $music_stack );
+                    }
                 }
 
                 break;
 
             case 'Organization':
-                $this->schema->url( wp_ulike_pro_get_metabox_value('url') );
-                $this->schema->telephone( wp_ulike_pro_get_metabox_value('telephone') );
-                $this->schema->url( wp_ulike_pro_get_metabox_value('url') );
-                $this->schema->address(
-                    Schema::PostalAddress()
-                    ->streetAddress( wp_ulike_pro_get_metabox_value('street_address') )
-                    ->addressLocality( wp_ulike_pro_get_metabox_value('address_locality') )
-                    ->addressRegion( wp_ulike_pro_get_metabox_value('address_region') )
-                    ->postalCode( wp_ulike_pro_get_metabox_value('postal_code') )
-                    ->addressCountry( wp_ulike_pro_get_metabox_value('address_country') )
+                $this->schema->url( $this->schemaUrl() );
+                $this->schema->telephone( $this->getMetaValue( 'telephone' ) );
+
+                $address = WP_Ulike_Pro_JsonLd::buildPostalAddress(
+                    array(
+                        'street_address'     => $this->getMetaValue( 'street_address' ),
+                        'address_locality'   => $this->getMetaValue( 'address_locality' ),
+                        'address_region'     => $this->getMetaValue( 'address_region' ),
+                        'postal_code'        => $this->getMetaValue( 'postal_code' ),
+                        'address_country'    => $this->getMetaValue( 'address_country' ),
+                    )
                 );
-                $this->schema->logo( wp_ulike_pro_get_metabox_value('image') );
+                if ( $address ) {
+                    $this->schema->address( $address );
+                }
+
+                $this->schema->logo( $this->getMetaValue( 'image' ) );
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
                 break;
 
             case 'LocalBusiness':
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
-                $this->schema->telephone( wp_ulike_pro_get_metabox_value('telephone') );
-                $this->schema->priceRange( wp_ulike_pro_get_metabox_value('price_range') );
-                $this->schema->address(
-                    Schema::PostalAddress()
-                    ->streetAddress( wp_ulike_pro_get_metabox_value('street_address') )
-                    ->addressLocality( wp_ulike_pro_get_metabox_value('address_locality') )
-                    ->addressRegion( wp_ulike_pro_get_metabox_value('address_region') )
-                    ->postalCode( wp_ulike_pro_get_metabox_value('postal_code') )
-                    ->addressCountry( wp_ulike_pro_get_metabox_value('address_country') )
+                $this->schema->telephone( $this->getMetaValue( 'telephone' ) );
+                $this->schema->priceRange( $this->getMetaValue( 'price_range' ) );
+
+                $address = WP_Ulike_Pro_JsonLd::buildPostalAddress(
+                    array(
+                        'street_address'     => $this->getMetaValue( 'street_address' ),
+                        'address_locality'   => $this->getMetaValue( 'address_locality' ),
+                        'address_region'     => $this->getMetaValue( 'address_region' ),
+                        'postal_code'        => $this->getMetaValue( 'postal_code' ),
+                        'address_country'    => $this->getMetaValue( 'address_country' ),
+                    )
                 );
+                if ( $address ) {
+                    $this->schema->address( $address );
+                }
+
+                $day_of_week = $this->getMetaValue( 'day_of_week' );
+                $opens       = $this->getMetaValue( 'opens' );
+                $closes      = $this->getMetaValue( 'closes' );
+                if ( ! empty( $day_of_week ) && is_array( $day_of_week ) ) {
+                    $hours_stack = array();
+                    foreach ( $day_of_week as $day ) {
+                        if ( empty( $day ) ) {
+                            continue;
+                        }
+                        $spec = WP_Ulike_Pro_JsonLd::buildOpeningHoursSpecification( $day, $opens, $closes );
+                        if ( $spec ) {
+                            $hours_stack[] = $spec;
+                        }
+                    }
+                    if ( ! empty( $hours_stack ) ) {
+                        $this->schema->openingHoursSpecification( $hours_stack );
+                    }
+                }
                 break;
 
             case 'HowTo':
-                $this->schema->totalTime( wp_ulike_pro_get_metabox_value('duration') );
+                $this->schema->totalTime( $this->getMetaValue( 'duration' ) );
                 $this->schema->image( wp_ulike_pro_get_metabox_images_list() );
-                $this->schema->estimatedCost(
-                    Schema::MonetaryAmount()
-                    ->currency( wp_ulike_pro_get_metabox_value('price_currency') )
-                    ->value( wp_ulike_pro_get_metabox_value('price') )
+
+                $estimated_cost = WP_Ulike_Pro_JsonLd::nested(
+                    'MonetaryAmount',
+                    array(
+                        'currency' => $this->getMetaValue( 'price_currency' ),
+                        'value'    => $this->getMetaValue( 'price' ),
+                    )
                 );
+                if ( $estimated_cost->hasProperties() ) {
+                    $this->schema->estimatedCost( $estimated_cost );
+                }
 
-                $get_supplies = wp_ulike_pro_get_metabox_value('supply');
-                if( ! empty( $get_supplies ) ){
+                $get_supplies = $this->getMetaValue( 'supply' );
+                if ( ! empty( $get_supplies ) ) {
                     $supply_stack = array();
-                    foreach ($get_supplies as $key => $supply) {
-                        if( empty( $supply ) ){
+                    foreach ( $get_supplies as $supply ) {
+                        if ( empty( $supply ) ) {
                             continue;
                         }
-                        $supply_stack[] = Schema::HowToSupply()
-                        ->name( $supply['name'] );
+                        $supply_entity = WP_Ulike_Pro_JsonLd::nested(
+                            'HowToSupply',
+                            array( 'name' => $supply['name'] ?? '' )
+                        );
+                        if ( $supply_entity->hasProperties() ) {
+                            $supply_stack[] = $supply_entity;
+                        }
                     }
-                    $this->schema->supply( $supply_stack );
+                    if ( ! empty( $supply_stack ) ) {
+                        $this->schema->supply( $supply_stack );
+                    }
                 }
 
-                $get_tools = wp_ulike_pro_get_metabox_value('tool');
-                if( ! empty( $get_tools ) ){
+                $get_tools = $this->getMetaValue( 'tool' );
+                if ( ! empty( $get_tools ) ) {
                     $tool_stack = array();
-                    foreach ($get_tools as $key => $tool) {
-                        if( empty( $tool ) ){
+                    foreach ( $get_tools as $tool ) {
+                        if ( empty( $tool ) ) {
                             continue;
                         }
-                        $tool_stack[] = Schema::HowToTool()
-                        ->name( $tool['name'] );
+                        $tool_entity = WP_Ulike_Pro_JsonLd::nested(
+                            'HowToTool',
+                            array( 'name' => $tool['name'] ?? '' )
+                        );
+                        if ( $tool_entity->hasProperties() ) {
+                            $tool_stack[] = $tool_entity;
+                        }
                     }
-                    $this->schema->tool( $tool_stack );
+                    if ( ! empty( $tool_stack ) ) {
+                        $this->schema->tool( $tool_stack );
+                    }
                 }
 
-                $get_steps = wp_ulike_pro_get_metabox_value('step');
-                if( ! empty( $get_steps ) ){
+                $get_steps = $this->getMetaValue( 'step' );
+                if ( ! empty( $get_steps ) ) {
                     $step_stack = array();
-                    foreach ($get_steps as $key => $step) {
-                        if( empty( $step ) ){
+                    foreach ( $get_steps as $step ) {
+                        if ( empty( $step ) ) {
                             continue;
                         }
                         $step_list_stack = array();
-                        foreach ( $step['list'] as $step_key => $step_value ) {
-                            if( empty( $step_value ) ){
+                        $step_list = isset( $step['list'] ) && is_array( $step['list'] ) ? $step['list'] : array();
+                        foreach ( $step_list as $step_value ) {
+                            if ( empty( $step_value ) ) {
                                 continue;
                             }
-                            $step_list_stack[] = Schema::HowToDirection()
-                            ->text( $step_value['name'] );
+                            $direction = WP_Ulike_Pro_JsonLd::nested(
+                                'HowToDirection',
+                                array( 'text' => $step_value['name'] ?? '' )
+                            );
+                            if ( $direction->hasProperties() ) {
+                                $step_list_stack[] = $direction;
+                            }
                         }
-                        $step_stack[] = Schema::HowToStep()
-                        ->name( $step['name'] )
-                        ->url( $step['url'] )
-                        ->image( $step['image'] )
-                        ->itemListElement( $step_list_stack );
+
+                        $step_entity = WP_Ulike_Pro_JsonLd::nested(
+                            'HowToStep',
+                            array(
+                                'name'            => $step['name'] ?? '',
+                                'url'             => $step['url'] ?? '',
+                                'image'           => $step['image'] ?? '',
+                                'itemListElement' => $step_list_stack,
+                            )
+                        );
+                        if ( $step_entity->hasProperties() ) {
+                            $step_stack[] = $step_entity;
+                        }
                     }
-                    $this->schema->step( $step_stack );
+                    if ( ! empty( $step_stack ) ) {
+                        $this->schema->step( $step_stack );
+                    }
                 }
 
                 break;
@@ -333,60 +518,60 @@ class WP_Ulike_Pro_Schema_Generator{
     }
 
 
+    private function getMetaValue( $meta_name ) {
+        return wp_ulike_pro_get_metabox_value_raw( $meta_name, $this->item_ID );
+    }
+
+    private function schemaDate( $meta_name ) {
+        return wp_ulike_pro_parse_schema_date( $this->getMetaValue( $meta_name ) );
+    }
+
     private function GetAggregateRating(){
         $rating = $this->getRatingInfo();
         if( empty( $rating['count'] ) ){
-            return '';
+            return null;
         }
-        return Schema::AggregateRating()
-        ->worstRating(1)
-        ->bestRating(5)
-        ->ratingValue($rating['value'])
-        ->ratingCount($rating['count']);
+        return WP_Ulike_Pro_JsonLd::buildAggregateRating( $rating );
     }
 
 
     private function getRatingInfo(){
-        // Get total likes
-        $totalLikes = wp_ulike_get_post_likes( $this->item_ID, 'like' );
-        // Get total dislikes
-        $totalDislikes = wp_ulike_get_post_likes( $this->item_ID, 'dislike' );
-
-        $totalCount = $totalLikes + $totalDislikes;
-        $calcValue  = $totalCount ? ( ( $totalLikes * 5 )  + ( $totalDislikes ) ) / $totalCount : 0;
-
-        if( wp_ulike_is_true( wp_ulike_pro_get_metabox_value('enable_time_factor_rating') ) ){
-            $calcValue  = wp_ulike_get_rating_value( $this->item_ID );
-        } else {
-            $calcValue  = $calcValue < 1 ? 1 : round( $calcValue, 2 );
-        }
+        $preview = wp_ulike_pro_get_schema_rating_preview( $this->item_ID );
 
         return array(
-            'count' => $totalCount,
-            'value' => $calcValue
+            'count' => (int) ( $preview['count'] ?? 0 ),
+            'value' => $preview['value'] ?? 0,
+            'worst' => (float) ( $preview['worst'] ?? 1 ),
+            'best'  => (float) ( $preview['best'] ?? 5 ),
         );
     }
 
+    /**
+     * Rating scale bounds used for aggregate and review ratings.
+     *
+     * @return array{worst: float, best: float}
+     */
+    private function getRatingScale() {
+        $preview = wp_ulike_pro_get_schema_rating_preview( $this->item_ID );
 
-    private function getRatingsQuery( $item_ID ){
-		// generate query string
-		// $query  = sprintf( "SELECT user.user_id,
-        //     (SELECT COUNT(DISTINCT `user_id`) FROM `%1$sulike` WHERE status='like' and user_id = user.user_id and post_id = %2$d ) as totalLikes,
-        //     (SELECT COUNT(DISTINCT `user_id`) FROM `%1$sulike` WHERE status='dislike' and user_id = user.user_id and post_id = %2$d ) as totalDislikes,
-        //     (SELECT COUNT(DISTINCT `user_id`) FROM `%1$sulike` WHERE user_id = user.user_id) as TotalCount
-        //     FROM (SELECT DISTINCT user_id FROM `%1$sulike`) user",
-		// 	$this->wpdb->prefix,
-		// 	$item_ID
-		// );
-		$query  = sprintf( "SELECT
-            sum(case when `status` = 'like' then 1 else 0 end) AS totalLikes,
-            sum(case when `status` = 'dislike' then 1 else 0 end) AS totalDislikes
-            FROM `%sulike` WHERE `post_id`= %d",
-			$this->wpdb->prefix,
-			$item_ID
+        return array(
+            'worst' => (float) ( $preview['worst'] ?? 1 ),
+            'best'  => (float) ( $preview['best'] ?? 5 ),
         );
+    }
 
-        return $this->wpdb->get_row( $query );
+    /**
+     * Schema URL from metabox, falling back to the current post permalink.
+     *
+     * @return string
+     */
+    private function schemaUrl() {
+        $url = trim( (string) $this->getMetaValue( 'url' ) );
+        if ( '' === $url ) {
+            $url = get_permalink( $this->item_ID );
+        }
+
+        return $url ? esc_url_raw( $url ) : '';
     }
 
     private function printScript(){
@@ -394,3 +579,4 @@ class WP_Ulike_Pro_Schema_Generator{
     }
 
 }
+

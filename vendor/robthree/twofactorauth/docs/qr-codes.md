@@ -59,3 +59,4 @@ $tfa = new TwoFactorAuth(
 ```
 
 As you create a new instance of your provider, you can supply any extra configuration there.
+

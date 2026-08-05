@@ -2,7 +2,7 @@
 /**
  * Admin Hooks
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -63,7 +63,7 @@ function wp_ulike_pro_manage_posts_custom_column( $column, $post_id ) {
     if ( $column === 'wp-ulike-thumbs-down' ){
 		$is_distinct = wp_ulike_setting_repo::isDistinct('post');
         $post_id     = wp_ulike_get_the_id( $post_id );
-        echo sprintf( '<span class="wp-ulike-counter-box">%d</span>',  wp_ulike_get_counter_value( $post_id, 'post', 'dislike', $is_distinct ) );
+        echo sprintf( '<span class="wp-ulike-counter-box">%d</span>',  wp_ulike_pro_get_counter_value( $post_id, 'post', 'dislike', $is_distinct ) );
     }
 }
 add_action( 'manage_posts_custom_column' , 'wp_ulike_pro_manage_posts_custom_column', 10, 2 );
@@ -124,8 +124,8 @@ function wp_ulike_pro_export_current_query( $query ) {
             }
 
             $is_distinct = \wp_ulike_setting_repo::isDistinct('post');
-            $data['likes']    = wp_ulike_get_counter_value( wp_ulike_get_the_id(), 'post', 'like', $is_distinct  );
-            $data['dislikes'] = wp_ulike_get_counter_value( wp_ulike_get_the_id(), 'post', 'dislike', $is_distinct );
+            $data['likes']    = wp_ulike_pro_get_counter_value( wp_ulike_get_the_id(), 'post', 'like', $is_distinct  );
+            $data['dislikes'] = wp_ulike_pro_get_counter_value( wp_ulike_get_the_id(), 'post', 'dislike', $is_distinct );
 
             $exporter[] = $data;
         }
@@ -218,7 +218,7 @@ add_filter( 'manage_edit-comments_sortable_columns', 'wp_ulike_pro_comments_sort
 function wp_ulike_pro_comment_column_content( $column, $comment_ID ) {
     if ( $column === 'wp-ulike-thumbs-down' ){
 		$is_distinct = wp_ulike_setting_repo::isDistinct('comment');
-        echo sprintf( '<span class="wp-ulike-counter-box">%d</span>',  wp_ulike_get_counter_value( $comment_ID, 'comment', 'dislike', $is_distinct ) );
+        echo sprintf( '<span class="wp-ulike-counter-box">%d</span>',  wp_ulike_pro_get_counter_value( $comment_ID, 'comment', 'dislike', $is_distinct ) );
     }
 }
 add_filter( 'manage_comments_custom_column', 'wp_ulike_pro_comment_column_content', 10, 2 );
@@ -303,7 +303,7 @@ function wp_ulike_pro_add_display_post_states( $post_states, $post ) {
         if( isset($core_pages[$current_page]) ){
             $post_name = get_post_meta( $core_pages[$current_page], '_wp_ulike_pro_core', true );
             if( ! empty( $post_name ) ){
-                $post_states[ 'wp-ulike-pro-core-' . $post_name ] = sprintf('ULike ᴾᴿᴼ - %s', ucwords(str_replace('-',' ', esc_attr($post_name))));
+                $post_states[ 'wp-ulike-pro-core-' . $post_name ] = ucwords(str_replace('-',' ', esc_attr($post_name)));
             }
         }
     }

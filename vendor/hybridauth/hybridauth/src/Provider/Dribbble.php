@@ -66,3 +66,4 @@ class Dribbble extends OAuth2
         return $userProfile;
     }
 }
+

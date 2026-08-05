@@ -2,7 +2,7 @@
 /**
  * Back-end AJAX Functionalities
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -33,25 +33,25 @@ function wp_ulike_pro_generate_api_key() {
 	}
 
 	$get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
-	
+
 	// Ensure it's an array
 	if ( ! is_array( $get_keys ) ) {
 		$get_keys = array();
 	}
-	
+
 	// Generate new key - store token in variable to ensure consistency
 	$token = wp_generate_password( 120, false );
 	$date  = current_time( 'mysql', true );
-	
+
 	// Create key array with exact token
 	$new_key = array(
 		'token' => $token,
 		'date'  => $date
 	);
-	
+
 	// Add to array (newest at the end)
 	$get_keys[] = $new_key;
-	
+
 	// Save to database
 	update_option( 'wp_ulike_rest_api_keys', $get_keys );
 
@@ -95,7 +95,7 @@ function wp_ulike_pro_delete_api_key() {
 
 	$token = sanitize_text_field( $_POST['token'] );
 	$token = trim( $token );
-	
+
 	if ( empty( $token ) ) {
 		wp_send_json_error( array(
 			'success' 	=> 0,
@@ -103,7 +103,7 @@ function wp_ulike_pro_delete_api_key() {
 			'message' 	=> esc_html__( 'Token is required.', WP_ULIKE_PRO_DOMAIN ),
 		) );
 	}
-	
+
 	$get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
 
 	if ( ! is_array( $get_keys ) || empty( $get_keys ) ) {
@@ -117,22 +117,22 @@ function wp_ulike_pro_delete_api_key() {
 	// Remove the key with matching token
 	$updated_keys = array();
 	$found = false;
-	
+
 	foreach ( $get_keys as $key => $value ) {
 		if ( ! is_array( $value ) || ! isset( $value['token'] ) ) {
 			// Keep invalid entries
 			$updated_keys[] = $value;
 			continue;
 		}
-		
+
 		$stored_token = trim( (string) $value['token'] );
-		
+
 		// Exact token match
 		if ( $stored_token === $token ) {
 			$found = true;
 			continue; // Skip this key (don't add to updated_keys)
 		}
-		
+
 		// Keep this key
 		$updated_keys[] = $value;
 	}
@@ -234,7 +234,9 @@ function wp_ulike_pro_remove_user_votes_ajax() {
 		) );
 	}
 
-	$result = wp_ulike_pro_remove_user_votes( $user_ids );
+	$result = class_exists( 'WP_Ulike_Pro_Maintenance' )
+		? WP_Ulike_Pro_Maintenance::remove_user_votes( $user_ids )
+		: false;
 
 	if( $result && is_array( $result ) && $result['success'] ){
 		wp_send_json_success( array(
@@ -327,6 +329,154 @@ function wp_ulike_pro_search_posts() {
 add_action( 'wp_ajax_wp_ulike_pro_search_posts', 'wp_ulike_pro_search_posts' );
 
 /**
+ * Search posts for Schema Generator tool.
+ *
+ * @return void
+ */
+function wp_ulike_pro_schema_search_posts() {
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_search' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$result = WP_Ulike_Pro_Schema_Generator_Tool::search_posts(
+		array(
+			'post_type'   => isset( $_GET['post_type'] ) ? wp_unslash( $_GET['post_type'] ) : '',
+			'search'      => isset( $_GET['search'] ) ? wp_unslash( $_GET['search'] ) : '',
+			'schema_only' => ! empty( $_GET['schema_only'] ),
+			'page'        => isset( $_GET['page'] ) ? absint( $_GET['page'] ) : 1,
+		)
+	);
+
+	wp_send_json_success( $result );
+}
+add_action( 'wp_ajax_wp_ulike_pro_schema_search_posts', 'wp_ulike_pro_schema_search_posts' );
+
+/**
+ * Load schema data for a post (Schema Generator tool).
+ *
+ * @return void
+ */
+function wp_ulike_pro_schema_load_post() {
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_load' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+	$post    = $post_id ? get_post( $post_id ) : null;
+
+	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$type_obj = get_post_type_object( $post->post_type );
+
+	wp_send_json_success(
+		array(
+			'schema'         => WP_Ulike_Pro_Schema_Generator_Tool::get_post_schema_data( $post_id ),
+			'rating_preview' => WP_Ulike_Pro_Schema_Generator_Tool::get_rating_preview_for_post( $post_id ),
+			'post'           => array(
+				'id'        => $post_id,
+				'title'     => get_the_title( $post_id ),
+				'type'      => $type_obj ? $type_obj->labels->singular_name : $post->post_type,
+				'edit_link' => get_edit_post_link( $post_id, 'raw' ),
+				'view_url'  => get_permalink( $post_id ),
+			),
+		)
+	);
+}
+add_action( 'wp_ajax_wp_ulike_pro_schema_load_post', 'wp_ulike_pro_schema_load_post' );
+
+/**
+ * Preview aggregate rating for Schema Generator (unsaved form state).
+ *
+ * @return void
+ */
+function wp_ulike_pro_schema_rating_preview() {
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_preview' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+	$post    = $post_id ? get_post( $post_id ) : null;
+
+	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$raw = array();
+	if ( ! empty( $_GET['schema'] ) && is_array( $_GET['schema'] ) ) {
+		$raw = wp_unslash( $_GET['schema'] );
+	}
+
+	wp_send_json_success(
+		array(
+			'rating_preview' => WP_Ulike_Pro_Schema_Generator_Tool::get_rating_preview_for_post( $post_id, $raw ),
+		)
+	);
+}
+add_action( 'wp_ajax_wp_ulike_pro_schema_rating_preview', 'wp_ulike_pro_schema_rating_preview' );
+
+/**
+ * Save schema data for a post (Schema Generator tool).
+ *
+ * @return void
+ */
+function wp_ulike_pro_schema_save_post() {
+	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wp_ulike_pro_schema_save' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$post_id = isset( $_POST['schema_post_id'] ) ? absint( $_POST['schema_post_id'] ) : 0;
+	$post    = $post_id ? get_post( $post_id ) : null;
+
+	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+	}
+
+	$raw    = isset( $_POST['schema'] ) && is_array( $_POST['schema'] ) ? wp_unslash( $_POST['schema'] ) : array();
+	$errors = WP_Ulike_Pro_Schema_Generator_Tool::validate_schema_submission( $raw );
+
+	if ( ! empty( $errors ) ) {
+		wp_send_json_error(
+			array(
+				'message' => implode( ' ', $errors ),
+				'errors'  => $errors,
+			)
+		);
+	}
+
+	WP_Ulike_Pro_Schema_Generator_Tool::save_post_schema_data( $post_id, $raw );
+
+	$response = array(
+		'message'        => esc_html__( 'Schema settings saved.', WP_ULIKE_PRO_DOMAIN ),
+		'rating_preview' => WP_Ulike_Pro_Schema_Generator_Tool::get_rating_preview_for_post( $post_id, $raw ),
+	);
+
+	if ( function_exists( 'wp_ulike_pro_get_post_schema_status' ) ) {
+		$response['status'] = wp_ulike_pro_get_post_schema_status( $post_id );
+	}
+
+	wp_send_json_success( $response );
+}
+add_action( 'wp_ajax_wp_ulike_pro_schema_save_post', 'wp_ulike_pro_schema_save_post' );
+
+/**
  * Bulk add likes/dislikes to posts
  *
  * @return void
@@ -416,16 +566,9 @@ function wp_ulike_pro_get_post_counts() {
 		) );
 	}
 
-	$is_distinct = wp_ulike_setting_repo::isDistinct( $item_type );
-	$meta_key_prefix = $is_distinct ? 'count_distinct_' : 'count_total_';
+	$payload = wp_ulike_pro_get_bulk_item_counter_payload( $post_id, $item_type );
 
-	$likes = wp_ulike_get_meta_data( $post_id, $item_type, $meta_key_prefix . 'like', true );
-	$dislikes = wp_ulike_get_meta_data( $post_id, $item_type, $meta_key_prefix . 'dislike', true );
-
-	wp_send_json_success( array(
-		'likes' => ! empty( $likes ) ? (int) $likes : 0,
-		'dislikes' => ! empty( $dislikes ) ? (int) $dislikes : 0
-	) );
+	wp_send_json_success( $payload );
 }
 add_action( 'wp_ajax_wp_ulike_pro_get_post_counts', 'wp_ulike_pro_get_post_counts' );
 
@@ -469,7 +612,7 @@ function wp_ulike_pro_bulk_update_likes_ajax() {
 		) );
 	} else {
 		wp_send_json_error( array(
-			'message' => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Failed to update likes/dislikes. Please try again.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Failed to update counters. Please try again.', WP_ULIKE_PRO_DOMAIN ),
 		) );
 	}
 }
@@ -762,27 +905,49 @@ function wp_ulike_pro_ajax_button_field() {
 
 	// Whitelist allowed actions for security
 	$allowed_actions = array(
-		'truncate_table',
-		'delete_orphaned_rows',
+		'sync_counters',
+		'repair_records',
+		'delete_views',
+		'purge_pulse_logs',
+		'count_pulse_logs',
 		'delete_meta_group',
-		'optimize_table',
-		'migrate_metadata',
-		'delete_duplicate_rows',
 		'optimize_post_meta',
 		'manage_default_pages',
 		'clear_all_cache',
 		'clear_transients',
 		'cleanup_sessions',
-		'recalculate_counters',
 		'repair_tables',
 		'analyze_tables',
 		'sync_indexes',
-		'upgrade_unserialize_post_meta',
 		'post_metabox_truncate',
-		'delete_views'
 	);
 
-	if( ! in_array( $action, $allowed_actions, true ) || ! function_exists( 'wp_ulike_pro_' . $action ) ){
+	$maintenance_method = str_replace( '-', '_', $action );
+	$handled            = false;
+	$result             = null;
+	$php_error          = null;
+
+	$filters = array();
+	if ( isset( $_POST['filters'] ) && is_array( $_POST['filters'] ) ) {
+		foreach ( wp_unslash( $_POST['filters'] ) as $filter_key => $filter_value ) {
+			$filters[ sanitize_key( $filter_key ) ] = sanitize_text_field( $filter_value );
+		}
+	}
+
+	if ( in_array( $action, $allowed_actions, true ) ) {
+		try {
+			if ( class_exists( 'WP_Ulike_Pro_Maintenance' ) && method_exists( 'WP_Ulike_Pro_Maintenance', $maintenance_method ) ) {
+				$result  = WP_Ulike_Pro_Maintenance::$maintenance_method( $type, $filters );
+				$handled = true;
+			}
+		} catch ( Exception $e ) {
+			$php_error = $e->getMessage();
+		} catch ( Error $e ) {
+			$php_error = $e->getMessage();
+		}
+	}
+
+	if ( ! $handled ) {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'empty',
@@ -790,20 +955,7 @@ function wp_ulike_pro_ajax_button_field() {
 		) );
 	}
 
-	// Catch any PHP errors or exceptions
-	$result = null;
-	$php_error = null;
-
-	try {
-		$result = call_user_func( 'wp_ulike_pro_' . $action, $type );
-	} catch ( Exception $e ) {
-		$php_error = $e->getMessage();
-	} catch ( Error $e ) {
-		$php_error = $e->getMessage();
-	}
-
-	// If PHP error occurred, report it
-	if( $php_error !== null ){
+	if ( $php_error !== null ) {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
@@ -815,12 +967,18 @@ function wp_ulike_pro_ajax_button_field() {
 		// Check if result is an array with detailed information
 		if( is_array( $result ) && isset( $result['success'] ) ){
 			if( $result['success'] ){
-				wp_send_json_success( array(
-					'success' => 1,
-					'status'  => 'success',
-					'message' => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Operation completed successfully.', WP_ULIKE_PRO_DOMAIN ),
-					'rows_affected' => isset( $result['rows_affected'] ) ? $result['rows_affected'] : 0
-				) );
+				$payload = array(
+					'success'       => 1,
+					'status'        => 'success',
+					'message'       => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Operation completed successfully.', WP_ULIKE_PRO_DOMAIN ),
+					'rows_affected' => isset( $result['rows_affected'] ) ? $result['rows_affected'] : 0,
+				);
+
+				if ( isset( $result['count'] ) ) {
+					$payload['count'] = (int) $result['count'];
+				}
+
+				wp_send_json_success( $payload );
 			} else {
 				// Function returned array with success=false, show the error message
 				wp_send_json_error( array(
@@ -913,17 +1071,52 @@ function wp_ulike_pro_history_api(){
 	}
 
 
-	$settings = new wp_ulike_setting_type( $type );
-	$instance = new WP_Ulike_Pro_Logs( $settings->getTableName(), $page, $perPage, $search, $sort  );
+	$settings  = new wp_ulike_setting_type( $type );
+	$item_type = wp_ulike_pro_engagement_item_type_from_query( $type );
+	$mode      = wp_ulike_pro_get_engagement_mode_for_type( $item_type );
+
+	if ( in_array( $mode, array( 'emoji', 'star' ), true ) ) {
+		$instance = new WP_Ulike_Pro_Engagement_Logs( $item_type, $page, $perPage, $search, $sort );
+	} else {
+		$instance = new wp_ulike_logs( $type, $page, $perPage, $sort, $search );
+	}
 
 	if( $action === 'delete' && ! empty( $items ) ){
+		if ( $instance instanceof wp_ulike_logs ) {
+			$items = array_map(
+				static function ( $id ) {
+					return array( 'id' => absint( $id ) );
+				},
+				$items
+			);
+		}
 		$instance->delete_rows( $items );
 		wp_send_json_success();
 	}
 
 	$output = [];
 	if( $action === 'export' ){
-		$output = $instance->get_csv_trnasformed_rows();
+		if ( $instance instanceof WP_Ulike_Pro_Engagement_Logs ) {
+			$output = $instance->get_csv_trnasformed_rows();
+		} else {
+			$csv_logs = new wp_ulike_logs( $type, $page, $perPage, $sort );
+			$rows     = $csv_logs->get_all_rows();
+			$output   = array();
+
+			if ( ! empty( $rows ) ) {
+				$setting_type = new wp_ulike_setting_type( $type );
+				foreach ( $rows as $row ) {
+					$output[] = array(
+						'ID'        => $row->id ?? '',
+						'User ID'   => $row->user_id ?? '',
+						'Item ID'   => $row->{ $setting_type->getColumnName() } ?? '',
+						'Status'    => $row->status ?? '',
+						'IP'        => $row->ip ?? '',
+						'Date Time' => $row->date_time ?? '',
+					);
+				}
+			}
+		}
 	} else {
 		// Fix an error log issue
 		if( ! empty( $sort['type'] ) ){
@@ -959,8 +1152,10 @@ function wp_ulike_pro_custom_datasets_api(){
 	$end_date   = isset( $_GET['end_date'] ) ? sanitize_text_field( wp_unslash( $_GET['end_date'] ) ) : '';
 	$category   = isset( $_GET['category'] ) ? sanitize_text_field( wp_unslash( $_GET['category'] ) ) : 'posts';
 
+	$filters = wp_ulike_pro_read_engagement_filters();
+
 	$instance = WP_Ulike_Pro_Stats_V2::get_instance();
-	$output   = $instance->get_custom_dataset( $category, $start_date, $end_date, $status );
+	$output   = $instance->get_custom_dataset( $category, $start_date, $end_date, $status, $filters );
 
     return wp_send_json($output);
 }
@@ -999,9 +1194,10 @@ function wp_ulike_pro_custom_country_codes_api(){
 		'end'   => $end_date
 	] : NULL;
 
+	$filters = wp_ulike_pro_read_engagement_filters();
 
 	$instance = WP_Ulike_Pro_Stats_V2::get_instance();
-	$output   = $instance->count_country_codes( $date_range, $status, $types );
+	$output   = $instance->count_country_codes( $date_range, $status, $types, $filters );
 
     return wp_send_json($output);
 }
@@ -1041,9 +1237,21 @@ function wp_ulike_pro_tops_api(){
 
 	$start_date = isset( $_GET['start_date'] ) ? sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) : '';
 	$end_date   = isset( $_GET['end_date'] ) ? sanitize_text_field( wp_unslash( $_GET['end_date'] ) ) : '';
-	$rel_type   = isset( $_GET['rel_type'] ) ? sanitize_text_field( wp_unslash( $_GET['rel_type'] ) ) : 'post';
 	$offset     = isset( $_GET['offset'] ) ? absint( $_GET['offset'] ) : 1;
 	$limit      = isset( $_GET['limit'] ) ? absint( $_GET['limit'] ) : 10;
+	$search     = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['search'] ) ) : '';
+	$category   = isset( $_GET['category'] ) ? absint( $_GET['category'] ) : 0;
+	$taxonomy   = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
+	$order      = ( isset( $_GET['order'] ) && 'ASC' === strtoupper( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) ) ? 'ASC' : 'DESC';
+
+	$rel_type = '';
+	if ( isset( $_GET['rel_type'] ) ) {
+		if ( is_array( $_GET['rel_type'] ) ) {
+			$rel_type = array_map( 'sanitize_text_field', wp_unslash( $_GET['rel_type'] ) );
+		} else {
+			$rel_type = sanitize_text_field( wp_unslash( $_GET['rel_type'] ) );
+		}
+	}
 
 	$date_range = ! empty( $start_date ) ? [
 		'start' => $start_date,
@@ -1052,25 +1260,137 @@ function wp_ulike_pro_tops_api(){
 
 	$instance = WP_Ulike_Pro_Stats_V2::get_instance();
 
+	$engagement_filters = wp_ulike_pro_read_engagement_filters();
+
 	$output = [];
 
 	foreach ($types as $type) {
 		$output[$type] = $instance->get_top(
 			[
-				'type'       => $type,
-				"rel_type"   => $rel_type,
-				"is_popular" => true,
-				"status"     => $status,
-				"offset"     => $offset,
-				"limit"      => $limit
+				'type'            => $type,
+				'rel_type'        => $rel_type,
+				'is_popular'      => true,
+				'status'          => $status,
+				'offset'          => $offset,
+				'limit'           => $limit,
+				'order'           => $order,
+				'search'          => $search,
+				'category'        => $category,
+				'taxonomy'        => $taxonomy,
+				'engagement_keys' => $engagement_filters['engagement_keys'],
+				'values'          => $engagement_filters['values'],
 			],
 			$date_range
 		);
+
+		if ( 'post' === $type && is_array( $output[ $type ] ) ) {
+			$post_type   = is_string( $rel_type ) && $rel_type ? $rel_type : 'post';
+			$filter_meta = $instance->get_post_filter_meta( $post_type, $taxonomy );
+			$output[ $type ]['categories']             = $filter_meta['categories'];
+			$output[ $type ]['category_label']         = $filter_meta['category_label'];
+			$output[ $type ]['taxonomy']               = $filter_meta['taxonomy'];
+			$output[ $type ]['available_taxonomies']   = $filter_meta['available_taxonomies'];
+		}
 	}
 
     return wp_send_json($output);
 }
 add_action('wp_ajax_wp_ulike_pro_tops_api','wp_ulike_pro_tops_api');
+
+/**
+ * Engaged users for a single content item (backing for the Engaged Users page
+ * so a refresh / deep link does not lose the list passed via router state).
+ *
+ * @return void
+ */
+function wp_ulike_pro_engaged_users_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$item_id = isset( $_GET['item_id'] ) ? absint( $_GET['item_id'] ) : 0;
+	$type    = isset( $_GET['type'] ) ? sanitize_key( wp_unslash( $_GET['type'] ) ) : '';
+	$limit   = isset( $_GET['limit'] ) ? absint( $_GET['limit'] ) : 100;
+
+	if ( ! $item_id || ! $type ) {
+		wp_send_json( array( 'users' => array(), 'title' => '' ) );
+	}
+
+	$item_type = wp_ulike_pro_engagement_item_type_from_query( $type );
+	$mode      = wp_ulike_pro_get_engagement_mode_for_type( $item_type );
+
+	$source = class_exists( 'WP_Ulike_Pulse_Registry' )
+		? WP_Ulike_Pulse_Registry::legacy_source_for_type( $item_type )
+		: null;
+	$log_table  = $source ? $source['table'] : '';
+	$log_column = $source ? $source['column'] : '';
+
+	$users = function_exists( 'wp_ulike_pro_build_tops_engaged_users_list' )
+		? wp_ulike_pro_build_tops_engaged_users_list( $item_id, $item_type, $mode, $log_table, $log_column, max( 1, min( $limit, 500 ) ), true )
+		: array();
+
+	$title = '';
+	if ( 'post' === $item_type ) {
+		$title = get_the_title( $item_id );
+	} elseif ( 'comment' === $item_type ) {
+		$comment = get_comment( $item_id );
+		if ( $comment ) {
+			// Prefer parent post title for the Engaged Users header; fall back to
+			// a short comment excerpt when the post title is unavailable.
+			$post_title = $comment->comment_post_ID ? get_the_title( (int) $comment->comment_post_ID ) : '';
+			$title      = $post_title ? $post_title : wp_html_excerpt( (string) $comment->comment_content, 80, '…' );
+		}
+	} elseif ( 'activity' === $item_type && function_exists( 'bp_activity_get_specific' ) ) {
+		$found    = bp_activity_get_specific(
+			array(
+				'activity_ids'     => array( $item_id ),
+				'display_comments' => false,
+			)
+		);
+		$activity = ! empty( $found['activities'][0] ) ? $found['activities'][0] : null;
+		if ( $activity ) {
+			$raw   = ! empty( $activity->content ) ? $activity->content : ( $activity->action ?? '' );
+			$title = wp_html_excerpt( wp_strip_all_tags( (string) $raw ), 80, '…' );
+		}
+	} elseif ( 'topic' === $item_type ) {
+		$post_type = get_post_type( $item_id );
+		if ( 'topic' === $post_type && function_exists( 'bbp_get_topic_title' ) ) {
+			$title = bbp_get_topic_title( $item_id );
+		} elseif ( 'reply' === $post_type && function_exists( 'bbp_get_reply_topic_title' ) ) {
+			$title = bbp_get_reply_topic_title( $item_id );
+		} else {
+			$title = get_the_title( $item_id );
+		}
+	}
+
+	wp_send_json(
+		array(
+			'users' => $users,
+			'title' => $title ? wp_strip_all_tags( $title ) : '',
+		)
+	);
+}
+add_action( 'wp_ajax_wp_ulike_pro_engaged_users_api', 'wp_ulike_pro_engaged_users_api' );
+
+/**
+ * Post filter metadata (taxonomies + terms) for stats filters.
+ *
+ * @return void
+ */
+function wp_ulike_pro_post_filters_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post';
+	$taxonomy  = isset( $_GET['taxonomy'] ) ? sanitize_key( wp_unslash( $_GET['taxonomy'] ) ) : '';
+
+	$instance = WP_Ulike_Pro_Stats_V2::get_instance();
+	$meta     = $instance->get_post_filter_meta( $post_type ?: 'post', $taxonomy );
+
+	return wp_send_json( $meta );
+}
+add_action( 'wp_ajax_wp_ulike_pro_post_filters_api', 'wp_ulike_pro_post_filters_api' );
 
 /**
  * Dashboard API
@@ -1086,6 +1406,60 @@ function wp_ulike_pro_stats_api(){
     return wp_send_json($stats);
 }
 add_action('wp_ajax_wp_ulike_pro_stats_api','wp_ulike_pro_stats_api');
+
+/**
+ * Overview dashboard API (reports, tips, metrics grid).
+ *
+ * @return void
+ */
+function wp_ulike_pro_overview_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$stats = WP_Ulike_Pro_Stats_V2::get_instance()->get_overview_api_data();
+	return wp_send_json( $stats );
+}
+add_action( 'wp_ajax_wp_ulike_pro_overview_api', 'wp_ulike_pro_overview_api' );
+
+/**
+ * Content intelligence report API.
+ *
+ * @return void
+ */
+function wp_ulike_pro_intelligence_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$start_date = isset( $_GET['start_date'] ) ? sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) : null;
+	$end_date   = isset( $_GET['end_date'] ) ? sanitize_text_field( wp_unslash( $_GET['end_date'] ) ) : null;
+	$stats      = WP_Ulike_Pro_Stats_V2::get_instance()->get_intelligence_api_data( $start_date, $end_date );
+
+	return wp_send_json( $stats );
+}
+add_action( 'wp_ajax_wp_ulike_pro_intelligence_api', 'wp_ulike_pro_intelligence_api' );
+
+/**
+ * Engagement metrics for a single content type.
+ *
+ * @return void
+ */
+function wp_ulike_pro_engagement_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+    $data = WP_Ulike_Pro_Stats_V2::get_instance()->get_engagement_api_data( $type );
+
+    if ( null === $data ) {
+        wp_send_json_error( esc_html__( 'Invalid content type.', WP_ULIKE_PRO_DOMAIN ) );
+    }
+
+    return wp_send_json( $data );
+}
+add_action( 'wp_ajax_wp_ulike_pro_engagement_api', 'wp_ulike_pro_engagement_api' );
 
 /**
  * Count device types
@@ -1118,3 +1492,22 @@ function wp_ulike_pro_devices_api(){
     return wp_send_json($output);
 }
 add_action('wp_ajax_wp_ulike_pro_devices_api','wp_ulike_pro_devices_api');
+
+/**
+ * WooCommerce commerce intelligence report API.
+ *
+ * @return void
+ */
+function wp_ulike_pro_woocommerce_api() {
+	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
+		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+	}
+
+	$start_date = isset( $_GET['start_date'] ) ? sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) : null;
+	$end_date   = isset( $_GET['end_date'] ) ? sanitize_text_field( wp_unslash( $_GET['end_date'] ) ) : null;
+	$stats      = WP_Ulike_Pro_Stats_V2::get_instance()->get_woocommerce_api_data( $start_date, $end_date );
+
+	return wp_send_json( $stats );
+}
+add_action( 'wp_ajax_wp_ulike_pro_woocommerce_api', 'wp_ulike_pro_woocommerce_api' );
+

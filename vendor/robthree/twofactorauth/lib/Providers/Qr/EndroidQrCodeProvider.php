@@ -82,3 +82,4 @@ class EndroidQrCodeProvider implements IQRCodeProvider
         }
     }
 }
+

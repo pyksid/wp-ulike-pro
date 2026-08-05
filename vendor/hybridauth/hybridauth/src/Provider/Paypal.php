@@ -111,3 +111,4 @@ class Paypal extends OAuth2
         return $userProfile;
     }
 }
+

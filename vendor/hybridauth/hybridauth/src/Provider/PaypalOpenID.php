@@ -69,3 +69,4 @@ class PaypalOpenID extends OpenID
         HttpClient\Util::redirect($this->openIdClient->authUrl());
     }
 }
+

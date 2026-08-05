@@ -13,3 +13,4 @@ namespace Hybridauth\Exception;
 class InvalidAuthorizationCodeException extends InvalidArgumentException implements ExceptionInterface
 {
 }
+

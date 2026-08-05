@@ -13,3 +13,4 @@ Argument                | Default value
 `$format`               | `'png'`
 
 The parameters are passed to [QRickit](http://qrickit.com/qrickit_apps/qrickit_api.php) so you can refer to them for more detail on how the values are used.
+

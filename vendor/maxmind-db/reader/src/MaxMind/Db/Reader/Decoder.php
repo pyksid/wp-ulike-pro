@@ -450,3 +450,4 @@ class Decoder
         return $testint === current($rc);
     }
 }
+

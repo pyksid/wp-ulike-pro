@@ -570,3 +570,4 @@ function includeFile($file)
 {
     include $file;
 }
+

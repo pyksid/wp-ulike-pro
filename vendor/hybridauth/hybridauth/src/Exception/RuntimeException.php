@@ -15,3 +15,4 @@ namespace Hybridauth\Exception;
 class RuntimeException extends Exception implements ExceptionInterface
 {
 }
+

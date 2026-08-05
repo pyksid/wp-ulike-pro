@@ -24,3 +24,4 @@ class AOLOpenID extends OpenID
      */
     protected $apiDocumentation = ''; // Not available
 }
+

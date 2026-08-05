@@ -72,3 +72,4 @@ class Pinterest extends OAuth2
         return $userProfile;
     }
 }
+

@@ -15,3 +15,4 @@ namespace Hybridauth\Exception;
 class InvalidArgumentException extends RuntimeException implements ExceptionInterface
 {
 }
+

@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -132,9 +132,18 @@ function wp_ulike_pro_generate_button_classes( array $args, array $info, $temp_l
 		$final_classes['up']   .= ' wp_ulike_put_image';
 		$final_classes['down'] .= ' wp_ulike_put_image';
 
-		if( in_array( $info['status'], array( 2, 4 ) ) && strpos( $info['user_status'], 'dis') === 0 ){
+		$user_status = (string) ( $info['user_status'] ?? '' );
+		// Cast before the strict comparison: the template passes this through
+		// esc_attr(), so it arrives as the STRING "4"/"2", and
+		// in_array( "4", array( 2, 4 ), true ) is false. That silently dropped
+		// the active class on page load, so a liked button rendered unstyled
+		// after a refresh even though the vote and the counter were correct
+		// (the AJAX path sets the class from the JSON int, which is why the
+		// click itself always looked right).
+		$status_id = (int) ( $info['status'] ?? 0 );
+		if ( in_array( $status_id, array( 2, 4 ), true ) && strpos( $user_status, 'dis' ) === 0 ) {
 			$final_classes['down'] .= ' image-unlike wp_ulike_btn_is_active';
-		} elseif( in_array( $info['status'], array( 2, 4 ) ) && strpos( $info['user_status'], 'dis') !== 0 ) {
+		} elseif ( in_array( $status_id, array( 2, 4 ), true ) && strpos( $user_status, 'dis' ) !== 0 ) {
 			$final_classes['up'] .= ' image-unlike wp_ulike_btn_is_active';
 		}
 	} else {
@@ -173,10 +182,11 @@ function wp_ulike_pro_generate_button_classes( array $args, array $info, $temp_l
 			$final_classes['sub']  .= ' wp_ulike_is_not_liked';
 			break;
 		case 2:
-			if( in_array( $info['status'], array( 2, 4 ) ) && strpos( $info['user_status'], 'dis') === 0 ){
+			$user_status = (string) ( $info['user_status'] ?? '' );
+			if ( strpos( $user_status, 'dis' ) === 0 ) {
 				$final_classes['down'] .= ' wp_ulike_is_liked';
 				$final_classes['sub']  .= ' wp_ulike_is_liked';
-			} elseif( in_array( $info['status'], array( 2, 4 ) ) && strpos( $info['user_status'], 'dis') !== 0 ) {
+			} else {
 				$final_classes['up']  .= ' wp_ulike_is_liked';
 				$final_classes['sub'] .= ' wp_ulike_is_liked';
 			}
@@ -549,6 +559,48 @@ function wp_ulike_pro_clapping_template( array $wp_ulike_template ){
 	return ob_get_clean(); // data is now in here
 }
 
+/**
+ * Emoji reactions template.
+ *
+ * @param array $wp_ulike_template Template variables.
+ * @return string
+ */
+function wp_ulike_pro_emoji_reactions_template( array $wp_ulike_template ) {
+	ob_start();
+	do_action( 'wp_ulike_before_template', $wp_ulike_template );
+	extract( $wp_ulike_template ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+	?>
+	<div class="wpulike wpulike-engagement-template <?php echo esc_attr( $wrapper_class ); ?>" <?php echo $attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wp_ulike_general_class">
+			<?php echo WP_Ulike_Pro_Engagement_Display::render( (int) $ID, sanitize_key( $type ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+	</div>
+	<?php
+	do_action( 'wp_ulike_after_template', $wp_ulike_template );
+	return ob_get_clean();
+}
+
+/**
+ * Star rating template.
+ *
+ * @param array $wp_ulike_template Template variables.
+ * @return string
+ */
+function wp_ulike_pro_star_rating_template( array $wp_ulike_template ) {
+	ob_start();
+	do_action( 'wp_ulike_before_template', $wp_ulike_template );
+	extract( $wp_ulike_template ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+	?>
+	<div class="wpulike wpulike-engagement-template <?php echo esc_attr( $wrapper_class ); ?>" <?php echo $attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wp_ulike_general_class">
+			<?php echo WP_Ulike_Pro_Engagement_Display::render( (int) $ID, sanitize_key( $type ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+	</div>
+	<?php
+	do_action( 'wp_ulike_after_template', $wp_ulike_template );
+	return ob_get_clean();
+}
+
 
 /**
  * Subtotal Votings Template
@@ -766,9 +818,17 @@ function wp_ulike_pro_get_metabox_value( $meta_name, $post_ID = '' ){
 		$meta_value   = isset( $meta_box[$meta_name] ) ? maybe_unserialize( $meta_box[$meta_name] ) : NULL;
 	}
 
-	if( empty( $meta_value ) ){
+	if ( null === $meta_value || '' === $meta_value || false === $meta_value ) {
 		$prefix     = 'wp_ulike_pro_';
 		$meta_value = get_post_meta( $post_ID, $prefix . $meta_name , true );
+	}
+
+	// Legacy installs may still store everything inside the serialized blob.
+	if ( ( null === $meta_value || '' === $meta_value || false === $meta_value ) && ! wp_ulike_is_true( $is_serialize ) ) {
+		$meta_box = get_post_meta( $post_ID, 'wp_ulike_pro_meta_box', true );
+		if ( is_array( $meta_box ) && array_key_exists( $meta_name, $meta_box ) ) {
+			$meta_value = maybe_unserialize( $meta_box[ $meta_name ] );
+		}
 	}
 
 	return is_array( $meta_value ) ? $meta_value : esc_html( $meta_value );
@@ -781,14 +841,936 @@ function wp_ulike_pro_get_metabox_value( $meta_name, $post_ID = '' ){
  * @param integer $post_ID
  * @return string|array
  */
-function wp_ulike_pro_get_comment_metabox_value( $meta_name, $comment_ID = '' ){
-	$comment_ID   = empty( $comment_ID ) ? get_comment_ID() : $comment_ID;
-	$meta_value   = NULL;
+/**
+ * Per-request comment meta cache store.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function &wp_ulike_pro_comment_metabox_cache_store() {
+	static $cache = array();
+	return $cache;
+}
 
-	$meta_box     = get_comment_meta( $comment_ID, 'wp_ulike_pro_comment_meta_box' , true );
-	$meta_value   = isset( $meta_box[$meta_name] ) ? maybe_unserialize( $meta_box[$meta_name] ) : NULL;
+function wp_ulike_pro_get_comment_metabox_blob( $comment_ID ) {
+	$cache = &wp_ulike_pro_comment_metabox_cache_store();
 
-	return is_array( $meta_value ) ? $meta_value : esc_html( $meta_value );
+	$comment_ID = $comment_ID ? absint( $comment_ID ) : absint( get_comment_ID() );
+	if ( ! $comment_ID ) {
+		return array();
+	}
+
+	if ( ! array_key_exists( $comment_ID, $cache ) ) {
+		$meta_box = get_comment_meta( $comment_ID, 'wp_ulike_pro_comment_meta_box', true );
+		$cache[ $comment_ID ] = is_array( $meta_box ) ? $meta_box : array();
+	}
+
+	return $cache[ $comment_ID ];
+}
+
+/**
+ * Clear per-request comment meta cache after a save.
+ *
+ * @param int $comment_ID Comment ID.
+ * @return void
+ */
+function wp_ulike_pro_reset_comment_metabox_cache( $comment_ID ) {
+	$cache      = &wp_ulike_pro_comment_metabox_cache_store();
+	$comment_ID = absint( $comment_ID );
+	if ( $comment_ID ) {
+		unset( $cache[ $comment_ID ] );
+	}
+}
+
+function wp_ulike_pro_get_comment_metabox_value( $meta_name, $comment_ID = '', $raw = false ){
+	$comment_ID = $comment_ID ? absint( $comment_ID ) : absint( get_comment_ID() );
+	if ( ! $comment_ID ) {
+		return '';
+	}
+
+	$meta_box = wp_ulike_pro_get_comment_metabox_blob( $comment_ID );
+	if ( ! array_key_exists( $meta_name, $meta_box ) ) {
+		return '';
+	}
+
+	$value = maybe_unserialize( $meta_box[ $meta_name ] );
+
+	if ( $raw || is_array( $value ) ) {
+		return $value;
+	}
+
+	return esc_html( $value );
+}
+
+/**
+ * Merge per-comment display overrides into wp_ulike_comments() args.
+ *
+ * @param int                  $comment_id Comment ID.
+ * @param array<string, mixed> $args       Button args.
+ * @return array<string, mixed>
+ */
+function wp_ulike_pro_merge_comment_button_args( $comment_id, $args = array() ) {
+	$comment_id = absint( $comment_id );
+	if ( ! $comment_id ) {
+		return $args;
+	}
+
+	$template = wp_ulike_pro_get_comment_metabox_value( 'template', $comment_id, true );
+	if ( '' !== $template && null !== $template ) {
+		$args['style'] = $template;
+	}
+
+	if ( empty( $args['id'] ) ) {
+		$args['id'] = $comment_id;
+	}
+
+	return $args;
+}
+
+/**
+ * Wrap comment content with a like button using the chosen position.
+ *
+ * @param string $button   Button HTML.
+ * @param string $content  Comment text.
+ * @param string $position top|bottom|top_bottom.
+ * @return string
+ */
+function wp_ulike_pro_wrap_comment_with_button( $button, $content, $position ) {
+	switch ( $position ) {
+		case 'top':
+			return $button . $content;
+		case 'top_bottom':
+			return $button . $content . $button;
+		default:
+			return $content . $button;
+	}
+}
+
+/**
+ * Get raw post meta box value (admin-safe, unescaped).
+ *
+ * @param string  $meta_name Meta key without prefix.
+ * @param integer $post_ID   Post ID.
+ * @return mixed
+ */
+function wp_ulike_pro_get_metabox_value_raw( $meta_name, $post_ID = '' ) {
+	$post_ID = absint( empty( $post_ID ) ? get_the_ID() : $post_ID );
+	if ( ! $post_ID ) {
+		return '';
+	}
+
+	$meta_value   = null;
+	$is_serialize = wp_ulike_get_option( 'enable_serialize', false );
+
+	if ( wp_ulike_is_true( $is_serialize ) ) {
+		$meta_box = get_post_meta( $post_ID, 'wp_ulike_pro_meta_box', true );
+		if ( is_array( $meta_box ) && array_key_exists( $meta_name, $meta_box ) ) {
+			$meta_value = maybe_unserialize( $meta_box[ $meta_name ] );
+		}
+	}
+
+	if ( null === $meta_value || '' === $meta_value || false === $meta_value ) {
+		$meta_value = get_post_meta( $post_ID, 'wp_ulike_pro_' . $meta_name, true );
+	}
+
+	// Legacy installs may still store everything inside the serialized blob.
+	if ( ( null === $meta_value || '' === $meta_value || false === $meta_value ) && ! wp_ulike_is_true( $is_serialize ) ) {
+		$meta_box = get_post_meta( $post_ID, 'wp_ulike_pro_meta_box', true );
+		if ( is_array( $meta_box ) && array_key_exists( $meta_name, $meta_box ) ) {
+			$meta_value = maybe_unserialize( $meta_box[ $meta_name ] );
+		}
+	}
+
+	return $meta_value;
+}
+
+/**
+ * Whether a post metabox flag is enabled (handles stored 'true' / 'false' strings).
+ *
+ * @param string  $meta_name Meta key without prefix.
+ * @param integer $post_ID   Post ID.
+ * @return bool
+ */
+function wp_ulike_pro_is_metabox_true( $meta_name, $post_ID = '' ) {
+	return wp_ulike_is_true( wp_ulike_pro_get_metabox_value_raw( $meta_name, $post_ID ) );
+}
+
+/**
+ * Per-post display meta keys (post editor meta box).
+ *
+ * @return string[]
+ */
+function wp_ulike_pro_get_display_meta_keys() {
+	return array(
+		'auto_display',
+		'template',
+		'display_position',
+		'likes_counter_quantity',
+		'dislikes_counter_quantity',
+	);
+}
+
+/**
+ * Schema-related meta keys (Tools → Schema Generator).
+ *
+ * @return string[]
+ */
+function wp_ulike_pro_get_schema_meta_keys() {
+	return array(
+		'enable_schema',
+		'schema_type',
+		'title',
+		'description',
+		'name',
+		'author',
+		'day_of_week',
+		'opens',
+		'closes',
+		'location',
+		'street_address',
+		'address_locality',
+		'address_region',
+		'postal_code',
+		'address_country',
+		'telephone',
+		'price_range',
+		'start_date',
+		'end_date',
+		'created_date',
+		'price',
+		'price_currency',
+		'availability',
+		'valid_date',
+		'url',
+		'sku',
+		'mpn',
+		'application_category',
+		'operating_system',
+		'software_version',
+		'is_accessible_for_free',
+		'issn',
+		'duration',
+		'encoding_format',
+		'num_tracks',
+		'image',
+		'tracks',
+		'supply',
+		'tool',
+		'step',
+		'image_list',
+		'disable_star_ratings',
+		'enable_time_factor_rating',
+		'enable_custom_rating',
+		'rating_value',
+		'rating_count',
+		'review_count',
+		'worst_rating',
+		'best_rating',
+		'enable_custom_reviews',
+		'reviews',
+		'enable_faq',
+		'faq',
+	);
+}
+
+/**
+ * Meta keys used to detect stored schema / FAQ configuration.
+ *
+ * @return string[]
+ */
+function wp_ulike_pro_get_schema_data_signal_keys() {
+	return array( 'enable_schema', 'enable_faq', 'schema_type', 'title', 'description', 'faq', 'reviews' );
+}
+
+/**
+ * Build schema status array from a flat meta map (admin search batch helper).
+ *
+ * @param array<string, mixed> $meta Meta values keyed without prefix.
+ * @return array<string, mixed>
+ */
+function wp_ulike_pro_build_schema_status_from_meta( $meta ) {
+	$meta = is_array( $meta ) ? $meta : array();
+
+	$schema_enabled = wp_ulike_is_true( $meta['enable_schema'] ?? '' );
+	$faq_enabled    = wp_ulike_is_true( $meta['enable_faq'] ?? '' );
+	$schema_type    = $meta['schema_type'] ?? '';
+	$has_data       = false;
+
+	foreach ( wp_ulike_pro_get_schema_data_signal_keys() as $key ) {
+		if ( ! array_key_exists( $key, $meta ) ) {
+			continue;
+		}
+
+		$value = $meta[ $key ];
+		if ( in_array( $key, array( 'enable_schema', 'enable_faq' ), true ) ) {
+			if ( wp_ulike_is_true( $value ) ) {
+				$has_data = true;
+				break;
+			}
+			continue;
+		}
+
+		if ( ! empty( $value ) ) {
+			$has_data = true;
+			break;
+		}
+	}
+
+	return array(
+		'schema_enabled' => $schema_enabled,
+		'faq_enabled'    => $faq_enabled,
+		'schema_type'    => is_string( $schema_type ) ? $schema_type : '',
+		'has_data'       => $has_data,
+	);
+}
+
+/**
+ * Batch-load schema status for multiple posts (single query, avoids N+1 in search).
+ *
+ * @param int[] $post_ids Post IDs.
+ * @return array<int, array<string, mixed>>
+ */
+function wp_ulike_pro_batch_get_post_schema_status( array $post_ids ) {
+	$post_ids = array_values( array_unique( array_filter( array_map( 'absint', $post_ids ) ) ) );
+	if ( empty( $post_ids ) ) {
+		return array();
+	}
+
+	global $wpdb;
+
+	$signals      = wp_ulike_pro_get_schema_data_signal_keys();
+	$meta_by_post = array_fill_keys( $post_ids, array() );
+	$meta_keys    = array( 'wp_ulike_pro_meta_box' );
+
+	foreach ( $signals as $key ) {
+		$meta_keys[] = 'wp_ulike_pro_' . $key;
+	}
+
+	$id_placeholders  = implode( ',', array_fill( 0, count( $post_ids ), '%d' ) );
+	$key_placeholders = implode( ',', array_fill( 0, count( $meta_keys ), '%s' ) );
+	$prepared_args    = array_merge( $post_ids, $meta_keys );
+
+	// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} WHERE post_id IN ($id_placeholders) AND meta_key IN ($key_placeholders)",
+			$prepared_args
+		),
+		ARRAY_A
+	);
+
+	$blob_rows        = array();
+	$individual_rows  = array();
+
+	foreach ( (array) $rows as $row ) {
+		$meta_key = (string) $row['meta_key'];
+		if ( 'wp_ulike_pro_meta_box' === $meta_key ) {
+			$blob_rows[] = $row;
+			continue;
+		}
+		$individual_rows[] = $row;
+	}
+
+	$use_serialize = wp_ulike_is_true( wp_ulike_get_option( 'enable_serialize', false ) );
+	$ordered_rows  = $use_serialize ? array_merge( $blob_rows, $individual_rows ) : array_merge( $individual_rows, $blob_rows );
+
+	foreach ( $ordered_rows as $row ) {
+		$post_id  = (int) $row['post_id'];
+		$meta_key = (string) $row['meta_key'];
+
+		if ( 'wp_ulike_pro_meta_box' === $meta_key ) {
+			$blob = maybe_unserialize( $row['meta_value'] );
+			if ( ! is_array( $blob ) ) {
+				continue;
+			}
+
+			foreach ( $signals as $signal ) {
+				if ( ! array_key_exists( $signal, $blob ) ) {
+					continue;
+				}
+
+				$value = maybe_unserialize( $blob[ $signal ] );
+				if ( ! array_key_exists( $signal, $meta_by_post[ $post_id ] ) || wp_ulike_pro_schema_meta_value_is_empty( $meta_by_post[ $post_id ][ $signal ] ) ) {
+					$meta_by_post[ $post_id ][ $signal ] = $value;
+				}
+			}
+			continue;
+		}
+
+		if ( 0 !== strpos( $meta_key, 'wp_ulike_pro_' ) ) {
+			continue;
+		}
+
+		$signal = substr( $meta_key, strlen( 'wp_ulike_pro_' ) );
+		if ( ! in_array( $signal, $signals, true ) ) {
+			continue;
+		}
+
+		$value = maybe_unserialize( $row['meta_value'] );
+		$meta_by_post[ $post_id ][ $signal ] = $value;
+	}
+
+	$statuses = array();
+	foreach ( $post_ids as $post_id ) {
+		$statuses[ $post_id ] = wp_ulike_pro_build_schema_status_from_meta( $meta_by_post[ $post_id ] );
+	}
+
+	return $statuses;
+}
+
+/**
+ * Whether a schema meta value should be treated as empty.
+ *
+ * @param mixed $value Meta value.
+ * @return bool
+ */
+function wp_ulike_pro_schema_meta_value_is_empty( $value ) {
+	return null === $value || false === $value || '' === $value || array() === $value;
+}
+
+/**
+ * Whether a post has schema or FAQ configuration stored.
+ *
+ * @param int $post_id Post ID.
+ * @return bool
+ */
+function wp_ulike_pro_post_has_schema_data( $post_id ) {
+	$post_id = absint( $post_id );
+	if ( ! $post_id ) {
+		return false;
+	}
+
+	$signals = wp_ulike_pro_get_schema_data_signal_keys();
+
+	if ( wp_ulike_is_true( wp_ulike_get_option( 'enable_serialize', false ) ) ) {
+		$blob = get_post_meta( $post_id, 'wp_ulike_pro_meta_box', true );
+		if ( ! is_array( $blob ) ) {
+			return false;
+		}
+
+		foreach ( $signals as $key ) {
+			if ( ! array_key_exists( $key, $blob ) ) {
+				continue;
+			}
+			$value = maybe_unserialize( $blob[ $key ] );
+			if ( in_array( $key, array( 'enable_schema', 'enable_faq' ), true ) ) {
+				if ( wp_ulike_is_true( $value ) ) {
+					return true;
+				}
+				continue;
+			}
+			if ( ! empty( $value ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	foreach ( $signals as $key ) {
+		$value = wp_ulike_pro_get_metabox_value_raw( $key, $post_id );
+		if ( in_array( $key, array( 'enable_schema', 'enable_faq' ), true ) ) {
+			if ( wp_ulike_is_true( $value ) ) {
+				return true;
+			}
+			continue;
+		}
+		if ( ! empty( $value ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Schema status summary for a post (admin UI).
+ *
+ * @param int $post_id Post ID.
+ * @return array<string, mixed>
+ */
+function wp_ulike_pro_get_post_schema_status( $post_id ) {
+	$post_id = absint( $post_id );
+
+	$schema_enabled = wp_ulike_is_true( wp_ulike_pro_get_metabox_value_raw( 'enable_schema', $post_id ) );
+	$faq_enabled    = wp_ulike_is_true( wp_ulike_pro_get_metabox_value_raw( 'enable_faq', $post_id ) );
+	$schema_type    = wp_ulike_pro_get_metabox_value_raw( 'schema_type', $post_id );
+
+	return array(
+		'schema_enabled' => $schema_enabled,
+		'faq_enabled'    => $faq_enabled,
+		'schema_type'    => is_string( $schema_type ) ? $schema_type : '',
+		'has_data'       => wp_ulike_pro_post_has_schema_data( $post_id ),
+	);
+}
+
+/**
+ * Preview aggregate rating output for schema markup (admin + frontend).
+ *
+ * @param int                  $post_id  Post ID.
+ * @param array<string, mixed> $settings Optional rating-related overrides.
+ * @return array<string, mixed>
+ */
+function wp_ulike_pro_get_schema_rating_preview( $post_id, $settings = array() ) {
+	$post_id = absint( $post_id );
+	if ( ! $post_id ) {
+		return array(
+			'mode'  => 'unavailable',
+			'value' => null,
+			'count' => 0,
+		);
+	}
+
+	$resolve = static function ( $key, $default = '' ) use ( $post_id, $settings ) {
+		if ( array_key_exists( $key, $settings ) ) {
+			return $settings[ $key ];
+		}
+		return wp_ulike_pro_get_metabox_value_raw( $key, $post_id );
+	};
+
+	if ( wp_ulike_is_true( $resolve( 'disable_star_ratings', 'false' ) ) ) {
+		return array(
+			'mode'  => 'disabled',
+			'value' => null,
+			'count' => 0,
+		);
+	}
+
+	$worst = (float) $resolve( 'worst_rating', 1 );
+	$best  = (float) $resolve( 'best_rating', 5 );
+
+	if ( wp_ulike_is_true( $resolve( 'enable_custom_rating', 'false' ) ) ) {
+		$value = trim( (string) $resolve( 'rating_value', '' ) );
+		$count = absint( $resolve( 'rating_count', 0 ) );
+
+		return array(
+			'mode'  => 'custom',
+			'value' => '' === $value ? null : (float) $value,
+			'count' => $count,
+			'worst' => $worst,
+			'best'  => $best,
+		);
+	}
+
+	// Star-rating engagement template uses ulike_pulse aggregates.
+	if (
+		class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) &&
+		class_exists( 'WP_Ulike_Pro_Engagement_Counter' ) &&
+		'star' === WP_Ulike_Pro_Engagement_Settings::get_mode( 'post' )
+	) {
+		$aggregates = WP_Ulike_Pro_Engagement_Counter::get_star_aggregates( $post_id, 'post' );
+		$count      = isset( $aggregates['count'] ) ? (int) $aggregates['count'] : 0;
+
+		if ( $count > 0 ) {
+			return array(
+				'mode'  => 'engagement_star',
+				'value' => round( (float) $aggregates['average'], 1 ),
+				'count' => $count,
+				'worst' => $worst,
+				'best'  => $best,
+			);
+		}
+	}
+
+	$likes     = (int) wp_ulike_get_post_likes( $post_id, 'like' );
+	$dislikes  = (int) wp_ulike_get_post_likes( $post_id, 'dislike' );
+	$total     = $likes + $dislikes;
+	$time_factor = wp_ulike_is_true( $resolve( 'enable_time_factor_rating', 'false' ) );
+
+	if ( ! $total ) {
+		return array(
+			'mode'        => 'auto',
+			'value'       => null,
+			'count'       => 0,
+			'likes'       => $likes,
+			'dislikes'    => $dislikes,
+			'worst'       => $worst,
+			'best'        => $best,
+			'time_factor' => $time_factor,
+		);
+	}
+
+	// wp_ulike_get_rating_value() was deprecated in WP ULike 5.2.0 and now always
+	// returns null (no time-decayed rating calculation is available upstream),
+	// so fall back to the standard like/dislike-weighted average instead of a
+	// silently wrong 0 rating.
+	$value = ( ( $likes * 5 ) + $dislikes ) / $total;
+	$value = $value < 1 ? 1 : round( $value, 2 );
+
+	return array(
+		'mode'        => 'auto',
+		'value'       => $value,
+		'count'       => $total,
+		'likes'       => $likes,
+		'dislikes'    => $dislikes,
+		'worst'       => $worst,
+		'best'        => $best,
+		'time_factor' => $time_factor,
+	);
+}
+
+/**
+ * Schema meta keys that store calendar dates.
+ *
+ * @return string[]
+ */
+function wp_ulike_pro_get_schema_date_meta_keys() {
+	return array(
+		'start_date',
+		'end_date',
+		'created_date',
+		'valid_date',
+	);
+}
+
+/**
+ * Parse a stored schema date to Y-m-d for admin inputs and JSON-LD.
+ *
+ * Supports plugin date formats: d/m/Y, m/d/Y, and Y-m-d.
+ *
+ * @param mixed $value Stored date value.
+ * @return string ISO date (Y-m-d) or empty string.
+ */
+function wp_ulike_pro_parse_schema_date( $value ) {
+	if ( ! is_string( $value ) && ! is_numeric( $value ) ) {
+		return '';
+	}
+
+	$value = trim( (string) $value );
+	if ( '' === $value ) {
+		return '';
+	}
+
+	if ( preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches ) ) {
+		return checkdate( (int) $matches[2], (int) $matches[3], (int) $matches[1] ) ? $value : '';
+	}
+
+	if ( preg_match( '/^(\d{4})-(\d{2})-(\d{2})[ T]/', $value, $matches ) ) {
+		return sprintf( '%04d-%02d-%02d', (int) $matches[1], (int) $matches[2], (int) $matches[3] );
+	}
+
+	if ( ! preg_match( '/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/', $value, $matches ) ) {
+		return '';
+	}
+
+	$first  = (int) $matches[1];
+	$second = (int) $matches[2];
+	$year   = (int) $matches[3];
+	$pairs  = array();
+
+	if ( $first > 12 && $second <= 12 ) {
+		$pairs[] = array( 'month' => $second, 'day' => $first );
+	} elseif ( $second > 12 && $first <= 12 ) {
+		$pairs[] = array( 'month' => $first, 'day' => $second );
+	} else {
+		$wp_format = (string) get_option( 'date_format', '' );
+		$day_first = true;
+
+		if ( preg_match( '/(^|[^\\\\])d/', $wp_format ) && preg_match( '/(^|[^\\\\])m/', $wp_format ) ) {
+			$day_first = strpos( $wp_format, 'd' ) < strpos( $wp_format, 'm' );
+		} elseif ( preg_match( '/(^|[^\\\\])j/', $wp_format ) && preg_match( '/(^|[^\\\\])n/', $wp_format ) ) {
+			$day_first = strpos( $wp_format, 'j' ) < strpos( $wp_format, 'n' );
+		}
+
+		if ( $day_first ) {
+			$pairs[] = array( 'month' => $second, 'day' => $first );
+			$pairs[] = array( 'month' => $first, 'day' => $second );
+		} else {
+			$pairs[] = array( 'month' => $first, 'day' => $second );
+			$pairs[] = array( 'month' => $second, 'day' => $first );
+		}
+	}
+
+	foreach ( $pairs as $pair ) {
+		if ( checkdate( $pair['month'], $pair['day'], $year ) ) {
+			return sprintf( '%04d-%02d-%02d', $year, $pair['month'], $pair['day'] );
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Format a parsed schema date for database storage (d/m/Y).
+ *
+ * @param mixed $value Date value from admin input or stored meta.
+ * @return string
+ */
+function wp_ulike_pro_format_schema_date_storage( $value ) {
+	$parsed = wp_ulike_pro_parse_schema_date( $value );
+	if ( '' === $parsed ) {
+		return '';
+	}
+
+	$parts = explode( '-', $parsed );
+	if ( 3 !== count( $parts ) ) {
+		return '';
+	}
+
+	return sprintf( '%02d/%02d/%04d', (int) $parts[2], (int) $parts[1], (int) $parts[0] );
+}
+
+/**
+ * Prepare a stored schema field for the admin UI.
+ *
+ * @param string $key   Meta key without prefix.
+ * @param mixed  $value Stored value.
+ * @return mixed
+ */
+function wp_ulike_pro_prepare_schema_admin_value( $key, $value ) {
+	if ( in_array( $key, wp_ulike_pro_get_schema_date_meta_keys(), true ) && is_string( $value ) ) {
+		return wp_ulike_pro_parse_schema_date( $value );
+	}
+
+	if ( 'reviews' === $key && is_array( $value ) ) {
+		foreach ( $value as $index => $row ) {
+			if ( is_array( $row ) && ! empty( $row['published_date'] ) ) {
+				$value[ $index ]['published_date'] = wp_ulike_pro_parse_schema_date( $row['published_date'] );
+			}
+		}
+	}
+
+	return $value;
+}
+
+/**
+ * Sanitize a single meta box value by key.
+ *
+ * @param string $key   Meta key.
+ * @param mixed  $value Raw value.
+ * @return mixed
+ */
+function wp_ulike_pro_sanitize_metabox_value( $key, $value ) {
+	$checkbox_keys = array(
+		'auto_display',
+		'enable_schema',
+		'disable_star_ratings',
+		'enable_time_factor_rating',
+		'enable_custom_rating',
+		'enable_custom_reviews',
+		'enable_faq',
+		'is_accessible_for_free',
+	);
+
+	if ( in_array( $key, $checkbox_keys, true ) ) {
+		return wp_ulike_is_true( $value ) ? 'true' : 'false';
+	}
+
+	if ( 'display_position' === $key ) {
+		$value   = sanitize_key( wp_unslash( $value ) );
+		$allowed = array( 'top', 'bottom', 'top_bottom' );
+		return in_array( $value, $allowed, true ) ? $value : 'bottom';
+	}
+
+	if ( 'template' === $key ) {
+		$value = sanitize_key( wp_unslash( $value ) );
+		if ( '' === $value ) {
+			return '';
+		}
+		$allowed = array_keys( wp_ulike_pro_get_templates_list_by_name() );
+		return in_array( $value, $allowed, true ) ? $value : '';
+	}
+
+	if ( 'description' === $key ) {
+		return sanitize_textarea_field( wp_unslash( $value ) );
+	}
+
+	if ( in_array( $key, wp_ulike_pro_get_schema_date_meta_keys(), true ) ) {
+		return wp_ulike_pro_format_schema_date_storage( wp_unslash( $value ) );
+	}
+
+	if ( 'faq' === $key && is_array( $value ) ) {
+		$clean = array();
+		foreach ( $value as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$question = isset( $row['question'] ) ? sanitize_text_field( wp_unslash( $row['question'] ) ) : '';
+			$answer   = isset( $row['answer'] ) ? wp_kses_post( wp_unslash( $row['answer'] ) ) : '';
+			if ( '' === $question && '' === $answer ) {
+				continue;
+			}
+			$clean[] = array(
+				'question' => $question,
+				'answer'   => $answer,
+			);
+		}
+		return $clean;
+	}
+
+	if ( 'reviews' === $key && is_array( $value ) ) {
+		$clean = array();
+		foreach ( $value as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$clean[] = array(
+				'author'         => isset( $row['author'] ) ? sanitize_text_field( wp_unslash( $row['author'] ) ) : '',
+				'published_date' => isset( $row['published_date'] ) ? wp_ulike_pro_format_schema_date_storage( wp_unslash( $row['published_date'] ) ) : '',
+				'name'           => isset( $row['name'] ) ? sanitize_text_field( wp_unslash( $row['name'] ) ) : '',
+				'review_body'    => isset( $row['review_body'] ) ? sanitize_textarea_field( wp_unslash( $row['review_body'] ) ) : '',
+				'rating_value'   => isset( $row['rating_value'] ) ? absint( $row['rating_value'] ) : 0,
+			);
+		}
+		return $clean;
+	}
+
+	if ( in_array( $key, array( 'tracks', 'supply', 'tool', 'step' ), true ) && is_array( $value ) ) {
+		return array_map(
+			function ( $row ) {
+				if ( ! is_array( $row ) ) {
+					return array();
+				}
+				$clean = array();
+				foreach ( $row as $sub_key => $sub_value ) {
+					if ( 'list' === $sub_key && is_array( $sub_value ) ) {
+						$clean['list'] = array_map(
+							function ( $item ) {
+								return array(
+									'name' => isset( $item['name'] ) ? sanitize_text_field( wp_unslash( $item['name'] ) ) : '',
+								);
+							},
+							$sub_value
+						);
+						continue;
+					}
+					if ( 'image' === $sub_key ) {
+						$clean[ $sub_key ] = esc_url_raw( wp_unslash( $sub_value ) );
+						continue;
+					}
+					$clean[ $sub_key ] = sanitize_text_field( wp_unslash( $sub_value ) );
+				}
+				return $clean;
+			},
+			$value
+		);
+	}
+
+	if ( 'image_list' === $key ) {
+		if ( is_array( $value ) ) {
+			return array_values( array_filter( array_map( 'esc_url_raw', $value ) ) );
+		}
+		if ( is_string( $value ) && '' !== $value ) {
+			$parts = preg_split( '/[\r\n,]+/', wp_unslash( $value ) );
+			return array_values( array_filter( array_map( 'esc_url_raw', array_map( 'trim', $parts ) ) ) );
+		}
+		return array();
+	}
+
+	if ( in_array( $key, array( 'likes_counter_quantity', 'dislikes_counter_quantity', 'rating_count', 'review_count', 'worst_rating', 'best_rating', 'num_tracks' ), true ) ) {
+		return absint( $value );
+	}
+
+	if ( in_array( $key, array( 'price', 'rating_value' ), true ) ) {
+		return is_numeric( $value ) ? $value : sanitize_text_field( wp_unslash( $value ) );
+	}
+
+	if ( 'day_of_week' === $key ) {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+		return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+	}
+
+	if ( 'schema_type' === $key ) {
+		$value = sanitize_text_field( wp_unslash( $value ) );
+		if ( '' === $value ) {
+			return '';
+		}
+		if ( class_exists( 'WP_Ulike_Pro_Schema_Generator_Tool' ) ) {
+			$allowed = array_keys( WP_Ulike_Pro_Schema_Generator_Tool::get_schema_types() );
+			return in_array( $value, $allowed, true ) ? $value : '';
+		}
+		return $value;
+	}
+
+	if ( in_array( $key, array( 'image', 'url' ), true ) ) {
+		return esc_url_raw( wp_unslash( $value ) );
+	}
+
+	if ( is_array( $value ) ) {
+		return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+	}
+
+	return sanitize_text_field( wp_unslash( $value ) );
+}
+
+/**
+ * Save post meta box values (serialized or individual keys).
+ *
+ * @param int   $post_id Post ID.
+ * @param array $values  Key/value pairs without prefix.
+ * @param bool  $merge   Merge with existing stored values.
+ * @return bool
+ */
+function wp_ulike_pro_save_metabox_values( $post_id, $values, $merge = true ) {
+	$post_id = absint( $post_id );
+	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+		return false;
+	}
+
+	$sanitized = array();
+	foreach ( (array) $values as $key => $value ) {
+		$key = sanitize_key( $key );
+		if ( '' === $key ) {
+			continue;
+		}
+		$sanitized[ $key ] = wp_ulike_pro_sanitize_metabox_value( $key, $value );
+	}
+
+	if ( empty( $sanitized ) ) {
+		return false;
+	}
+
+	if ( wp_ulike_is_true( wp_ulike_get_option( 'enable_serialize', false ) ) ) {
+		$stored = $merge ? get_post_meta( $post_id, 'wp_ulike_pro_meta_box', true ) : array();
+		if ( ! is_array( $stored ) ) {
+			$stored = array();
+		}
+		update_post_meta( $post_id, 'wp_ulike_pro_meta_box', array_merge( $stored, $sanitized ) );
+		return true;
+	}
+
+	foreach ( $sanitized as $key => $value ) {
+		update_post_meta( $post_id, 'wp_ulike_pro_' . $key, $value );
+	}
+
+	return true;
+}
+
+/**
+ * Save comment meta box values.
+ *
+ * @param int   $comment_id Comment ID.
+ * @param array $values     Key/value pairs.
+ * @return bool
+ */
+function wp_ulike_pro_save_comment_metabox_values( $comment_id, $values ) {
+	$comment_id = absint( $comment_id );
+	if ( ! $comment_id || ! current_user_can( 'edit_comment', $comment_id ) ) {
+		return false;
+	}
+
+	$sanitized = array();
+	foreach ( (array) $values as $key => $value ) {
+		$key = sanitize_key( $key );
+		if ( '' === $key ) {
+			continue;
+		}
+		$sanitized[ $key ] = wp_ulike_pro_sanitize_metabox_value( $key, $value );
+	}
+
+	if ( empty( $sanitized ) ) {
+		return false;
+	}
+
+	$stored = get_comment_meta( $comment_id, 'wp_ulike_pro_comment_meta_box', true );
+	if ( ! is_array( $stored ) ) {
+		$stored = array();
+	}
+
+	update_comment_meta( $comment_id, 'wp_ulike_pro_comment_meta_box', array_merge( $stored, $sanitized ) );
+	wp_ulike_pro_reset_comment_metabox_cache( $comment_id );
+	return true;
 }
 
 /**
@@ -809,7 +1791,7 @@ function wp_ulike_pro_get_counter_quantity( $id, $status, $type = 'post' ){
 			$counter_val = wp_ulike_pro_get_metabox_value( $counter_key, $id );
 			break;
 		case 'comment':
-			$counter_val = wp_ulike_pro_get_comment_metabox_value( $counter_key, $id );
+			$counter_val = wp_ulike_pro_get_comment_metabox_value( $counter_key, $id, true );
 			break;
 	}
 
@@ -846,6 +1828,25 @@ function wp_ulike_pro_get_templates_list_by_attribute( $attr ){
 	}
 
 	return ! empty( $options ) ? implode(',', $options) : NULL;
+}
+
+/**
+ * Comma-separated template keys that do not have a given attribute flag.
+ *
+ * @param string $attr Template metadata key.
+ * @return string|null
+ */
+function wp_ulike_pro_get_templates_list_excluding_attribute( $attr ) {
+	$options   = array();
+	$templates = wp_ulike_generate_templates_list();
+
+	foreach ( $templates as $key => $args ) {
+		if ( empty( $args[ $attr ] ) ) {
+			$options[] = $key;
+		}
+	}
+
+	return ! empty( $options ) ? implode( ',', $options ) : null;
 }
 
 /**
@@ -1054,87 +2055,358 @@ function wp_ulike_pro_pagination( $args = array() ) {
  * @param array $args
  * @return object|null
  */
-function wp_ulike_pro_get_items_info( $args = array() ){
-	// Global wordpress database object
-	global $wpdb;
-	//Main data
+function wp_ulike_pro_get_items_info( $args = array() ) {
 	$defaults = array(
-		"type"     => 'post',
-		"rel_type" => 'post',
-		"status"   => 'like',
-		"user_id"  => '',
-		"order"    => 'DESC',
-		"period"   => 'all',
-		"offset"   => 1,
-		"limit"    => 10
+		'type'       => 'post',
+		'rel_type'   => 'post',
+		'status'     => 'like',
+		'user_id'    => '',
+		'order'      => 'DESC',
+		'period'     => 'all',
+		'offset'     => 1,
+		'limit'      => 10,
+		'is_popular' => false,
 	);
 
-	$parsed_args  = wp_parse_args( $args, $defaults );
-	$info_args    = wp_ulike_get_table_info( $parsed_args['type'] );
-	$period_limit = wp_ulike_get_period_limit_sql( $parsed_args['period'] );
+	$parsed_args               = wp_parse_args( $args, $defaults );
+	$parsed_args['is_popular'] = false;
 
-	$limit_records = '';
-	if( (int) $parsed_args['limit'] > 0 ){
-		$offset = $parsed_args['offset'] > 0 ? ( $parsed_args['offset'] - 1 ) * $parsed_args['limit'] : 0;
-		$limit_records = sprintf( "LIMIT %d, %d", $offset, $parsed_args['limit'] );
-	}
+	$vote_statuses = array( 'like', 'dislike', 'unlike', 'undislike' );
+	$status        = $parsed_args['status'];
+	$mode          = function_exists( 'wp_ulike_pro_get_engagement_mode_for_type' )
+		? wp_ulike_pro_get_engagement_mode_for_type( $parsed_args['type'] )
+		: 'none';
 
-
-	$related_condition = '';
-	switch ($parsed_args['type']) {
-		case 'post':
-		case 'topic':
-			$post_type = '';
-			if( is_array( $parsed_args['rel_type'] ) ){
-				$post_type = sprintf( " AND r.post_type IN ('%s')", implode ("','", $parsed_args['rel_type'] ) );
-			} elseif( ! empty( $parsed_args['rel_type'] ) ) {
-				$post_type = sprintf( " AND r.post_type = '%s'", $parsed_args['rel_type'] );
+	// User history on emoji/star types must read engagement rows (vote-only misses reactions).
+	if ( ! empty( $parsed_args['user_id'] ) && in_array( $mode, array( 'emoji', 'star' ), true ) ) {
+		if ( is_string( $status ) && in_array( $status, array( 'dislike', 'unlike', 'undislike' ), true ) ) {
+			// Explicit classic vote filter.
+			$ids = wp_ulike_get_popular_items_ids( $parsed_args );
+		} elseif ( is_string( $status ) && ! in_array( $status, $vote_statuses, true ) && 'all' !== $status && '' !== $status ) {
+			if ( 'star' === $mode && is_numeric( $status ) ) {
+				$parsed_args['values'] = array( absint( $status ) );
+				$ids                   = wp_ulike_pro_get_popular_engagement_item_ids( $parsed_args, 'star' );
+			} else {
+				$parsed_args['engagement_keys'] = array( sanitize_key( $status ) );
+				$ids                            = wp_ulike_pro_get_popular_engagement_item_ids( $parsed_args, 'emoji' );
 			}
-			$related_condition = 'AND r.post_status IN (\'publish\', \'inherit\', \'private\')'  . $post_type;
-			break;
-	}
-
-	$user_condition = '';
-	if( !empty( $parsed_args['user_id'] ) ){
-		if( is_array( $parsed_args['user_id'] ) ){
-			$user_condition = sprintf( " AND t.user_id IN ('%s')", implode ("','", $parsed_args['user_id'] ) );
 		} else {
-			$user_condition = sprintf( " AND t.user_id = '%s'", $parsed_args['user_id'] );
+			// like / all / empty → that type's engagement history (keeps offset/limit correct).
+			$ids = wp_ulike_pro_get_popular_engagement_item_ids( $parsed_args, $mode );
 		}
-	}
-
-	// create query condition from status
-	$status_type  = '';
-	if( is_array( $parsed_args['status'] ) ){
-		$status_type = sprintf( "t.status IN ('%s')", implode ("','", $parsed_args['status'] ) );
 	} else {
-		$status_type = sprintf( "t.status = '%s'", $parsed_args['status'] );
+		$ids = wp_ulike_get_popular_items_ids( $parsed_args );
 	}
 
-	// generate query string
-	$query  = sprintf( '
-		SELECT DISTINCT t.%1$s AS item_ID
-		FROM %2$s t
-		INNER JOIN %3$s r ON t.%1$s = r.%4$s %5$s
-		WHERE %6$s %7$s
-		%8$s
-		ORDER BY item_ID
-		%9$s %10$s',
-		$info_args['column'],
-		$wpdb->prefix . $info_args['table'],
-		$info_args['related_table_prefix'],
-		$info_args['related_column'],
-		$related_condition,
-		$status_type,
-		$user_condition,
-		$period_limit,
-		$parsed_args['order'],
-		$limit_records
+	return ! empty( $ids ) ? $ids : null;
+}
+
+/**
+ * Whether tops query args include content filters that require a wider popular pool.
+ *
+ * @param array $args Query arguments.
+ * @return bool
+ */
+function wp_ulike_pro_tops_has_content_filters( $args ) {
+	$flags = function_exists( 'wp_ulike_pro_tops_engagement_filter_flags' )
+		? wp_ulike_pro_tops_engagement_filter_flags( $args )
+		: array( 'has_reaction' => false, 'has_rating' => false );
+
+	return ! empty( $args['search'] )
+		|| ! empty( $args['category'] )
+		|| ! empty( $flags['has_reaction'] )
+		|| ! empty( $flags['has_rating'] );
+}
+
+/**
+ * Max popular candidates to scan when applying search/category filters.
+ *
+ * @return int
+ */
+function wp_ulike_pro_tops_search_pool_limit() {
+	return max( 50, (int) apply_filters( 'wp_ulike_pro_tops_search_pool_limit', 1000 ) );
+}
+
+/**
+ * Adjust popular-items args before content filtering.
+ *
+ * @param array $args Query arguments.
+ * @return array
+ */
+function wp_ulike_pro_prepare_popular_items_args( $args ) {
+	$prepared = $args;
+
+	if ( wp_ulike_pro_tops_has_content_filters( $prepared ) ) {
+		$prepared['limit']  = wp_ulike_pro_tops_search_pool_limit();
+		$prepared['offset'] = 1;
+	}
+
+	return $prepared;
+}
+
+/**
+ * Whether tops request filters by emoji reaction and/or star rating.
+ *
+ * @param array $args Query arguments.
+ * @return array{has_reaction:bool,has_rating:bool}
+ */
+function wp_ulike_pro_tops_engagement_filter_flags( $args ) {
+	$keys = ! empty( $args['engagement_keys'] )
+		? array_filter( array_map( 'strval', (array) $args['engagement_keys'] ) )
+		: array();
+	$vals = ! empty( $args['values'] )
+		? array_filter( array_map( 'absint', (array) $args['values'] ) )
+		: array();
+
+	return array(
+		'has_reaction' => ! empty( $keys ),
+		'has_rating'   => ! empty( $vals ),
 	);
+}
 
-	$result = $wpdb->get_results( $query, OBJECT_K );
+/**
+ * Popular item IDs for Top Content, respecting vote vs emoji vs star filters.
+ *
+ * Reaction filter → only items with those emoji keys (no classic votes / stars).
+ * Rating filter   → only items with those star values (no classic votes / emoji).
+ * Both            → union of matching emoji + star items.
+ * Neither         → votes ∪ emoji ∪ star (data-driven default).
+ *
+ * @param array $popular_args Prepared popular-items args.
+ * @return int[]
+ */
+function wp_ulike_pro_get_tops_union_item_ids( $popular_args ) {
+	$flags       = wp_ulike_pro_tops_engagement_filter_flags( $popular_args );
+	$page_limit  = max( 1, (int) ( $popular_args['limit'] ?? 10 ) );
+	$page_offset = max( 1, (int) ( $popular_args['offset'] ?? 1 ) );
+	$pool_floor  = wp_ulike_pro_tops_search_pool_limit();
+	$is_pool     = $page_limit >= $pool_floor;
 
-	return !empty( $result ) ? array_keys( $result ) : null;
+	// Vote ∪ emoji ∪ star each apply their own LIMIT. Fetch a wide enough
+	// candidate set, merge, then slice to the requested page so posts never
+	// return 15–30 rows for a "10 per page" request.
+	$fetch_args           = $popular_args;
+	$fetch_args['offset'] = 1;
+	$fetch_args['limit']  = $is_pool
+		? $page_limit
+		: min( $pool_floor, $page_offset * $page_limit * 3 );
+
+	$ids = array();
+
+	if ( $flags['has_reaction'] ) {
+		$ids = array_merge(
+			$ids,
+			(array) wp_ulike_pro_get_popular_engagement_item_ids( $fetch_args, 'emoji' )
+		);
+	}
+
+	if ( $flags['has_rating'] ) {
+		$ids = array_merge(
+			$ids,
+			(array) wp_ulike_pro_get_popular_engagement_item_ids( $fetch_args, 'star' )
+		);
+	}
+
+	if ( $flags['has_reaction'] || $flags['has_rating'] ) {
+		$ids = array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
+	} else {
+		// No reaction/rating filter: include every engagement kind.
+		$vote_ids = (array) wp_ulike_get_popular_items_ids( $fetch_args );
+		$pro_ids  = array_merge(
+			(array) wp_ulike_pro_get_popular_engagement_item_ids( $fetch_args, 'emoji' ),
+			(array) wp_ulike_pro_get_popular_engagement_item_ids( $fetch_args, 'star' )
+		);
+
+		$ids = array_values(
+			array_unique(
+				array_filter(
+					array_map( 'absint', array_merge( $vote_ids, $pro_ids ) )
+				)
+			)
+		);
+	}
+
+	if ( $is_pool ) {
+		return $ids;
+	}
+
+	return wp_ulike_pro_paginate_tops_items( $ids, $page_offset, $page_limit );
+}
+
+/**
+ * Case-insensitive substring search helper.
+ *
+ * @param string $haystack Content to search in.
+ * @param string $search   Search term.
+ * @return bool
+ */
+function wp_ulike_pro_text_matches_search( $haystack, $search ) {
+	$search = trim( (string) $search );
+	if ( '' === $search ) {
+		return true;
+	}
+
+	return false !== stripos( wp_strip_all_tags( (string) $haystack ), $search );
+}
+
+/**
+ * Slice a filtered list using tops pagination args.
+ *
+ * @param array $items  Filtered items.
+ * @param int   $offset Page number (1-based).
+ * @param int   $limit  Page size.
+ * @return array
+ */
+function wp_ulike_pro_paginate_tops_items( $items, $offset, $limit ) {
+	$items  = array_values( $items );
+	$offset = max( 1, (int) $offset );
+	$limit  = max( 1, (int) $limit );
+	$start  = ( $offset - 1 ) * $limit;
+
+	return array_slice( $items, $start, $limit );
+}
+
+/**
+ * Filter comments by search term.
+ *
+ * @param array  $comments Comment objects.
+ * @param string $search   Search term.
+ * @return array
+ */
+function wp_ulike_pro_filter_comments_by_search( $comments, $search ) {
+	$search = trim( (string) $search );
+	if ( '' === $search || empty( $comments ) ) {
+		return $comments;
+	}
+
+	return array_values(
+		array_filter(
+			$comments,
+			function ( $comment ) use ( $search ) {
+				$fields = array(
+					$comment->comment_content,
+					$comment->comment_author,
+					get_the_title( $comment->comment_post_ID ),
+				);
+
+				foreach ( $fields as $field ) {
+					if ( wp_ulike_pro_text_matches_search( $field, $search ) ) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		)
+	);
+}
+
+/**
+ * Filter BuddyPress activities by search term.
+ *
+ * @param array  $activities Activity objects.
+ * @param string $search     Search term.
+ * @return array
+ */
+function wp_ulike_pro_filter_activities_by_search( $activities, $search ) {
+	$search = trim( (string) $search );
+	if ( '' === $search || empty( $activities ) ) {
+		return $activities;
+	}
+
+	return array_values(
+		array_filter(
+			$activities,
+			function ( $activity ) use ( $search ) {
+				$author = get_user_by( 'id', $activity->user_id );
+				$fields = array(
+					$activity->action,
+					$activity->content,
+					$author ? $author->display_name : '',
+				);
+
+				foreach ( $fields as $field ) {
+					if ( wp_ulike_pro_text_matches_search( $field, $search ) ) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		)
+	);
+}
+
+/**
+ * Filter engager rows by user search term.
+ *
+ * @param array  $users  Query rows/objects with user_id.
+ * @param string $search Search term.
+ * @return array
+ */
+function wp_ulike_pro_filter_engagers_by_search( $users, $search ) {
+	$search = trim( (string) $search );
+	if ( '' === $search || empty( $users ) ) {
+		return $users;
+	}
+
+	return array_values(
+		array_filter(
+			$users,
+			function ( $user ) use ( $search ) {
+				$user_id  = isset( $user->user_id ) ? (int) $user->user_id : 0;
+				$userdata = $user_id ? get_userdata( $user_id ) : false;
+
+				if ( ! $userdata ) {
+					return false;
+				}
+
+				$fields = array(
+					$userdata->display_name,
+					$userdata->user_login,
+					$userdata->user_nicename,
+					$userdata->user_email,
+				);
+
+				foreach ( $fields as $field ) {
+					if ( wp_ulike_pro_text_matches_search( $field, $search ) ) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		)
+	);
+}
+
+/**
+ * Get total posts/topics count after search/category filters.
+ *
+ * @param array $args Query arguments.
+ * @return int
+ */
+function wp_ulike_pro_get_posts_query_total( $args ) {
+	$count_args           = $args;
+	$count_args['offset'] = 1;
+	// Popular tops without content filters paginate in SQL (limit=page size).
+	// Counting with limit=1 made found_posts≈1 and hid pagination entirely.
+	// Use a wide pool so the total reflects the popular set size.
+	$count_args['limit']  = function_exists( 'wp_ulike_pro_tops_search_pool_limit' )
+		? wp_ulike_pro_tops_search_pool_limit()
+		: 1000;
+
+	$query = wp_ulike_pro_get_posts_query( $count_args );
+
+	if ( ! ( $query instanceof WP_Query ) ) {
+		return 0;
+	}
+
+	if ( wp_ulike_pro_tops_has_content_filters( $count_args ) ) {
+		return (int) $query->found_posts;
+	}
+
+	return (int) $query->post_count;
 }
 
 /**
@@ -1155,7 +2427,10 @@ function wp_ulike_pro_get_posts_query( $args ){
 		"order"      => 'DESC',
 		"period"     => 'all',
 		"offset"     => 1,
-		"limit"      => 10
+		"limit"      => 10,
+		"search"     => '',
+		"category"   => 0,
+		"taxonomy"   => '',
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
 	if( $parsed_args['type'] === 'topic' ){
@@ -1165,26 +2440,65 @@ function wp_ulike_pro_get_posts_query( $args ){
 
 	if( empty( $parsed_args['rel_type'] ) ){
 		// Get post types
-		$parsed_args['rel_type'] =  get_post_types_by_support( array(
+		$parsed_args['rel_type'] = get_post_types_by_support( array(
 			'title',
 			'editor',
 			'thumbnail'
 		) );
 	}
 
-	$get_items  = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	if ( empty( $parsed_args['rel_type'] ) ) {
+		$parsed_args['rel_type'] = array( 'post' );
+	}
+
+	$uses_wp_pagination = wp_ulike_pro_tops_has_content_filters( $parsed_args );
+	$page_limit         = max( 1, (int) $parsed_args['limit'] );
+	$page_offset        = max( 1, (int) $parsed_args['offset'] );
+
+	// Filtered lists need a wide ID pool + WP_Query paging. Unfiltered lists
+	// are already sliced to one page inside wp_ulike_pro_get_tops_union_item_ids().
+	$id_args = $uses_wp_pagination
+		? wp_ulike_pro_prepare_popular_items_args( $parsed_args )
+		: $parsed_args;
+
+	if ( wp_ulike_is_true( $parsed_args['is_popular'] ) ) {
+		$get_items = wp_ulike_pro_get_tops_union_item_ids( $id_args );
+	} else {
+		$get_items = wp_ulike_pro_get_items_info( $parsed_args );
+	}
+
+	if ( empty( $get_items ) ) {
+		return false;
+	}
 
 	$query_args = array(
-		'post_type'      => $parsed_args['rel_type'],
-		'post_status'    => array('publish', 'inherit', 'private'),
-		'posts_per_page' => $parsed_args['limit']
+		'post_type'              => $parsed_args['rel_type'],
+		'post_status'            => array( 'publish', 'inherit', 'private' ),
+		'posts_per_page'         => $uses_wp_pagination ? $page_limit : count( $get_items ),
+		'paged'                  => $uses_wp_pagination ? $page_offset : 1,
+		'post__in'               => $get_items,
+		'orderby'                => 'post__in',
+		'ignore_sticky_posts'    => true,
 	);
 
-	if( ! empty( $get_items ) ){
-		$query_args['post__in'] = $get_items;
-		$query_args['orderby'] = 'post__in';
-	} elseif( empty( $get_items ) ) {
-		return false;
+	if ( ! empty( $parsed_args['search'] ) ) {
+		$query_args['s'] = $parsed_args['search'];
+	}
+
+	if ( ! empty( $parsed_args['category'] ) ) {
+		$taxonomy = ! empty( $parsed_args['taxonomy'] ) ? sanitize_key( $parsed_args['taxonomy'] ) : 'category';
+
+		if ( 'category' !== $taxonomy && taxonomy_exists( $taxonomy ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => $taxonomy,
+					'field'    => 'term_id',
+					'terms'    => absint( $parsed_args['category'] ),
+				),
+			);
+		} else {
+			$query_args['cat'] = absint( $parsed_args['category'] );
+		}
 	}
 
 	return new WP_Query( $query_args );
@@ -1208,24 +2522,58 @@ function wp_ulike_pro_get_comments_query( $args ){
 		"order"      => 'DESC',
 		"period"     => 'all',
 		"offset"     => 1,
-		"limit"      => 10
+		"limit"      => 10,
+		"search"     => '',
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
 
-	$get_items  = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	$has_filters = wp_ulike_pro_tops_has_content_filters( $parsed_args );
+	$id_args     = $has_filters
+		? wp_ulike_pro_prepare_popular_items_args( $parsed_args )
+		: $parsed_args;
 
-	if( empty( $get_items ) ){
+	if ( wp_ulike_is_true( $parsed_args['is_popular'] ) ) {
+		$get_items = wp_ulike_pro_get_tops_union_item_ids( $id_args );
+	} else {
+		$get_items = wp_ulike_pro_get_items_info( $parsed_args );
+	}
+
+	if ( empty( $get_items ) ) {
 		return false;
 	}
 
 	$query_args = array(
 		'comment__in' => $get_items,
-		'orderby'     => 'comment__in'
+		'orderby'     => 'comment__in',
+		'number'      => 0,
 	);
 
-	$comments_query = new WP_Comment_Query;
+	$comments_query = new WP_Comment_Query();
+	$comments       = $comments_query->query( $query_args );
 
-	return $comments_query->query( $query_args );
+	if ( empty( $comments ) ) {
+		return false;
+	}
+
+	if ( ! empty( $parsed_args['search'] ) ) {
+		$comments = wp_ulike_pro_filter_comments_by_search( $comments, $parsed_args['search'] );
+	}
+
+	if ( empty( $comments ) ) {
+		return false;
+	}
+
+	// Search/filter path still needs an explicit page slice; unfiltered IDs are
+	// already one page from wp_ulike_pro_get_tops_union_item_ids().
+	if ( $has_filters ) {
+		return wp_ulike_pro_paginate_tops_items(
+			$comments,
+			$parsed_args['offset'],
+			$parsed_args['limit']
+		);
+	}
+
+	return $comments;
 }
 
 /**
@@ -1250,12 +2598,22 @@ function wp_ulike_pro_get_activity_query( $args ){
 		"order"      => 'DESC',
 		"period"     => 'all',
 		"offset"     => 1,
-		"limit"      => 10
+		"limit"      => 10,
+		"search"     => '',
 	);
 	$parsed_args = wp_parse_args( $args, $defaults );
-	$get_items   = wp_ulike_is_true( $parsed_args['is_popular'] ) ? wp_ulike_get_popular_items_ids( $parsed_args ) : wp_ulike_pro_get_items_info( $parsed_args );
+	$has_filters = wp_ulike_pro_tops_has_content_filters( $parsed_args );
+	$id_args     = $has_filters
+		? wp_ulike_pro_prepare_popular_items_args( $parsed_args )
+		: $parsed_args;
 
-	if( empty( $get_items ) ){
+	if ( wp_ulike_is_true( $parsed_args['is_popular'] ) ) {
+		$get_items = wp_ulike_pro_get_tops_union_item_ids( $id_args );
+	} else {
+		$get_items = wp_ulike_pro_get_items_info( $parsed_args );
+	}
+
+	if ( empty( $get_items ) ) {
 		return false;
 	}
 
@@ -1267,17 +2625,171 @@ function wp_ulike_pro_get_activity_query( $args ){
 		$bp_prefix = 'prefix';
 	}
 
+	$item_ids = array_map( 'absint', $get_items );
+	$item_ids = array_filter( $item_ids );
+	if ( empty( $item_ids ) ) {
+		return false;
+	}
+
+	$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
+
 	// generate query string
-	$query_string  = sprintf( '
+	$query_string = $wpdb->prepare(
+		"
 		SELECT * FROM
-		`%1$sbp_activity`
-		WHERE `id` IN (%2$s)
-		ORDER BY FIELD(`id`, %2$s)',
-		$wpdb->$bp_prefix,
-		implode( ',',$get_items )
+		`{$wpdb->$bp_prefix}bp_activity`
+		WHERE `id` IN ($placeholders)
+		ORDER BY FIELD(`id`, $placeholders)",
+		array_merge( $item_ids, $item_ids )
 	);
 
-	return $wpdb->get_results( $query_string );
+	$activities = $wpdb->get_results( $query_string );
+
+	if ( empty( $activities ) ) {
+		return false;
+	}
+
+	if ( ! empty( $parsed_args['search'] ) ) {
+		$activities = wp_ulike_pro_filter_activities_by_search( $activities, $parsed_args['search'] );
+	}
+
+	if ( empty( $activities ) ) {
+		return false;
+	}
+
+	if ( wp_ulike_pro_tops_has_content_filters( $parsed_args ) ) {
+		return wp_ulike_pro_paginate_tops_items(
+			$activities,
+			$parsed_args['offset'],
+			$parsed_args['limit']
+		);
+	}
+
+	return $activities;
+}
+
+/**
+ * Count comments after optional search filter.
+ *
+ * @param array $args Query arguments.
+ * @return int
+ */
+function wp_ulike_pro_count_filtered_comments( $args ) {
+	$defaults = array(
+		'type'       => 'comment',
+		'is_popular' => true,
+		'status'     => array( 'like', 'dislike' ),
+		'period'     => 'all',
+		'search'     => '',
+	);
+	$parsed_args  = wp_parse_args( $args, $defaults );
+	$popular_args = wp_ulike_pro_prepare_popular_items_args( $parsed_args );
+	$get_items    = wp_ulike_get_popular_items_ids( $popular_args );
+
+	if ( empty( $get_items ) ) {
+		return 0;
+	}
+
+	$comments_query = new WP_Comment_Query();
+	$comments       = $comments_query->query(
+		array(
+			'comment__in' => $get_items,
+			'orderby'     => 'comment__in',
+			'number'      => 0,
+		)
+	);
+
+	if ( ! empty( $parsed_args['search'] ) ) {
+		$comments = wp_ulike_pro_filter_comments_by_search( $comments, $parsed_args['search'] );
+	}
+
+	return count( $comments );
+}
+
+/**
+ * Count activities after optional search filter.
+ *
+ * @param array $args Query arguments.
+ * @return int
+ */
+function wp_ulike_pro_count_filtered_activities( $args ) {
+	if ( ! defined( 'BP_VERSION' ) ) {
+		return 0;
+	}
+
+	$defaults = array(
+		'type'       => 'activity',
+		'is_popular' => true,
+		'status'     => array( 'like', 'dislike' ),
+		'period'     => 'all',
+		'search'     => '',
+	);
+	$parsed_args  = wp_parse_args( $args, $defaults );
+	$popular_args = wp_ulike_pro_prepare_popular_items_args( $parsed_args );
+	$get_items    = wp_ulike_get_popular_items_ids( $popular_args );
+
+	if ( empty( $get_items ) ) {
+		return 0;
+	}
+
+	global $wpdb;
+
+	if ( is_multisite() ) {
+		$bp_prefix = 'base_prefix';
+	} else {
+		$bp_prefix = 'prefix';
+	}
+
+	$item_ids     = array_map( 'absint', $get_items );
+	$item_ids     = array_filter( $item_ids );
+	$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
+	$query_string = $wpdb->prepare(
+		"SELECT * FROM `{$wpdb->$bp_prefix}bp_activity` WHERE `id` IN ($placeholders)",
+		$item_ids
+	);
+
+	$activities = $wpdb->get_results( $query_string );
+
+	if ( ! empty( $parsed_args['search'] ) ) {
+		$activities = wp_ulike_pro_filter_activities_by_search( $activities, $parsed_args['search'] );
+	}
+
+	return count( $activities );
+}
+
+/**
+ * Count engagers after optional search filter.
+ *
+ * @param array $args Query arguments.
+ * @return int
+ */
+function wp_ulike_pro_count_filtered_engagers( $args ) {
+	$defaults = array(
+		'limit'  => 10,
+		'period' => 'all',
+		'offset' => 1,
+		'status' => array( 'like', 'dislike' ),
+		'search' => '',
+	);
+	$parsed_args = wp_parse_args( $args, $defaults );
+	$search      = trim( (string) $parsed_args['search'] );
+
+	if ( '' === $search ) {
+		return (int) wp_ulike_pro_count_top_combined_engagers( $parsed_args['period'], $parsed_args['status'] );
+	}
+
+	$top_likers = wp_ulike_pro_get_top_combined_engagers(
+		array(
+			'limit'  => wp_ulike_pro_tops_search_pool_limit(),
+			'offset' => 1,
+			'period' => $parsed_args['period'],
+			'status' => $parsed_args['status'],
+			'search' => $search,
+			'order'  => 'DESC',
+		)
+	);
+
+	return count( $top_likers );
 }
 
 /**
@@ -1325,6 +2837,24 @@ function wp_ulike_pro_get_audit_token(){
     }
 
     return $site_key;
+}
+
+/**
+ * Canonical site URL used for license API requests (multisite-aware).
+ *
+ * @return string
+ */
+function wp_ulike_pro_get_license_site_url() {
+	$use_home_url = apply_filters( 'wp_ulike_pro_license_api_use_home_url', true );
+	$site_url     = $use_home_url ? home_url() : get_site_url();
+
+	$apply_multisite_logic = apply_filters( 'wp_ulike_pro_api_apply_multisite_logic', true );
+
+	if ( $apply_multisite_logic && is_multisite() ) {
+		$site_url = $use_home_url ? network_home_url() : network_site_url();
+	}
+
+	return untrailingslashit( esc_url_raw( $site_url ) );
 }
 
 /**
@@ -1945,36 +3475,331 @@ function wp_ulike_pro_is_private_or_local_ip( $ip ) {
 }
 
 /**
- * Get the device type based on the user agent.
+ * Detect device type for like/dislike analytics.
  *
- * @return string
+ * Uses stripos() for speed (no regex on typical desktop/mobile traffic).
+ * Runs once per vote; cost is negligible next to the DB write.
+ *
+ * @param string $user_agent User agent string.
+ * @return string One of: desktop, mobile, tablet, television, gaming.
  */
-function wp_ulike_pro_get_device_info($userAgent = null) {
-    // Use the current HTTP_USER_AGENT if none is provided
-    if (!$userAgent) {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+function wp_ulike_pro_detect_device_type( $user_agent ) {
+    if ( $user_agent === null || $user_agent === '' ) {
+        return 'desktop';
     }
 
-    $browser = new WhichBrowser\Parser($userAgent);
+    $user_agent  = (string) $user_agent;
+    $is_ios_like = stripos( $user_agent, 'like iPhone' ) === false;
 
-    // Determine the device type
-    $deviceType = 'desktop'; // Default to desktop
-
-    if ($browser->device->type) {
-        $deviceType = strtolower($browser->device->type);
+    // iOS — checked first (very common on mobile web).
+    if ( $is_ios_like && stripos( $user_agent, 'iPad' ) !== false ) {
+        return 'tablet';
+    }
+    if ( $is_ios_like && ( stripos( $user_agent, 'iPhone' ) !== false || stripos( $user_agent, 'iPod' ) !== false ) ) {
+        return 'mobile';
     }
 
-    return [
-        'device'  => $deviceType,
-        'os'      => $browser->os->toString(),
-        'browser' => $browser->browser->toString(),
-    ];
+    // Android — "Mobile" in UA is the standard phone vs tablet split.
+    if ( stripos( $user_agent, 'Android' ) !== false ) {
+        return stripos( $user_agent, 'Mobile' ) !== false ? 'mobile' : 'tablet';
+    }
+
+    // Other phones.
+    if ( stripos( $user_agent, 'Mobile' ) !== false
+        || stripos( $user_agent, 'BlackBerry' ) !== false
+        || stripos( $user_agent, 'IEMobile' ) !== false
+        || stripos( $user_agent, 'Opera Mini' ) !== false
+        || stripos( $user_agent, 'Opera Mobi' ) !== false
+        || stripos( $user_agent, 'Windows Phone' ) !== false
+        || stripos( $user_agent, 'webOS' ) !== false ) {
+        return 'mobile';
+    }
+
+    // Other tablets.
+    if ( stripos( $user_agent, 'Tablet' ) !== false
+        || stripos( $user_agent, 'PlayBook' ) !== false
+        || stripos( $user_agent, 'Kindle Fire' ) !== false ) {
+        return 'tablet';
+    }
+
+    // Gaming & TV — rare; checked last so normal traffic exits early.
+    if ( stripos( $user_agent, 'PlayStation' ) !== false
+        || stripos( $user_agent, 'Xbox' ) !== false
+        || stripos( $user_agent, 'Nintendo' ) !== false ) {
+        return 'gaming';
+    }
+
+    if ( stripos( $user_agent, 'SMART-TV' ) !== false
+        || stripos( $user_agent, 'SmartTV' ) !== false
+        || stripos( $user_agent, 'Smart-TV' ) !== false
+        || stripos( $user_agent, 'GoogleTV' ) !== false
+        || stripos( $user_agent, 'AppleTV' ) !== false
+        || stripos( $user_agent, 'Roku' ) !== false
+        || stripos( $user_agent, 'NetCast' ) !== false
+        || stripos( $user_agent, 'HbbTV' ) !== false
+        || ( stripos( $user_agent, 'Tizen' ) !== false && stripos( $user_agent, 'TV' ) !== false ) ) {
+        return 'television';
+    }
+
+    return 'desktop';
+}
+
+/**
+ * Get device, OS, and browser info from the user agent.
+ *
+ * Uses WP ULike's lightweight parser from the free plugin when available.
+ *
+ * @param string|null $user_agent User agent string. Defaults to current request UA.
+ * @return array{device: string, os: string, browser: string}
+ */
+function wp_ulike_pro_get_device_info( $user_agent = null ) {
+    if ( ! $user_agent ) {
+        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    }
+
+    if ( ! class_exists( 'WP_Ulike_User_Agent_Parser' ) ) {
+        return array(
+            'device'  => wp_ulike_pro_detect_device_type( $user_agent ),
+            'os'      => '',
+            'browser' => '',
+        );
+    }
+
+    $parser = new WP_Ulike_User_Agent_Parser( $user_agent );
+    $parser->parse();
+
+    $client = $parser->get_client();
+    $os     = $parser->get_os();
+
+    return array(
+        'device'  => wp_ulike_pro_detect_device_type( $user_agent ),
+        'os'      => trim( $os['name'] . ' ' . $os['version'] ),
+        'browser' => trim( $client['name'] . ' ' . $client['version'] ),
+    );
 }
 
 
+if ( ! function_exists( 'wp_ulike_pro_get_user_global_latest_activity' ) ) {
+	/**
+	 * Latest vote or engagement row for a user across all content types (Pulse-aware).
+	 *
+	 * @param int $user_id User ID.
+	 * @return array{date_time:string,status:string}|null
+	 */
+	function wp_ulike_pro_get_user_global_latest_activity( $user_id ) {
+		global $wpdb;
+
+		$user_id = absint( $user_id );
+		if ( ! $user_id ) {
+			return null;
+		}
+
+		$cache_key = 'global_latest_activity_' . $user_id;
+		$cached    = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
+		if ( false !== $cached ) {
+			return $cached ?: null;
+		}
+
+		$candidates = array();
+
+		$pulse_table = esc_sql( wp_ulike_pro_pulse_table() );
+		$mode        = class_exists( 'WP_Ulike_Pulse_Query' ) && method_exists( 'WP_Ulike_Pulse_Query', 'read_mode' )
+			? WP_Ulike_Pulse_Query::read_mode()
+			: 'pulse';
+
+		// Pulse arm — always run. Emoji/star live only in pulse regardless of
+		// read mode, and vote rows in merged mode are valid latest-activity
+		// candidates alongside legacy rows. Picking MAX(date_time) across
+		// candidates handles any overlap correctly.
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT date_time, engagement_kind, engagement_key, status
+				FROM `{$pulse_table}` WHERE user_id = %s AND status = %s
+				ORDER BY date_time DESC, id DESC LIMIT 1",
+				(string) $user_id,
+				'active'
+			),
+			ARRAY_A
+		);
+
+		if ( ! empty( $row['date_time'] ) ) {
+			$candidates[] = array(
+				'date_time' => $row['date_time'],
+				'status'    => wp_ulike_pro_map_pulse_activity_status( $row ),
+				'ts'        => strtotime( $row['date_time'] ),
+			);
+		}
+
+		// Legacy arm — pre-cutover activity on dual/legacy sites.
+		if ( ( 'legacy' === $mode || 'merged' === $mode ) && class_exists( 'WP_Ulike_Pulse_Registry' ) ) {
+			$parts = array();
+			foreach ( WP_Ulike_Pulse_Registry::log_table_names() as $table ) {
+				if ( ! WP_Ulike_Pulse_Registry::table_exists( $table ) ) {
+					continue;
+				}
+				$t      = esc_sql( $table );
+				$parts[] = $wpdb->prepare(
+					"SELECT date_time, status FROM `{$t}` WHERE user_id = %s",
+					(string) $user_id
+				);
+			}
+
+			if ( ! empty( $parts ) ) {
+				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- fragments built from prepared statements.
+				$legacy_row = $wpdb->get_row(
+					'SELECT date_time, status FROM (' . implode( ' UNION ALL ', $parts ) . ') AS x ORDER BY date_time DESC LIMIT 1',
+					ARRAY_A
+				);
+
+				if ( ! empty( $legacy_row['date_time'] ) ) {
+					$mapped = class_exists( 'WP_Ulike_Pulse_Vote_Map' )
+						? WP_Ulike_Pulse_Vote_Map::legacy_to_row( $legacy_row['status'] )
+						: array( 'engagement_key' => 'like', 'status' => 'active' );
+					$candidates[] = array(
+						'date_time' => $legacy_row['date_time'],
+						'status'    => wp_ulike_pro_map_pulse_activity_status(
+							array(
+								'engagement_kind' => 'vote',
+								'engagement_key'  => $mapped['engagement_key'],
+								'status'          => $mapped['status'],
+							)
+						),
+						'ts'        => strtotime( $legacy_row['date_time'] ),
+					);
+				}
+			}
+		}
+
+		if ( empty( $candidates ) ) {
+			wp_cache_set( $cache_key, array(), WP_ULIKE_PRO_DOMAIN, 300 );
+			return null;
+		}
+
+		usort(
+			$candidates,
+			static function ( $a, $b ) {
+				return $b['ts'] <=> $a['ts'];
+			}
+		);
+
+		$latest = array(
+			'date_time' => $candidates[0]['date_time'],
+			'status'    => $candidates[0]['status'],
+		);
+
+		wp_cache_set( $cache_key, $latest, WP_ULIKE_PRO_DOMAIN, 300 );
+
+		return $latest;
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_map_pulse_activity_status' ) ) {
+	/**
+	 * Map a pulse row to a display status string.
+	 *
+	 * @param array<string,string> $row Pulse row fragment.
+	 * @return string
+	 */
+	function wp_ulike_pro_map_pulse_activity_status( $row ) {
+		$kind = isset( $row['engagement_kind'] ) ? (string) $row['engagement_kind'] : WP_Ulike_Pulse_Registry::KIND_VOTE;
+
+		if ( WP_Ulike_Pulse_Registry::KIND_VOTE === $kind ) {
+			return WP_Ulike_Pulse_Vote_Map::row_to_legacy(
+				$row['engagement_key'] ?? WP_Ulike_Pulse_Vote_Map::KEY_LIKE,
+				$row['status'] ?? 'active'
+			);
+		}
+
+		return (string) ( $row['engagement_key'] ?? $row['status'] ?? '' );
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_get_counter_value' ) ) {
+	/**
+	 * Pulse-native vote/engagement counter (avoids free-plugin legacy table merge).
+	 *
+	 * @param int          $item_id     Item ID.
+	 * @param string       $type        Content type slug (post, comment, ...).
+	 * @param string       $status      like|dislike|all|unlike|undislike.
+	 * @param bool         $is_distinct Distinct users for vote mode.
+	 * @param mixed        $period      Period filter.
+	 * @return int
+	 */
+	function wp_ulike_pro_get_counter_value( $item_id, $type, $status = 'like', $is_distinct = true, $period = null ) {
+		$item_id = absint( $item_id );
+		$type    = sanitize_key( (string) $type );
+		$status  = sanitize_key( (string) $status );
+
+		if ( ! $item_id || ! $type ) {
+			return 0;
+		}
+
+		// All-time like/dislike: use free meta-aware counter (same as the button).
+		// Period filters and unlike|undislike still need a Pulse ledger count.
+		$has_period_filter = ! empty( $period ) && 'all' !== $period;
+		if ( ! $has_period_filter && in_array( $status, array( 'like', 'dislike' ), true ) && function_exists( 'wp_ulike_get_counter_value' ) ) {
+			return (int) wp_ulike_get_counter_value( $item_id, $type, $status, $is_distinct, null );
+		}
+
+		// like / dislike / all / unlike / undislike are classic vote metrics.
+		// unlike|undislike count Pulse status=removed rows (do not remap to active).
+		// Never return emoji/star totals for "like" — engagement totals use
+		// wp_ulike_pro_count_engagement_activity() / star stats.
+		if ( in_array( $status, array( 'like', 'dislike', 'all', 'unlike', 'undislike' ), true ) ) {
+			$period = null === $period ? 'all' : $period;
+			return (int) WP_Ulike_Pro_Pulse_Reader::count_item_votes( $item_id, $type, $status, $is_distinct, $period );
+		}
+
+		return 0;
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_get_likers_list_per_post' ) ) {
+	/**
+	 * Vote likers user IDs for one item (Pulse-native; legacy table args kept for callers).
+	 *
+	 * Always returns classic vote likers — never remaps to emoji/star engagers
+	 * when the type's primary template is engagement (display automation can still
+	 * render up/down + likers modal alongside reactions).
+	 * Engagement avatars: wp_ulike_pro_get_engagement_engager_user_ids().
+	 *
+	 * @param string   $log_table  Legacy table key (ulike, ulike_comments, ...).
+	 * @param string   $log_column Legacy column name (unused).
+	 * @param int      $item_id    Item ID.
+	 * @param int|null $limit      Max users; null = 500.
+	 * @return int[]
+	 */
+	function wp_ulike_pro_get_likers_list_per_post( $log_table, $log_column, $item_id, $limit = null ) {
+		unset( $log_column );
+
+		$item_id = absint( $item_id );
+		if ( ! $item_id ) {
+			return array();
+		}
+
+		$limit = null === $limit ? 500 : max( 1, absint( $limit ) );
+		$type  = 'post';
+
+		if ( class_exists( 'WP_Ulike_Pro_Stats_Type_Resolver' ) ) {
+			// Accept bare suffixes (ulike_comments) and prefixed names (wp_ulike_comments)
+			// from Pulse_Registry::legacy_source_for_type().
+			$stats_type = WP_Ulike_Pro_Stats_Type_Resolver::table_to_stats_type( (string) $log_table );
+			if ( $stats_type ) {
+				$type = WP_Ulike_Pro_Stats_Type_Resolver::map_stats_type_to_item_type( $stats_type );
+			}
+		}
+
+		return WP_Ulike_Pro_Pulse_Reader::rebuild_likers_list( $item_id, $type, $limit );
+	}
+}
+
 if( ! function_exists( 'wp_ulike_pro_get_user_latest_activity' ) ) {
 	/**
-	 * Get user latest activity details for each item
+	 * Latest classic vote activity for a user on an item.
+	 *
+	 * Always returns vote ledger activity — never remaps to emoji/star when the
+	 * type's primary template is engagement. Engagement activity:
+	 * wp_ulike_pro_get_engagement_user_latest_activity().
 	 *
 	 * @param integer $item_id
 	 * @param integer $user_id
@@ -1982,76 +3807,21 @@ if( ! function_exists( 'wp_ulike_pro_get_user_latest_activity' ) ) {
 	 * @return array|null
 	 */
 	function wp_ulike_pro_get_user_latest_activity( $item_id, $user_id, $type ) {
-		global $wpdb;
-
-		$settings    = new wp_ulike_setting_type( $type );
-		$table_name  = $wpdb->prefix . $settings->getTableName();
-		$column_name = $settings->getColumnName();
-
-		$query  = $wpdb->prepare( "
-				SELECT `date_time`, `status`, `country_code`, `device`
-				FROM `{$table_name}`
-				WHERE `{$column_name}` = %s
-				AND `user_id` = %d
-				ORDER BY id DESC LIMIT 1
-			",
-			$item_id,
-			$user_id
-		);
-
-		$result = $wpdb->get_row( $query, ARRAY_A );
-
-		if( ! empty( $result['date_time'] ) ){
-			$result['date_time'] = wp_ulike_date_i18n( $result['date_time'] );
-		}
-
-		return $result;
+		return WP_Ulike_Pro_Pulse_Reader::get_user_latest_activity( $item_id, $user_id, $type );
 	}
 }
 
 if( ! function_exists( 'wp_ulike_pro_get_latest_user_activity_date' ) ) {
 	/**
-	 * Get the latest activity date for a given user across multiple WP ULike tables.
-	 *
-	 * This function queries the `wp_ulike`, `wp_ulike_forums`, `wp_ulike_comments`,
-	 * and `wp_ulike_activities` tables to find the most recent activity timestamp
-	 * for a given user ID. It uses efficient subqueries with `MAX(date_time)` and
-	 * `GREATEST()` to determine the latest activity while ensuring optimal performance.
-	 *
-	 * The result is cached using the WordPress object cache for 5 minutes (300 seconds)
-	 * to reduce database load on repeated requests.
+	 * Get the latest activity date for a given user across vote and engagement storage.
 	 *
 	 * @param int $user_id The user ID to check for activity.
 	 * @return string|null The latest activity timestamp in 'Y-m-d H:i:s' format, or null if no activity is found.
 	 */
 	function wp_ulike_pro_get_latest_user_activity_date( $user_id ) {
-		global $wpdb;
+		$activity = wp_ulike_pro_get_user_global_latest_activity( $user_id );
 
-		// Use a unique cache key based on the user ID.
-		$cache_key = 'latest_activity_' . $user_id;
-		$latest_date = wp_cache_get( $cache_key, WP_ULIKE_PRO_DOMAIN );
-		if ( false !== $latest_date ) {
-			return $latest_date;
-		}
-
-		// Use subqueries to get the max date from each table.
-		// COALESCE ensures that if one table returns NULL (no rows), we substitute a base value.
-		$query = "
-			SELECT GREATEST(
-				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike WHERE user_id = %d), '0000-00-00 00:00:00'),
-				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_forums WHERE user_id = %d), '0000-00-00 00:00:00'),
-				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_comments WHERE user_id = %d), '0000-00-00 00:00:00'),
-				COALESCE((SELECT MAX(date_time) FROM {$wpdb->prefix}ulike_activities WHERE user_id = %d), '0000-00-00 00:00:00')
-			) AS latest_activity_date
-		";
-
-		// Prepare and execute the query.
-		$latest_date = $wpdb->get_var( $wpdb->prepare( $query, $user_id, $user_id, $user_id, $user_id ) );
-
-		// Cache the result for 5 minutes (300 seconds).
-		wp_cache_set( $cache_key, $latest_date, WP_ULIKE_PRO_DOMAIN, 300 );
-
-		return $latest_date;
+		return ! empty( $activity['date_time'] ) ? $activity['date_time'] : null;
 	}
 }
 
@@ -2156,3 +3926,1723 @@ function wp_ulike_pro_is_safe_redirect( $url ) {
 
 	return true;
 }
+
+
+/**
+ * Engagement storage & sanitization
+ */
+
+if ( ! function_exists( 'wp_ulike_pro_pulse_table' ) ) {
+	/**
+	 * Unified Pulse storage table (ulike_pulse, owned by WP ULike free).
+	 *
+	 * @return string
+	 */
+	function wp_ulike_pro_pulse_table() {
+		return WP_Ulike_Pulse_Schema::table();
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_engagement_table' ) ) {
+	/**
+	 * @deprecated 2.3 Use wp_ulike_pro_pulse_table().
+	 * @return string
+	 */
+	function wp_ulike_pro_engagement_table() {
+		return wp_ulike_pro_pulse_table();
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_legacy_votes_pending' ) ) {
+	/**
+	 * Whether the site is not yet on pure Pulse storage (legacy or dual/merged mode).
+	 *
+	 * Pro statistics are correct in every storage mode (legacy/dual/pulse) because
+	 * vote reads route through the free plugin's mode-aware Pulse_Query. This flag
+	 * only signals that a storage upgrade is available — it is a soft nudge, not a
+	 * data-completeness gate.
+	 *
+	 * @return bool
+	 */
+	function wp_ulike_pro_legacy_votes_pending() {
+		if ( function_exists( 'wp_ulike_pulse_reads_legacy_votes' ) && wp_ulike_pulse_reads_legacy_votes() ) {
+			return true;
+		}
+
+		if ( function_exists( 'wp_ulike_pulse_needs_migration' ) && wp_ulike_pulse_needs_migration() ) {
+			return true;
+		}
+
+		return false;
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_get_pulse_migration_url' ) ) {
+	/**
+	 * Admin URL for WP ULike Pulse / storage upgrade (free plugin).
+	 *
+	 * @return string
+	 */
+	function wp_ulike_pro_get_pulse_migration_url() {
+		if ( class_exists( 'WP_Ulike_Pulse_Admin' ) ) {
+			return WP_Ulike_Pulse_Admin::get_page_url();
+		}
+
+		return admin_url( 'admin.php?page=wp-ulike-pulse' );
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_engagements_available' ) ) {
+	/**
+	 * Whether ulike_pulse is available.
+	 *
+	 * Pro requires WP ULike 5.2+, which always provisions Pulse storage.
+	 *
+	 * @return bool
+	 */
+	function wp_ulike_pro_engagements_available() {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_pulse_pro_kinds_sql' ) ) {
+	/**
+	 * SQL fragment limiting queries to Pro-owned pulse rows (emoji + star).
+	 *
+	 * @param string $column Column reference, e.g. engagement_kind or e.engagement_kind.
+	 * @return string
+	 */
+	function wp_ulike_pro_pulse_pro_kinds_sql( $column = 'engagement_kind' ) {
+		$column = (string) $column;
+		$emoji  = WP_Ulike_Pulse_Registry::KIND_EMOJI;
+		$star   = WP_Ulike_Pulse_Registry::KIND_STAR;
+
+		if ( false !== strpos( $column, '.' ) ) {
+			list( $alias, $field ) = explode( '.', $column, 2 );
+			return sprintf(
+				'`%s`.`%s` IN (\'%s\',\'%s\')',
+				esc_sql( $alias ),
+				esc_sql( $field ),
+				$emoji,
+				$star
+			);
+		}
+
+		return sprintf(
+			'`%s` IN (\'%s\',\'%s\')',
+			esc_sql( $column ),
+			$emoji,
+			$star
+		);
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_sanitize_engagement_kind' ) ) {
+	/**
+	 * @param string $kind Raw kind.
+	 * @return string emoji|star or empty.
+	 */
+	function wp_ulike_pro_sanitize_engagement_kind( $kind ) {
+		$kind = sanitize_key( (string) $kind );
+
+		return in_array(
+			$kind,
+			array( WP_Ulike_Pulse_Registry::KIND_EMOJI, WP_Ulike_Pulse_Registry::KIND_STAR ),
+			true
+		) ? $kind : '';
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_sanitize_engagement_status' ) ) {
+	/**
+	 * @param string $status Raw status.
+	 * @return string active|removed
+	 */
+	function wp_ulike_pro_sanitize_engagement_status( $status ) {
+		return in_array( $status, array( 'active', 'removed' ), true ) ? $status : 'active';
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_sanitize_engagement_key' ) ) {
+	/**
+	 * @param string $key Reaction slug or rating axis key.
+	 * @return string
+	 */
+	function wp_ulike_pro_sanitize_engagement_key( $key ) {
+		$key = sanitize_key( (string) $key );
+
+		return preg_match( '/^[a-z0-9_-]{1,30}$/', $key ) ? $key : '';
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_engagement_meta_cache_group' ) ) {
+	/**
+	 * @param string $item_type Content type slug.
+	 * @return string
+	 */
+	function wp_ulike_pro_engagement_meta_cache_group( $item_type ) {
+		return 'wp_ulike_engagement_' . sanitize_key( $item_type ) . '_meta';
+	}
+}
+
+/**
+ * Engagement helpers
+ */
+
+if ( ! function_exists( 'wp_ulike_pro_engagements' ) ) {
+	/**
+	 * Render engagement widget for an item.
+	 *
+	 * @param int    $item_id   Item ID.
+	 * @param string $item_type Content type slug (post, comment, activity, topic).
+	 * @return string
+	 */
+	function wp_ulike_pro_engagements( $item_id, $item_type = 'post' ) {
+		return WP_Ulike_Pro_Engagement_Display::render( absint( $item_id ), sanitize_key( $item_type ) );
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_format_engagement_count' ) ) {
+	/**
+	 * Format engagement counts: locale + optional K/M/B, without vote prefix/postfix (+/-).
+	 *
+	 * Uses wp_ulike_format_number() with a dedicated status so global like/dislike
+	 * prefix settings (meant for vote buttons) are not applied to reaction tallies.
+	 *
+	 * @param int|float|string $number Raw count.
+	 * @return string
+	 */
+	function wp_ulike_pro_format_engagement_count( $number ) {
+		if ( ! function_exists( 'wp_ulike_format_number' ) ) {
+			return (string) $number;
+		}
+
+		return wp_ulike_format_number( $number, 'engagement' );
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_pro_get_engagement_counts' ) ) {
+	/**
+	 * Get engagement counter payload for an item.
+	 *
+	 * @param int    $item_id   Item ID.
+	 * @param string $item_type Content type slug.
+	 * @return array
+	 */
+	function wp_ulike_pro_get_engagement_counts( $item_id, $item_type = 'post' ) {
+		$item_id   = absint( $item_id );
+		$item_type = sanitize_key( $item_type );
+		$mode      = WP_Ulike_Pro_Engagement_Settings::get_mode( $item_type );
+
+		if ( 'emoji' === $mode ) {
+			return array(
+				'kind'   => 'emoji',
+				'counts' => WP_Ulike_Pro_Engagement_Counter::get_all_reaction_counts( $item_id, $item_type ),
+				'total'  => WP_Ulike_Pro_Engagement_Counter::get_total_reactions( $item_id, $item_type ),
+			);
+		}
+
+		if ( 'star' === $mode ) {
+			$agg = WP_Ulike_Pro_Engagement_Counter::get_star_aggregates( $item_id, $item_type );
+
+			return array(
+				'kind'    => 'star',
+				'average' => $agg['average'],
+				'count'   => $agg['count'],
+			);
+		}
+
+		return array();
+	}
+}
+
+
+/**
+ * Map stats/query type to engagement item type slug.
+ *
+ * @param string $type post|comment|activity|topic.
+ * @return string
+ */
+function wp_ulike_pro_engagement_item_type_from_query( $type ) {
+	$type = sanitize_key( (string) $type );
+
+	if ( class_exists( 'WP_Ulike_Pro_Stats_Type_Resolver' ) ) {
+		return WP_Ulike_Pro_Stats_Type_Resolver::map_stats_type_to_item_type( $type );
+	}
+
+	if ( class_exists( 'WP_Ulike_Pulse_Registry' ) ) {
+		return WP_Ulike_Pulse_Registry::normalize_item_type( $type );
+	}
+
+	$map = array(
+		'post'       => 'post',
+		'posts'      => 'post',
+		'comment'    => 'comment',
+		'comments'   => 'comment',
+		'activity'   => 'activity',
+		'activities' => 'activity',
+		'topic'      => 'topic',
+		'topics'     => 'topic',
+	);
+
+	return isset( $map[ $type ] ) ? $map[ $type ] : $type;
+}
+
+/**
+ * Whether a content type uses emoji or star engagements.
+ *
+ * @param string $item_type post|comment|activity|topic.
+ * @return string none|emoji|star
+ */
+function wp_ulike_pro_get_engagement_mode_for_type( $item_type ) {
+	if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) ) {
+		return 'none';
+	}
+
+	return WP_Ulike_Pro_Engagement_Settings::get_mode( wp_ulike_pro_engagement_item_type_from_query( $item_type ) );
+}
+
+/**
+ * Engagement kind used for ranking (emoji reactions vs star ratings).
+ *
+ * @param string $mode none|emoji|star.
+ * @return string
+ */
+function wp_ulike_pro_engagement_kind_for_mode( $mode ) {
+	return 'star' === $mode ? 'star' : 'emoji';
+}
+
+/**
+ * Build SQL period fragment for engagement queries.
+ *
+ * @param string $period Period key.
+ * @param string $column Date column name.
+ * @return string
+ */
+function wp_ulike_pro_engagement_period_sql( $period, $column = 'date_time' ) {
+	$period_sql = wp_ulike_get_period_limit_sql( $period );
+
+	if ( empty( $period_sql ) ) {
+		return '';
+	}
+
+	return str_replace( 'date_time', $column, $period_sql );
+}
+
+/**
+ * Distinct actor SQL for engagement rows (registered user_id or guest fingerprint).
+ *
+ * @param string $alias Table alias (empty = unqualified columns).
+ * @return string
+ */
+function wp_ulike_pro_engagement_distinct_actor_sql( $alias = 'e' ) {
+	$prefix = $alias ? $alias . '.' : '';
+
+	// CONVERT(... USING utf8mb4): CONCAT() inherits the column's collation, and
+	// legacy tables from older WordPress installs frequently differ from the
+	// newer pulse table. UNION-ing both arms then fails with "Illegal mix of
+	// collations" and the whole metric silently reads 0. Never use an explicit
+	// COLLATE utf8mb4_* here -- it errors on utf8mb3 legacy tables.
+	return "CONVERT(CASE
+		WHEN {$prefix}user_id IS NOT NULL AND CAST({$prefix}user_id AS CHAR) NOT IN ('', '0') THEN CONCAT('u:', {$prefix}user_id)
+		WHEN {$prefix}fingerprint IS NOT NULL AND CAST({$prefix}fingerprint AS CHAR) NOT IN ('', '0') THEN CONCAT('f:', {$prefix}fingerprint)
+		ELSE NULL
+	END USING utf8mb4)";
+}
+
+/**
+ * Count expression respecting Logging Method (distinct users vs total rows).
+ *
+ * Star ratings always count one vote per actor regardless of logging method.
+ * Distinct mode keys guests by fingerprint so they are not collapsed into one "0" bucket.
+ *
+ * @param string $item_type Content type slug.
+ * @param string $kind      Optional engagement kind (emoji|star).
+ * @return string
+ */
+function wp_ulike_pro_engagement_count_expression( $item_type, $kind = 'emoji' ) {
+	$actor_sql = wp_ulike_pro_engagement_distinct_actor_sql( 'e' );
+
+	if ( 'star' === $kind ) {
+		return "COUNT(DISTINCT {$actor_sql})";
+	}
+
+	if ( class_exists( 'wp_ulike_setting_repo' ) && wp_ulike_setting_repo::isDistinct( $item_type ) ) {
+		return "COUNT(DISTINCT {$actor_sql})";
+	}
+
+	return 'COUNT(*)';
+}
+
+/**
+ * Count active engagement rows for a fingerprint on an item.
+ *
+ * @param string $fingerprint Browser fingerprint.
+ * @param int    $item_id     Item ID.
+ * @param string $item_type   Content type slug.
+ * @param string $kind        Optional engagement kind ('emoji' or 'star') to
+ *                            scope the count to a single engagement type. When
+ *                            provided, a prior vote of a DIFFERENT engagement
+ *                            type does NOT consume this type's vote budget —
+ *                            emoji and star are independent. When empty, the
+ *                            count spans all Pro engagement kinds (legacy behavior).
+ * @return int
+ */
+function wp_ulike_pro_count_engagement_fingerprint( $fingerprint, $item_id, $item_type, $kind = '' ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_pulse_table();
+	if ( empty( $fingerprint ) ) {
+		return 0;
+	}
+
+	$kind = $kind ? sanitize_key( $kind ) : '';
+	$cache_key = 'engagement_fingerprint_' . md5( $item_type . '_' . $item_id . '_' . $fingerprint . '_' . $kind );
+	$count     = wp_cache_get( $cache_key, WP_ULIKE_SLUG );
+
+	if ( false === $count ) {
+		if ( $kind ) {
+			$kinds_sql = $wpdb->prepare( ' AND engagement_kind = %s', $kind );
+		} else {
+			$kinds_sql = ' AND ' . wp_ulike_pro_pulse_pro_kinds_sql();
+		}
+
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM `{$table}` WHERE item_id = %d AND item_type = %s AND fingerprint = %s AND status = %s{$kinds_sql}",
+				$item_id,
+				sanitize_key( $item_type ),
+				$fingerprint,
+				'active'
+			)
+		);
+
+		wp_cache_add( $cache_key, $count, WP_ULIKE_SLUG, 10 );
+	}
+
+	return (int) $count;
+}
+
+/**
+ * Read mode-aware engagement filters (reaction slugs / star ratings) from the request.
+ *
+ * @return array{engagement_keys:string[],values:int[]}
+ */
+function wp_ulike_pro_read_engagement_filters() {
+	$reaction_raw = isset( $_GET['reaction'] ) ? wp_unslash( $_GET['reaction'] ) : array();
+	$reaction     = array();
+	if ( is_array( $reaction_raw ) ) {
+		$reaction = array_values( array_filter( array_map( 'sanitize_text_field', $reaction_raw ) ) );
+	}
+
+	$rating_raw = isset( $_GET['rating'] ) ? wp_unslash( $_GET['rating'] ) : array();
+	$rating     = array();
+	if ( is_array( $rating_raw ) ) {
+		$rating = array_values( array_filter( array_map( 'absint', $rating_raw ) ) );
+	}
+
+	return array(
+		'engagement_keys' => $reaction,
+		'values'          => $rating,
+	);
+}
+
+/**
+ * Get popular item IDs ranked by engagement activity.
+ *
+ * @param array  $args Query arguments (type, period, offset, limit, rel_type, search, user_id).
+ * @param string $mode emoji|star.
+ * @return int[]
+ */
+function wp_ulike_pro_get_popular_engagement_item_ids( $args, $mode ) {
+	global $wpdb;
+
+	$table     = wp_ulike_pro_engagement_table();
+	$item_type = wp_ulike_pro_engagement_item_type_from_query( $args['type'] ?? 'post' );
+
+	if ( empty( $table ) || ! in_array( $mode, array( 'emoji', 'star' ), true ) ) {
+		return array();
+	}
+
+	$defaults = array(
+		'type'    => 'post',
+		'period'  => 'all',
+		'offset'  => 1,
+		'limit'   => 10,
+		'order'   => 'DESC',
+		'rel_type'=> '',
+		'search'  => '',
+		'user_id' => '',
+	);
+	$args = wp_parse_args( $args, $defaults );
+
+	$kind      = wp_ulike_pro_engagement_kind_for_mode( $mode );
+	$count_sql = wp_ulike_pro_engagement_count_expression( $item_type, $kind );
+	$join      = '';
+	$where     = $wpdb->prepare(
+		'e.item_type = %s AND e.engagement_kind = %s AND e.status = %s',
+		$item_type,
+		$kind,
+		'active'
+	);
+
+	// Apply mode-specific filters only. Reaction slugs belong to emoji;
+	// star rating values belong to star. Cross-applying would leak wrong kinds
+	// into the other query (or return empty when key/value don't match).
+	if ( 'emoji' === $mode ) {
+		if ( ! empty( $args['engagement_keys'] ) ) {
+			$keys = array_values( array_filter( array_map( 'strval', (array) $args['engagement_keys'] ) ) );
+			if ( $keys ) {
+				$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
+				$where       .= $wpdb->prepare( " AND e.engagement_key IN ({$placeholders})", ...$keys );
+			}
+		} elseif ( ! empty( $args['values'] ) ) {
+			// Rating-only filter: do not return emoji items.
+			return array();
+		}
+	} elseif ( 'star' === $mode ) {
+		if ( ! empty( $args['values'] ) ) {
+			$values = array_values( array_filter( array_map( 'absint', (array) $args['values'] ) ) );
+			if ( $values ) {
+				$placeholders = implode( ',', array_fill( 0, count( $values ), '%d' ) );
+				$where       .= $wpdb->prepare( " AND e.value IN ({$placeholders})", ...$values );
+			}
+		} elseif ( ! empty( $args['engagement_keys'] ) ) {
+			// Reaction-only filter: do not return star items.
+			return array();
+		}
+	}
+
+	if ( in_array( $item_type, array( 'post', 'topic' ), true ) ) {
+		$join .= " INNER JOIN `{$wpdb->posts}` r ON r.ID = e.item_id ";
+		$where .= " AND r.post_status IN ('publish', 'inherit', 'private')";
+
+		$rel_type = $args['rel_type'];
+		if ( empty( $rel_type ) && 'post' === $item_type ) {
+			$rel_type = get_post_types_by_support( array( 'title', 'editor', 'thumbnail' ) );
+		}
+		if ( 'topic' === $item_type && empty( $rel_type ) ) {
+			$rel_type = array( 'topic', 'reply' );
+		}
+
+		if ( is_array( $rel_type ) && ! empty( $rel_type ) ) {
+			$rel_type     = array_values( $rel_type );
+			$placeholders = implode( ',', array_fill( 0, count( $rel_type ), '%s' ) );
+			$where       .= $wpdb->prepare( " AND r.post_type IN ({$placeholders})", ...$rel_type );
+		} elseif ( ! empty( $rel_type ) ) {
+			$where .= $wpdb->prepare( ' AND r.post_type = %s', $rel_type );
+		}
+	}
+
+	if ( ! empty( $args['user_id'] ) ) {
+		if ( is_array( $args['user_id'] ) ) {
+			$user_ids = array_values( array_map( 'strval', array_filter( (array) $args['user_id'] ) ) );
+			if ( ! empty( $user_ids ) ) {
+				$placeholders = implode( ',', array_fill( 0, count( $user_ids ), '%s' ) );
+				$where       .= $wpdb->prepare( " AND e.user_id IN ({$placeholders})", ...$user_ids );
+			}
+		} else {
+			$where .= $wpdb->prepare( ' AND e.user_id = %s', (string) $args['user_id'] );
+		}
+	}
+
+	$period_sql = wp_ulike_pro_engagement_period_sql( $args['period'], 'e.date_time' );
+	if ( $period_sql ) {
+		$where .= ' ' . $period_sql;
+	}
+
+	$order = strtoupper( $args['order'] ) === 'ASC' ? 'ASC' : 'DESC';
+	$limit = max( 1, (int) $args['limit'] );
+	$paged = max( 0, ( (int) $args['offset'] - 1 ) * $limit );
+
+	$query = "
+		SELECT e.item_id, {$count_sql} AS engagement_total
+		FROM `{$table}` e
+		{$join}
+		WHERE {$where}
+		GROUP BY e.item_id
+		ORDER BY engagement_total {$order}, e.item_id {$order}
+		LIMIT %d, %d
+	";
+
+	$rows = $wpdb->get_results( $wpdb->prepare( $query, $paged, $limit ) );
+
+	if ( empty( $rows ) ) {
+		return array();
+	}
+
+	$item_ids = array_map(
+		static function ( $row ) {
+			return (int) $row->item_id;
+		},
+		$rows
+	);
+
+	if ( ! empty( $args['search'] ) && in_array( $item_type, array( 'post', 'topic' ), true ) ) {
+		$item_ids = wp_ulike_pro_filter_post_ids_by_search( $item_ids, $args['search'] );
+	}
+
+	return array_values( array_filter( array_map( 'absint', $item_ids ) ) );
+}
+
+/**
+ * Count items that have engagement activity (for tops pagination totals).
+ *
+ * @param array  $args Query arguments.
+ * @param string $mode emoji|star.
+ * @return int
+ */
+function wp_ulike_pro_count_popular_engagement_items( $args, $mode ) {
+	global $wpdb;
+
+	$table     = wp_ulike_pro_engagement_table();
+	$item_type = wp_ulike_pro_engagement_item_type_from_query( $args['type'] ?? 'post' );
+
+	if ( empty( $table ) || ! in_array( $mode, array( 'emoji', 'star' ), true ) ) {
+		return 0;
+	}
+
+	$args['limit']  = wp_ulike_pro_tops_search_pool_limit();
+	$args['offset'] = 1;
+	$item_ids       = wp_ulike_pro_get_popular_engagement_item_ids( $args, $mode );
+
+	return count( $item_ids );
+}
+
+/**
+ * Filter post IDs by search term (title).
+ *
+ * @param int[]  $post_ids Post IDs.
+ * @param string $search   Search term.
+ * @return int[]
+ */
+function wp_ulike_pro_filter_post_ids_by_search( $post_ids, $search ) {
+	$search = trim( (string) $search );
+	if ( '' === $search || empty( $post_ids ) ) {
+		return $post_ids;
+	}
+
+	return array_values(
+		array_filter(
+			$post_ids,
+			static function ( $post_id ) use ( $search ) {
+				return wp_ulike_pro_text_matches_search( get_the_title( $post_id ), $search );
+			}
+		)
+	);
+}
+
+/**
+ * Period-aware vote metrics for Top Content rows.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param string $period    Period key.
+ * @return array{likes_count:int,dislikes_count:int,mode:string,star_average:float}
+ */
+function wp_ulike_pro_get_tops_item_metrics( $item_id, $item_type, $period = 'all', $filters = array() ) {
+	$item_id     = absint( $item_id );
+	$item_type   = sanitize_key( $item_type );
+	$mode        = wp_ulike_pro_get_engagement_mode_for_type( $item_type );
+	$is_distinct = wp_ulike_setting_repo::isDistinct( $item_type );
+
+	// Always gather every engagement kind for this item so the tops table
+	// reflects historical + display-automation emoji/star even when the
+	// type's current template mode is "none" or a different kind. The
+	// frontend picks the right pill from engagement/emoji_breakdown/star_*.
+	$like_count    = wp_ulike_pro_get_counter_value( $item_id, $item_type, 'like', $is_distinct, $period );
+	$dislike_count = wp_ulike_pro_get_counter_value( $item_id, $item_type, 'dislike', $is_distinct, $period );
+	$emoji_count   = wp_ulike_pro_count_engagement_activity( $item_id, $item_type, 'emoji', $period, $filters );
+	$star_stats    = wp_ulike_pro_get_star_period_stats( $item_id, $item_type, $period, $filters );
+
+	return array(
+		'likes_count'    => (int) $like_count,
+		'dislikes_count' => (int) $dislike_count,
+		'emoji_count'    => (int) $emoji_count,
+		'star_count'     => (int) $star_stats['count'],
+		'star_average'   => (float) $star_stats['average'],
+		'mode'           => $mode,
+	);
+}
+
+/**
+ * Count emoji reactions or star ratings for an item in a period.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param string $kind      emoji|star.
+ * @param string $period    Period key.
+ * @return int
+ */
+function wp_ulike_pro_count_engagement_activity( $item_id, $item_type, $kind, $period = 'all', $filters = array() ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return 0;
+	}
+
+	$count_expr = wp_ulike_pro_engagement_count_expression( $item_type, $kind );
+	$where      = $wpdb->prepare(
+		"item_id = %d AND item_type = %s AND engagement_kind = %s AND status = %s",
+		$item_id,
+		$item_type,
+		$kind,
+		'active'
+	);
+
+	if ( ! empty( $filters['engagement_keys'] ) ) {
+		$keys = array_values( array_filter( array_map( 'strval', (array) $filters['engagement_keys'] ) ) );
+		if ( $keys ) {
+			$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
+			$where       .= $wpdb->prepare( " AND engagement_key IN ({$placeholders})", ...$keys );
+		}
+	}
+	if ( ! empty( $filters['values'] ) ) {
+		$values = array_values( array_filter( array_map( 'absint', (array) $filters['values'] ) ) );
+		if ( $values ) {
+			$placeholders = implode( ',', array_fill( 0, count( $values ), '%d' ) );
+			$where       .= $wpdb->prepare( " AND value IN ({$placeholders})", ...$values );
+		}
+	}
+
+	$period_sql = wp_ulike_pro_engagement_period_sql( $period );
+	if ( $period_sql ) {
+		$where .= ' ' . $period_sql;
+	}
+
+	return (int) $wpdb->get_var( "SELECT {$count_expr} FROM `{$table}` AS e WHERE {$where}" );
+}
+
+/**
+ * Count engagement activity for a custom date range (stats engagement rate).
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param string $kind      emoji|star.
+ * @param string $start     Start date (Y-m-d).
+ * @param string $end       End date (Y-m-d).
+ * @return int
+ */
+function wp_ulike_pro_count_engagement_activity_for_range( $item_id, $item_type, $kind, $start, $end ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) || empty( $start ) || empty( $end ) ) {
+		return 0;
+	}
+
+	$count_expr = wp_ulike_pro_engagement_count_expression( $item_type, $kind );
+	$where      = $wpdb->prepare(
+		"item_id = %d AND item_type = %s AND engagement_kind = %s AND status = %s AND date_time >= %s AND date_time <= %s",
+		absint( $item_id ),
+		sanitize_key( $item_type ),
+		sanitize_key( $kind ),
+		'active',
+		$start . ' 00:00:00',
+		$end . ' 23:59:59'
+	);
+
+	return (int) $wpdb->get_var( "SELECT {$count_expr} FROM `{$table}` AS e WHERE {$where}" );
+}
+
+/**
+ * Star rating aggregates for a period.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param string $period    Period key.
+ * @return array{count:int,average:float}
+ */
+function wp_ulike_pro_get_star_period_stats( $item_id, $item_type, $period = 'all', $filters = array() ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return array( 'count' => 0, 'average' => 0.0 );
+	}
+
+	$where = $wpdb->prepare(
+		"item_id = %d AND item_type = %s AND engagement_kind = %s AND status = %s",
+		$item_id,
+		$item_type,
+		'star',
+		'active'
+	);
+
+	if ( ! empty( $filters['values'] ) ) {
+		$values = array_values( array_filter( array_map( 'absint', (array) $filters['values'] ) ) );
+		if ( $values ) {
+			$placeholders = implode( ',', array_fill( 0, count( $values ), '%d' ) );
+			$where       .= $wpdb->prepare( " AND value IN ({$placeholders})", ...$values );
+		}
+	}
+
+	$period_sql = wp_ulike_pro_engagement_period_sql( $period );
+	if ( $period_sql ) {
+		$where .= ' ' . $period_sql;
+	}
+
+	$actor_sql = wp_ulike_pro_engagement_distinct_actor_sql( '' );
+	$row       = $wpdb->get_row(
+		"SELECT COUNT(DISTINCT {$actor_sql}) AS rating_count, COALESCE(SUM(value), 0) AS rating_sum FROM `{$table}` WHERE {$where}",
+		ARRAY_A
+	);
+
+	$count = isset( $row['rating_count'] ) ? (int) $row['rating_count'] : 0;
+	$sum   = isset( $row['rating_sum'] ) ? (int) $row['rating_sum'] : 0;
+
+	return array(
+		'count'   => $count,
+		'average' => $count > 0 ? round( $sum / $count, 1 ) : 0.0,
+	);
+}
+
+/**
+ * Latest engagement activity for a user on an item (Top Content engagers column).
+ *
+ * @param int    $item_id Item ID.
+ * @param int    $user_id User ID.
+ * @param string $type    Content type slug.
+ * @return array|null
+ */
+function wp_ulike_pro_get_engagement_user_latest_activity( $item_id, $user_id, $type ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return null;
+	}
+
+	$row = $wpdb->get_row(
+		$wpdb->prepare(
+			"SELECT date_time, engagement_kind, engagement_key, value, status, country_code, device
+			FROM `{$table}`
+			WHERE item_id = %d AND item_type = %s AND user_id = %d
+			ORDER BY id DESC LIMIT 1",
+			$item_id,
+			sanitize_key( $type ),
+			$user_id
+		),
+		ARRAY_A
+	);
+
+	if ( empty( $row ) ) {
+		return null;
+	}
+
+	if ( ! empty( $row['date_time'] ) ) {
+		$row['date_time'] = wp_ulike_date_i18n( $row['date_time'] );
+	}
+
+	if ( 'emoji' === $row['engagement_kind'] && class_exists( 'WP_Ulike_Pro_Engagement_Registry' ) ) {
+		$reaction = WP_Ulike_Pro_Engagement_Registry::get_reaction( $row['engagement_key'], $type );
+		$row['status'] = $reaction ? $reaction['emoji'] . ' ' . wp_strip_all_tags( $reaction['label'] ) : $row['engagement_key'];
+		if ( $reaction ) {
+			$row['emoji']  = $reaction['emoji'];
+			$row['label']  = wp_strip_all_tags( $reaction['label'] );
+		}
+	} elseif ( 'star' === $row['engagement_kind'] && ! empty( $row['value'] ) ) {
+		$row['status'] = sprintf( '★ %d', (int) $row['value'] );
+		$row['value']  = (int) $row['value'];
+	} else {
+		$row['status'] = (string) $row['status'];
+	}
+
+	return wp_ulike_pro_normalize_engager_activity( $row, $type );
+}
+
+/**
+ * Logged-in engager user IDs for tops avatar stacks.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param int    $limit     Max users.
+ * @return int[]
+ */
+function wp_ulike_pro_get_engagement_engager_user_ids( $item_id, $item_type, $limit = 12 ) {
+	if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Engagers' ) ) {
+		return array();
+	}
+
+	$engagers = WP_Ulike_Pro_Engagement_Engagers::get_engagers( $item_id, $item_type, null, $limit );
+
+	return array_map(
+		static function ( $engager ) {
+			return (int) $engager['user_id'];
+		},
+		$engagers
+	);
+}
+
+/**
+ * Registered voters (active like OR dislike) for one item.
+ *
+ * Unlike rebuild_likers_list() (likes-only, includes guest ip2long IDs), this is
+ * members-only and includes dislikes — what the Engaged Users stats page needs.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type post|comment|activity|topic.
+ * @param int    $limit     Max users.
+ * @return int[]
+ */
+function wp_ulike_pro_get_item_voter_user_ids( $item_id, $item_type, $limit = 12 ) {
+	global $wpdb;
+
+	$item_id   = absint( $item_id );
+	$item_type = sanitize_key( (string) $item_type );
+	$limit     = max( 1, absint( $limit ) );
+
+	if ( ! $item_id || ! $item_type ) {
+		return array();
+	}
+
+	$users_table = $wpdb->users;
+	$ids         = array();
+
+	if ( class_exists( 'WP_Ulike_Pulse_Schema' ) && class_exists( 'WP_Ulike_Pulse_Registry' ) ) {
+		$pulse = WP_Ulike_Pulse_Schema::table();
+		// read_mode() returns legacy|merged|pulse — never "dual".
+		$mode  = class_exists( 'WP_Ulike_Pulse_Query' ) ? WP_Ulike_Pulse_Query::read_mode() : 'pulse';
+
+		if ( in_array( $mode, array( 'pulse', 'merged' ), true ) && ! empty( $pulse ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT CAST(p.user_id AS UNSIGNED)
+					FROM `{$pulse}` p
+					INNER JOIN (
+						SELECT MAX(id) AS max_id
+						FROM `{$pulse}`
+						WHERE item_id = %d AND item_type = %s AND engagement_kind = %s
+						GROUP BY user_id
+					) latest ON p.id = latest.max_id
+					INNER JOIN `{$users_table}` u ON u.ID = CAST(p.user_id AS UNSIGNED)
+					WHERE p.status = %s AND p.engagement_key IN (%s, %s)
+					ORDER BY p.date_time DESC
+					LIMIT %d",
+					$item_id,
+					$item_type,
+					WP_Ulike_Pulse_Registry::KIND_VOTE,
+					WP_Ulike_Pulse_Vote_Map::ROW_ACTIVE,
+					WP_Ulike_Pulse_Vote_Map::KEY_LIKE,
+					WP_Ulike_Pulse_Vote_Map::KEY_DISLIKE,
+					$limit
+				)
+			);
+		}
+
+		// Legacy / dual: also pull registered voters from the classic log table.
+		if ( 'pulse' !== $mode ) {
+			$source = WP_Ulike_Pulse_Registry::legacy_source_for_type( $item_type );
+			if ( ! empty( $source['table'] ) && ! empty( $source['column'] ) ) {
+				$table  = $source['table'];
+				$column = esc_sql( $source['column'] );
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$legacy_ids = $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT CAST(p.user_id AS UNSIGNED)
+						FROM `{$table}` p
+						INNER JOIN (
+							SELECT MAX(id) AS max_id
+							FROM `{$table}`
+							WHERE `{$column}` = %d
+							GROUP BY user_id
+						) latest ON p.id = latest.max_id
+						INNER JOIN `{$users_table}` u ON u.ID = CAST(p.user_id AS UNSIGNED)
+						WHERE p.status IN (%s, %s)
+						ORDER BY p.date_time DESC
+						LIMIT %d",
+						$item_id,
+						WP_Ulike_Pulse_Vote_Map::ACTION_LIKE,
+						WP_Ulike_Pulse_Vote_Map::ACTION_DISLIKE,
+						$limit
+					)
+				);
+				$ids = array_unique( array_merge( (array) $ids, (array) $legacy_ids ) );
+			}
+		}
+	} elseif ( class_exists( 'WP_Ulike_Pro_Pulse_Reader' ) ) {
+		// Older Free without Pulse helpers — likes-only fallback.
+		$ids = WP_Ulike_Pro_Pulse_Reader::rebuild_likers_list( $item_id, $item_type, $limit );
+	}
+
+	$ids = array_values(
+		array_filter(
+			array_map( 'absint', (array) $ids ),
+			static function ( $id ) {
+				return $id > 0;
+			}
+		)
+	);
+
+	return array_slice( $ids, 0, $limit );
+}
+
+/**
+ * Whether any public content type uses emoji or star engagement.
+ *
+ * @return bool
+ */
+function wp_ulike_pro_site_has_engagement_voting() {
+	foreach ( array( 'post', 'comment', 'activity', 'topic' ) as $type ) {
+		$mode = wp_ulike_pro_get_engagement_mode_for_type( $type );
+		if ( in_array( $mode, array( 'emoji', 'star' ), true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Normalize engager activity for stats UI (classic + engagement table).
+ *
+ * @param array|null $activity  Raw activity row.
+ * @param string     $item_type Content type slug.
+ * @return array|null
+ */
+function wp_ulike_pro_normalize_engager_activity( $activity, $item_type = 'post' ) {
+	if ( empty( $activity ) || ! is_array( $activity ) ) {
+		return null;
+	}
+
+	$normalized = array(
+		'date_time'    => isset( $activity['date_time'] ) ? (string) $activity['date_time'] : '',
+		'status'       => isset( $activity['status'] ) ? (string) $activity['status'] : '',
+		'country_code' => isset( $activity['country_code'] ) ? (string) $activity['country_code'] : '',
+		'device'       => isset( $activity['device'] ) ? (string) $activity['device'] : '',
+	);
+
+	if ( ! empty( $activity['status_key'] ) ) {
+		$normalized['status_key'] = sanitize_key( (string) $activity['status_key'] );
+	}
+
+	if ( ! empty( $activity['engagement_kind'] ) ) {
+		$kind = sanitize_key( $activity['engagement_kind'] );
+		$normalized['engagement_kind'] = $kind;
+
+		if ( 'emoji' === $kind ) {
+			$key = isset( $activity['engagement_key'] ) ? (string) $activity['engagement_key'] : '';
+			$normalized['engagement_key'] = $key;
+			if ( class_exists( 'WP_Ulike_Pro_Engagement_Registry' ) && $key ) {
+				$reaction = WP_Ulike_Pro_Engagement_Registry::get_reaction( $key, $item_type );
+				if ( $reaction ) {
+					$normalized['emoji'] = $reaction['emoji'];
+					$normalized['label'] = wp_strip_all_tags( $reaction['label'] );
+				}
+			}
+		}
+
+		if ( 'star' === $kind && isset( $activity['value'] ) ) {
+			$normalized['value'] = (int) $activity['value'];
+		}
+	}
+
+	return $normalized;
+}
+
+/**
+ * Count unique registered engagers for one item (votes ∪ emoji ∪ star).
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type post|comment|activity|topic.
+ * @return int
+ */
+function wp_ulike_pro_count_item_unique_engagers( $item_id, $item_type ) {
+	$item_id   = absint( $item_id );
+	$item_type = sanitize_key( $item_type );
+	if ( ! $item_id || ! $item_type ) {
+		return 0;
+	}
+
+	$pool = 5000;
+	$ids  = array_unique(
+		array_merge(
+			wp_ulike_pro_get_item_voter_user_ids( $item_id, $item_type, $pool ),
+			wp_ulike_pro_get_engagement_engager_user_ids( $item_id, $item_type, $pool )
+		)
+	);
+
+	return count(
+		array_filter(
+			array_map( 'absint', $ids ),
+			static function ( $id ) {
+				return $id > 0;
+			}
+		)
+	);
+}
+
+/**
+ * Build engaged-users list for Top Content rows.
+ *
+ * @param int    $item_id    Item ID.
+ * @param string $item_type  Content type slug.
+ * @param string $mode       none|emoji|star.
+ * @param string $log_table  Classic log table key (ulike, ulike_comments, ...).
+ * @param string $log_column Classic ID column.
+ * @param int    $limit      Max users.
+ * @param bool   $include_activity Whether to resolve per-user activity.
+ * @return array<int,array<string,mixed>>
+ */
+function wp_ulike_pro_build_tops_engaged_users_list( $item_id, $item_type, $mode, $log_table, $log_column, $limit = 12, $include_activity = false ) {
+	$item_id   = absint( $item_id );
+	$item_type = sanitize_key( $item_type );
+	unset( $mode, $log_table, $log_column );
+
+	// Members-only pool already filtered in SQL (wp_users join). Fetch a bit over
+	// `$limit` so emoji/star union can still fill gaps without a huge guest scan.
+	$fetch_limit = max( (int) $limit * 3, (int) $limit );
+
+	// Vote engagers (like + dislike) via item_type — never derive type from a
+	// possibly-prefixed log table (API used to mis-map comments → posts).
+	// Union with emoji/star engagers for display-automation / historical rows.
+	$users = array_unique(
+		array_merge(
+			wp_ulike_pro_get_item_voter_user_ids( $item_id, $item_type, $fetch_limit ),
+			wp_ulike_pro_get_engagement_engager_user_ids( $item_id, $item_type, $fetch_limit )
+		)
+	);
+
+	$list = array();
+
+	foreach ( $users as $raw_user_id ) {
+		if ( count( $list ) >= $limit ) {
+			break;
+		}
+
+		$user_id   = absint( $raw_user_id );
+		$user_info = $user_id ? get_user_by( 'id', $user_id ) : false;
+		if ( ! $user_info ) {
+			continue;
+		}
+
+		$list[] = array(
+			'id'       => $user_id,
+			'name'     => esc_attr( $user_info->display_name ),
+			'avatar'   => get_avatar_url( $user_info->user_email, array( 'size' => 48 ) ),
+			'role'     => translate_user_role( $user_info->roles[0] ?? esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN ) ),
+			// Activity labels are expensive (per-user queries). Skip on the tops
+			// list; Engaged Users page passes $include_activity = true.
+			'activity' => $include_activity
+				? wp_ulike_pro_resolve_tops_user_activity( $item_id, $user_id, $item_type )
+				: null,
+		);
+	}
+
+	return $list;
+}
+
+/**
+ * Tops UI: prefer newer of vote vs engagement activity for one user+item.
+ *
+ * @param int    $item_id   Item ID.
+ * @param int    $user_id   User ID.
+ * @param string $item_type Content type slug.
+ * @return array|null
+ */
+function wp_ulike_pro_resolve_tops_user_activity( $item_id, $user_id, $item_type ) {
+	$item_id   = absint( $item_id );
+	$user_id   = absint( $user_id );
+	$item_type = sanitize_key( $item_type );
+
+	$vote_ts = 0;
+	if ( class_exists( 'WP_Ulike_Pulse_Query' ) ) {
+		$vote_row = WP_Ulike_Pulse_Query::get_user_latest_activity( $item_id, $user_id, $item_type );
+		if ( $vote_row && ! empty( $vote_row->date_time ) ) {
+			$vote_ts = (int) strtotime( (string) $vote_row->date_time );
+		}
+	}
+
+	$eng_ts = 0;
+	$table  = wp_ulike_pro_engagement_table();
+	if ( $table ) {
+		global $wpdb;
+		$eng_date = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT date_time FROM `{$table}`
+				WHERE item_id = %d AND item_type = %s AND user_id = %d
+				ORDER BY id DESC LIMIT 1",
+				$item_id,
+				$item_type,
+				$user_id
+			)
+		);
+		if ( $eng_date ) {
+			$eng_ts = (int) strtotime( (string) $eng_date );
+		}
+	}
+
+	if ( $eng_ts > $vote_ts ) {
+		return wp_ulike_pro_get_engagement_user_latest_activity( $item_id, $user_id, $item_type );
+	}
+
+	if ( $vote_ts > 0 ) {
+		return wp_ulike_pro_normalize_engager_activity(
+			WP_Ulike_Pro_Pulse_Reader::get_user_latest_activity( $item_id, $user_id, $item_type ),
+			$item_type
+		);
+	}
+
+	return null;
+}
+
+/**
+ * Emoji reaction breakdown for a single tops item.
+ *
+ * @param int    $item_id   Item ID.
+ * @param string $item_type Content type slug.
+ * @param string $period    Period key.
+ * @param int    $limit     Max reactions.
+ * @return array<int,array{key:string,emoji:string,label:string,total:int}>
+ */
+function wp_ulike_pro_get_tops_item_emoji_breakdown( $item_id, $item_type, $period = 'all', $limit = 5 ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return array();
+	}
+
+	$count_sql = wp_ulike_pro_engagement_count_expression( $item_type, 'emoji' );
+	$where     = $wpdb->prepare(
+		'item_id = %d AND item_type = %s AND engagement_kind = %s AND status = %s',
+		absint( $item_id ),
+		sanitize_key( $item_type ),
+		'emoji',
+		'active'
+	);
+
+	$period_sql = wp_ulike_pro_engagement_period_sql( $period );
+	if ( $period_sql ) {
+		$where .= ' ' . $period_sql;
+	}
+
+	$rows = $wpdb->get_results(
+		"SELECT engagement_key, {$count_sql} AS total
+		FROM `{$table}` AS e
+		WHERE {$where}
+		GROUP BY engagement_key
+		ORDER BY total DESC
+		LIMIT " . absint( $limit ),
+		ARRAY_A
+	);
+
+	$breakdown = array();
+	foreach ( (array) $rows as $row ) {
+		$key   = (string) $row['engagement_key'];
+		$entry = array(
+			'key'   => $key,
+			'total' => (int) $row['total'],
+			'emoji' => '',
+			'label' => $key,
+		);
+
+		if ( class_exists( 'WP_Ulike_Pro_Engagement_Registry' ) ) {
+			$reaction = WP_Ulike_Pro_Engagement_Registry::get_reaction( $key, $item_type );
+			if ( $reaction ) {
+				$entry['emoji'] = $reaction['emoji'];
+				$entry['label'] = wp_strip_all_tags( $reaction['label'] );
+			}
+		}
+
+		$breakdown[] = $entry;
+	}
+
+	return $breakdown;
+}
+
+/**
+ * Build engagement block + optional emoji breakdown for tops API rows.
+ *
+ * @param array  $metrics           From wp_ulike_pro_get_tops_item_metrics().
+ * @param int    $item_id           Item ID.
+ * @param string $item_type         Content type slug.
+ * @param string $period            Period key.
+ * @param float  $engagement_rate   Rate percentage.
+ * @param float  $engagement_growth Growth percentage.
+ * @return array{engagement:array,emoji_breakdown:array}
+ */
+function wp_ulike_pro_build_tops_engagement_payload( $metrics, $item_id, $item_type, $period, $engagement_rate, $engagement_growth ) {
+	$engagement = array();
+
+	if ( $engagement_rate > 0 ) {
+		$engagement['rate']   = round( (float) $engagement_rate, 2 );
+		$engagement['growth'] = $engagement_growth;
+	}
+
+	// Always expose star average/count when star rows exist, regardless of
+	// the type's current template mode (historical / display automation).
+	if ( ! empty( $metrics['star_count'] ) ) {
+		$engagement['star_average'] = (float) $metrics['star_average'];
+		$engagement['star_count']   = (int) $metrics['star_count'];
+	}
+
+	if ( ! empty( $metrics['emoji_count'] ) ) {
+		$engagement['emoji_count'] = (int) $metrics['emoji_count'];
+	}
+
+	// Data-driven display mode for badges/insights (not template mode):
+	// prefer star when star rows exist, else emoji when reactions exist.
+	if ( ! empty( $metrics['star_count'] ) ) {
+		$engagement['mode'] = 'star';
+	} elseif ( ! empty( $metrics['emoji_count'] ) ) {
+		$engagement['mode'] = 'emoji';
+	}
+
+	$payload = array(
+		'engagement'      => $engagement,
+		'emoji_breakdown' => array(),
+	);
+
+	// Always populate emoji breakdown when emoji rows exist, regardless of
+	// the type's current template mode, so historical / display-automation
+	// emoji reactions render in the tops table.
+	if ( ! empty( $metrics['emoji_count'] ) ) {
+		$payload['emoji_breakdown'] = wp_ulike_pro_get_tops_item_emoji_breakdown( $item_id, $item_type, $period );
+	}
+
+	return $payload;
+}
+
+/**
+ * Exact, SQL-side combined engager ranking (votes + emoji + star): one row
+ * per registered user, GROUP BY + SUM over a UNION of vote and engagement
+ * events, sorted and paginated in SQL.
+ *
+ * This replaces the old "pull top-N per source, merge in PHP" approach for
+ * the no-search path. That approach pulled the top-N vote users and top-N
+ * engagement users *separately* (each sorted by its own single-source
+ * score) then summed after merging -- a user ranked low in both individual
+ * dimensions but with a high *combined* total could be excluded from both
+ * pools and never surface, which produced empty/wrong deep pages. GROUP BY
+ * over the full matching set has no such gap: every registered user with
+ * any qualifying row is counted, regardless of page depth.
+ *
+ * Search is intentionally not handled here -- name/email matching needs a
+ * second lookup against wp_users columns beyond ID, and search results are
+ * rarely paginated deep enough for the pool approximation to matter; callers
+ * should keep using the pool-based path for search requests.
+ *
+ * @param array $args period, status, order, limit, offset.
+ * @return array<int,object>|null Rows with user_id, likeCount, emoji_count,
+ *                                star_count, total_count. Null if no source
+ *                                (vote or engagement) is available.
+ */
+function wp_ulike_pro_combined_engager_union_parts( $period, $status ) {
+	if ( ! class_exists( 'WP_Ulike_Pulse_Query' ) || ! method_exists( 'WP_Ulike_Pulse_Query', 'vote_events_sql' ) ) {
+		return null;
+	}
+
+	$parts = array();
+
+	$vote_sql = WP_Ulike_Pulse_Query::vote_events_sql( $period, $status );
+	if ( null !== $vote_sql ) {
+		$parts[] = "SELECT user_id, 'vote' AS kind FROM ( {$vote_sql} ) AS vote_src";
+	}
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( ! empty( $table ) ) {
+		$period_sql = wp_ulike_pro_engagement_period_sql( $period, 'e.date_time' );
+		// Restrict to Pro-owned kinds (emoji + star). The engagement table IS the
+		// pulse table, so without this filter every vote row would be emitted by
+		// BOTH arms -- once by vote_events_sql() above and again here -- doubling
+		// likeCount/total_count for anyone who has voted.
+		$eng_where = "e.status = 'active' AND " . wp_ulike_pro_pulse_pro_kinds_sql( 'e.engagement_kind' );
+		if ( $period_sql ) {
+			$eng_where .= ' ' . $period_sql;
+		}
+		$parts[] = "SELECT CAST(e.user_id AS CHAR) AS user_id, e.engagement_kind AS kind FROM `{$table}` e WHERE {$eng_where}";
+	}
+
+	return empty( $parts ) ? null : $parts;
+}
+
+/**
+ * Exact count of distinct registered users matching
+ * wp_ulike_pro_combined_engager_union_parts() -- same UNION, same wp_users
+ * join, so this total and get_combined_engager_rows()'s list can never
+ * disagree (unlike the old approach, which derived the total from a
+ * different, separately-approximated computation than the list itself).
+ *
+ * @param mixed        $period Period filter.
+ * @param string|array $status Vote status filter.
+ * @return int|null Null if no source (vote or engagement) is available.
+ */
+function wp_ulike_pro_count_combined_engager_rows( $period, $status ) {
+	global $wpdb;
+
+	$parts = wp_ulike_pro_combined_engager_union_parts( $period, $status );
+	if ( null === $parts ) {
+		return null;
+	}
+
+	$users = $wpdb->users;
+
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	return (int) $wpdb->get_var(
+		'SELECT COUNT(DISTINCT combined.user_id) FROM ( ' . implode( ' UNION ALL ', $parts ) . " ) AS combined
+		INNER JOIN `{$users}` u ON u.ID = CAST(combined.user_id AS UNSIGNED)"
+	);
+}
+
+function wp_ulike_pro_get_combined_engager_rows( $args = array() ) {
+	global $wpdb;
+
+	$defaults = array(
+		'limit'  => 10,
+		'offset' => 1,
+		'period' => 'all',
+		'status' => array( 'like', 'dislike' ),
+		'order'  => 'DESC',
+	);
+	$args = wp_parse_args( $args, $defaults );
+
+	$limit  = max( 1, absint( $args['limit'] ) );
+	$offset = max( 1, absint( $args['offset'] ) );
+	$order  = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
+	$parts = wp_ulike_pro_combined_engager_union_parts( $args['period'], $args['status'] );
+	if ( null === $parts ) {
+		return null;
+	}
+
+	$users = $wpdb->users;
+
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	return $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT combined.user_id,
+				SUM(CASE WHEN combined.kind = 'vote' THEN 1 ELSE 0 END) AS likeCount,
+				SUM(CASE WHEN combined.kind = 'emoji' THEN 1 ELSE 0 END) AS emoji_count,
+				SUM(CASE WHEN combined.kind = 'star' THEN 1 ELSE 0 END) AS star_count,
+				COUNT(*) AS total_count
+			FROM ( " . implode( ' UNION ALL ', $parts ) . " ) AS combined
+			INNER JOIN `{$users}` u ON u.ID = CAST(combined.user_id AS UNSIGNED)
+			GROUP BY combined.user_id
+			ORDER BY total_count {$order}
+			LIMIT %d OFFSET %d",
+			$limit,
+			( $offset - 1 ) * $limit
+		)
+	);
+}
+
+/**
+ * Top members ranked by vote + emoji + star activity (union, not XOR).
+ *
+ * @param array $args limit, offset, period, search, order, status.
+ * @return array<int,object>
+ */
+function wp_ulike_pro_get_top_combined_engagers( $args = array() ) {
+	$defaults = array(
+		'limit'  => 10,
+		'offset' => 1,
+		'period' => 'all',
+		'search' => '',
+		'order'  => 'DESC',
+		'status' => array( 'like', 'dislike' ),
+	);
+	$args     = wp_parse_args( $args, $defaults );
+
+	$limit  = max( 1, absint( $args['limit'] ) );
+	$offset = max( 1, absint( $args['offset'] ) );
+	$order  = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+	$search = trim( (string) $args['search'] );
+
+	// No search: exact SQL-side ranking, correct at every page depth (see
+	// wp_ulike_pro_get_combined_engager_rows() docblock for why this
+	// replaced the old top-N-per-source-then-merge-in-PHP approach, which
+	// could produce empty/wrong deep pages).
+	if ( '' === $search ) {
+		$exact_rows = wp_ulike_pro_get_combined_engager_rows(
+			array(
+				'limit'  => $limit,
+				'offset' => $offset,
+				'period' => $args['period'],
+				'status' => $args['status'],
+				'order'  => $order,
+			)
+		);
+
+		if ( null !== $exact_rows ) {
+			return array_map(
+				static function ( $row ) {
+					return (object) array(
+						'user_id'        => (string) $row->user_id,
+						'likeCount'      => (int) $row->likeCount,
+						'dislikeCount'   => 0,
+						'unlikeCount'    => 0,
+						'undislikeCount' => 0,
+						'emoji_count'    => (int) $row->emoji_count,
+						'star_count'     => (int) $row->star_count,
+						'total_count'    => (int) $row->total_count,
+					);
+				},
+				(array) $exact_rows
+			);
+		}
+		// Fall through to the pool-based path below only if the exact query
+		// could not run at all (e.g. an older Free version without
+		// WP_Ulike_Pulse_Query::vote_events_sql() yet).
+	}
+
+	// Pull a wide pool from both ledgers, merge by user, then paginate.
+	// Used for search (name/email matching needs a wp_users lookup beyond
+	// ID, which this pool-then-filter approach already does) and as a
+	// fallback if the exact path above was unavailable.
+	$pool = '' !== $search
+		? wp_ulike_pro_tops_search_pool_limit()
+		: max( $limit * $offset + $limit, $limit * 5, 50 );
+
+	$merged = array();
+
+	$vote_rows = wp_ulike_get_best_likers_info(
+		$pool,
+		$args['period'],
+		1,
+		$args['status'],
+		$order
+	);
+	foreach ( (array) $vote_rows as $row ) {
+		$uid = absint( $row->user_id ?? 0 );
+		if ( ! $uid ) {
+			continue;
+		}
+		$sum = (int) ( $row->SumUser ?? $row->likeCount ?? 0 );
+		$key = (string) $uid;
+		if ( ! isset( $merged[ $key ] ) ) {
+			$merged[ $key ] = (object) array(
+				'user_id'        => $key,
+				'likeCount'      => $sum,
+				'dislikeCount'   => 0,
+				'unlikeCount'    => 0,
+				'undislikeCount' => 0,
+				'emoji_count'    => 0,
+				'star_count'     => 0,
+				'total_count'    => $sum,
+			);
+		} else {
+			$merged[ $key ]->likeCount   += $sum;
+			$merged[ $key ]->total_count += $sum;
+		}
+	}
+
+	$eng_rows = wp_ulike_pro_get_top_engagement_engagers(
+		array(
+			'limit'  => $pool,
+			'offset' => 1,
+			'period' => $args['period'],
+			'order'  => $order,
+		)
+	);
+	foreach ( (array) $eng_rows as $row ) {
+		$uid = absint( $row->user_id ?? 0 );
+		if ( ! $uid ) {
+			continue;
+		}
+		$key = (string) $uid;
+		$emoji = (int) ( $row->emoji_count ?? 0 );
+		$star  = (int) ( $row->star_count ?? 0 );
+		$total = (int) ( $row->total_count ?? ( $emoji + $star ) );
+		if ( ! isset( $merged[ $key ] ) ) {
+			$merged[ $key ] = (object) array(
+				'user_id'        => $key,
+				'likeCount'      => 0,
+				'dislikeCount'   => 0,
+				'unlikeCount'    => 0,
+				'undislikeCount' => 0,
+				'emoji_count'    => $emoji,
+				'star_count'     => $star,
+				'total_count'    => $total,
+			);
+		} else {
+			$merged[ $key ]->emoji_count += $emoji;
+			$merged[ $key ]->star_count  += $star;
+			$merged[ $key ]->total_count += $total;
+		}
+	}
+
+	$rows = array_values( $merged );
+
+	if ( '' !== $search ) {
+		$rows = wp_ulike_pro_filter_engagers_by_search( $rows, $search );
+	}
+
+	usort(
+		$rows,
+		static function ( $a, $b ) use ( $order ) {
+			$av = (int) ( $a->total_count ?? 0 );
+			$bv = (int) ( $b->total_count ?? 0 );
+			if ( $av === $bv ) {
+				return 0;
+			}
+			if ( 'ASC' === $order ) {
+				return $av <=> $bv;
+			}
+			return $bv <=> $av;
+		}
+	);
+
+	$start = ( $offset - 1 ) * $limit;
+
+	return array_slice( $rows, $start, $limit );
+}
+
+/**
+ * Unique engagers across votes + emoji + star.
+ *
+ * @param mixed $period Period key or range.
+ * @param array $status Vote status filter for the classic ledger.
+ * @return int
+ */
+function wp_ulike_pro_count_top_combined_engagers( $period = 'all', $status = array( 'like', 'dislike' ) ) {
+	global $wpdb;
+
+	// Exact path: same UNION + wp_users join as get_combined_engager_rows(),
+	// so this total and the actual ranked list can never disagree.
+	$exact = wp_ulike_pro_count_combined_engager_rows( $period, $status );
+	if ( null !== $exact ) {
+		return $exact;
+	}
+
+	// Fallback below only if the exact path was unavailable (e.g. an older
+	// Free version without WP_Ulike_Pulse_Query::vote_events_sql() yet).
+	// Free count is registered WordPress users only (guest ip2long excluded).
+	$vote_total = (int) wp_ulike_get_top_enagers_total_number( $period, $status );
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return $vote_total;
+	}
+
+	$users      = $wpdb->users;
+	$period_sql = wp_ulike_pro_engagement_period_sql( $period, 'e.date_time' );
+	$eng_where  = "e.status = 'active'";
+	if ( $period_sql ) {
+		$eng_where .= ' ' . $period_sql;
+	}
+
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$eng_count = (int) $wpdb->get_var(
+		"SELECT COUNT(DISTINCT e.user_id) FROM `{$table}` e
+		INNER JOIN `{$users}` u ON u.ID = CAST(e.user_id AS UNSIGNED)
+		WHERE {$eng_where}"
+	);
+
+	if ( $eng_count <= 0 ) {
+		return $vote_total;
+	}
+
+	$mode = class_exists( 'WP_Ulike_Pulse_Config' ) ? WP_Ulike_Pulse_Config::read_mode() : 'pulse';
+	if ( in_array( $mode, array( 'pulse', 'merged' ), true ) && class_exists( 'WP_Ulike_Pulse_Schema' ) ) {
+		$pulse        = WP_Ulike_Pulse_Schema::table();
+		$since        = ( 'merged' === $mode && class_exists( 'WP_Ulike_Pulse_Config' ) )
+			? $wpdb->prepare( ' AND date_time >= %s', WP_Ulike_Pulse_Config::dual_since() )
+			: '';
+		$period_limit = wp_ulike_get_period_limit_sql( $period );
+
+		// Exact registered-user union of pulse votes + emoji/star engagers.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$union_total = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM (
+				SELECT DISTINCT CAST(p.user_id AS CHAR) AS user_id
+				FROM `{$pulse}` p
+				INNER JOIN `{$users}` u ON u.ID = CAST(p.user_id AS UNSIGNED)
+				WHERE p.engagement_kind = 'vote' AND p.status IN ('active','removed')
+				{$since} {$period_limit}
+				UNION
+				SELECT DISTINCT CAST(e.user_id AS CHAR) AS user_id
+				FROM `{$table}` e
+				INNER JOIN `{$users}` u2 ON u2.ID = CAST(e.user_id AS UNSIGNED)
+				WHERE {$eng_where}
+			) AS combined_engagers"
+		);
+
+		if ( 'merged' === $mode ) {
+			// Free vote_total already unions legacy + pulse registered voters.
+			// Add engagement-only users not present in the vote ledger count by
+			// taking max(vote_total, pulse∪eng) — under-counts engagement-only
+			// users who only appear on legacy is impossible (eng is pulse-only).
+			return max( $vote_total, $union_total );
+		}
+
+		return $union_total;
+	}
+
+	return max( $vote_total, $eng_count );
+}
+
+/**
+ * Top members ranked by engagement-table activity (emoji + star).
+ *
+ * @param array $args limit, offset, period, search, order.
+ * @return array<int,object>
+ */
+function wp_ulike_pro_get_top_engagement_engagers( $args = array() ) {
+	global $wpdb;
+
+	$table = wp_ulike_pro_engagement_table();
+	if ( empty( $table ) ) {
+		return array();
+	}
+
+	$defaults = array(
+		'limit'  => 10,
+		'offset' => 1,
+		'period' => 'all',
+		'search' => '',
+		'order'  => 'DESC',
+	);
+	$args     = wp_parse_args( $args, $defaults );
+
+	$limit  = max( 1, absint( $args['limit'] ) );
+	$offset = max( 1, absint( $args['offset'] ) );
+	$order  = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
+	$users      = $wpdb->users;
+	$period_sql = wp_ulike_pro_engagement_period_sql( $args['period'], 'e.date_time' );
+	$where      = "e.status = 'active'";
+	if ( $period_sql ) {
+		$where .= ' ' . $period_sql;
+	}
+
+	$sql = "
+		SELECT e.user_id,
+			COUNT(*) AS total_count,
+			SUM(CASE WHEN e.engagement_kind = 'emoji' THEN 1 ELSE 0 END) AS emoji_count,
+			SUM(CASE WHEN e.engagement_kind = 'star' THEN 1 ELSE 0 END) AS star_count,
+			MAX(e.date_time) AS last_activity
+		FROM `{$table}` e
+		INNER JOIN `{$users}` u ON u.ID = CAST(e.user_id AS UNSIGNED)
+		WHERE {$where}
+		GROUP BY e.user_id
+		ORDER BY total_count {$order}
+		LIMIT %d OFFSET %d";
+
+	$rows = $wpdb->get_results(
+		$wpdb->prepare( $sql, $limit, ( $offset - 1 ) * $limit ),
+		OBJECT
+	);
+
+	if ( '' !== trim( (string) $args['search'] ) && ! empty( $rows ) ) {
+		$search = strtolower( trim( (string) $args['search'] ) );
+		$rows   = array_values(
+			array_filter(
+				$rows,
+				static function ( $row ) use ( $search ) {
+					$user = get_userdata( (int) $row->user_id );
+					if ( ! $user ) {
+						return false;
+					}
+					return false !== strpos( strtolower( $user->display_name ), $search )
+						|| false !== strpos( strtolower( $user->user_login ), $search );
+				}
+			)
+		);
+	}
+
+	return $rows;
+}
+

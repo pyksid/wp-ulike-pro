@@ -367,7 +367,7 @@ class Counter extends Widget_Base {
 
         $item_ID     = empty($settings['item_id']) ? wp_ulike_pro_get_auto_id( 'post' ) : $settings['item_id'];
         $is_distinct = \wp_ulike_setting_repo::isDistinct('post');
-        $counter     = wp_ulike_get_counter_value( $item_ID, 'post', $settings['status'], $is_distinct  );
+        $counter     = wp_ulike_pro_get_counter_value( $item_ID, 'post', $settings['status'], $is_distinct  );
 
 		?>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
@@ -386,3 +386,4 @@ class Counter extends Widget_Base {
     }
 
 }
+

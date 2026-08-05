@@ -45,3 +45,4 @@ function mmdb_autoload($class): void
 }
 
 spl_autoload_register('mmdb_autoload');
+

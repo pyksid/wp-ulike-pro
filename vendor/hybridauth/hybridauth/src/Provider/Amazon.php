@@ -79,3 +79,4 @@ class Amazon extends OAuth2
         return $userProfile;
     }
 }
+

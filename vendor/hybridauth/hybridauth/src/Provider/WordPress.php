@@ -66,3 +66,4 @@ class WordPress extends OAuth2
         return $userProfile;
     }
 }
+

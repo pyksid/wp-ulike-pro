@@ -530,7 +530,7 @@ class WP_Ulike_Pro_Social_Login {
 		) );
 
 		// Case-insensitive validation - find matching provider from allowed list
-		$provider_lower = strtolower( trim( $provider ) );
+		$provider_lower = strtolower( trim( is_string( $provider ) ? $provider : '' ) );
 		$matched_provider = null;
 
 		foreach ( $allowed_providers as $allowed ) {

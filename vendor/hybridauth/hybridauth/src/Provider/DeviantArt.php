@@ -89,3 +89,4 @@ class DeviantArt extends OAuth2
         return $userProfile;
     }
 }
+

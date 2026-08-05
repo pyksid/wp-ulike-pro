@@ -35,6 +35,8 @@ class WP_Ulike_Pro_Admin_Customizer {
         $this->register_profile_section();
         $this->register_forms_section();
         $this->register_socials_section();
+        $this->register_emoji_reactions_section();
+        $this->register_star_rating_section();
 
         // Merge pro sections with existing sections
         return array_merge( $sections, $this->sections );
@@ -59,58 +61,43 @@ class WP_Ulike_Pro_Admin_Customizer {
             $assets['js'] = ! empty( $assets['js'] ) ? array( $assets['js'] ) : array();
         }
 
-        // Remove free plugin JS and localized scripts
-        // Filter out free plugin assets (marked with 'source' => 'free')
-        $assets['js'] = array_filter( $assets['js'], function( $js_asset ) {
-            // If it's the new format with source, check if it's free
-            if ( is_array( $js_asset ) && isset( $js_asset['source'] ) ) {
-                return $js_asset['source'] !== 'free';
-            }
-            // If it's a string URL, check if it's the free plugin JS (minified only)
-            if ( is_string( $js_asset ) ) {
-                return strpos( $js_asset, 'wp-ulike.min.js' ) === false;
-            }
-            return true;
-        } );
-        $assets['js'] = array_values( $assets['js'] ); // Re-index array
+        // Keep free JS for like/dislike button hover preview; Pro scripts still load after.
 
-        // Remove free plugin localized scripts
-        if ( isset( $assets['localized_scripts'] ) && is_array( $assets['localized_scripts'] ) ) {
-            // Remove wp_ulike_params (free plugin script)
-            unset( $assets['localized_scripts']['wp_ulike_params'] );
-
-            // Filter out any other free plugin scripts
-            foreach ( $assets['localized_scripts'] as $key => $script_data ) {
-                if ( is_array( $script_data ) && isset( $script_data['source'] ) && $script_data['source'] === 'free' ) {
-                    unset( $assets['localized_scripts'][ $key ] );
-                }
-            }
-        } else {
-            $assets['localized_scripts'] = array();
-        }
+        // Cache-bust with Pro version so customizer preview picks up CSS/JS updates.
+        $ver = defined( 'WP_ULIKE_PRO_VERSION' ) ? WP_ULIKE_PRO_VERSION : '1.0.0';
 
         // Add Pro CSS files (always minified) - marked as pro
         $assets['css'][] = array(
-            'url' => WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/wp-ulike-pro.min.css',
-            'source' => 'pro'
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/wp-ulike-pro.min.css' ),
+            'source' => 'pro',
+            'ver'    => $ver,
         );
         $assets['css'][] = array(
-            'url' => WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/uploader.min.css',
-            'source' => 'pro'
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/uploader.min.css' ),
+            'source' => 'pro',
+            'ver'    => $ver,
+        );
+        $assets['css'][] = array(
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/customizer-preview.css' ),
+            'source' => 'pro',
+            'ver'    => $ver,
         );
 
         // Add Pro JS files (always minified) - marked as pro
         $assets['js'][] = array(
-            'url' => WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js',
-            'source' => 'pro'
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js' ),
+            'source' => 'pro',
+            'ver'    => $ver,
         );
         $assets['js'][] = array(
-            'url' => WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/share.min.js',
-            'source' => 'pro'
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/share.min.js' ),
+            'source' => 'pro',
+            'ver'    => $ver,
         );
         $assets['js'][] = array(
-            'url' => WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/uploader.min.js',
-            'source' => 'pro'
+            'url'    => add_query_arg( 'ver', $ver, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/uploader.min.js' ),
+            'source' => 'pro',
+            'ver'    => $ver,
         );
 
         // Always in preview mode in customizer context
@@ -124,7 +111,22 @@ class WP_Ulike_Pro_Admin_Customizer {
                 'TabSide' => wp_ulike_get_option( 'user_profiles_appearance|tabs_side', 'top' ),
                 'ViewTracking' => array(
                     'enabledTypes' => wp_ulike_get_option( 'view_tracking_enabled_types', array( 'post' ) )
-                )
+                ),
+                'Engagements' => array(
+                    'action'  => 'wp_ulike_pro_engagement_process',
+                    // Preview iframe is for styling only — no engagement AJAX.
+                    'enabled' => false,
+                    'i18n'    => array(
+                        /* translators: 1: user rating value, 2: max stars */
+                        'ratingStatus' => __( 'Your rating: %1$d of %2$d', WP_ULIKE_PRO_DOMAIN ),
+                        'noRating'     => __( 'No rating', WP_ULIKE_PRO_DOMAIN ),
+                        'addReaction'  => __( 'Add reaction', WP_ULIKE_PRO_DOMAIN ),
+                        /* translators: %s: reaction label */
+                        'reactedWith'  => __( 'You reacted with %s', WP_ULIKE_PRO_DOMAIN ),
+                        /* translators: 1: reaction label, 2: count */
+                        'reactionCount'=> __( '%1$s, %2$s reactions', WP_ULIKE_PRO_DOMAIN ),
+                    ),
+                ),
             ),
             'source' => 'pro'
         );
@@ -820,6 +822,323 @@ class WP_Ulike_Pro_Admin_Customizer {
     }
 
     /**
+     * Register emoji reactions customizer section.
+     *
+     * @return void
+     */
+    public function register_emoji_reactions_section() {
+        $this->sections[] = array(
+            'parent'   => WP_ULIKE_SLUG,
+            'id'       => 'emoji_reactions_template',
+            'title'    => esc_html__( 'Emoji Reactions', WP_ULIKE_PRO_DOMAIN ),
+            'template' => 'emoji_reactions',
+            'icon'     => 'face-smile',
+            'fields'   => array(
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Reactions', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'emoji_reaction_size',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Reaction Button Size', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 24,
+                    'max'              => 72,
+                    'step'             => 1,
+                    'unit'             => 'px',
+                    'default'          => 36,
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-reaction-size',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_font_size',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Emoji Size', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 14,
+                    'max'              => 40,
+                    'step'             => 1,
+                    'unit'             => 'px',
+                    'default'          => 20,
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-emoji-size',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_reaction_gap',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Reaction Spacing', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 0,
+                    'max'              => 16,
+                    'step'             => 1,
+                    'unit'             => 'px',
+                    'default'          => 2,
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-reactions',
+                    'output_mode'      => 'gap',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_reaction_hover_scale',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Hover Pop Scale', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'How much a reaction enlarges on hover (desktop).', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 100,
+                    'max'              => 140,
+                    'step'             => 1,
+                    'unit'             => '%',
+                    'default'          => 112,
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-reaction-hover-scale',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_reaction_border',
+                    'type'             => 'border',
+                    'title'            => esc_html__( 'Reaction Border', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-reaction',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+                array(
+                    'id'               => 'emoji_accent_color',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Accent Color', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'Focus rings and default accent mixes.', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-accent',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_reaction_hover_bg',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Reaction Hover Background', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-reaction-hover-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_reaction_active_bg',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Selected Reaction Background', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-reaction-active-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Trigger (Hover mode)', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'emoji_trigger_padding',
+                    'type'             => 'spacing',
+                    'title'            => esc_html__( 'Trigger Padding', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-trigger',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+                array(
+                    'id'               => 'emoji_trigger_border',
+                    'type'             => 'border',
+                    'title'            => esc_html__( 'Trigger Border', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-trigger',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+                array(
+                    'id'               => 'emoji_trigger_bg',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Trigger Background', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-trigger-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_trigger_hover_bg',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Trigger Hover Background', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-trigger-hover-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_trigger_reacted_bg',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Trigger Reacted Background', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'When the visitor has an active reaction.', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-trigger-reacted-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Picker (Hover mode)', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'emoji_picker_border',
+                    'type'             => 'border',
+                    'title'            => esc_html__( 'Picker Border', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-picker',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+                array(
+                    'id'               => 'emoji_picker_background',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Picker Background', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji',
+                    'output_mode'      => '--ulp-eng-picker-bg',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'emoji_picker_padding',
+                    'type'             => 'spacing',
+                    'title'            => esc_html__( 'Picker Padding', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-picker',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Counters', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'emoji_count_typography',
+                    'type'             => 'typography',
+                    'title'            => esc_html__( 'Count Typography', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'Per-reaction and trigger total counts.', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-emoji .ulp-engagement-count, .wpulike-engagements-emoji .ulp-engagement-trigger-count',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Register star rating customizer section.
+     *
+     * @return void
+     */
+    public function register_star_rating_section() {
+        $this->sections[] = array(
+            'parent'   => WP_ULIKE_SLUG,
+            'id'       => 'star_rating_template',
+            'title'    => esc_html__( 'Star Rating', WP_ULIKE_PRO_DOMAIN ),
+            'template' => 'star_rating',
+            'icon'     => 'star',
+            'fields'   => array(
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Stars', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'star_size',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Star Size', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 16,
+                    'max'              => 56,
+                    'step'             => 1,
+                    'unit'             => 'px',
+                    'default'          => 24,
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-size',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'star_dot_size',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Empty Dot Size', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'Size of unselected dots relative to the star.', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 16,
+                    'max'              => 50,
+                    'step'             => 1,
+                    'unit'             => '%',
+                    'default'          => 28,
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-dot-size',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'star_gap',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Star Spacing', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 0,
+                    'max'              => 24,
+                    'step'             => 1,
+                    'unit'             => 'px',
+                    'default'          => 4,
+                    'output'           => '.wpulike-engagements-star .ulp-engagement-stars',
+                    'output_mode'      => 'gap',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'star_active_color',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Active Color', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'Filled stars and hover preview.', WP_ULIKE_PRO_DOMAIN ),
+                    'default'          => '#f0b429',
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-active',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'star_inactive_color',
+                    'type'             => 'color',
+                    'title'            => esc_html__( 'Empty Dot Color', WP_ULIKE_PRO_DOMAIN ),
+                    'default'          => '#c4c4c4',
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-inactive',
+                    'output_important' => true,
+                ),
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Interaction', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'star_hover_scale',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Hover Pop Scale', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'How much the focused star enlarges on hover.', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 100,
+                    'max'              => 140,
+                    'step'             => 1,
+                    'unit'             => '%',
+                    'default'          => 118,
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-focus-scale',
+                    'output_important' => true,
+                ),
+                array(
+                    'id'               => 'star_motion',
+                    'type'             => 'slider',
+                    'title'            => esc_html__( 'Animation Strength', WP_ULIKE_PRO_DOMAIN ),
+                    'subtitle'         => esc_html__( 'Morph and spring intensity. Set to 0 for instant changes.', WP_ULIKE_PRO_DOMAIN ),
+                    'min'              => 0,
+                    'max'              => 100,
+                    'step'             => 10,
+                    'unit'             => '%',
+                    'default'          => 100,
+                    'output'           => '.wpulike-engagements-star',
+                    'output_mode'      => '--ulp-eng-star-motion',
+                    'output_important' => true,
+                ),
+                array(
+                    'type'    => 'heading',
+                    'content' => esc_html__( 'Summary', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                array(
+                    'id'               => 'star_summary_typography',
+                    'type'             => 'typography',
+                    'title'            => esc_html__( 'Rating Summary Typography', WP_ULIKE_PRO_DOMAIN ),
+                    'output'           => '.wpulike-engagements-star .ulp-engagement-rating-summary',
+                    'output_important' => true,
+                    'units'            => array( 'px', 'em', 'rem' ),
+                ),
+            ),
+        );
+    }
+
+    /**
      * Render template preview for pro templates
      *
      * @param string $preview_html Existing preview HTML (empty by default)
@@ -828,7 +1147,7 @@ class WP_Ulike_Pro_Admin_Customizer {
      */
     public function render_template_preview( $preview_html, $template_type ) {
         // Only handle pro templates
-        if ( ! in_array( $template_type, array( 'profile', 'forms', 'social' ), true ) ) {
+        if ( ! in_array( $template_type, array( 'profile', 'forms', 'social', 'emoji_reactions', 'star_rating' ), true ) ) {
             return $preview_html;
         }
 
@@ -840,6 +1159,24 @@ class WP_Ulike_Pro_Admin_Customizer {
         ob_start();
 
         switch ( $template_type ) {
+            case 'emoji_reactions':
+                echo '<div class="ulp-customizer-preview-root ulp-customizer-engagement-preview">';
+                echo '<p class="ulp-customizer-preview-label">' . esc_html__( 'Emoji Reactions', WP_ULIKE_PRO_DOMAIN ) . '</p>';
+                echo '<div class="wpulike wpulike-engagement-template">';
+                echo '<div class="wp_ulike_general_class">';
+                echo $this->render_engagement_preview( 'emoji' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo '</div></div></div>';
+                break;
+
+            case 'star_rating':
+                echo '<div class="ulp-customizer-preview-root ulp-customizer-engagement-preview">';
+                echo '<p class="ulp-customizer-preview-label">' . esc_html__( 'Star Rating', WP_ULIKE_PRO_DOMAIN ) . '</p>';
+                echo '<div class="wpulike wpulike-engagement-template">';
+                echo '<div class="wp_ulike_general_class">';
+                echo $this->render_engagement_preview( 'star' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo '</div></div></div>';
+                break;
+
             case 'profile':
                 $user_id = get_current_user_id();
                 echo '<div style="position: relative; padding: 20px; min-height: 300px; display: flex; align-items: center; justify-content: center;">';
@@ -920,4 +1257,52 @@ class WP_Ulike_Pro_Admin_Customizer {
         return ob_get_clean();
     }
 
+    /**
+     * Render engagement widget in customizer preview.
+     *
+     * @param string $mode emoji|star.
+     * @return string
+     */
+    private function render_engagement_preview( $mode ) {
+        if (
+            ! class_exists( 'WP_Ulike_Pro_Engagement_Display' )
+            || ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' )
+        ) {
+            return '';
+        }
+
+        $template = 'emoji' === $mode
+            ? WP_Ulike_Pro_Engagement_Settings::TEMPLATE_EMOJI
+            : WP_Ulike_Pro_Engagement_Settings::TEMPLATE_STAR;
+
+        // One context layer: force template, show counters (typography), hide engagers.
+        WP_Ulike_Pro_Engagement_Settings::push_context(
+            'post',
+            array(
+                'template'         => $template,
+                'display_counters' => true,
+                'display_likers'   => false,
+            )
+        );
+
+        try {
+            $html = WP_Ulike_Pro_Engagement_Display::render( 1, 'post' );
+        } finally {
+            WP_Ulike_Pro_Engagement_Settings::pop_context( 'post' );
+        }
+
+        // Keep hover picker open so size/border controls are visible without hover.
+        if ( 'emoji' === $mode && $html && false !== strpos( $html, 'ulp-picker-style-hover' ) ) {
+            $html = preg_replace(
+                '/class="([^"]*\bulp-picker-style-hover\b[^"]*)"/',
+                'class="$1 ulp-picker-open"',
+                $html,
+                1
+            );
+        }
+
+        return $html;
+    }
+
 }
+

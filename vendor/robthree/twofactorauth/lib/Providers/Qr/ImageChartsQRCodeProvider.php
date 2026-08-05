@@ -58,3 +58,4 @@ class ImageChartsQRCodeProvider extends BaseHTTPQRCodeProvider
             . '&chl=' . rawurlencode($qrtext);
     }
 }
+

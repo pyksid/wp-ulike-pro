@@ -2,7 +2,7 @@
 /**
  * Option panel
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -30,7 +30,6 @@ class WP_Ulike_Pro_Options_Panel {
         // Filters
         add_filter( 'wp_ulike_panel_general', array( $this, 'update_general_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_content_options', array( $this, 'content_options_section' ), 10, 1 );
-        add_filter( 'wp_ulike_panel_integrations', array( $this, 'integrations_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_profiles', array( $this, 'profiles_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_share_buttons', array( $this, 'social_share_section' ), 10, 1 );
         add_filter( 'wp_ulike_panel_forms', array( $this, 'forms_section' ), 10, 1 );
@@ -105,74 +104,69 @@ class WP_Ulike_Pro_Options_Panel {
 
 
     /**
-     * Custom function to insert item after array key
-     *
-     * @param array $array
-     * @param string $key
-     * @param array $new
-     * @return array
-     */
-    public function array_insert_after( array $array, $key, array $new ) {
-        $keys = array_keys( $array );
-        $index = array_search( $key, $keys );
-        $pos = false === $index ? count( $array ) : $index + 1;
-
-        return array_merge( array_slice( $array, 0, $pos ), $new, array_slice( $array, $pos ) );
-    }
-
-    /**
      * Enable meta options
      *
      * @param array $options
      * @return array
      */
     public function post_type_options( $options ){
-        $options[] = array(
-            'id'      => 'enable_metadata',
-            'type'    => 'switcher',
-            'default' => true,
-            'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
-            'help'    => 'If you are an old user, after activating this option, go to Developer Tools > Optimization section and once click on "Migrate Counter Metadata" button to move counter values from wp_ulike_meta table to meta table.'
-        );
-        $options[] = array(
-            'id'      => 'enable_attachments',
-            'type'    => 'switcher',
-            'default' => false,
-            'title'   => esc_html__('Enable Attachments', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('Add like buttons to image attachments displayed on your site. Requires WordPress 5.6+ and a theme that uses the standard WordPress attachment image function.', WP_ULIKE_PRO_DOMAIN),
+        $options = wp_ulike_array_insert_after(
+            $options,
+            'auto_display_filter_post_types',
+            array(
+                'enable_attachments' => array(
+                    'id'      => 'enable_attachments',
+                    'type'    => 'switcher',
+                    'default' => false,
+                    'title'   => esc_html__('Enable Attachments', WP_ULIKE_PRO_DOMAIN),
+                    'desc'    => esc_html__('Add like buttons to image attachments displayed on your site. Requires WordPress 5.6+ and a theme that uses the standard WordPress attachment image function.', WP_ULIKE_PRO_DOMAIN),
+                ),
+                'filter_attachment_class' => array(
+                    'id'         => 'filter_attachment_class',
+                    'type'       => 'repeater',
+                    'fields'     => array(
+                        array(
+                            'id'    => 'name',
+                            'type'  => 'text',
+                            'title' => esc_html__('Class Name', WP_ULIKE_PRO_DOMAIN),
+                            'desc'  => esc_html__('Enter the CSS class name that identifies the attachment image.', WP_ULIKE_PRO_DOMAIN)
+                        ),
+                    ),
+                    'title'      => esc_html__('Filter By Class Name', WP_ULIKE_PRO_DOMAIN),
+                    'dependency' => array( 'enable_attachments', '==', 'true' ),
+                    'desc'       => esc_html__('Show like buttons only on images with specific CSS classes. Add one class name per line (e.g., attachment-full, attachment-large).', WP_ULIKE_PRO_DOMAIN)
+                ),
+                'filter_attachment_size' => array(
+                    'id'         => 'filter_attachment_size',
+                    'type'       => 'repeater',
+                    'fields'     => array(
+                        array(
+                            'id'    => 'name',
+                            'type'  => 'text',
+                            'title' => esc_html__('Image Size', WP_ULIKE_PRO_DOMAIN),
+                            'desc'  => esc_html__('Enter the WordPress image size name (e.g., thumbnail, medium, large, full).', WP_ULIKE_PRO_DOMAIN)
+                        ),
+                    ),
+                    'title'      => esc_html__('Filter By Attachment Size', WP_ULIKE_PRO_DOMAIN),
+                    'dependency' => array( 'enable_attachments', '==', 'true' ),
+                    'desc'       => esc_html__('Show like buttons only on images displayed at specific sizes. Add one size name per line (e.g., large, thumbnail, medium).', WP_ULIKE_PRO_DOMAIN)
+                ),
+            )
         );
 
-        $options[] = array(
-            'id'         => 'filter_attachment_class',
-            'type'       => 'repeater',
-            'fields'     => array(
-                array(
-                    'id'    => 'name',
-                    'type'  => 'text',
-                    'title' => esc_html__('Class Name', WP_ULIKE_PRO_DOMAIN),
-                    'desc'  => esc_html__('Enter the CSS class name that identifies the attachment image.', WP_ULIKE_PRO_DOMAIN)
+        $options = wp_ulike_array_insert_after(
+            $options,
+            'vote_limit_number',
+            array(
+                'enable_metadata' => array(
+                    'id'      => 'enable_metadata',
+                    'type'    => 'switcher',
+                    'default' => true,
+                    'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
+                    'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
+                    'help'    => 'If you are an old user, after activating this option, go to Tools → Maintenance → Advanced and click "Move Post Counters" to move counter values from the wp_ulike_meta table to the meta table.'
                 ),
-            ),
-            'title'      => esc_html__('Filter By Class Name', WP_ULIKE_PRO_DOMAIN),
-            'dependency' => array( 'enable_attachments', '==', 'true' ),
-            'desc'       => esc_html__('Show like buttons only on images with specific CSS classes. Add one class name per line (e.g., attachment-full, attachment-large).', WP_ULIKE_PRO_DOMAIN)
-        );
-
-        $options[] = array(
-            'id'         => 'filter_attachment_size',
-            'type'       => 'repeater',
-            'fields'     => array(
-                array(
-                    'id'    => 'name',
-                    'type'  => 'text',
-                    'title' => esc_html__('Image Size', WP_ULIKE_PRO_DOMAIN),
-                    'desc'  => esc_html__('Enter the WordPress image size name (e.g., thumbnail, medium, large, full).', WP_ULIKE_PRO_DOMAIN)
-                ),
-            ),
-            'title'      => esc_html__('Filter By Attachment Size', WP_ULIKE_PRO_DOMAIN),
-            'dependency' => array( 'enable_attachments', '==', 'true' ),
-            'desc'       => esc_html__('Show like buttons only on images displayed at specific sizes. Add one size name per line (e.g., large, thumbnail, medium).', WP_ULIKE_PRO_DOMAIN)
+            )
         );
 
         return $options;
@@ -185,16 +179,20 @@ class WP_Ulike_Pro_Options_Panel {
      * @return array
      */
     public function comment_type_options( $options ){
-        $options[] = array(
-            'id'      => 'enable_metadata',
-            'type'    => 'switcher',
-            'default' => true,
-            'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
-            'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
-            'help'        => 'If you are an old user, after activating this option, go to Developer Tools > Optimization section and once click on "Migrate Counter Metadata" button to move counter values from wp_ulike_meta table to meta table.'
+        return wp_ulike_array_insert_after(
+            $options,
+            'vote_limit_number',
+            array(
+                'enable_metadata' => array(
+                    'id'      => 'enable_metadata',
+                    'type'    => 'switcher',
+                    'default' => true,
+                    'title'   => esc_html__('Enable Standard Meta Data', WP_ULIKE_PRO_DOMAIN),
+                    'desc'    => esc_html__('Store vote counts in WordPress standard meta tables, making it easier to query and display likes using standard WordPress functions.', WP_ULIKE_PRO_DOMAIN) . ' ' . esc_html__('Meta Keys:', WP_ULIKE_PRO_DOMAIN) . ' <code>like_amount</code>, <code>dislike_amount</code>, <code>net_votes</code>',
+                    'help'    => 'If you are an old user, after activating this option, go to Tools → Maintenance → Advanced and click "Move Comment Counters" to move counter values from the wp_ulike_meta table to the meta table.'
+                ),
+            )
         );
-
-        return $options;
     }
 
     /**
@@ -241,7 +239,6 @@ class WP_Ulike_Pro_Options_Panel {
         return $options;
     }
 
-
     /**
      * Update general section in setting panel
      *
@@ -252,20 +249,27 @@ class WP_Ulike_Pro_Options_Panel {
         // Get all display roles
         $user_roles_list = wp_ulike_pro_get_user_roles_list( array( 'Administrator', 'Subscriber' ) );
 
-        $options[] =  array(
-            'id'       => 'statistics_display_roles',
-            'type'     => 'select',
-            'title'    => esc_html__( 'Statistics Page Access', WP_ULIKE_PRO_DOMAIN),
-            'desc'     => esc_html__( 'Choose which user roles can access the Statistics page in the admin menu.',WP_ULIKE_PRO_DOMAIN ),
-            'chosen'   => true,
-            'multiple' => true,
-            'options'  => $user_roles_list
+        $options = wp_ulike_array_insert_after(
+            $options,
+            'enable_admin_posts_columns',
+            array(
+                array(
+                    'id'       => 'statistics_display_roles',
+                    'type'     => 'select',
+                    'title'    => esc_html__( 'Statistics Page Access', WP_ULIKE_PRO_DOMAIN),
+                    'desc'     => esc_html__( 'Choose which user roles can access the Statistics page in the admin menu.',WP_ULIKE_PRO_DOMAIN ),
+                    'chosen'   => true,
+                    'multiple' => true,
+                    'options'  => $user_roles_list
+                ),
+            )
         );
+
         $options[] = array(
             'id'       => 'enable_meta_box',
             'type'     => 'select',
-            'title'    => esc_html__( 'Show Meta Box In Post Editor',WP_ULIKE_PRO_DOMAIN ),
-            'desc'     => esc_html__( 'Add a WP ULike meta box to the edit screen of selected post types, allowing you to view and manage likes directly from the editor.',WP_ULIKE_PRO_DOMAIN ),
+            'title'    => esc_html__( 'Show Display Panel In Post Editor', WP_ULIKE_PRO_DOMAIN ),
+            'desc'     => esc_html__( 'Add a lightweight sidebar panel on selected post types for per-post button display overrides. Schema and FAQ markup is configured under Tools → Schema Generator.', WP_ULIKE_PRO_DOMAIN ),
             'chosen'   => true,
             'multiple' => true,
             'default'  => array('post', 'page'),
@@ -283,6 +287,13 @@ class WP_Ulike_Pro_Options_Panel {
                 'topic'    => esc_html__( 'Topics', WP_ULIKE_PRO_DOMAIN )
             ),
             'default'  => array( 'post' )
+        );
+        $options[] = array(
+            'id'         => 'enable_serialize',
+            'type'       => 'switcher',
+            'default'    => true,
+            'title'      => esc_html__('Enable Serialized Data Storage', WP_ULIKE_PRO_DOMAIN),
+            'desc'       => esc_html__('Store meta box data in a more efficient format, reducing database size and improving performance. If you\'re upgrading from an older version, enable this option first, then run "Convert to Serialized Format" under Tools → Maintenance → Advanced.', WP_ULIKE_PRO_DOMAIN)
         );
 
         return $options;
@@ -360,9 +371,35 @@ class WP_Ulike_Pro_Options_Panel {
             $options['likers_style']['options']['pile'] = esc_html__('Pile + Modal', WP_ULIKE_PRO_DOMAIN);
         }
 
+        // Engagement templates (emoji / star) reuse these classic options — keep copy accurate.
+        if ( isset( $options['counter_display_condition']['desc'] ) ) {
+            $options['counter_display_condition']['desc'] = esc_html__(
+                'Control when the counter is shown. For Star Rating this is the average and rating count; for Emoji Reactions it is the reaction totals.',
+                WP_ULIKE_PRO_DOMAIN
+            );
+        }
+        if ( isset( $options['hide_zero_counter']['desc'] ) ) {
+            $options['hide_zero_counter']['desc'] = esc_html__(
+                'Hide the counter when there are no votes, reactions, or ratings yet.',
+                WP_ULIKE_PRO_DOMAIN
+            );
+        }
+        if ( isset( $options['enable_likers_box']['desc'] ) ) {
+            $options['enable_likers_box']['desc'] = esc_html__(
+                'Show who engaged with this item — likers, reactors, or raters depending on the selected template.',
+                WP_ULIKE_PRO_DOMAIN
+            );
+        }
+        if ( isset( $options['likers_style']['desc'] ) ) {
+            $options['likers_style']['desc'] = esc_html__(
+                'Inline: show avatars next to the button. Popover: show avatars on hover. Pile + Modal: compact avatar stack that opens a full list.',
+                WP_ULIKE_PRO_DOMAIN
+            );
+        }
+
         // Add percentage option
         $percentage_list = wp_ulike_pro_get_templates_list_by_attribute( 'is_percentage_support' );
-        $options = $this->array_insert_after( $options, 'hide_zero_counter', array(
+        $options = wp_ulike_array_insert_after( $options, 'hide_zero_counter', array(
             'enable_percentage_values' => array(
                 'id'         => 'enable_percentage_values',
                 'type'       => 'switcher',
@@ -373,7 +410,7 @@ class WP_Ulike_Pro_Options_Panel {
         ) );
 
         // Add modal login template
-        $options = $this->array_insert_after( $options, 'login_template', array(
+        $options = wp_ulike_array_insert_after( $options, 'login_template', array(
             'modal_template' => array(
                 'id'         => 'modal_template',
                 'type'       => 'wp_editor',
@@ -386,7 +423,7 @@ class WP_Ulike_Pro_Options_Panel {
         ) );
 
         // Pile modal title
-        $options = $this->array_insert_after( $options, 'likers_style', array(
+        $options = wp_ulike_array_insert_after( $options, 'likers_style', array(
             'likers_modal_title' => array(
                 'id'         => 'likers_modal_title',
                 'type'       => 'text',
@@ -398,7 +435,7 @@ class WP_Ulike_Pro_Options_Panel {
         ) );
 
         // Pile modal template
-        $options = $this->array_insert_after( $options, 'likers_modal_title', array(
+        $options = wp_ulike_array_insert_after( $options, 'likers_modal_title', array(
             'likers_modal_template' => array(
                 'id'       => 'likers_modal_template',
                 'type'     => 'code_editor',
@@ -420,23 +457,28 @@ class WP_Ulike_Pro_Options_Panel {
             )
         ) );
 
-        return $options;
-    }
-
-    /**
-     * Update integrations section in setting panel
-     *
-     * @param array $options
-     * @return array
-     */
-    public function integrations_section( $options ){
-        $options[] = array(
-            'id'         => 'enable_serialize',
-            'type'       => 'switcher',
-            'default'    => true,
-            'title'      => esc_html__('Enable Serialized Data Storage', WP_ULIKE_PRO_DOMAIN),
-            'desc'       => esc_html__('Store meta box data in a more efficient format, reducing database size and improving performance. If you\'re upgrading from an older version, use the conversion tools in Tools > Optimization to migrate your existing data.', WP_ULIKE_PRO_DOMAIN)
-        );
+        if ( isset( $options['enable_auto_display'] ) ) {
+            $tools_url = admin_url( 'admin.php?page=wp-ulike-pro-tools&tab=display-automation' );
+            $options   = wp_ulike_array_insert_after(
+                $options,
+                'enable_auto_display',
+                array(
+                    'display_automation_notice' => array(
+                        'id'      => 'display_automation_notice',
+                        'type'    => 'submessage',
+                        'style'   => 'info',
+                        'content' => wp_kses_post(
+                            sprintf(
+                                /* translators: 1: opening anchor, 2: closing anchor */
+                                esc_html__( 'Need more control? Use %1$sDisplay Automation%2$s in Tools for WooCommerce reviews, BuddyPress, page filters, and advanced placement rules. You can keep Automatic Display enabled for simple setups, or turn it off when using Display Automation to avoid duplicate buttons.', WP_ULIKE_PRO_DOMAIN ),
+                                '<a href="' . esc_url( $tools_url ) . '"><strong>',
+                                '</strong></a>'
+                            )
+                        ),
+                    ),
+                )
+            );
+        }
 
         return $options;
     }
@@ -1608,7 +1650,16 @@ class WP_Ulike_Pro_Options_Panel {
                 <strong>example.com/user/emily</strong><br><br>
                 We have tried to design the options in such a way that you have the most flexibility and you can customize the profiles to your liking.<br><br>' . sprintf(
                     '<a href="%s" title="Documents" target="_blank">%s</a>',
-                    'https://docs.wpulike.com/article/16-profiles-settings',
+                    esc_url(
+                        add_query_arg(
+                            array(
+                                'utm_source'   => 'settings',
+                                'utm_medium'   => 'wp-dash',
+                                'utm_campaign' => 'profiles-settings',
+                            ),
+                            'https://docs.wpulike.com/article/16-profiles-settings'
+                        )
+                    ),
                     esc_html__( 'Read More', WP_ULIKE_PRO_DOMAIN )
                 ),
             ),

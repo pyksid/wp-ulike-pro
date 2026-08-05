@@ -48,3 +48,4 @@ interface StorageInterface
      */
     public function clear();
 }
+

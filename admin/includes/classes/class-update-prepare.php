@@ -198,8 +198,10 @@ class WP_Ulike_Pro_Update_Prepare {
 
 			$api_request_transient->name          = esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN );
 			$api_request_transient->slug          = $this->plugin_slug;
-			$api_request_transient->author        = '<a href="https://wpulike.com/?utm_source=wp-dash&utm_medium=plugin-uri&utm_campaign=api">wpulike.com</a>';
-			$api_request_transient->homepage      = 'https://wpulike.com/?utm_source=wp-dash&utm_medium=plugin-uri&utm_campaign=api';
+			$homepage_url = WP_Ulike_Pro_API::get_homepage_url( 'api', 'wp-dash', 'plugin-uri' );
+
+			$api_request_transient->author        = '<a href="' . esc_url( $homepage_url ) . '">wpulike.com</a>';
+			$api_request_transient->homepage      = $homepage_url;
 			$api_request_transient->requires      = $api_response['requires'];
 			$api_request_transient->tested        = $api_response['tested'];
 

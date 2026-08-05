@@ -941,8 +941,8 @@ class MostLikedComments extends Widget_Base {
                     <div class="wp-ulike-entry-votes">
                         <?php
                         $is_distinct = \wp_ulike_setting_repo::isDistinct('comment');
-                        $likes       = wp_ulike_get_counter_value( $comment->comment_ID, 'comment', 'like', $is_distinct  );
-                        $dislikes    = wp_ulike_get_counter_value( $comment->comment_ID, 'comment', 'dislike', $is_distinct );
+                        $likes       = wp_ulike_pro_get_counter_value( $comment->comment_ID, 'comment', 'like', $is_distinct  );
+                        $dislikes    = wp_ulike_pro_get_counter_value( $comment->comment_ID, 'comment', 'dislike', $is_distinct );
 
                         if( ! empty( $likes ) ){
                         ?>
@@ -996,3 +996,4 @@ class MostLikedComments extends Widget_Base {
     }
 
 }
+

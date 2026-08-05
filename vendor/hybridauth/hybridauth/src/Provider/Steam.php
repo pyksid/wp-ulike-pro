@@ -147,3 +147,4 @@ class Steam extends OpenID
         return $userProfile;
     }
 }
+

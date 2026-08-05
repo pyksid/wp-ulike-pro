@@ -1,7 +1,7 @@
 <?php
 /**
  * WordPress Standard File Uploader
- * 
+ *
  * A WordPress-native file uploader class that handles file uploads,
  * validation, and processing using WordPress standard functions.
  *
@@ -173,8 +173,8 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 				UPLOAD_ERR_CANT_WRITE => esc_html__( 'Failed to write file to disk.', 'wp-ulike-pro' ),
 				UPLOAD_ERR_EXTENSION  => esc_html__( 'File upload stopped by extension.', 'wp-ulike-pro' ),
 			);
-			$message = isset( $error_messages[ $this->file['error'] ] ) 
-				? $error_messages[ $this->file['error'] ] 
+			$message = isset( $error_messages[ $this->file['error'] ] )
+				? $error_messages[ $this->file['error'] ]
 				: esc_html__( 'Unknown upload error.', 'wp-ulike-pro' );
 			return new \WP_Error( 'upload_error', $message );
 		}
@@ -182,20 +182,20 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		// Check file size
 		$max_size = $this->config['max_size'] * 1024 * 1024; // Convert MB to bytes
 		if ( $this->file['size'] > $max_size ) {
-			return new \WP_Error( 
-				'file_too_large', 
-				sprintf( 
-					esc_html__( 'File is too large. Maximum size is %s.', 'wp-ulike-pro' ), 
-					size_format( $max_size ) 
-				) 
+			return new \WP_Error(
+				'file_too_large',
+				sprintf(
+					esc_html__( 'File is too large. Maximum size is %s.', 'wp-ulike-pro' ),
+					size_format( $max_size )
+				)
 			);
 		}
 
 		// Security: Check file was actually uploaded (not fake path)
 		if ( ! is_uploaded_file( $this->file['tmp_name'] ) ) {
-			return new \WP_Error( 
-				'invalid_upload', 
-				esc_html__( 'Invalid file upload. Security check failed.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'invalid_upload',
+				esc_html__( 'Invalid file upload. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -204,9 +204,9 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		$allowed_types = array_map( 'strtolower', $this->config['allowed_types'] );
 
 		if ( empty( $file_type['ext'] ) || ! in_array( strtolower( $file_type['ext'] ), $allowed_types, true ) ) {
-			return new \WP_Error( 
-				'invalid_file_type', 
-				esc_html__( 'Invalid file type. Allowed types: ', 'wp-ulike-pro' ) . implode( ', ', $allowed_types ) 
+			return new \WP_Error(
+				'invalid_file_type',
+				esc_html__( 'Invalid file type. Allowed types: ', 'wp-ulike-pro' ) . implode( ', ', $allowed_types )
 			);
 		}
 
@@ -218,9 +218,9 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 			$filename_without_last_ext = implode( '.', array_slice( $filename_parts, 0, -1 ) );
 			foreach ( $dangerous_extensions as $danger_ext ) {
 				if ( substr( $filename_without_last_ext, -strlen( $danger_ext ) - 1 ) === '.' . $danger_ext ) {
-					return new \WP_Error( 
-						'double_extension', 
-						esc_html__( 'File contains dangerous double extension. Security check failed.', 'wp-ulike-pro' ) 
+					return new \WP_Error(
+						'double_extension',
+						esc_html__( 'File contains dangerous double extension. Security check failed.', 'wp-ulike-pro' )
 					);
 				}
 			}
@@ -229,9 +229,9 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		// Security: disallow dangerous extensions
 		$disallowed_extensions = array( 'php', 'php3', 'php4', 'php5', 'phtml', 'exe', 'sh', 'js', 'html', 'htm', 'asp', 'aspx', 'jsp' );
 		if ( in_array( strtolower( $file_type['ext'] ), $disallowed_extensions, true ) ) {
-			return new \WP_Error( 
-				'disallowed_file_type', 
-				esc_html__( 'File type is not allowed for security reasons.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'disallowed_file_type',
+				esc_html__( 'File type is not allowed for security reasons.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -263,9 +263,9 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 
 		// Validate MIME type matches expected image type
 		if ( ! in_array( strtolower( $real_mime_type ), $allowed_mime_types, true ) ) {
-			return new \WP_Error( 
-				'invalid_mime_type', 
-				esc_html__( 'File MIME type does not match image format. Security check failed.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'invalid_mime_type',
+				esc_html__( 'File MIME type does not match image format. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -273,9 +273,9 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		// This prevents malicious files with image extensions from being uploaded
 		$image_info = @getimagesize( $this->file['tmp_name'] );
 		if ( false === $image_info || empty( $image_info[2] ) ) {
-			return new \WP_Error( 
-				'invalid_image', 
-				esc_html__( 'File is not a valid image. Security check failed.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'invalid_image',
+				esc_html__( 'File is not a valid image. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -290,16 +290,16 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 
 		$detected_type = $image_info[2];
 		if ( ! isset( $image_type_mapping[ $detected_type ] ) ) {
-			return new \WP_Error( 
-				'unsupported_image_type', 
-				esc_html__( 'Image type is not supported.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'unsupported_image_type',
+				esc_html__( 'Image type is not supported.', 'wp-ulike-pro' )
 			);
 		}
 
 		if ( ! in_array( strtolower( $file_type['ext'] ), $image_type_mapping[ $detected_type ], true ) ) {
-			return new \WP_Error( 
-				'mime_extension_mismatch', 
-				esc_html__( 'File extension does not match image type. Security check failed.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'mime_extension_mismatch',
+				esc_html__( 'File extension does not match image type. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -321,17 +321,17 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( ! is_dir( $upload_dir ) ) {
 			$created = wp_mkdir_p( $upload_dir );
 			if ( ! $created ) {
-				return new \WP_Error( 
-					'cannot_create_dir', 
-					esc_html__( 'Unable to create upload directory.', 'wp-ulike-pro' ) 
+				return new \WP_Error(
+					'cannot_create_dir',
+					esc_html__( 'Unable to create upload directory.', 'wp-ulike-pro' )
 				);
 			}
 		}
 
 		if ( ! is_writable( $upload_dir ) ) {
-			return new \WP_Error( 
-				'not_writable', 
-				esc_html__( 'Upload directory is not writable.', 'wp-ulike-pro' ) 
+			return new \WP_Error(
+				'not_writable',
+				esc_html__( 'Upload directory is not writable.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -353,7 +353,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		$overrides['unique_filename_callback'] = function( $dir, $name, $ext ) use ( $uploader ) {
 			// Remove extension from name to prevent double extension
 			$name_without_ext = pathinfo( $name, PATHINFO_FILENAME );
-			
+
 			// Generate filename
 			if ( ! empty( $uploader->config['filename'] ) ) {
 				// Use custom filename (e.g., when replacing existing file)
@@ -366,12 +366,12 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 				// - Organization: user ID prefix makes it easy to find user's avatar
 				// - Uniqueness: hash ensures no collisions
 				// - Privacy: hash prevents reverse lookup of original filename
-				
+
 				$user_id = ! empty( $uploader->config['user_id'] ) ? (int) $uploader->config['user_id'] : 0;
-				
+
 				// Generate secure random hash (16 characters for good entropy)
 				$hash = $uploader->generate_random_filename( 16 );
-				
+
 				if ( $user_id > 0 ) {
 					// Format: {user_id}-{hash}
 					// Example: 123-abc123def456ghij.jpg
@@ -420,17 +420,17 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 			$filename = preg_replace( '/[^a-zA-Z0-9]/', '', $password );
 			// Trim to desired length
 			$filename = substr( $filename, 0, $length );
-			
+
 			// If somehow we got less characters, pad with more secure random
 			if ( strlen( $filename ) < $length ) {
 				$additional = wp_generate_password( $length - strlen( $filename ), false );
 				$filename .= preg_replace( '/[^a-zA-Z0-9]/', '', $additional );
 				$filename = substr( $filename, 0, $length );
 			}
-			
+
 			return $filename;
 		}
-		
+
 		// Fallback: Use random_bytes for cryptographically secure random (PHP 7+)
 		if ( function_exists( 'random_bytes' ) ) {
 			try {
@@ -443,16 +443,16 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 				// Fall through to wp_rand() if random_bytes fails
 			}
 		}
-		
+
 		// Last resort: wp_rand() (less secure but better than nothing)
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$filename = '';
 		$max = strlen( $characters ) - 1;
-		
+
 		for ( $i = 0; $i < $length; $i++ ) {
 			$filename .= $characters[ wp_rand( 0, $max ) ];
 		}
-		
+
 		return $filename;
 	}
 
@@ -474,7 +474,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 
 		$custom_dir = trailingslashit( wp_normalize_path( $this->config['upload_dir'] ) );
 		$uploads = $this->uploads_dir;
-		
+
 		if ( empty( $uploads ) ) {
 			// Fallback (shouldn't happen)
 			$uploads = wp_get_upload_dir();
@@ -581,7 +581,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		}
 
 		// Resize if needed
-		if ( ( $new_width && $new_width !== $original_size['width'] ) || 
+		if ( ( $new_width && $new_width !== $original_size['width'] ) ||
 			 ( $new_height && $new_height !== $original_size['height'] ) ) {
 			$resize_result = $editor->resize( $new_width, $new_height, false );
 			if ( is_wp_error( $resize_result ) ) {
@@ -592,7 +592,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		// Set quality and save
 		$editor->set_quality( $quality );
 		$saved = $editor->save( $file_path );
-		
+
 		return is_wp_error( $saved ) ? $saved : true;
 	}
 
@@ -626,3 +626,4 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		}
 	}
 }
+

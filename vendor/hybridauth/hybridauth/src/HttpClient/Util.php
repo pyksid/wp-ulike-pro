@@ -98,3 +98,4 @@ class Util
             $collection->get($requestUri ? 'REQUEST_URI' : 'PHP_SELF');
     }
 }
+

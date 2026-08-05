@@ -262,3 +262,4 @@ class Twitter extends OAuth1
         return $userActivity;
     }
 }
+

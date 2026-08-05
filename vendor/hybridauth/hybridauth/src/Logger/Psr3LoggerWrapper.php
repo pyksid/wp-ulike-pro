@@ -48,3 +48,4 @@ class Psr3LoggerWrapper implements LoggerInterface
         $this->logger->log($level, $message, $context);
     }
 }
+

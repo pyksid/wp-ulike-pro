@@ -1,7 +1,7 @@
 <?php
 /**
  * Tools page template
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -12,96 +12,58 @@ if ( ! defined('ABSPATH') ) {
     die();
 }
 
-// Get current tab
-$current_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'maintenance';
-$tabs = array(
-    'maintenance'  => esc_html__( 'Maintenance', WP_ULIKE_PRO_DOMAIN ),
-    'bulk-actions' => esc_html__( 'Bulk Actions', WP_ULIKE_PRO_DOMAIN ),
-    'gdpr'         => esc_html__( 'GDPR', WP_ULIKE_PRO_DOMAIN ),
-    'rest-api'     => esc_html__( 'REST API', WP_ULIKE_PRO_DOMAIN ),
-    'debug'        => esc_html__( 'Debug Info', WP_ULIKE_PRO_DOMAIN )
-);
+$data = WP_Ulike_Pro_Tools::get_tools_view_data();
+$current_tab = $data['current_tab'];
 
-// Only load data for the active tab to improve performance
-$optimization_tools = array();
+// Only load data for the active tab to improve performance.
 $debug_info = '';
 
-if ( $current_tab === 'maintenance' ) {
-    $optimization_tools = WP_Ulike_Pro_Tools::get_optimization_tools();
-} elseif ( $current_tab === 'debug' ) {
-    $debug_info = WP_Ulike_Pro_Tools::get_debug_info();
+if ( 'debug' === $current_tab ) {
+	$debug_info = WP_Ulike_Pro_Tools::get_debug_info();
 }
 ?>
 
-<div class="wrap wp-ulike-pro-admin-page-tools">
-    <nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Secondary menu', WP_ULIKE_PRO_DOMAIN ); ?>">
-        <?php foreach ( $tabs as $tab_key => $tab_label ) : ?>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=wp-ulike-pro-tools&tab=' . $tab_key ) ); ?>"
-               class="nav-tab <?php echo $current_tab === $tab_key ? 'nav-tab-active' : ''; ?>">
-                <?php echo esc_html( $tab_label ); ?>
-            </a>
-        <?php endforeach; ?>
-    </nav>
+<div class="wrap wp-ulike-about wp-ulike-about--tools wp-ulike-pro-admin-page-tools">
 
-    <div class="wp-ulike-pro-tools-container">
+	<h1 class="wp-ulike-about__title">
+		<?php esc_html_e( 'Tools', WP_ULIKE_PRO_DOMAIN ); ?>
+		<?php if ( ! empty( $data['pro_version'] ) ) : ?>
+			<span class="wp-ulike-about__badge wp-ulike-about__badge--pro"><?php echo esc_html( 'Pro ' . $data['pro_version'] ); ?></span>
+		<?php endif; ?>
+	</h1>
+
+	<p class="wp-ulike-about__lead"><?php echo esc_html( $data['tab_lead'] ); ?></p>
+
+	<?php if ( ! empty( $data['settings_saved'] ) ) : ?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_html_e( 'Settings saved successfully.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+		</div>
+	<?php endif; ?>
+
+	<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-nav.php'; ?>
+
+	<div class="wp-ulike-tools-content">
+		<div class="wp-ulike-pro-tools-container">
         <?php if ( $current_tab === 'maintenance' ) : ?>
             <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
-                <div class="wp-ulike-pro-tools-card">
-                    <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'License Required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
-                    </div>
-                    <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'You need an active license to access maintenance tools.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                    </div>
-                </div>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
             <?php else : ?>
-                <?php foreach ( $optimization_tools as $group_key => $group_data ) : ?>
-                    <div class="wp-ulike-pro-tools-card">
-                        <div class="wp-ulike-pro-tools-card-header">
-                            <h2><?php echo esc_html( $group_data['title'] ); ?></h2>
-                        </div>
-                        <div class="wp-ulike-pro-tools-card-content">
-                            <div class="wp-ulike-pro-tools-list">
-                                <?php foreach ( $group_data['tools'] as $tool ) : ?>
-                                    <div class="wp-ulike-pro-tool-item">
-                                        <div class="wp-ulike-pro-tool-content">
-                                            <h3 class="wp-ulike-pro-tool-title"><?php echo esc_html( $tool['title'] ); ?></h3>
-                                            <p class="wp-ulike-pro-tool-desc"><?php echo wp_kses_post( $tool['desc'] ); ?></p>
-                                        </div>
-                                        <div class="wp-ulike-pro-tool-action">
-                                            <button type="button"
-                                                    class="wp-ulike-pro-btn wp-ulike-pro-btn-secondary wp-ulike-pro-ajax-button-field wp-ulike-pro-tools-action-btn"
-                                                    data-type="<?php echo esc_attr( $tool['type'] ); ?>"
-                                                    data-action="<?php echo esc_attr( $tool['action'] ); ?>"
-                                                    data-nonce="<?php echo esc_attr( wp_create_nonce('wp_ulike_pro_ajax_button_field') ); ?>">
-                                                <?php echo esc_html( $tool['label'] ); ?>
-                                            </button>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-maintenance.php'; ?>
             <?php endif; ?>
 
         <?php elseif ( $current_tab === 'gdpr' ) : ?>
             <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
-                <div class="wp-ulike-pro-tools-card">
-                    <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'License Required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
-                    </div>
-                    <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'You need an active license to access GDPR tools.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                    </div>
-                </div>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
             <?php else : ?>
+				<div class="notice notice-info wp-ulike-pro-tools-notice">
+					<p><?php esc_html_e( 'This removes all records tied to registered user accounts: classic likes/dislikes, emoji reactions, star ratings, and related user meta. Guest activity stored by IP or fingerprint is not included — use Maintenance cleanup tools or contact support if you need help with anonymous data.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+				</div>
                 <div class="wp-ulike-pro-tools-card">
                     <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'Remove User Logs', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                        <h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'Remove User Logs', WP_ULIKE_PRO_DOMAIN ); ?></h2>
                     </div>
                     <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'Search and select users to remove all their records. This action will delete all logs (likes and dislikes) from all content types (posts, comments, activities, topics) and sync counters. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                        <p class="wp-ulike-tools-panel__intro"><?php esc_html_e( 'Search and select users to remove all their records. This action deletes vote logs, emoji reactions, and star ratings from all content types (posts, comments, activities, topics), clears related user meta, and syncs counters. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ); ?></p>
 
                         <div class="wp-ulike-pro-gdpr-user-search">
                             <label for="wp-ulike-pro-user-search">
@@ -141,23 +103,61 @@ if ( $current_tab === 'maintenance' ) {
                 </div>
             <?php endif; ?>
 
+        <?php elseif ( $current_tab === 'display-automation' ) : ?>
+            <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
+            <?php else : ?>
+                <?php include WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/display-automation.php'; ?>
+            <?php endif; ?>
+
+        <?php elseif ( $current_tab === 'schema-generator' ) : ?>
+            <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
+            <?php else : ?>
+                <?php include WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/schema-generator.php'; ?>
+            <?php endif; ?>
+
         <?php elseif ( $current_tab === 'bulk-actions' ) : ?>
             <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
-                <div class="wp-ulike-pro-tools-card">
-                    <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'License Required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
-                    </div>
-                    <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'You need an active license to access bulk actions.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                    </div>
-                </div>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
             <?php else : ?>
+                <?php
+                $bulk_engagement_config = function_exists( 'wp_ulike_pro_get_bulk_engagement_config' )
+                    ? wp_ulike_pro_get_bulk_engagement_config()
+                    : array();
+                ?>
                 <div class="wp-ulike-pro-tools-card">
                     <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'Bulk Add Likes/Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                        <h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'Bulk Counter Management', WP_ULIKE_PRO_DOMAIN ); ?></h2>
                     </div>
                     <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'Filter and select posts to manage like/dislike counts. You can edit counts individually or apply bulk operations with specific or random values.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                        <p class="wp-ulike-tools-panel__intro"><?php esc_html_e( 'Filter and select content to manage counters in bulk. Each row lets you choose which counter system to edit — votes, emoji reactions, or star ratings — even when settings and Display Automation use different templates.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+
+                        <div class="wp-ulike-pro-bulk-guide">
+                            <p class="wp-ulike-pro-bulk-steps-label"><?php esc_html_e( 'How it works', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                            <ol class="wp-ulike-pro-bulk-steps" aria-label="<?php esc_attr_e( 'How to use bulk counter management', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                <li class="wp-ulike-pro-bulk-step is-active" data-bulk-step="search">
+                                    <span class="wp-ulike-pro-bulk-step-number" aria-hidden="true">1</span>
+                                    <span class="wp-ulike-pro-bulk-step-text"><?php esc_html_e( 'Search & filter', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                </li>
+                                <li class="wp-ulike-pro-bulk-step" data-bulk-step="select">
+                                    <span class="wp-ulike-pro-bulk-step-number" aria-hidden="true">2</span>
+                                    <span class="wp-ulike-pro-bulk-step-text"><?php esc_html_e( 'Select items', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                </li>
+                                <li class="wp-ulike-pro-bulk-step" data-bulk-step="apply">
+                                    <span class="wp-ulike-pro-bulk-step-number" aria-hidden="true">3</span>
+                                    <span class="wp-ulike-pro-bulk-step-text"><?php esc_html_e( 'Edit & apply', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                </li>
+                            </ol>
+
+                            <div class="wp-ulike-pro-bulk-guide-notice" role="note">
+                                <span class="wp-ulike-pro-bulk-guide-notice-icon dashicons dashicons-info" aria-hidden="true"></span>
+                                <div class="wp-ulike-pro-bulk-guide-notice-body">
+                                    <strong class="wp-ulike-pro-bulk-guide-notice-title"><?php esc_html_e( 'Good to know', WP_ULIKE_PRO_DOMAIN ); ?></strong>
+                                    <p><?php esc_html_e( 'Updates display counters only — not individual vote logs. Safe for fixing counts, seeding demo data, or syncing meta after imports.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="wp-ulike-pro-bulk-filters">
                             <div class="wp-ulike-pro-filter-tabs">
@@ -194,7 +194,7 @@ if ( $current_tab === 'maintenance' ) {
                                             <select id="wp-ulike-pro-bulk-taxonomy" class="wp-ulike-pro-filter-select">
                                                 <option value=""><?php esc_html_e( 'Select Taxonomy', WP_ULIKE_PRO_DOMAIN ); ?></option>
                                             </select>
-                                            <span class="spinner wp-ulike-pro-taxonomy-spinner" style="float: none; margin: 0 0 0 8px; visibility: hidden;"></span>
+                                            <span class="spinner wp-ulike-pro-inline-spinner wp-ulike-pro-taxonomy-spinner" aria-hidden="true"></span>
                                         </div>
                                     </div>
 
@@ -206,7 +206,7 @@ if ( $current_tab === 'maintenance' ) {
                                             <select id="wp-ulike-pro-bulk-category" class="wp-ulike-pro-filter-select" disabled>
                                                 <option value=""><?php esc_html_e( 'All Categories', WP_ULIKE_PRO_DOMAIN ); ?></option>
                                             </select>
-                                            <span class="spinner wp-ulike-pro-category-spinner" style="float: none; margin: 0 0 0 8px; visibility: hidden;"></span>
+                                            <span class="spinner wp-ulike-pro-inline-spinner wp-ulike-pro-category-spinner" aria-hidden="true"></span>
                                         </div>
                                     </div>
 
@@ -256,7 +256,7 @@ if ( $current_tab === 'maintenance' ) {
                                                id="wp-ulike-pro-bulk-item-id"
                                                class="wp-ulike-pro-filter-input"
                                                placeholder="<?php esc_attr_e( 'Enter item ID(s) separated by comma...', WP_ULIKE_PRO_DOMAIN ); ?>">
-                                        <p class="description" style="margin-top: 6px; margin-bottom: 0; font-size: 12px; color: #646970;">
+                                        <p class="description wp-ulike-tools-field-hint">
                                             <?php esc_html_e( 'Enter one or more item IDs separated by commas. Leave empty to search all items of selected type.', WP_ULIKE_PRO_DOMAIN ); ?>
                                         </p>
                                     </div>
@@ -271,7 +271,7 @@ if ( $current_tab === 'maintenance' ) {
                             </div>
                         </div>
 
-                        <div class="wp-ulike-pro-bulk-results" style="display: none;" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wp_ulike_pro_get_post_counts' ) ); ?>">
+                        <div class="wp-ulike-pro-bulk-results" style="display: none;" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wp_ulike_pro_get_post_counts' ) ); ?>" data-bulk-config="<?php echo esc_attr( wp_json_encode( $bulk_engagement_config ) ); ?>">
                             <div class="wp-ulike-pro-bulk-results-header">
                                 <h3><?php esc_html_e( 'Search Results', WP_ULIKE_PRO_DOMAIN ); ?> <span class="wp-ulike-pro-results-count">(0)</span></h3>
                                 <div class="wp-ulike-pro-bulk-select-actions">
@@ -284,7 +284,8 @@ if ( $current_tab === 'maintenance' ) {
                         </div>
 
                         <div class="wp-ulike-pro-bulk-selected" style="display: none;">
-                            <h3><?php esc_html_e( 'Selected Posts', WP_ULIKE_PRO_DOMAIN ); ?> <span class="wp-ulike-pro-selected-count">(0)</span></h3>
+                            <h3><?php esc_html_e( 'Selected Items', WP_ULIKE_PRO_DOMAIN ); ?> <span class="wp-ulike-pro-selected-count">(0)</span></h3>
+                            <p class="wp-ulike-pro-bulk-loading-progress description" style="display: none;" aria-live="polite"></p>
 
                             <div class="wp-ulike-pro-bulk-actions-panel">
                                 <div class="wp-ulike-pro-bulk-actions-tabs">
@@ -296,16 +297,20 @@ if ( $current_tab === 'maintenance' ) {
                                     </button>
                                 </div>
 
+                                <p class="wp-ulike-pro-bulk-mode-hint" data-mode="individual">
+                                    <?php esc_html_e( 'Set exact values per item. Use Votes, Emoji, or Stars on each row — only the active tab is saved when you apply.', WP_ULIKE_PRO_DOMAIN ); ?>
+                                </p>
+                                <p class="wp-ulike-pro-bulk-mode-hint" data-mode="bulk" style="display: none;">
+                                    <?php esc_html_e( 'Apply the same change to every selected item. Expand a section, check “Apply to selected items”, enter values, then click Apply.', WP_ULIKE_PRO_DOMAIN ); ?>
+                                </p>
+
                                 <div class="wp-ulike-pro-bulk-mode-content" data-mode="individual">
                                     <div class="wp-ulike-pro-bulk-posts-table-wrapper">
-                                        <table class="wp-list-table widefat fixed striped">
-                                            <thead>
+                                        <table class="wp-list-table widefat fixed striped wp-ulike-pro-bulk-individual-table">
+                                            <thead id="wp-ulike-pro-bulk-table-head">
                                                 <tr>
-                                                    <th class="column-post" style="width: 40%;"><?php esc_html_e( 'Post', WP_ULIKE_PRO_DOMAIN ); ?></th>
-                                                    <th class="column-current-likes" style="width: 15%;"><?php esc_html_e( 'Current Likes', WP_ULIKE_PRO_DOMAIN ); ?></th>
-                                                    <th class="column-new-likes" style="width: 15%;"><?php esc_html_e( 'New Likes', WP_ULIKE_PRO_DOMAIN ); ?></th>
-                                                    <th class="column-current-dislikes" style="width: 15%;"><?php esc_html_e( 'Current Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></th>
-                                                    <th class="column-new-dislikes" style="width: 15%;"><?php esc_html_e( 'New Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></th>
+                                                    <th class="column-post" style="width: 32%;"><?php esc_html_e( 'Item', WP_ULIKE_PRO_DOMAIN ); ?></th>
+                                                    <th class="column-counters"><?php esc_html_e( 'Counters', WP_ULIKE_PRO_DOMAIN ); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="wp-ulike-pro-bulk-posts-table-body">
@@ -331,93 +336,261 @@ if ( $current_tab === 'maintenance' ) {
                                             </label>
                                         </div>
 
-                                        <div class="wp-ulike-pro-bulk-operation-values" data-operation="add">
-                                            <table class="form-table" role="presentation">
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-add-likes"><?php esc_html_e( 'Add Likes', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-add-likes" class="small-text" min="0" value="0" step="1">
-                                                            <p class="description"><?php esc_html_e( 'This number will be added to current likes for each post.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-add-dislikes"><?php esc_html_e( 'Add Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-add-dislikes" class="small-text" min="0" value="0" step="1">
-                                                            <p class="description"><?php esc_html_e( 'This number will be added to current dislikes for each post.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        <div class="wp-ulike-pro-bulk-counter-sections">
+                                            <div class="wp-ulike-pro-bulk-counter-section is-collapsed" data-counter-mode="vote">
+                                                <div class="wp-ulike-pro-bulk-section-head">
+                                                    <button type="button" class="wp-ulike-pro-bulk-section-toggle" aria-expanded="false">
+                                                        <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
+                                                        <span class="wp-ulike-pro-bulk-section-title"><?php esc_html_e( 'Likes / Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                                    </button>
+                                                    <label class="wp-ulike-pro-bulk-section-apply">
+                                                        <input type="checkbox" class="wp-ulike-pro-bulk-apply-section" data-counter-mode="vote">
+                                                        <?php esc_html_e( 'Apply to selected items', WP_ULIKE_PRO_DOMAIN ); ?>
+                                                    </label>
+                                                </div>
+                                                <div class="wp-ulike-pro-bulk-section-body">
+                                                <p class="description"><?php esc_html_e( 'Vote counters on selected items. Independent of the template shown on the frontend.', WP_ULIKE_PRO_DOMAIN ); ?></p>
 
-                                        <div class="wp-ulike-pro-bulk-operation-values" data-operation="set" style="display: none;">
-                                            <table class="form-table" role="presentation">
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-set-likes"><?php esc_html_e( 'Set Likes', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-set-likes" class="small-text" min="0" value="0" step="1">
-                                                            <p class="description"><?php esc_html_e( 'All selected posts will have this exact number of likes.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-set-dislikes"><?php esc_html_e( 'Set Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-set-dislikes" class="small-text" min="0" value="0" step="1">
-                                                            <p class="description"><?php esc_html_e( 'All selected posts will have this exact number of dislikes.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="add">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-add-likes"><?php esc_html_e( 'Add Likes', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-add-likes" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-add-dislikes"><?php esc_html_e( 'Add Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-add-dislikes" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
 
-                                        <div class="wp-ulike-pro-bulk-operation-values" data-operation="random" style="display: none;">
-                                            <table class="form-table" role="presentation">
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-random-likes-min"><?php esc_html_e( 'Random Likes Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-random-likes-min" class="small-text" min="0" value="0" step="1" placeholder="Min">
-                                                            <span> - </span>
-                                                            <input type="number" id="wp-ulike-pro-bulk-random-likes-max" class="small-text" min="0" value="10" step="1" placeholder="Max">
-                                                            <p class="description"><?php esc_html_e( 'Random number of likes will be added to each post within this range.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">
-                                                            <label for="wp-ulike-pro-bulk-random-dislikes-min"><?php esc_html_e( 'Random Dislikes Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
-                                                        </th>
-                                                        <td>
-                                                            <input type="number" id="wp-ulike-pro-bulk-random-dislikes-min" class="small-text" min="0" value="0" step="1" placeholder="Min">
-                                                            <span> - </span>
-                                                            <input type="number" id="wp-ulike-pro-bulk-random-dislikes-max" class="small-text" min="0" value="5" step="1" placeholder="Max">
-                                                            <p class="description"><?php esc_html_e( 'Random number of dislikes will be added to each post within this range.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="set" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-set-likes"><?php esc_html_e( 'Set Likes', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-set-likes" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-set-dislikes"><?php esc_html_e( 'Set Dislikes', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-set-dislikes" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="random" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-random-likes-min"><?php esc_html_e( 'Random Likes Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-likes-min" class="small-text" min="0" value="0" step="1" placeholder="<?php esc_attr_e( 'Min', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                                                    <span> - </span>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-likes-max" class="small-text" min="0" value="10" step="1" placeholder="<?php esc_attr_e( 'Max', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-random-dislikes-min"><?php esc_html_e( 'Random Dislikes Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-dislikes-min" class="small-text" min="0" value="0" step="1" placeholder="<?php esc_attr_e( 'Min', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                                                    <span> - </span>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-dislikes-max" class="small-text" min="0" value="5" step="1" placeholder="<?php esc_attr_e( 'Max', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="wp-ulike-pro-bulk-counter-section is-collapsed" data-counter-mode="emoji">
+                                                <div class="wp-ulike-pro-bulk-section-head">
+                                                    <button type="button" class="wp-ulike-pro-bulk-section-toggle" aria-expanded="false">
+                                                        <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
+                                                        <span class="wp-ulike-pro-bulk-section-title"><?php esc_html_e( 'Emoji Reactions', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                                    </button>
+                                                    <label class="wp-ulike-pro-bulk-section-apply">
+                                                        <input type="checkbox" class="wp-ulike-pro-bulk-apply-section" data-counter-mode="emoji">
+                                                        <?php esc_html_e( 'Apply to selected items', WP_ULIKE_PRO_DOMAIN ); ?>
+                                                    </label>
+                                                </div>
+                                                <div class="wp-ulike-pro-bulk-section-body">
+                                                <p class="description"><?php esc_html_e( 'Uses reactions from settings. Bulk add/set applies the same number to every enabled reaction on each item. For per-emoji control, use Individual Edit.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="add">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-add-reactions"><?php esc_html_e( 'Add to Each Reaction', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-add-reactions" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="set" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-set-reactions"><?php esc_html_e( 'Set Each Reaction To', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-set-reactions" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="random" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-random-reactions-min"><?php esc_html_e( 'Random Reaction Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-reactions-min" class="small-text" min="0" value="0" step="1">
+                                                                    <span> - </span>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-reactions-max" class="small-text" min="0" value="10" step="1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="wp-ulike-pro-bulk-counter-section is-collapsed" data-counter-mode="star">
+                                                <div class="wp-ulike-pro-bulk-section-head">
+                                                    <button type="button" class="wp-ulike-pro-bulk-section-toggle" aria-expanded="false">
+                                                        <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
+                                                        <span class="wp-ulike-pro-bulk-section-title"><?php esc_html_e( 'Star Ratings', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                                    </button>
+                                                    <label class="wp-ulike-pro-bulk-section-apply">
+                                                        <input type="checkbox" class="wp-ulike-pro-bulk-apply-section" data-counter-mode="star">
+                                                        <?php esc_html_e( 'Apply to selected items', WP_ULIKE_PRO_DOMAIN ); ?>
+                                                    </label>
+                                                </div>
+                                                <div class="wp-ulike-pro-bulk-section-body">
+                                                <p class="description"><?php esc_html_e( 'Star rating count and average on selected items.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="add">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-add-star-count"><?php esc_html_e( 'Add Rating Count', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-add-star-count" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-add-star-average"><?php esc_html_e( 'Set Average To', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-add-star-average" class="small-text" min="0" max="5" value="0" step="0.1">
+                                                                    <p class="description"><?php esc_html_e( 'Optional. When set above 0, updates the average while adding to the count.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="set" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-set-star-count"><?php esc_html_e( 'Rating Count', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-set-star-count" class="small-text" min="0" value="0" step="1">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-set-star-average"><?php esc_html_e( 'Average Rating', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-set-star-average" class="small-text" min="0" max="5" value="0" step="0.1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="wp-ulike-pro-bulk-operation-values" data-operation="random" style="display: none;">
+                                                    <table class="form-table" role="presentation">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-random-star-count-min"><?php esc_html_e( 'Random Rating Count', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-star-count-min" class="small-text" min="0" value="0" step="1">
+                                                                    <span> - </span>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-star-count-max" class="small-text" min="0" value="20" step="1">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    <label for="wp-ulike-pro-bulk-random-star-average-min"><?php esc_html_e( 'Random Average Range', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                                                                </th>
+                                                                <td>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-star-average-min" class="small-text" min="0" max="5" value="3" step="0.1">
+                                                                    <span> - </span>
+                                                                    <input type="number" id="wp-ulike-pro-bulk-random-star-average-max" class="small-text" min="0" max="5" value="5" step="0.1">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <p class="submit wp-ulike-pro-bulk-apply-submit">
-                                <button type="button" id="wp-ulike-pro-bulk-apply" class="button button-primary wp-ulike-pro-bulk-apply-btn" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wp_ulike_pro_bulk_update_likes' ) ); ?>" disabled>
-                                    <span class="wp-ulike-pro-apply-button-text"><?php esc_html_e( 'Apply Changes', WP_ULIKE_PRO_DOMAIN ); ?></span>
-                                </button>
-                            </p>
+                            <div class="wp-ulike-pro-bulk-apply-footer">
+                                <p class="wp-ulike-pro-bulk-apply-summary description" aria-live="polite"></p>
+                                <p class="submit wp-ulike-pro-bulk-apply-submit">
+                                    <button type="button" id="wp-ulike-pro-bulk-apply" class="button button-primary wp-ulike-pro-bulk-apply-btn" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wp_ulike_pro_bulk_update_likes' ) ); ?>" disabled>
+                                        <span class="wp-ulike-pro-apply-button-text"><?php esc_html_e( 'Apply Changes', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                    </button>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -425,14 +598,7 @@ if ( $current_tab === 'maintenance' ) {
 
         <?php elseif ( $current_tab === 'rest-api' ) : ?>
             <?php if ( ! WP_Ulike_Pro_API::has_permission() ) : ?>
-                <div class="wp-ulike-pro-tools-card">
-                    <div class="wp-ulike-pro-tools-card-header">
-                        <h2><?php esc_html_e( 'License Required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
-                    </div>
-                    <div class="wp-ulike-pro-tools-card-content">
-                        <p><?php esc_html_e( 'You need an active license to access REST API settings.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                    </div>
-                </div>
+				<?php require WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools-license-required.php'; ?>
             <?php else : ?>
                 <?php
                 // Get current settings
@@ -446,10 +612,6 @@ if ( $current_tab === 'maintenance' ) {
                 // Get all user roles
                 $roles = wp_roles()->get_names();
 
-                // Show success message
-                if ( isset( $_GET['settings-updated'] ) && $_GET['settings-updated'] === 'true' ) {
-                    echo '<div class="notice notice-success is-dismissible" style="margin: 0 0 20px 0;"><p>' . esc_html__( 'Settings saved successfully.', WP_ULIKE_PRO_DOMAIN ) . '</p></div>';
-                }
                 ?>
                 <form method="post" action="" class="wp-ulike-pro-rest-api-settings-form">
                     <?php wp_nonce_field( 'wp_ulike_rest_api_settings', 'wp_ulike_rest_api_settings_nonce' ); ?>
@@ -457,10 +619,10 @@ if ( $current_tab === 'maintenance' ) {
 
                     <div class="wp-ulike-pro-tools-card">
                         <div class="wp-ulike-pro-tools-card-header">
-                            <h2><?php esc_html_e( 'REST API Settings', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                            <h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'REST API Settings', WP_ULIKE_PRO_DOMAIN ); ?></h2>
                         </div>
                         <div class="wp-ulike-pro-tools-card-content">
-                            <p><?php esc_html_e( 'Configure REST API access and authentication settings for external applications.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                            <p class="wp-ulike-tools-panel__intro"><?php esc_html_e( 'Configure REST API access and authentication settings for external applications.', WP_ULIKE_PRO_DOMAIN ); ?></p>
 
                             <div class="wp-ulike-pro-rest-api-settings">
                                 <div class="wp-ulike-pro-rest-api-setting-group">
@@ -533,7 +695,7 @@ if ( $current_tab === 'maintenance' ) {
 
                     <div class="wp-ulike-pro-tools-card token-auth-dependent" style="<?php echo ( $enable_rest_api && $authentication_type === 'token' ) ? '' : 'display:none;'; ?>">
                         <div class="wp-ulike-pro-tools-card-header">
-                            <h2><?php esc_html_e( 'API Keys Management', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                            <h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'API Keys Management', WP_ULIKE_PRO_DOMAIN ); ?></h2>
                         </div>
                         <div class="wp-ulike-pro-tools-card-content">
                             <?php WP_Ulike_Pro_Tools::render_api_keys_section(); ?>
@@ -545,13 +707,13 @@ if ( $current_tab === 'maintenance' ) {
         <?php elseif ( $current_tab === 'debug' ) : ?>
             <div class="wp-ulike-pro-tools-card">
                 <div class="wp-ulike-pro-tools-card-header">
-                    <h2><?php esc_html_e( 'System Information', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+                    <h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'System Information', WP_ULIKE_PRO_DOMAIN ); ?></h2>
                 </div>
                 <div class="wp-ulike-pro-tools-card-content">
-                    <p><?php esc_html_e( 'Copy the information below and send it to support when requesting help. This information helps us troubleshoot your issue more effectively.', WP_ULIKE_PRO_DOMAIN ); ?></p>
-                    <p style="color: #46b450; font-size: 13px; margin-top: 10px;">
-                        <strong><?php esc_html_e( 'Privacy Note:', WP_ULIKE_PRO_DOMAIN ); ?></strong>
-                        <?php esc_html_e( 'This information is safe to share. It contains no passwords, license keys, or sensitive personal data—only system configuration details needed for technical support.', WP_ULIKE_PRO_DOMAIN ); ?>
+                    <p class="wp-ulike-tools-panel__intro"><?php esc_html_e( 'Copy the information below and send it to support when requesting help. This information helps us troubleshoot your issue more effectively.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                    <p class="wp-ulike-tools-panel__notice wp-ulike-tools-panel__notice--privacy">
+                        <strong><?php esc_html_e( 'Privacy note:', WP_ULIKE_PRO_DOMAIN ); ?></strong>
+                        <?php esc_html_e( 'This report does not include your password, license key, IP addresses, or user statistics. It lists technical versions, your site URL, active plugins, and up to the last 200 lines from your debug log when that file exists. Review the text below before sending it to support.', WP_ULIKE_PRO_DOMAIN ); ?>
                     </p>
                     <textarea readonly="readonly" onclick="this.focus();this.select()" id="wp-ulike-debug-info" class="large-text wp-ulike-pro-debug-textarea" rows="20"><?php echo esc_textarea( $debug_info ); ?></textarea>
                     <p class="submit">
@@ -559,8 +721,8 @@ if ( $current_tab === 'maintenance' ) {
                             <?php esc_html_e( 'Copy to Clipboard', WP_ULIKE_PRO_DOMAIN ); ?>
                         </button>
                         <button type="button" class="button" id="wp-ulike-download-debug-info">
-                            <span class="dashicons dashicons-download" style="vertical-align: middle; margin-right: 4px;"></span>
-                            <?php esc_html_e( 'Download Logs', WP_ULIKE_PRO_DOMAIN ); ?>
+                            <span class="dashicons dashicons-download" aria-hidden="true"></span>
+                            <?php esc_html_e( 'Download report', WP_ULIKE_PRO_DOMAIN ); ?>
                         </button>
                         <span class="wp-ulike-pro-copy-success">
                             <span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'Copied!', WP_ULIKE_PRO_DOMAIN ); ?>
@@ -569,6 +731,8 @@ if ( $current_tab === 'maintenance' ) {
                 </div>
             </div>
         <?php endif; ?>
-    </div>
+		</div>
+	</div>
 </div>
+
 

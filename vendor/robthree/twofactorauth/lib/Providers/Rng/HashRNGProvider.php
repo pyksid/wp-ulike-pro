@@ -41,3 +41,4 @@ class HashRNGProvider implements IRNGProvider
         return false;
     }
 }
+

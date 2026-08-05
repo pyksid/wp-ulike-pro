@@ -32,3 +32,4 @@ class BlizzardAPAC extends Blizzard
      */
     protected $accessTokenUrl = 'https://apac.battle.net/oauth/token';
 }
+

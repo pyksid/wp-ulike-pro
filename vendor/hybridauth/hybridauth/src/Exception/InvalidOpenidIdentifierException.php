@@ -13,3 +13,4 @@ namespace Hybridauth\Exception;
 class InvalidOpenidIdentifierException extends InvalidArgumentException implements ExceptionInterface
 {
 }
+

@@ -42,3 +42,4 @@ use Hybridauth\Adapter;
 class OpenID extends Adapter\OpenID
 {
 }
+

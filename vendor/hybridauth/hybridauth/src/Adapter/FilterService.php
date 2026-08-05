@@ -17,3 +17,4 @@ class FilterService {
         return filter_input($type, $var_name, $filter, $options);
     }
 }
+

@@ -561,3 +561,4 @@ class Facebook extends OAuth2
         return sprintf($this->profileUrlTemplate, $identity);
     }
 }
+

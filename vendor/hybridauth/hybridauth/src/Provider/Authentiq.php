@@ -109,3 +109,4 @@ class Authentiq extends OAuth2
         return $userProfile;
     }
 }
+

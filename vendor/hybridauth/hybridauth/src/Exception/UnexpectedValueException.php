@@ -17,3 +17,4 @@ namespace Hybridauth\Exception;
 class UnexpectedValueException extends RuntimeException implements ExceptionInterface
 {
 }
+

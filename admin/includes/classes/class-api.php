@@ -15,8 +15,94 @@ class WP_Ulike_Pro_API {
 	const PRODUCT_ID   = 13;
 
 	const BASE_API_URL = 'https://wpulike.com/api/audit/v1/licenses/';
-	const RENEW_URL    = 'https://wpulike.com/checkout/';
-	const PRICING_URL  = 'https://wpulike.com/pricing/';
+	const HOMEPAGE_URL   = 'https://wpulike.com/';
+	const ACCOUNT_URL    = 'https://wpulike.com/user/';
+	const RENEW_URL      = 'https://wpulike.com/checkout/';
+	const PRICING_URL    = 'https://wpulike.com/pricing/';
+
+	/**
+	 * Pricing page URL with UTM parameters.
+	 *
+	 * @param string $campaign Campaign slug.
+	 * @param string $source   utm_source value.
+	 * @param array  $query    Extra query args.
+	 * @return string
+	 */
+	public static function get_pricing_url( $campaign = 'pricing', $source = 'wp-dash', $query = array() ) {
+		return add_query_arg(
+			array_merge(
+				array(
+					'utm_source'   => $source,
+					'utm_medium'   => 'wp-dash',
+					'utm_campaign' => $campaign,
+				),
+				$query
+			),
+			self::PRICING_URL
+		);
+	}
+
+	/**
+	 * Account / user dashboard URL with UTM parameters.
+	 *
+	 * @param string $campaign Campaign slug.
+	 * @param string $source   utm_source value.
+	 * @return string
+	 */
+	public static function get_account_url( $campaign = 'account', $source = 'wp-dash' ) {
+		return add_query_arg(
+			array(
+				'utm_source'   => $source,
+				'utm_medium'   => 'wp-dash',
+				'utm_campaign' => $campaign,
+			),
+			self::ACCOUNT_URL
+		);
+	}
+
+	/**
+	 * Checkout / renew URL with UTM parameters and EDD license args.
+	 *
+	 * @param string $license_key License key.
+	 * @param string $campaign    Campaign slug.
+	 * @param string $source      utm_source value.
+	 * @param array  $extra_query Extra checkout query args.
+	 * @return string
+	 */
+	public static function get_renew_url( $license_key, $campaign = 'renew-license', $source = 'license-page', $extra_query = array() ) {
+		return add_query_arg(
+			array_merge(
+				array(
+					'utm_source'        => $source,
+					'utm_medium'        => 'wp-dash',
+					'utm_campaign'      => $campaign,
+					'edd_license_key'   => $license_key,
+					'download_id'       => self::PRODUCT_ID,
+				),
+				$extra_query
+			),
+			self::RENEW_URL
+		);
+	}
+
+	/**
+	 * wpulike.com homepage URL with UTM parameters.
+	 *
+	 * @param string $campaign Campaign slug.
+	 * @param string $source   utm_source value.
+	 * @param string $medium   utm_medium value.
+	 * @return string
+	 */
+	public static function get_homepage_url( $campaign = 'homepage', $source = 'wp-dash', $medium = 'wp-dash' ) {
+		return add_query_arg(
+			array(
+				'utm_source'   => $source,
+				'utm_medium'   => $medium,
+				'utm_campaign' => $campaign,
+			),
+			self::HOMEPAGE_URL
+		);
+	}
 
 	// License Statuses
 	const STATUS_VALID          = 'valid';
@@ -100,14 +186,13 @@ class WP_Ulike_Pro_API {
 				return self::remote_post( $body_args, $retry_count + 1 );
 			}
 
-			// Return user-friendly error message
-			return new \WP_Error(
+			return self::license_api_wp_error(
 				$error_code,
-				sprintf(
-					'<p><strong>%s</strong></p><p>%s</p><p>%s <a href="mailto:info@wpulike.com">info@wpulike.com</a>.</p>',
-					esc_html__( 'Connection Error', WP_ULIKE_PRO_DOMAIN ),
-					esc_html__( 'Unable to connect to the license server. This could be due to:', WP_ULIKE_PRO_DOMAIN ),
-					esc_html__( 'If the problem persists, please contact our support at', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'Could not connect to the WP ULike license server. Check firewall, security plugins, and “Details for support” on the License page.', WP_ULIKE_PRO_DOMAIN ),
+				array(
+					'http_code'  => 0,
+					'http_message' => $error_message,
+					'connection' => $error_code,
 				)
 			);
 		}
@@ -123,7 +208,7 @@ class WP_Ulike_Pro_API {
 		}
 
 		$response_body = wp_remote_retrieve_body( $response );
-		$data = json_decode( $response_body, true );
+		$data          = json_decode( $response_body, true );
 
 		// Show detailed debug info for any error (4xx, non-200, or invalid JSON)
 		$should_show_debug = (
@@ -133,187 +218,167 @@ class WP_Ulike_Pro_API {
 		);
 
 		if ( $should_show_debug ) {
-			return new \WP_Error(
-				$response_code >= 400 && $response_code < 500 ? 'http_error' : ( $response_code !== 200 ? 'unexpected_response' : 'no_json' ),
-				self::get_debug_error_message( $response, $response_code, $response_message, $response_body, $body_args, $site_url )
+			$error_code = $response_code >= 400 && $response_code < 500 ? 'http_error' : ( $response_code !== 200 ? 'unexpected_response' : 'no_json' );
+
+			return self::license_api_wp_error(
+				$error_code,
+				self::get_short_license_api_error_message( $response_code, $response_message, empty( $data ) || ! is_array( $data ) ),
+				array(
+					'http_code'    => (int) $response_code,
+					'http_message' => $response_message,
+					'body'         => $response_body,
+				)
 			);
 		}
 
 		// Ensure data structure exists
 		if ( ! isset( $data['data'] ) ) {
-			return new \WP_Error(
+			return self::license_api_wp_error(
 				'invalid_response',
-				esc_html__( 'Invalid response format from license server.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'Invalid response format from license server.', WP_ULIKE_PRO_DOMAIN ),
+				array(
+					'http_code'    => (int) $response_code,
+					'http_message' => $response_message,
+					'body'         => $response_body,
+				)
 			);
 		}
+
+		self::clear_last_license_api_error();
 
 		return $data['data'];
 	}
 
 	/**
-	 * Generate comprehensive debug error message with copy functionality
-	 *
-	 * @param array|\WP_Error $response The HTTP response
-	 * @param int $response_code HTTP response code
-	 * @param string $response_message HTTP response message
-	 * @param string $response_body Response body
-	 * @param array $body_args Request body arguments
-	 * @param string $site_url Site URL
-	 * @return string HTML formatted debug message
+	 * @param array<string, mixed> $context Error context (http_code, http_message, body, connection).
 	 */
-	private static function get_debug_error_message( $response, $response_code, $response_message, $response_body, $body_args, $site_url ) {
-		// Safely get server info without blocking on IP lookup
-		$remote_ip = isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) : ( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'Unknown' );
+	private static function persist_last_license_api_error( array $context ) {
+		update_option(
+			'wp_ulike_pro_last_license_api_error',
+			array(
+				'time'         => time(),
+				'code'         => isset( $context['code'] ) ? sanitize_key( (string) $context['code'] ) : '',
+				'http_code'    => (int) ( $context['http_code'] ?? 0 ),
+				'http_message' => sanitize_text_field( (string) ( $context['http_message'] ?? '' ) ),
+				'body_excerpt' => self::sanitize_response_excerpt( $context['body'] ?? '' ),
+				'connection'   => sanitize_key( (string) ( $context['connection'] ?? '' ) ),
+			),
+			false
+		);
 
-		// Try to get public IP, but don't block if it fails
-		$public_ip = 'Not available';
-		try {
-			$public_ip = self::get_public_server_ip();
-		} catch ( Exception $e ) {
-			// Silently fail - public IP is not critical for error reporting
+		delete_option( 'wp_ulike_pro_last_license_api_debug' );
+	}
+
+	/**
+	 * Last license API failure (7 days), for License → Details for support.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public static function get_last_license_api_error() {
+		$data = get_option( 'wp_ulike_pro_last_license_api_error' );
+
+		if ( ! is_array( $data ) || empty( $data['time'] ) ) {
+			return null;
 		}
 
-		// Get response headers
-		$response_headers = wp_remote_retrieve_headers( $response );
-		$headers_string = '';
-		if ( $response_headers && is_array( $response_headers ) ) {
-			$headers_array = [];
-			foreach ( $response_headers as $key => $value ) {
-				$headers_array[] = $key . ': ' . ( is_array( $value ) ? implode( ', ', $value ) : $value );
+		if ( time() - (int) $data['time'] > WEEK_IN_SECONDS ) {
+			return null;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Clear stored API error after a successful license request.
+	 */
+	public static function clear_last_license_api_error() {
+		delete_option( 'wp_ulike_pro_last_license_api_error' );
+		delete_option( 'wp_ulike_pro_last_license_api_debug' );
+	}
+
+	/**
+	 * Safe excerpt of an API response body for support (no secrets, truncated).
+	 *
+	 * @param string $body Raw response body.
+	 * @param int    $max  Max characters.
+	 * @return string
+	 */
+	private static function sanitize_response_excerpt( $body, $max = 400 ) {
+		$body = is_string( $body ) ? trim( $body ) : '';
+
+		if ( '' === $body ) {
+			return '';
+		}
+
+		$decoded = json_decode( $body, true );
+
+		if ( is_array( $decoded ) ) {
+			foreach ( array( 'message', 'error', 'error_message' ) as $key ) {
+				if ( ! empty( $decoded[ $key ] ) && is_scalar( $decoded[ $key ] ) ) {
+					$body = (string) $decoded[ $key ];
+					break;
+				}
 			}
-			$headers_string = implode( "\n", $headers_array );
 		}
 
-		// Prepare request body (hide sensitive data)
-		$request_body = $body_args;
-		if ( isset( $request_body['item_license'] ) ) {
-			$request_body['item_license'] = substr( $request_body['item_license'], 0, 8 ) . '...' . substr( $request_body['item_license'], -4 );
-		}
-		$request_body_json = wp_json_encode( $request_body, JSON_PRETTY_PRINT );
+		$body = wp_strip_all_tags( $body );
+		$body = preg_replace( '/\s+/u', ' ', $body );
+		$body = preg_replace( '/[a-f0-9]{32,}/i', '[redacted]', $body );
 
-		// Get additional debugging information
-		$server_software = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown';
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : 'Unknown';
-		$memory_limit = ini_get( 'memory_limit' );
-		$max_execution_time = ini_get( 'max_execution_time' );
-		$curl_version = function_exists( 'curl_version' ) ? curl_version() : false;
-		$curl_info = $curl_version ? ( $curl_version['version'] . ' (SSL: ' . ( isset( $curl_version['ssl_version'] ) ? $curl_version['ssl_version'] : 'N/A' ) . ')' ) : 'Not available';
-		$openssl_version = defined( 'OPENSSL_VERSION_TEXT' ) ? OPENSSL_VERSION_TEXT : ( function_exists( 'openssl_version_text' ) ? openssl_version_text() : 'Not available' );
-
-		// WordPress debug info
-		$wp_debug = defined( 'WP_DEBUG' ) && WP_DEBUG ? 'Yes' : 'No';
-		$wp_debug_log = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ? 'Yes' : 'No';
-		$wp_debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ? 'Yes' : 'No';
-
-		// Active plugins count
-		$active_plugins = get_option( 'active_plugins', [] );
-		$active_plugins_count = is_array( $active_plugins ) ? count( $active_plugins ) : 0;
-		if ( is_multisite() ) {
-			$network_plugins = get_site_option( 'active_sitewide_plugins', [] );
-			$active_plugins_count += is_array( $network_plugins ) ? count( $network_plugins ) : 0;
+		if ( strlen( $body ) > $max ) {
+			$body = substr( $body, 0, $max ) . '…';
 		}
 
-		// Theme info
-		$theme = wp_get_theme();
-		$theme_name = $theme->get( 'Name' ) ?: 'Unknown';
-		$theme_version = $theme->get( 'Version' ) ?: 'Unknown';
+		return $body;
+	}
 
-		// SSL/TLS info
-		$is_ssl = is_ssl() ? 'Yes' : 'No';
-		$ssl_version = isset( $_SERVER['SERVER_PROTOCOL'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_PROTOCOL'] ) ) : 'Unknown';
+	/**
+	 * Short user-facing message for license API failures.
+	 *
+	 * @param int    $response_code    HTTP code.
+	 * @param string $response_message HTTP message.
+	 * @param bool   $invalid_json     Whether JSON parsing failed.
+	 * @return string
+	 */
+	private static function get_short_license_api_error_message( $response_code, $response_message, $invalid_json = false ) {
+		if ( $invalid_json || 0 === (int) $response_code ) {
+			return esc_html__( 'The license server returned an unexpected response. Copy “Details for support” and contact us if this continues.', WP_ULIKE_PRO_DOMAIN );
+		}
 
-		// Request timing (if available from response)
-		$request_time = isset( $response['http_response'] ) && method_exists( $response['http_response'], 'get_response_object' ) ? 'Available' : 'Not tracked';
+		if ( $response_code >= 500 ) {
+			return sprintf(
+				/* translators: %d: HTTP status code */
+				esc_html__( 'License server error (HTTP %d). Try again in a few minutes.', WP_ULIKE_PRO_DOMAIN ),
+				(int) $response_code
+			);
+		}
 
-		// Build comprehensive debug message
-		$debug_message = sprintf(
-			"=== WP ULike Pro API Debug Information ===\n\n" .
-			"ERROR DETAILS:\n" .
-			"Response Code: %s\n" .
-			"Response Message: %s\n" .
-			"API Endpoint: %s\n" .
-			"Request Method: POST\n\n" .
-			"SERVER INFORMATION:\n" .
-			"Server IP: %s\n" .
-			"Remote IP: %s\n" .
-			"Public IP: %s\n" .
-			"Server Software: %s\n" .
-			"Site URL: %s\n" .
-			"Is Multisite: %s\n" .
-			"Is SSL: %s\n" .
-			"Protocol: %s\n\n" .
-			"SOFTWARE VERSIONS:\n" .
-			"PHP Version: %s\n" .
-			"WordPress Version: %s\n" .
-			"WP ULike Pro Version: %s\n" .
-			"cURL Version: %s\n" .
-			"OpenSSL Version: %s\n" .
-			"Theme: %s (v%s)\n" .
-			"Active Plugins Count: %d\n\n" .
-			"PHP CONFIGURATION:\n" .
-			"Memory Limit: %s\n" .
-			"Max Execution Time: %s\n" .
-			"allow_url_fopen: %s\n\n" .
-			"WORDPRESS DEBUG:\n" .
-			"WP_DEBUG: %s\n" .
-			"WP_DEBUG_LOG: %s\n" .
-			"WP_DEBUG_DISPLAY: %s\n\n" .
-			"REQUEST INFORMATION:\n" .
-			"User Agent: %s\n" .
-			"Request Body: %s\n\n" .
-			"RESPONSE INFORMATION:\n" .
-			"Response Headers: %s\n" .
-			"Response Body: %s\n\n" .
-			"TIMESTAMP:\n" .
-			"Date: %s\n" .
-			"Timezone: %s\n",
-			$response_code ?: 'Unknown',
-			$response_message ?: 'Unknown',
-			self::BASE_API_URL,
-			isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) : 'Unknown',
-			$remote_ip,
-			$public_ip,
-			$server_software,
-			esc_url( $site_url ),
-			is_multisite() ? 'Yes' : 'No',
-			$is_ssl,
-			$ssl_version,
-			phpversion(),
-			get_bloginfo( 'version' ),
-			defined( 'WP_ULIKE_PRO_VERSION' ) ? WP_ULIKE_PRO_VERSION : 'Unknown',
-			$curl_info,
-			$openssl_version,
-			$theme_name,
-			$theme_version,
-			$active_plugins_count,
-			$memory_limit,
-			$max_execution_time,
-			ini_get( 'allow_url_fopen' ) ? 'Enabled' : 'Disabled',
-			$wp_debug,
-			$wp_debug_log,
-			$wp_debug_display,
-			$user_agent,
-			$request_body_json ?: 'Not available',
-			$headers_string ?: 'Not available',
-			! empty( $response_body ) ? ( strlen( $response_body ) > 1000 ? substr( $response_body, 0, 1000 ) . '... (truncated)' : $response_body ) : 'Empty response',
-			current_time( 'mysql' ),
-			wp_timezone_string()
+		if ( $response_code >= 400 ) {
+			return sprintf(
+				/* translators: %d: HTTP status code */
+				esc_html__( 'License request blocked or rejected (HTTP %d). Check your firewall or security plugins, then copy “Details for support”.', WP_ULIKE_PRO_DOMAIN ),
+				(int) $response_code
+			);
+		}
+
+		return esc_html__( 'Could not verify the license with WP ULike. Use “Details for support” on the License page.', WP_ULIKE_PRO_DOMAIN );
+	}
+
+	/**
+	 * @param string               $code         Error code.
+	 * @param string               $user_message User-facing message.
+	 * @param array<string, mixed> $context      HTTP/connection context for support.
+	 * @return \WP_Error
+	 */
+	private static function license_api_wp_error( $code, $user_message, array $context = array() ) {
+		$context['code'] = $code;
+		self::persist_last_license_api_error( $context );
+
+		return new \WP_Error(
+			$code,
+			$user_message,
+			array( 'user_message' => $user_message )
 		);
-
-		// Simple debug message with pre/code block
-		$debug_info = sprintf(
-			'<div class="notice notice-error" style="margin: 15px 0;">
-				<p><strong>%s</strong></p>
-				<p>%s <a href="mailto:info@wpulike.com">info@wpulike.com</a> %s:</p>
-				<pre style="background: #f4f4f4; padding: 15px; border: 1px solid #ddd; border-radius: 4px; overflow: auto; max-height: 500px; max-width: 100%%; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;"><code style="display: block; overflow: auto;">%s</code></pre>
-			</div>',
-			esc_html__( 'Error occurred', WP_ULIKE_PRO_DOMAIN ),
-			esc_html__( 'If the problem persists, please contact our support at', WP_ULIKE_PRO_DOMAIN ),
-			esc_html__( 'and share the following debug information', WP_ULIKE_PRO_DOMAIN ),
-			esc_html( trim( $debug_message ) )
-		);
-
-		return $debug_info;
 	}
 
 	/**
@@ -593,7 +658,7 @@ class WP_Ulike_Pro_API {
 				esc_html__( '%1$sYou have no more activations left.%2$s %3$sPlease upgrade to a more advanced license%4$s (you\'ll only need to cover the difference).', WP_ULIKE_PRO_DOMAIN ),
 				'<strong>',
 				'</strong>',
-				'<a href="https://wpulike.com/user/" target="_blank">',
+				'<a href="' . esc_url( self::get_account_url( 'upgrade-license', 'wp-dash' ) ) . '" target="_blank">',
 				'</a>'
 			),
 			'expired'             => sprintf(
@@ -601,7 +666,7 @@ class WP_Ulike_Pro_API {
 				esc_html__( '%1$sOh no! Your WP ULike Pro license has expired.%2$s Want to keep creating better marketing and high-performing websites? Renew your subscription to regain access to all of the new pro features, templates, updates & more. %3$sRenew now%4$s', WP_ULIKE_PRO_DOMAIN ),
 				'<strong>',
 				'</strong>',
-				'<a href="https://wpulike.com/pricing/" target="_blank">',
+				'<a href="' . esc_url( self::get_pricing_url( 'renew-license', 'wp-dash' ) ) . '" target="_blank">',
 				'</a>'
 			),
 			'missing'             => esc_html__( 'Your license is missing. Please check your key again.', WP_ULIKE_PRO_DOMAIN ),
@@ -645,21 +710,21 @@ class WP_Ulike_Pro_API {
 	}
 
 	public static function has_permission() {
-		// Front-end: Just check if license key exists (no validation, no server requests)
-		if( ! is_admin() || wp_doing_ajax() ){
+		// Front-end: lightweight check — key must exist (no remote validation).
+		if ( ! is_admin() ) {
 			$license_key = WP_Ulike_Pro_License::get_license_key();
 			return ! empty( $license_key );
 		}
 
-		// Admin area: Simple check using cached data
+		// Admin area (including AJAX): use cached license status.
 		$license_data = self::get_license_data( false );
 
 		if ( ! is_array( $license_data ) || empty( $license_data['license'] ) ) {
 			return false;
 		}
 
-		// Allow valid and expired licenses (expired gets grace period)
-		return in_array( $license_data['license'], [ self::STATUS_VALID, self::STATUS_EXPIRED ] );
+		// Allow valid and expired licenses (expired gets grace period).
+		return in_array( $license_data['license'], [ self::STATUS_VALID, self::STATUS_EXPIRED ], true );
 	}
 
 	public static function is_license_about_to_expire() {

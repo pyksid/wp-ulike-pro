@@ -22,3 +22,4 @@ class EndroidQRCodeTest extends TestCase
 
     }
 }
+

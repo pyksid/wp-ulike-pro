@@ -74,3 +74,4 @@ class QRicketProvider extends BaseHTTPQRCodeProvider
             . '&d=' . rawurlencode($qrtext);
     }
 }
+

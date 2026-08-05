@@ -98,3 +98,4 @@ class Slack extends OAuth2
         return null;
     }
 }
+

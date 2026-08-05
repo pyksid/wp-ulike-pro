@@ -742,3 +742,4 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
         return $response;
     }
 }
+

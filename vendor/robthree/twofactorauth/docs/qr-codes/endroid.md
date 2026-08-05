@@ -35,3 +35,4 @@ $qrCodeProvider->setLogo('/path/to/your/image');
 ```
 
 You can see how to also set the size of the logo in the [source code](https://github.com/RobThree/TwoFactorAuth/blob/master/lib/Providers/Qr/EndroidQrCodeWithLogoProvider.php).
+

@@ -121,3 +121,4 @@ class Metadata
         $this->searchTreeSize = $this->nodeCount * $this->nodeByteSize;
     }
 }
+

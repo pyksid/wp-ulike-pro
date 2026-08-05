@@ -2,7 +2,7 @@
 /**
  * Front-End Scripts Class.
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -52,7 +52,10 @@ class WP_Ulike_Pro_Front_End_Assets {
             'TabSide' => wp_ulike_get_option( 'user_profiles_appearance|tabs_side', 'top' ),
             'ViewTracking' => array(
                 'enabledTypes' => $view_tracking_enabled
-            )
+            ),
+            'notifications' => wp_ulike_get_option( 'enable_toast_notice', true ),
+            'ajax_error'    => wp_ulike_setting_repo::getAjaxErrorNotice(),
+            'modalClose'    => esc_html__( 'Close dialog', WP_ULIKE_PRO_DOMAIN ),
         );
 
         if( ! WP_Ulike_Pro::is_preview_mode() ){
@@ -86,8 +89,8 @@ class WP_Ulike_Pro_Front_End_Assets {
                 // Get formatted avatar config for JavaScript
                 $avatar_config_js = WP_Ulike_Pro_Options::getAvatarConfigForJs();
 
-                // Localize config
-                wp_localize_script( 'ulp-uploader', 'fileUploaderCommonConfig', array(
+                // Pass config as inline JSON.
+                wp_ulike_add_inline_script_data( 'ulp-uploader', 'fileUploaderCommonConfig', array(
                     'AjaxUrl' => add_query_arg( WP_Ulike_Pro::is_preview_mode() ? array( 'preview' => true ) : array(), admin_url( 'admin-ajax.php' ) ),
                     'Nonce' => wp_create_nonce( WP_ULIKE_PRO_DOMAIN ),
                     'uploadUrl' => trailingslashit( $upload_url ),
@@ -105,11 +108,10 @@ class WP_Ulike_Pro_Front_End_Assets {
         wp_enqueue_style( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/css/wp-ulike-pro.min.css', array( WP_ULIKE_SLUG ), WP_ULIKE_PRO_VERSION );
 
         //Add wp_ulike script file with special functions.
-        wp_enqueue_script( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js', array(), WP_ULIKE_PRO_VERSION, true );
+        wp_ulike_enqueue_script_with_defer( WP_ULIKE_PRO_DOMAIN, WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/wp-ulike-pro.min.js', array(), WP_ULIKE_PRO_VERSION );
 
 
-        //localize script
-        wp_localize_script( WP_ULIKE_PRO_DOMAIN, 'UlikeProCommonConfig', $localize_args );
+        wp_ulike_add_inline_script_data( WP_ULIKE_PRO_DOMAIN, 'UlikeProCommonConfig', apply_filters( 'wp_ulike_pro_front_end_localize', $localize_args ) );
     }
 
 }

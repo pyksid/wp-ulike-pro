@@ -72,3 +72,4 @@ class Dropbox extends OAuth2
         return $userProfile;
     }
 }
+

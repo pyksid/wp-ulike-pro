@@ -7,7 +7,7 @@ namespace WpUlikePro\Includes\Elementor;
  *
  * Custom Elementor extension.
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -51,7 +51,7 @@ final class Elements {
      *
      * @var string Minimum PHP version required to run the plugin.
      */
-    const MINIMUM_PHP_VERSION = '5.4.0';
+    const MINIMUM_PHP_VERSION = '7.3.0';
 
     /**
      * Default elementor dir path
@@ -400,3 +400,4 @@ final class Elements {
 }
 
 Elements::instance();
+

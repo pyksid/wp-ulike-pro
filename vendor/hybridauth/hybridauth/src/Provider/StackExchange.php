@@ -104,3 +104,4 @@ class StackExchange extends OAuth2
         return $userProfile;
     }
 }
+

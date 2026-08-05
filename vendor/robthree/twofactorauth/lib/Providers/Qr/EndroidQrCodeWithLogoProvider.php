@@ -53,3 +53,4 @@ class EndroidQrCodeWithLogoProvider extends EndroidQrCodeProvider
         return $qrCode;
     }
 }
+

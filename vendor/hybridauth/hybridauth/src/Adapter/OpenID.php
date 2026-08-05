@@ -281,3 +281,4 @@ abstract class OpenID extends AbstractAdapter implements AdapterInterface
         return $userProfile;
     }
 }
+

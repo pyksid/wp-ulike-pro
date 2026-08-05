@@ -2,7 +2,7 @@
 /**
  * Handle data for the current users session.
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -640,3 +640,4 @@ class WP_Ulike_Pro_Session_Handler extends WP_Ulike_Pro_Session {
 		return $user_id && null !== $GLOBALS['wpdb']->get_var( $GLOBALS['wpdb']->prepare( "SELECT session_key FROM {$this->_table} WHERE session_key = %s", $user_id ) );
 	}
 }
+

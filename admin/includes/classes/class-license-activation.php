@@ -24,6 +24,13 @@ class WP_Ulike_Pro_License_Activation{
 	 */
 	protected static $instance  = null;
 
+	/**
+	 * Option name for legacy license info.
+	 *
+	 * @var string
+	 */
+	protected $option_prefix = 'wp_ulike_pro_license_info';
+
 	function __construct(){
 		$this->option_prefix = 'wp_ulike_pro_license_info';
 	}
@@ -128,3 +135,4 @@ class WP_Ulike_Pro_License_Activation{
     }
 
 }
+

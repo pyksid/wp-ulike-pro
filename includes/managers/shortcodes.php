@@ -2,7 +2,7 @@
 /**
  * Shortcodes manager
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -50,6 +50,90 @@ add_shortcode( 'wp_ulike_pro_completeness_profile', 'wp_ulike_pro_profile_shortc
 
 
 /**
+ * Count string/int status values for array_count_values()-safe tallies.
+ *
+ * @param array $values Flat status map values.
+ * @return array<string|int,int>
+ */
+function wp_ulike_pro_count_scalar_status_values( $values ) {
+    if ( ! is_array( $values ) ) {
+        return array();
+    }
+
+    $scalars = array();
+    foreach ( $values as $value ) {
+        if ( ( is_string( $value ) || is_int( $value ) ) && ! empty( $value ) ) {
+            $scalars[] = $value;
+        }
+    }
+
+    return empty( $scalars ) ? array() : array_count_values( $scalars );
+}
+
+/**
+ * Count active engagement keys from nested user engagement meta.
+ *
+ * Shape: [ item_id => [ kind => [ engagement_key, status, ... ] ] ]
+ *
+ * @param array $cache Engagement meta cache.
+ * @return array<string,int>
+ */
+function wp_ulike_pro_count_engagement_meta_statuses( $cache ) {
+    if ( ! is_array( $cache ) ) {
+        return array();
+    }
+
+    $counts = array();
+
+    foreach ( $cache as $kinds ) {
+        if ( ! is_array( $kinds ) ) {
+            continue;
+        }
+
+        foreach ( $kinds as $state ) {
+            if ( ! is_array( $state ) ) {
+                continue;
+            }
+
+            if ( isset( $state['status'] ) && 'active' !== $state['status'] ) {
+                continue;
+            }
+
+            $key = isset( $state['engagement_key'] ) ? sanitize_key( $state['engagement_key'] ) : '';
+            if ( '' === $key ) {
+                continue;
+            }
+
+            $counts[ $key ] = isset( $counts[ $key ] ) ? (int) $counts[ $key ] + 1 : 1;
+        }
+    }
+
+    return $counts;
+}
+
+/**
+ * Sum status tallies while excluding removed vote buckets (unlike/undislike).
+ *
+ * @param array $counts Status => count map.
+ * @return int
+ */
+function wp_ulike_pro_sum_active_status_counts( $counts ) {
+    if ( ! is_array( $counts ) ) {
+        return 0;
+    }
+
+    $sum = 0;
+    foreach ( $counts as $status_key => $count ) {
+        if ( in_array( (string) $status_key, array( 'unlike', 'undislike' ), true ) ) {
+            continue;
+        }
+        $sum += (int) $count;
+    }
+
+    return $sum;
+}
+
+/**
  * Create shortcode: [wp_ulike_pro_user_info]
  *
  * @param array $atts
@@ -94,59 +178,69 @@ function  wp_ulike_pro_user_info_shortcode( $atts ){
         $result    = 0;
 
         if( is_array( $user_info ) ){
-            foreach ($user_info as $key => $value) {
-                if( !empty( $value[0] ) ){
-                    $unserialize_value = maybe_unserialize( $value[0] );
-                    $raw_data[ $key ]  = array_count_values( array_filter( $unserialize_value ) );
+            foreach ( $user_info as $key => $value ) {
+                if ( empty( $value[0] ) ) {
+                    continue;
+                }
+
+                $unserialize_value = maybe_unserialize( $value[0] );
+                if ( ! is_array( $unserialize_value ) ) {
+                    continue;
+                }
+
+                $status_slug = '';
+                $counts      = array();
+
+                // Legacy vote history: user_{type}_status => [ item_id => 'like' ]
+                if ( preg_match( '/_status$/', $key ) ) {
+                    $status_slug = $key;
+                    $counts      = wp_ulike_pro_count_scalar_status_values( $unserialize_value );
+                // Engagement history: user_{type}_engagements => nested item/kind maps
+                } elseif ( preg_match( '/_engagements$/', $key ) ) {
+                    $status_slug = preg_replace( '/_engagements$/', '_status', $key );
+                    $counts      = wp_ulike_pro_count_engagement_meta_statuses( $unserialize_value );
+                }
+
+                if ( '' === $status_slug || empty( $counts ) ) {
+                    continue;
+                }
+
+                // Merge so legacy + engagement meta for the same type both contribute.
+                if ( ! isset( $raw_data[ $status_slug ] ) ) {
+                    $raw_data[ $status_slug ] = array();
+                }
+
+                foreach ( $counts as $status_key => $count ) {
+                    $raw_data[ $status_slug ][ $status_key ] = ( isset( $raw_data[ $status_slug ][ $status_key ] ) ? (int) $raw_data[ $status_slug ][ $status_key ] : 0 ) + (int) $count;
                 }
             }
-            if( empty( $table ) ){
-                foreach ($raw_data as $raw_key => $raw_value) {
-                    $current_status_value = !empty( $raw_value[$status] ) ? $raw_value[$status] : 0;
-                    $result += empty( $status ) ? array_sum( $raw_value ) : $current_status_value;
+
+            if ( empty( $table ) ) {
+                foreach ( $raw_data as $raw_value ) {
+                    $current_status_value = ! empty( $raw_value[ $status ] ) ? (int) $raw_value[ $status ] : 0;
+                    $result += empty( $status ) ? wp_ulike_pro_sum_active_status_counts( $raw_value ) : $current_status_value;
                 }
             } else {
-                $slug   = sprintf( 'user_%s_status', $table );
-                if( isset( $raw_data[$slug] ) ){
-                    $result = empty( $status ) ? array_sum( $raw_data[$slug] ) : $raw_data[$slug][$status];
+                $slug = sprintf( 'user_%s_status', sanitize_key( $table ) );
+                if ( isset( $raw_data[ $slug ] ) ) {
+                    $result = empty( $status )
+                        ? wp_ulike_pro_sum_active_status_counts( $raw_data[ $slug ] )
+                        : ( isset( $raw_data[ $slug ][ $status ] ) ? (int) $raw_data[ $slug ][ $status ] : 0 );
                 }
             }
         }
 
     } else {
-        global $wpdb;
-        $tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
-        $data   = array();
+        $activity = wp_ulike_pro_get_user_global_latest_activity( $user_id );
 
-        foreach ( $tables as $t_key => $t_value ) {
-            // SECURITY: Use prepared statement to prevent SQL injection
-            $table_name = esc_sql( $wpdb->prefix . $t_value );
-            $user_id_safe = absint( $user_id );
-            $get_query = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY id DESC LIMIT 1", $user_id_safe ), ARRAY_A );
-            if( ! empty( $get_query ) ){
-                $data[] = $get_query;
-            }
-        }
-
-        if( !empty( $data ) ){
-            $max_date = strtotime( $data[0]['date_time'] );
-            $max_key  = 0;
-
-            foreach ( $data as $d_key => $d_value ) {
-                if( strtotime( $d_value['date_time'] ) > $max_date ){
-                    $max_key  = $d_key;
-                    $max_date = strtotime( $d_value['date_time'] );
-                }
-            }
-
-            switch ($type) {
+        if ( ! empty( $activity ) ) {
+            switch ( $type ) {
                 case 'last_activity':
-                    $date_i18n = wp_date( 'Y-m-d H:i:s', $max_date );
-                    $result    = human_time_diff( strtotime( $date_i18n ) );
+                    $result = human_time_diff( strtotime( $activity['date_time'] ) );
                     break;
 
                 case 'last_status':
-                    $result = $data[$max_key]['status'];
+                    $result = $activity['status'];
                     break;
             }
         }
@@ -663,3 +757,38 @@ function  wp_ulike_pro_social_login_shortcode( $atts ){
     return wp_ulike_pro_get_social_logins( $args );
 }
 add_shortcode( 'wp_ulike_pro_social_login', 'wp_ulike_pro_social_login_shortcode' );
+
+/**
+ * Shortcode: [wp_ulike_pro_engagements]
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string
+ */
+function wp_ulike_pro_engagements_shortcode( $atts ) {
+	$atts = shortcode_atts(
+		array(
+			'id'   => 0,
+			'type' => 'post',
+		),
+		$atts,
+		'wp_ulike_pro_engagements'
+	);
+
+	$item_id   = absint( $atts['id'] );
+	$item_type = sanitize_key( $atts['type'] );
+
+	if ( ! $item_id ) {
+		if ( 'post' === $item_type ) {
+			$item_id = get_the_ID();
+		} elseif ( 'comment' === $item_type ) {
+			$item_id = get_comment_ID();
+		}
+	}
+
+	if ( ! $item_id ) {
+		return '';
+	}
+
+	return wp_ulike_pro_engagements( $item_id, $item_type );
+}
+add_shortcode( 'wp_ulike_pro_engagements', 'wp_ulike_pro_engagements_shortcode' );

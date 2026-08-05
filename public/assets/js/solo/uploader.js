@@ -322,10 +322,8 @@
       // Create modal HTML WITHOUT the large image URL to avoid blocking
       // We'll set the image src after modal opens to prevent large data URLs from blocking
       const cropperHTML = `
-        <div class="ulp-avatar-cropper-modal">
-          <div class="ulp-avatar-cropper-header">
-            <h3>${this.options.messages.chooseProfilePicture}</h3>
-          </div>
+        <div class="ulpmodal-media-wrapper ulp-avatar-cropper-modal">
+          <h3 class="ulpmodal-title">${this.options.messages.chooseProfilePicture}</h3>
           <div class="ulp-avatar-cropper-body">
             <div class="ulp-avatar-cropper-wrapper">
               <div class="ulp-avatar-cropper-image-container">
@@ -365,6 +363,7 @@
       window.ulpmodal(cropperHTML, {
         closeOnClick: false,
         closeOnEsc: true,
+        ariaLabel: this.options.messages.chooseProfilePicture,
         afterOpen: (event) => {
           const modalElement = event && event.target ? event.target : event;
           const img = modalElement.querySelector('#ulp-crop-img');

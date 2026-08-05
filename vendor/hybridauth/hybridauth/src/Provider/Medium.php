@@ -86,3 +86,4 @@ class Medium extends OAuth2
         return $userProfile;
     }
 }
+

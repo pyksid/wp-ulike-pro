@@ -91,3 +91,4 @@ class Spotify extends OAuth2
         return $userProfile;
     }
 }
+

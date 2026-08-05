@@ -15,3 +15,4 @@ namespace Hybridauth\Exception;
 class BadMethodCallException extends RuntimeException implements ExceptionInterface
 {
 }
+

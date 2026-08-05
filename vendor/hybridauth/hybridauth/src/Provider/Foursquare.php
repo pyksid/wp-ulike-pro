@@ -138,3 +138,4 @@ class Foursquare extends OAuth2
         return $userContact;
     }
 }
+

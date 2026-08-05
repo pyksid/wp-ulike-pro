@@ -403,3 +403,4 @@ abstract class AbstractAdapter implements AdapterInterface
         self::$filterService = $filterService;
     }
 }
+

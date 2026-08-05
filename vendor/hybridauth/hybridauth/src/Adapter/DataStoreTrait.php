@@ -72,3 +72,4 @@ trait DataStoreTrait
         $this->getStorage()->deleteMatch($this->providerId . '.');
     }
 }
+

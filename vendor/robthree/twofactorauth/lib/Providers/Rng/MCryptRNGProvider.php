@@ -35,3 +35,4 @@ class MCryptRNGProvider implements IRNGProvider
         return true;
     }
 }
+

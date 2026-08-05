@@ -86,3 +86,4 @@ class Disqus extends OAuth2
         return $userProfile;
     }
 }
+

@@ -125,7 +125,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
                     return array(
                         'like_amount'    => wp_ulike_get_post_likes( $params['id'], 'like' ),
                         'dislike_amount' => wp_ulike_get_post_likes( $params['id'], 'dislike' ),
-                        'likers_ids'     => wp_ulike_get_likers_list_per_post( 'ulike', 'post_id', $params['id'], NULL )
+                        'likers_ids'     => wp_ulike_pro_get_likers_list_per_post( 'ulike', 'post_id', $params['id'], NULL )
                     );
                 }
             ) );
@@ -137,7 +137,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
                     return array(
                         'like_amount'    => wp_ulike_get_comment_likes( $params['id'], 'like' ),
                         'dislike_amount' => wp_ulike_get_comment_likes( $params['id'], 'dislike' ),
-                        'likers_ids'     => wp_ulike_get_likers_list_per_post( 'ulike_comments', 'comment_id', $params['id'], NULL )
+                        'likers_ids'     => wp_ulike_pro_get_likers_list_per_post( 'ulike_comments', 'comment_id', $params['id'], NULL )
                     );
                 }
             ) );
@@ -202,8 +202,8 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
      */
     public function get_items( $request ) {
         $params = $request->get_params();
-        $info   = $this->get_table_info( $params['type'] );
-        $logs   = new WP_Ulike_Pro_Logs( $info['table'], $params['page'], $params['per_page'], $params['search'] );
+        $type   = sanitize_key( $params['type'] );
+        $logs   = new wp_ulike_logs( $type, $params['page'], $params['per_page'] );
         $data   = $logs->get_results();
 
         //return a response or error based on some conditional
@@ -225,48 +225,28 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
      * @return WP_Error|WP_REST_Response
      */
     public function get_item( $request ) {
-        global $wpdb;
-
-        //get parameters from request
         $params = $request->get_params();
         $info   = $this->get_table_info( $params['type'] );
 
-        // SECURITY: Validate table name - whitelist allowed tables
-        $allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
-        if( empty( $info ) || ! isset( $info['table'] ) || ! in_array( $info['table'], $allowed_tables, true ) ){
+        if ( empty( $info ) || empty( $info['table'] ) || empty( $info['column'] ) ) {
             return new WP_Error( 'invalid-table', esc_html__( 'Invalid table type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
         }
 
-        // SECURITY: Validate column name - whitelist allowed columns
-        $allowed_columns = array( 'post_id', 'comment_id', 'activity_id', 'topic_id' );
-        if( empty( $info['column'] ) || ! in_array( $info['column'], $allowed_columns, true ) ){
-            return new WP_Error( 'invalid-column', esc_html__( 'Invalid column type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
-        }
-
-        $table  = esc_sql( $wpdb->prefix . $info['table'] );
-        $column = esc_sql( $info['column'] );
-        $data   = NULL;
-
-        // SECURITY: Sanitize item_id
         $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
-        if( $item_id <= 0 ){
+        if ( $item_id <= 0 ) {
             return new WP_Error( 'invalid-item-id', esc_html__( 'Invalid item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
         }
 
-        if( $params['output'] === 'logs' ){
-            $data = $wpdb->get_row(
-                $wpdb->prepare( "
-                    SELECT * FROM `{$table}`
-                    WHERE `{$column}` = %d",
-                    $item_id
-                )
-            );
+        $output = isset( $params['output'] ) ? strtolower( $params['output'] ) : 'logs';
+        $type   = sanitize_key( $params['type'] );
+
+        if ( 'logs' === $output ) {
+            $data = WP_Ulike_Pro_Pulse_Reader::get_log_row( $info['table'], $item_id );
         } else {
-            // SECURITY: Use sanitized item_id
             $data = array(
-                'like_amount'    => wp_ulike_meta_counter_value( $item_id, $params['type'], 'like',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
-                'dislike_amount' => wp_ulike_meta_counter_value( $item_id, $params['type'], 'dislike',  wp_ulike_setting_repo::isDistinct( $params['type'] ) ),
-                'likers_list'    => wp_ulike_get_likers_list_per_post( $info['table'], $column, $item_id, NULL )
+                'like_amount'    => wp_ulike_meta_counter_value( $item_id, $type, 'like', wp_ulike_setting_repo::isDistinct( $type ) ),
+                'dislike_amount' => wp_ulike_meta_counter_value( $item_id, $type, 'dislike', wp_ulike_setting_repo::isDistinct( $type ) ),
+                'likers_list'    => wp_ulike_pro_get_likers_list_per_post( $info['table'], $info['column'], $item_id, null ),
             );
         }
 
@@ -324,7 +304,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             // Update meta
 			$entities_instance->updateMetaData( $params['item_id'] );
             // Do actions
-            do_action_ref_array('wp_ulike_after_process', $entities_instance->getActionAtts() );
+            wp_ulike_do_action_ref_array( 'wp_ulike_after_process', $entities_instance->getActionAtts() );
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
@@ -364,7 +344,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             // Update meta
 			$entities_instance->updateMetaData( $params['item_id'] );
             // Do actions
-            do_action_ref_array('wp_ulike_after_process', $entities_instance->getActionAtts() );
+            wp_ulike_do_action_ref_array( 'wp_ulike_after_process', $entities_instance->getActionAtts() );
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
@@ -418,7 +398,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             }
 
             // Do actions
-            do_action_ref_array('wp_ulike_after_process', $entities_instance->getActionAtts() );
+            wp_ulike_do_action_ref_array( 'wp_ulike_after_process', $entities_instance->getActionAtts() );
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
@@ -440,41 +420,18 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
      * @return WP_Error|WP_REST_Response
      */
     public function get_user_status( $request ){
-        global $wpdb;
-
         $params = $request->get_params();
-        $info   = $this->get_table_info( $params['type'] );
+        $type   = sanitize_key( $params['type'] );
 
-        // SECURITY: Validate table name - whitelist allowed tables
-        $allowed_tables = array( 'ulike', 'ulike_comments', 'ulike_activities', 'ulike_forums' );
-        if( empty( $info ) || ! isset( $info['table'] ) || ! in_array( $info['table'], $allowed_tables, true ) ){
-            return new WP_Error( 'invalid-table', esc_html__( 'Invalid table type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
-        }
-
-        // SECURITY: Validate column name - whitelist allowed columns
-        $allowed_columns = array( 'post_id', 'comment_id', 'activity_id', 'topic_id' );
-        if( empty( $info['column'] ) || ! in_array( $info['column'], $allowed_columns, true ) ){
-            return new WP_Error( 'invalid-column', esc_html__( 'Invalid column type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
-        }
-
-        // SECURITY: Sanitize and validate user ID and item ID
         $user_id = isset( $params['id'] ) ? absint( $params['id'] ) : 0;
         $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
 
-        if( $user_id <= 0 || $item_id <= 0 ){
+        if ( $user_id <= 0 || $item_id <= 0 ) {
             return new WP_Error( 'invalid-params', esc_html__( 'Invalid user ID or item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
         }
 
-        // SECURITY: Escape table and column names
-        $table_name = esc_sql( $wpdb->prefix . $info['table'] );
-        $column = esc_sql( $info['column'] );
-
-        // SECURITY: Use prepared statement to prevent SQL injection
-        $data = $wpdb->get_var( $wpdb->prepare(
-            "SELECT `status` FROM `{$table_name}` WHERE `user_id` = %d AND `{$column}` = %d ORDER BY `id` DESC LIMIT 1",
-            $user_id,
-            $item_id
-        ) );
+        $activity = wp_ulike_pro_get_user_latest_activity( $item_id, $user_id, $type );
+        $data     = ! empty( $activity['status'] ) ? $activity['status'] : '';
 
         if ( !empty( $data ) ) {
             return new WP_REST_Response( array(
@@ -561,7 +518,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
      */
     public function get_stats( $request ){
         $params = $request->get_params();
-	    $instance = WP_Ulike_Pro_Stats::get_instance();
+	    $instance = WP_Ulike_Pro_Stats_Rest::get_instance();
 
         // filter post types
         $filter = ! empty( $params['filter'] ) ? explode( ',', $params['filter'] ) : '';
@@ -604,15 +561,32 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 	 * @return void
 	 */
 	private function get_authorization_header(){
-		$requestHeaders = apache_request_headers();
-		// Server-side fix for bug in old Android versions (a nice side-effect of this fix means we don't care about capitalization for Authorization)
-        $requestHeaders = array_combine( array_map('ucwords', array_keys( $requestHeaders ) ), array_values( $requestHeaders ) );
-		// Get Authorization Header
-		if ( isset( $requestHeaders['Authorization'] ) ) {
-			return trim( $requestHeaders['Authorization'] );
-		} else {
-			return isset( $_REQUEST['authorization'] ) ? trim( $_REQUEST['authorization'] ) : NULL;
+		if ( function_exists( 'rest_get_authorization_header' ) ) {
+			$header = rest_get_authorization_header();
+			if ( ! empty( $header ) ) {
+				return trim( $header );
+			}
 		}
+
+		if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+			return trim( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) );
+		}
+
+		if ( isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
+			return trim( wp_unslash( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) );
+		}
+
+		if ( function_exists( 'apache_request_headers' ) ) {
+			$request_headers = apache_request_headers();
+			if ( is_array( $request_headers ) ) {
+				$request_headers = array_combine( array_map( 'ucwords', array_keys( $request_headers ) ), array_values( $request_headers ) );
+				if ( isset( $request_headers['Authorization'] ) ) {
+					return trim( $request_headers['Authorization'] );
+				}
+			}
+		}
+
+		return isset( $_REQUEST['authorization'] ) ? trim( wp_unslash( $_REQUEST['authorization'] ) ) : null;
 	}
 
     /**
@@ -652,15 +626,18 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 
 	public function current_user_can( $access_name ){
         $allowed_roles = $this->get_rest_api_setting( $access_name, array( 'administrator' ) );
-        if( ! empty( $allowed_roles ) ){
-            if( empty( $this->current_user->roles ) ){
-                return false;
-            }
-            $user_caps = array_intersect( $allowed_roles, $this->current_user->roles ) ? key( $this->current_user->allcaps ) : 'manage_options';
-            return current_user_can( $user_caps );
+
+        if ( empty( $allowed_roles ) ) {
+            $allowed_roles = array( 'administrator' );
         }
 
-        return true;
+        if ( empty( $this->current_user->ID ) || empty( $this->current_user->roles ) ) {
+            return false;
+        }
+
+        $user_roles = (array) $this->current_user->roles;
+
+        return ! empty( array_intersect( $allowed_roles, $user_roles ) );
     }
 
     public function isValidDate($date, $format = 'Y-m-d') {

@@ -70,3 +70,4 @@ class GitLab extends OAuth2
         return $userProfile;
     }
 }
+

@@ -198,3 +198,4 @@ class Google extends OAuth2
         return $contacts;
     }
 }
+

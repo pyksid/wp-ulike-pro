@@ -48,8 +48,8 @@ if ( $wp_ulike_query->have_posts() ) {
             <div class="wp-ulike-entry-votes">
                 <?php
                 $is_distinct = wp_ulike_setting_repo::isDistinct('topic');
-                $likes       = wp_ulike_get_counter_value( $post->ID, 'topic', 'like', $is_distinct  );
-                $dislikes    = wp_ulike_get_counter_value( $post->ID, 'topic', 'dislike', $is_distinct );
+                $likes       = wp_ulike_pro_get_counter_value( $post->ID, 'topic', 'like', $is_distinct  );
+                $dislikes    = wp_ulike_pro_get_counter_value( $post->ID, 'topic', 'dislike', $is_distinct );
 
                 if( ! empty( $likes ) ){ ?>
                 <span class="wp-ulike-up-votes">

@@ -533,3 +533,4 @@ class PostsButton extends Widget_Base {
     }
 
 }
+

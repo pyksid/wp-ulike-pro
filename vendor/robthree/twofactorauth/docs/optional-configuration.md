@@ -54,3 +54,4 @@ Argument               | Default value | Use
 `$requirecryptosecure` | `true`        | Whether you want to require a cryptographically secure source of random numbers
 
 **Note:** as above, these values provide the widest variety of support amongst common authenticator apps however you may choose to increase the value of `$bits` (160 or higher is recommended, see [RFC 4226 - Algorithm Requirements](https://tools.ietf.org/html/rfc4226#section-4)) as long as it is set to a multiple of 8.
+

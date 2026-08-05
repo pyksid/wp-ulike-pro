@@ -109,3 +109,4 @@ class BitBucket extends OAuth2
         return $userProfile;
     }
 }
+

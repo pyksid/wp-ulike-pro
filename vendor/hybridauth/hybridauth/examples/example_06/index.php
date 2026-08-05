@@ -47,3 +47,4 @@ $adapters = $hybridauth->getConnectedAdapters();
 <?php endif; ?>
 </body>
 </html>
+

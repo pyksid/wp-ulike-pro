@@ -2,7 +2,7 @@
 /**
  * Front-End reCAPTCHA Enqueue Class.
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -43,7 +43,7 @@ class WP_Ulike_Pro_reCAPTCHA_Enqueue {
         }
 
         wp_enqueue_script( 'ulp-recaptcha', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/recaptcha.js', array( 'ulp-google-recapthca-api' ), WP_ULIKE_PRO_VERSION, true );
-        wp_localize_script( 'ulp-recaptcha', 'UlikeProRecaptchaData', array(
+        wp_ulike_add_inline_script_data( 'ulp-recaptcha', 'UlikeProRecaptchaData', array(
             'recaptchaVersion'   => $version,
             'recaptchaSiteKey'  => $site_key,
         ) );

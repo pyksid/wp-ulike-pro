@@ -116,3 +116,4 @@ final class Parser
         return [$birthday['year'], $birthday['month'], $birthday['day']];
     }
 }
+

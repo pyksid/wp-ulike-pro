@@ -2,7 +2,7 @@
 /**
  * Permalinks
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -97,11 +97,11 @@ class WP_Ulike_Pro_Permalinks {
 		global $wpdb;
 
 		$permalink_base = WP_Ulike_Pro_Options::getProfilePermalinkBase();
-		
+
 		// SECURITY: Sanitize permalink_base and slug to prevent SQL injection
 		$permalink_base = sanitize_key( $permalink_base );
 		$slug = sanitize_text_field( $slug );
-		
+
 		// SECURITY: Use prepared statement
 		$meta_key = 'ulp_user_profile_url_slug_' . $permalink_base;
 		$user_id = $wpdb->get_var(

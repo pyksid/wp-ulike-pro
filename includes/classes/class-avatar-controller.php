@@ -79,7 +79,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 				// Delete previous avatar if exists (for better performance)
 				// Get existing avatar data from user meta
 				$existing_avatar_data = get_user_meta( $user_id, 'ulp_avatar_data', true );
-				
+
 				if ( ! empty( $existing_avatar_data['name'] ) ) {
 					// Security: Sanitize and validate filename
 					$existing_name = sanitize_file_name( basename( $existing_avatar_data['name'] ) );

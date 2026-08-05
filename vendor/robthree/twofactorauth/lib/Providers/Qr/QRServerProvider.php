@@ -106,3 +106,4 @@ class QRServerProvider extends BaseHTTPQRCodeProvider
             . '&data=' . rawurlencode($qrtext);
     }
 }
+

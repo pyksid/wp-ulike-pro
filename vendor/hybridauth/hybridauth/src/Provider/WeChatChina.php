@@ -32,3 +32,4 @@ class WeChatChina extends WeChat
      */
     protected $accessTokenInfoUrl = 'https://api.weixin.qq.com/sns/auth';
 }
+

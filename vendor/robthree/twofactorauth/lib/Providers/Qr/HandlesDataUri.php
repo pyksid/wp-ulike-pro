@@ -22,3 +22,4 @@ trait HandlesDataUri
         return null;
     }
 }
+

@@ -1,3 +1,9 @@
+= 2.2.1 =
+* Performance: Lighter plugin — replaced heavy third-party packages with built-in schema and analytics helpers.
+* Improved: Schema.org output, Tools page, overview dashboard, and editor display options.
+* Improved: GeoIP lookup with an updated database (requires WP ULike 5.0.6+).
+* Fix: Various stability and translation fixes.
+
 = 1.8.6 =
 * New: New overview data sections to show monthly & daily performance, including GMGR calculations for more detailed trend analysis.
 * New: User roles engagement displayed through pie charts, offering insights into user interactions.

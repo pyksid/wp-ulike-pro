@@ -31,3 +31,4 @@ abstract class BaseHTTPQRCodeProvider implements IQRCodeProvider
         return $data;
     }
 }
+

@@ -2,7 +2,7 @@
 /**
  * General Hooks
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -11,151 +11,175 @@
 /**
  * Register premium templates
  *
+ * When the license is invalid/missing, templates stay visible in settings but
+ * are marked is_locked so Optiwich cannot select them (same UX as free).
+ *
  * @param array $templates
  * @return array
  */
 function wp_ulike_pro_register_templates( $templates ){
-    $templates['wp-ulike-pro-default'] = array(
-        'name'                  => esc_html__('Simple Up/Down Vote', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_default_up_down_voting_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/default.svg'),
-        'is_text_support'       => true,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-pro-book-heart'] = array(
-        'name'                  => esc_html__('Book Heart', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_bookheart_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/bookHeart.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-pro-checkmark'] = array(
-        'name'                  => esc_html__('Check Mark', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_checkmark_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkMark.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-pro-voters'] = array(
-        'name'                  => esc_html__('Voter Thumb', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_voters_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/voters.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-pro-check-like'] = array(
-        'name'                  => esc_html__('Check Vote', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_checkvote_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkVote.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-pro-broken-heart'] = array(
-        'name'                  => esc_html__('Broken Heart', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_brokenheart_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/brokenHeart.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-positive-negative'] = array(
-        'name'                  => esc_html__('Positive/Negative Circles', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_positivecircle_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/posNeg.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-feedback'] = array(
-        'name'                  => esc_html__('FeedBack', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_feedback_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/feedback.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-rating-face'] = array(
-        'name'                  => esc_html__('Rating Face', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_rating_face_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingFace.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-rating-boy'] = array(
-        'name'                  => esc_html__('Rating Boy', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_rating_boy_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingBoy.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-rating-girl'] = array(
-        'name'                  => esc_html__('Rating Girl', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_rating_girl_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingGirl.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
+	$pro_templates = array(
+		'wp-ulike-pro-default' => array(
+			'name'                  => esc_html__( 'Simple Up/Down Vote', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_default_up_down_voting_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/default.svg' ),
+			'is_text_support'       => true,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-book-heart' => array(
+			'name'                  => esc_html__( 'Book Heart', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_bookheart_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/bookHeart.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-checkmark' => array(
+			'name'                  => esc_html__( 'Check Mark', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_checkmark_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkMark.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-voters' => array(
+			'name'                  => esc_html__( 'Voter Thumb', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_voters_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/voters.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-check-like' => array(
+			'name'                  => esc_html__( 'Check Vote', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_checkvote_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/checkVote.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-broken-heart' => array(
+			'name'                  => esc_html__( 'Broken Heart', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_brokenheart_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/brokenHeart.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-positive-negative' => array(
+			'name'                  => esc_html__( 'Positive/Negative Circles', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_positivecircle_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/posNeg.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-feedback' => array(
+			'name'                  => esc_html__( 'FeedBack', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_feedback_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/feedback.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-rating-face' => array(
+			'name'                  => esc_html__( 'Rating Face', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_rating_face_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingFace.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-rating-boy' => array(
+			'name'                  => esc_html__( 'Rating Boy', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_rating_boy_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingBoy.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-rating-girl' => array(
+			'name'                  => esc_html__( 'Rating Girl', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_rating_girl_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/ratingGirl.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-stack-votings' => array(
+			'name'            => esc_html__( 'Up/Down Votes', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_stack_votings_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/stackVotings.svg' ),
+			'is_text_support' => false,
+			'has_subtotal'    => true,
+		),
+		'wp-ulike-star-thumb' => array(
+			'name'            => esc_html__( 'Star Thumb', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_star_thumb_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/starThumb.svg' ),
+			'is_text_support' => false,
+			'has_subtotal'    => true,
+		),
+		'wp-ulike-arrow-votings' => array(
+			'name'            => esc_html__( 'Arrow Votings', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_arrow_votings_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/arrowVotings.svg' ),
+			'is_text_support' => false,
+			'has_subtotal'    => true,
+		),
+		'wp-ulike-minimal-votings' => array(
+			'name'            => esc_html__( 'Minimal Votings', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_minimal_votings_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/minimalVotings.svg' ),
+			'is_text_support' => false,
+			'has_subtotal'    => true,
+		),
+		'wp-ulike-badge-thumb' => array(
+			'name'                  => esc_html__( 'Badge Thumb', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_badge_thumb_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/badgeThumb.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-fave-star' => array(
+			'name'            => esc_html__( 'Fave Star', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_fave_star_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/faveStar.svg' ),
+			'is_text_support' => false,
+		),
+		'wp-ulike-pin' => array(
+			'name'                  => esc_html__( 'Pin Button', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_pin_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/pin.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-clapping' => array(
+			'name'            => esc_html__( 'Clapping Button', WP_ULIKE_PRO_DOMAIN ),
+			'callback'        => 'wp_ulike_pro_clapping_template',
+			'symbol'          => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/clapping.svg' ),
+			'is_text_support' => false,
+		),
+		'wp-ulike-smiley-switch' => array(
+			'name'                  => esc_html__( 'Smiley Switch button', WP_ULIKE_PRO_DOMAIN ),
+			'callback'              => 'wp_ulike_pro_smiley_switch_template',
+			'symbol'                => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/smileySwitch.svg' ),
+			'is_text_support'       => false,
+			'is_percentage_support' => true,
+		),
+		'wp-ulike-pro-emoji-reactions' => array(
+			'name'                   => esc_html__( 'Emoji Reactions', WP_ULIKE_PRO_DOMAIN ),
+			'callback'               => 'wp_ulike_pro_emoji_reactions_template',
+			'symbol'                 => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/emojiReactions.svg' ),
+			'is_engagement_template' => true,
+			'engagement_kind'        => 'emoji',
+		),
+		'wp-ulike-pro-star-rating' => array(
+			'name'                   => esc_html__( 'Star Rating', WP_ULIKE_PRO_DOMAIN ),
+			'callback'               => 'wp_ulike_pro_star_rating_template',
+			'symbol'                 => esc_url( WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/starRating.svg' ),
+			'is_engagement_template' => true,
+			'engagement_kind'        => 'star',
+		),
+	);
 
-    );
-    $templates['wp-ulike-stack-votings'] = array(
-        'name'            => esc_html__('Up/Down Votes', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_stack_votings_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/stackVotings.svg'),
-        'is_text_support' => false,
-        'has_subtotal'    => true
-    );
-    $templates['wp-ulike-star-thumb'] = array(
-        'name'            => esc_html__('Star Thumb', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_star_thumb_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/starThumb.svg'),
-        'is_text_support' => false,
-        'has_subtotal'    => true
-    );
-    $templates['wp-ulike-arrow-votings'] = array(
-        'name'            => esc_html__('Arrow Votings', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_arrow_votings_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/arrowVotings.svg'),
-        'is_text_support' => false,
-        'has_subtotal'    => true
-    );
-    $templates['wp-ulike-minimal-votings'] = array(
-        'name'            => esc_html__('Minimal Votings', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_minimal_votings_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/minimalVotings.svg'),
-        'is_text_support' => false,
-        'has_subtotal'    => true
-    );
-    $templates['wp-ulike-badge-thumb'] = array(
-        'name'                  => esc_html__('Badge Thumb', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_badge_thumb_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/badgeThumb.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-fave-star'] = array(
-        'name'            => esc_html__('Fave Star', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_fave_star_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/faveStar.svg'),
-        'is_text_support' => false
-    );
-    $templates['wp-ulike-pin'] = array(
-        'name'                  => esc_html__('Pin Button', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_pin_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/pin.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
-    $templates['wp-ulike-clapping'] = array(
-        'name'            => esc_html__('Clapping Button', WP_ULIKE_PRO_DOMAIN),
-        'callback'        => 'wp_ulike_pro_clapping_template',
-        'symbol'          => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/clapping.svg'),
-        'is_text_support' => false
-    );
-    $templates['wp-ulike-smiley-switch'] = array(
-        'name'                  => esc_html__('Smiley Switch button', WP_ULIKE_PRO_DOMAIN),
-        'callback'              => 'wp_ulike_pro_smiley_switch_template',
-        'symbol'                => esc_url(WP_ULIKE_PRO_PUBLIC_URL . '/assets/img/templates/smileySwitch.svg'),
-        'is_text_support'       => false,
-        'is_percentage_support' => true
-    );
+	if ( ! WP_Ulike_Pro_API::is_license_active() ) {
+		foreach ( $pro_templates as $key => $template ) {
+			$pro_templates[ $key ]['is_locked'] = true;
+		}
+	}
 
-    return $templates;
+	return array_merge( $templates, $pro_templates );
 }
 add_filter( 'wp_ulike_add_templates_list', 'wp_ulike_pro_register_templates', 10, 1 );
 
@@ -180,7 +204,10 @@ function wp_ulike_pro_upgrade_templates_args( $info, $args, $temp_list ){
         $info['wrapper_class'] .= ' wpulike-is-pro';
     }
 
-    // Count dislikes
+    // Count dislikes from the vote ledger (Free counter). Do not use
+    // wp_ulike_pro_get_counter_value here — when the type's primary template is
+    // emoji/star that helper used to return 0 for dislike even while up/down UI
+    // is still rendered (display automation / mixed templates).
     $info['total_dislikes'] = wp_ulike_get_counter_value( $args['id'], $args['slug'], 'dislike', $args['is_distinct'] );
 
 
@@ -302,12 +329,16 @@ add_filter( 'wp_ulike_ajax_respond', 'wp_ulike_pro_upgrade_ajax_respond', 10, 4 
  * @return array
  */
 function wp_ulike_pro_upgrade_ajax_counter_value( $counterValue, $id, $slug, $status, $is_distinct, $template ){
-    // Counters
-    $up_vote   = wp_ulike_get_counter_value( $id, $slug, 'like', $is_distinct );
-    $down_vote = wp_ulike_get_counter_value( $id, $slug, 'dislike', $is_distinct );
+    // Same vote ledger path as page-load templates (wp_ulike_get_counter_value /
+    // meta + Pulse merge). Do not use wp_ulike_pro_get_counter_value here alone —
+    // that helper is Pulse-live and historically remapped "like" → emoji totals
+    // when the type's primary template was engagement, which made AJAX diverge
+    // from the numbers rendered on first paint.
+    $up_vote   = (int) wp_ulike_get_counter_value( $id, $slug, 'like', $is_distinct );
+    $down_vote = (int) wp_ulike_get_counter_value( $id, $slug, 'dislike', $is_distinct );
 
     if( in_array(  $slug, array('post', 'comment') ) ) {
-        // Add Quantity values
+        // Free counter filter skips quantity during wp_ulike_process AJAX.
         $up_vote    += wp_ulike_pro_get_counter_quantity( $id, 'like', $slug );
         $down_vote  += wp_ulike_pro_get_counter_quantity( $id, 'dislike', $slug );
 
@@ -390,17 +421,6 @@ function wp_ulike_pro_upgrade_user_access_capabilities( $roles, $type ){
     return $roles;
 }
 add_filter( 'wp_ulike_display_capabilities', 'wp_ulike_pro_upgrade_user_access_capabilities', 10, 2 );
-
-
-/**
- * Upgrade plugin name
- *
- * @return string
- */
-function wp_ulike_pro_upgrade_plugin_name(){
-    return esc_html__( 'ULike ᴾᴿᴼ', WP_ULIKE_PRO_DOMAIN );
-}
-add_filter( 'wp_ulike_plugin_name', 'wp_ulike_pro_upgrade_plugin_name' );
 
 /**
  * Update counter based on quantity meta value.
@@ -520,7 +540,7 @@ function wp_ulike_pro_general_hooks_wp(){
     // SECURITY: Sanitize GET parameters
     $ulp_api = isset( $_GET['ulp-api'] ) ? sanitize_text_field( wp_unslash( $_GET['ulp-api'] ) ) : '';
     $provider = isset( $_GET['provider'] ) ? sanitize_text_field( wp_unslash( $_GET['provider'] ) ) : '';
-    
+
     if( WP_Ulike_Pro_Options::getAvailabeSocialLogins() && ! empty( $ulp_api ) && ! empty( $provider ) ){
         // SECURITY: Whitelist allowed providers
         $allowed_providers = array( 'facebook', 'google', 'twitter', 'apple', 'microsoft', 'telegram', 'steam', 'openid' );
@@ -528,9 +548,9 @@ function wp_ulike_pro_general_hooks_wp(){
             wp_safe_redirect( home_url() );
             exit;
         }
-        
+
         global $ulp_session;
-        
+
         // SECURITY: Validate session before processing
         $current_url = $ulp_session->get( 'current_url' );
         if ( empty( $current_url ) ) {
@@ -583,7 +603,7 @@ add_action( 'after_setup_theme', 'wp_ulike_pro_general_hooks_after_setup_theme' 
  */
 function wp_ulike_pro_update_the_content( $current_content, $post_content ){
 
-    if( WpUlikeInit::is_frontend() && wp_ulike_is_true( wp_ulike_pro_get_metabox_value( 'auto_display' ) ) && in_the_loop() && is_main_query() && is_singular() ){
+    if ( WpUlikeInit::is_frontend() && wp_ulike_pro_is_metabox_true( 'auto_display' ) && in_the_loop() && is_main_query() && is_singular() ) {
 
         // exclude to display like button on other pages
         if( is_page() && wp_ulike_get_the_id() != get_queried_object_id()  ){
@@ -619,44 +639,51 @@ function wp_ulike_pro_update_the_content( $current_content, $post_content ){
 add_filter( 'wp_ulike_the_content', 'wp_ulike_pro_update_the_content', 10, 2 );
 
 /**
- * Update the content value of comment based on meta fields
+ * Apply per-comment display overrides on the comment like button output.
  *
- * @param string $current_content
- * @param string $comment_content
+ * Hooked to `wp_ulike_comment_text` (same filter name as before).
+ *
+ * @param string          $output  Comment text plus like button markup.
+ * @param string          $content Original comment text.
+ * @param WP_Comment|null $comment Comment object (WP ULike 4.x passes this).
  * @return string
  */
-function wp_ulike_pro_update_comment_text( $current_content, $comment_content ){
-    // Check meta conditions
-    if( wp_ulike_is_true( wp_ulike_pro_get_comment_metabox_value( 'auto_display' ) ) && WP_Ulike_Pro::is_frontend() ){
-        // Get display position if exist
-        $display_position = wp_ulike_pro_get_comment_metabox_value( 'display_position' );
-        $button_args      = array();
+function wp_ulike_pro_update_comment_text( $output, $content, $comment = null ){
+	if ( ! WP_Ulike_Pro::is_frontend() ) {
+		return $output;
+	}
 
-        // Select template
-        if( '' !== ( $template = wp_ulike_pro_get_comment_metabox_value( 'template' ) ) ){
-            $button_args['style'] = $template;
-        }
+	$comment_id = ( $comment instanceof WP_Comment ) ? (int) $comment->comment_ID : (int) get_comment_ID();
+	if ( ! $comment_id ) {
+		return $output;
+	}
 
-        $get_html_button = wp_ulike_comments( 'put', $button_args );
+	$auto_display = wp_ulike_is_true( wp_ulike_pro_get_comment_metabox_value( 'auto_display', $comment_id, true ) );
+	$template     = wp_ulike_pro_get_comment_metabox_value( 'template', $comment_id, true );
+	$position     = wp_ulike_pro_get_comment_metabox_value( 'display_position', $comment_id, true );
+	$global_auto  = wp_ulike_setting_repo::isAutoDisplayOn( 'comment' );
 
-        switch ( $display_position ) {
-            case 'top':
-                $current_content = $get_html_button . $comment_content;
-                break;
+	// Per-comment button when global auto display is disabled.
+	if ( $auto_display && ! $global_auto ) {
+		$button_args = wp_ulike_pro_merge_comment_button_args( $comment_id, array( 'id' => $comment_id ) );
+		$button      = wp_ulike_comments( 'put', $button_args );
 
-            case 'top_bottom':
-                $current_content = $get_html_button . $comment_content . $get_html_button;
-                break;
+		return wp_ulike_pro_wrap_comment_with_button( $button, $content, $position ? $position : 'bottom' );
+	}
 
-            default:
-                $current_content = $comment_content . $get_html_button;
-                break;
-        }
-    }
+	// Override global button template/position when this comment has custom values.
+	if ( $global_auto && ( '' !== $template || ( $position && 'bottom' !== $position ) ) ) {
+		$button_args = wp_ulike_pro_merge_comment_button_args( $comment_id, array( 'id' => $comment_id ) );
+		$button      = wp_ulike_comments( 'put', $button_args );
+		$position    = $position ? $position : wp_ulike_get_option( 'comments_group|auto_display_position', 'bottom' );
 
-    return $current_content;
+		return wp_ulike_pro_wrap_comment_with_button( $button, $content, $position );
+	}
+
+	// Counter seeds still apply via wp_ulike_counter_value on the global button output.
+	return $output;
 }
-add_filter( 'wp_ulike_comment_text', 'wp_ulike_pro_update_comment_text', 10, 2 );
+add_filter( 'wp_ulike_comment_text', 'wp_ulike_pro_update_comment_text', 10, 3 );
 
 /**
  * Enable REST API
@@ -995,6 +1022,15 @@ function wp_ulike_pro_add_pile_up_likers_template( $template, $get_users, $item_
         // Limit list
 		$limit_users = $has_limit ? array_slice( $get_users, 0, $args['counter'] ) : $get_users;
 
+        // Prime users + their meta in one round trip. This filter short-circuits
+        // the core likers template, which does its own batch load, so without
+        // this every avatar costs a separate query -- multiplied by every button
+        // on the page (a template showcase renders dozens).
+        $prime_ids = array_unique( array_filter( array_map( 'absint', (array) $limit_users ) ) );
+        if( ! empty( $prime_ids ) ){
+            cache_users( $prime_ids );
+        }
+
         foreach ( $limit_users as $user ) {
             $user_info	= get_user_by( 'id', $user );
             // Check user existence
@@ -1119,7 +1155,7 @@ add_filter( 'wp_ulike_pro_rewrite_rules', 'wp_ulike_localize_rewrite_rules', 10,
  * It uses a geo-location service to determine the user's country code from the
  * IP address and a device detection library to determine whether the user is
  * using a mobile, tablet, or desktop device. These values are then stored in
- * the respective columns (`country_code` and `device_type`) of the `ulike` table.
+ * the respective columns (`country_code`, `device`, `os`, and `browser`) of the vote table.
  *
  * @param array $data The data passed by the action hook, including:
  * - 'item_id'        => The ID of the item being inserted or updated.
@@ -1130,7 +1166,7 @@ add_filter( 'wp_ulike_pro_rewrite_rules', 'wp_ulike_localize_rewrite_rules', 10,
  * - 'status'         => The status of the action (e.g., like, dislike).
  * - 'ip'             => The IP address of the user performing the action.
  *
- * The method updates the 'country_code' and 'device_type' columns in the
+ * The method updates the 'country_code', 'device', 'os', and 'browser' columns in the
  * database for the specified item, adding the following information:
  * - Country code determined by the user's IP address (e.g., 'US', 'GB').
  * - Device type based on the user's device.
@@ -1138,38 +1174,137 @@ add_filter( 'wp_ulike_pro_rewrite_rules', 'wp_ulike_localize_rewrite_rules', 10,
  * @return void
  */
 function wp_ulike_pro_process_and_update_location_and_device_data( $data ) {
-    global $wpdb;
+	global $wpdb;
 
-    // Extract necessary data
-    $table          = $data['table'];
-    $item_id        = $data['item_id'];
-    $related_column = $data['related_column'];
-    $user_id        = $data['user_id'];
-    $ip_address     = $data['ip'];
+	if ( empty( $data['table'] ) || ! is_array( $data ) ) {
+		return;
+	}
 
-    // 1. Get the country code using the IP address
-    $country_code = wp_ulike_pro_get_country_code_from_ip( $ip_address );
+	$country_code = wp_ulike_pro_get_country_code_from_ip( $data['ip'] ?? '' );
+	$device_info  = wp_ulike_pro_get_device_info();
+	$update_data  = array(
+		'country_code' => $country_code,
+		'device'       => $device_info['device'] ?? null,
+		'os'           => $device_info['os'] ?? null,
+		'browser'      => $device_info['browser'] ?? null,
+	);
+	$update_format = array( '%s', '%s', '%s', '%s' );
 
-    // 2. Get the device info based on the user agent
-    $device_info = wp_ulike_pro_get_device_info();
+	// Pulse (and any path that provides the row id): update that row only.
+	// Never match pulse by item_id+user_id — that overwrites emoji/star rows
+	// for the same voter on the same item.
+	if ( ! empty( $data['id'] ) ) {
+		$wpdb->update(
+			$data['table'],
+			$update_data,
+			array( 'id' => (int) $data['id'] ),
+			$update_format,
+			array( '%d' )
+		);
+		return;
+	}
 
-    // 3. Update the database with the new country code and device type
-    $wpdb->update(
-        $table,
-        array(
-            'country_code' => $country_code,
-            'device'       => $device_info['device'] ?? NULL,
-            'os'           => $device_info['os'] ?? NULL,
-            'browser'      => $device_info['browser'] ?? NULL,
-        ),
-        array(
-            $related_column => $item_id,
-            'user_id'       => $user_id,
-        )
-    );
+	// Legacy vote tables: one row per user+item is typical; keep prior WHERE.
+	if ( empty( $data['item_id'] ) || empty( $data['related_column'] ) ) {
+		return;
+	}
+
+	$wpdb->update(
+		$data['table'],
+		$update_data,
+		array(
+			$data['related_column'] => $data['item_id'],
+			'user_id'               => $data['user_id'] ?? '0',
+		),
+		$update_format,
+		array( '%d', '%s' )
+	);
 }
 add_action( 'wp_ulike_data_inserted', 'wp_ulike_pro_process_and_update_location_and_device_data', 10, 1 );
 add_action( 'wp_ulike_data_updated', 'wp_ulike_pro_process_and_update_location_and_device_data', 10, 1 );
+
+/**
+ * Clear Pro engagement counter meta when Free removes an item's vote/engagement rows.
+ *
+ * @param int    $item_id Item ID.
+ * @param string $type    Setting type slug (post, comment, …).
+ * @return void
+ */
+function wp_ulike_pro_clear_engagement_meta_on_item_delete( $item_id, $type ) {
+	global $wpdb;
+
+	$item_id = absint( $item_id );
+	$type    = sanitize_key( $type );
+	if ( ! $item_id || ! $type ) {
+		return;
+	}
+
+	$table = $wpdb->prefix . 'ulike_meta';
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from $wpdb->prefix.
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM `{$table}` WHERE item_id = %d AND meta_group = %s AND meta_key LIKE %s",
+			$item_id,
+			$type,
+			$wpdb->esc_like( 'eng_' ) . '%'
+		)
+	);
+	wp_cache_delete( $item_id, sprintf( 'wp_ulike_%s_meta', $type ) );
+}
+add_action( 'wp_ulike_delete_vote_data', 'wp_ulike_pro_clear_engagement_meta_on_item_delete', 20, 2 );
+
+/**
+ * Keep Free site statistics + query cache in sync when Pro engagements are written.
+ *
+ * Free listens only to classic vote hooks. Pro owns engagement_* and calls Free's
+ * public cache/stats API — no engagement hooks registered in the Free plugin.
+ *
+ * @param array<string,mixed> $atts Engagement payload.
+ * @return void
+ */
+function wp_ulike_pro_on_engagement_inserted( $atts ) {
+	if ( ! is_array( $atts ) || empty( $atts['item_type'] ) || ! class_exists( 'WP_Ulike_Query_Cache' ) ) {
+		return;
+	}
+
+	// INSERT ONLY. adjust_statistics_meta( +1 ) counts a brand-new engagement
+	// row; running it on an update (reaction switched, star re-rated) would
+	// inflate site-wide totals on every change.
+	if ( 'inserted' !== ( $atts['event'] ?? 'inserted' ) ) {
+		return;
+	}
+
+	WP_Ulike_Query_Cache::adjust_statistics_meta( 1, $atts['item_type'] );
+	WP_Ulike_Query_Cache::bump();
+
+	// Keep the admin menu badge in sync for emoji/star (Free only hooks votes).
+	if ( empty( $atts['status'] ) || 'removed' !== $atts['status'] ) {
+		WP_Ulike_Query_Cache::increment_admin_new_votes();
+	}
+}
+add_action( 'wp_ulike_engagement_recorded', 'wp_ulike_pro_on_engagement_inserted', 9, 1 );
+
+/**
+ * @param array<string,mixed> $atts Engagement payload.
+ * @return void
+ */
+function wp_ulike_pro_on_engagement_updated( $atts ) {
+	// UPDATE ONLY -- the insert path is handled by
+	// wp_ulike_pro_on_engagement_inserted() above.
+	if ( ! is_array( $atts ) || 'updated' !== ( $atts['event'] ?? '' ) ) {
+		return;
+	}
+
+	if ( class_exists( 'WP_Ulike_Query_Cache' ) ) {
+		WP_Ulike_Query_Cache::bump();
+
+		// Re-select / change reaction on an existing row — still "new" activity.
+		if ( is_array( $atts ) && ( empty( $atts['status'] ) || 'removed' !== $atts['status'] ) ) {
+			WP_Ulike_Query_Cache::increment_admin_new_votes();
+		}
+	}
+}
+add_action( 'wp_ulike_engagement_recorded', 'wp_ulike_pro_on_engagement_updated', 10, 1 );
 
 /**
  * change wordpress custom login url
@@ -1194,3 +1329,263 @@ add_action( 'wp_ulike_data_updated', 'wp_ulike_pro_process_and_update_location_a
 //     return $login_url;
 // }
 // add_filter( 'login_url', 'wp_ulike_pro_custom_login_url', 10, 3 );
+
+function wp_ulike_pro_engagement_geo_device_data( $data ) {
+	global $wpdb;
+
+	if ( empty( $data['table'] ) || empty( $data['id'] ) ) {
+		return;
+	}
+
+	// INSERT ONLY -- geo/device belong to the row's original request; re-stamping
+	// them when a reaction is merely switched would rewrite the origin data.
+	if ( 'inserted' !== ( $data['event'] ?? 'inserted' ) ) {
+		return;
+	}
+
+	$country_code = wp_ulike_pro_get_country_code_from_ip( $data['ip'] ?? '' );
+	$device_info  = wp_ulike_pro_get_device_info();
+
+	$wpdb->update(
+		$data['table'],
+		array(
+			'country_code' => $country_code,
+			'device'       => $device_info['device'] ?? null,
+			'os'           => $device_info['os'] ?? null,
+			'browser'      => $device_info['browser'] ?? null,
+		),
+		array( 'id' => (int) $data['id'] ),
+		array( '%s', '%s', '%s', '%s' ),
+		array( '%d' )
+	);
+}
+add_action( 'wp_ulike_engagement_recorded', 'wp_ulike_pro_engagement_geo_device_data', 10, 1 );
+
+/**
+ * Inject engagement settings after the template picker.
+ *
+ * @param array $options Panel fields.
+ * @return array
+ */
+function wp_ulike_pro_engagement_content_options( $options ) {
+	if ( ! is_array( $options ) ) {
+		$options = array();
+	}
+
+	return wp_ulike_array_insert_after( $options, 'template', WP_Ulike_Pro_Engagement_Settings::get_panel_fields() );
+}
+add_filter( 'wp_ulike_panel_content_options', 'wp_ulike_pro_engagement_content_options', 50 );
+
+function wp_ulike_pro_engagement_script_config( $args ) {
+	$args['Engagements'] = array(
+		'action'  => 'wp_ulike_pro_engagement_process',
+		'enabled' => true,
+		'i18n'    => array(
+			/* translators: 1: user rating value, 2: max stars */
+			'ratingStatus' => __( 'Your rating: %1$d of %2$d', WP_ULIKE_PRO_DOMAIN ),
+			'noRating'     => __( 'No rating', WP_ULIKE_PRO_DOMAIN ),
+			'addReaction'  => __( 'Add reaction', WP_ULIKE_PRO_DOMAIN ),
+			/* translators: %s: reaction label */
+			'reactedWith'  => __( 'You reacted with %s', WP_ULIKE_PRO_DOMAIN ),
+			/* translators: 1: reaction label, 2: count */
+			'reactionCount'=> __( '%1$s, %2$s reactions', WP_ULIKE_PRO_DOMAIN ),
+		),
+	);
+
+	return $args;
+}
+add_filter( 'wp_ulike_pro_front_end_localize', 'wp_ulike_pro_engagement_script_config' );
+
+/**
+ * Keep emoji/star templates scoped to display-automation contexts.
+ *
+ * When automation owns engagement for a type, basic auto-display still inherits
+ * the global template — demote that bleed only (style === global settings).
+ * Shortcodes/widgets that pass a different style are left alone.
+ *
+ * @param array $args Button args for wp_ulike_display_button().
+ * @return array
+ */
+function wp_ulike_pro_scope_engagement_display_button_args( $args ) {
+	if ( ! is_array( $args ) || empty( $args['style'] ) || empty( $args['slug'] ) || ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) ) {
+		return $args;
+	}
+
+	$style = sanitize_key( (string) $args['style'] );
+	$slug  = sanitize_key( (string) $args['slug'] );
+
+	if ( ! WP_Ulike_Pro_Engagement_Settings::is_engagement_template( $style )
+		|| WP_Ulike_Pro_Engagement_Settings::has_active_context( $slug )
+		|| ! WP_Ulike_Pro_Engagement_Settings::automation_scopes_engagement( $slug ) ) {
+		return $args;
+	}
+
+	$global = sanitize_key( (string) WP_Ulike_Pro_Engagement_Settings::get_type_option( $slug, 'template', 'wpulike-default' ) );
+	if ( $style === $global ) {
+		$args['style'] = 'wpulike-default';
+	}
+
+	return $args;
+}
+add_filter( 'wp_ulike_display_button_args', 'wp_ulike_pro_scope_engagement_display_button_args', 5 );
+
+function wp_ulike_pro_engagement_push_template_context( $template_args ) {
+	if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) || ! is_array( $template_args ) ) {
+		return;
+	}
+
+	$item_type = isset( $template_args['type'] ) ? sanitize_key( $template_args['type'] ) : '';
+	$style     = isset( $template_args['style'] ) ? sanitize_key( $template_args['style'] ) : '';
+
+	if ( ! $item_type || ! $style || ! WP_Ulike_Pro_Engagement_Settings::is_engagement_template( $style ) ) {
+		return;
+	}
+
+	$context = array(
+		'template' => $style,
+	);
+
+	// Display Automation / Elementor / shortcode overrides (same args as classic buttons).
+	if ( ! empty( $template_args['wrapper_class'] ) && false !== strpos( (string) $template_args['wrapper_class'], 'wpulike-hide-counter' ) ) {
+		$context['display_counters'] = false;
+	}
+
+	if ( isset( $template_args['display_likers'] ) && '' !== $template_args['display_likers'] && null !== $template_args['display_likers'] ) {
+		$context['display_likers'] = wp_ulike_is_true( $template_args['display_likers'] ) ? 1 : 0;
+	}
+
+	if ( ! empty( $template_args['likers_style'] ) ) {
+		$likers_style = sanitize_key( (string) $template_args['likers_style'] );
+		if ( in_array( $likers_style, array( 'default', 'popover', 'pile' ), true ) ) {
+			$context['likers_style'] = $likers_style;
+		}
+	}
+
+	if ( ! empty( $template_args['engagement_picker_style'] ) ) {
+		$picker_style = sanitize_key( (string) $template_args['engagement_picker_style'] );
+		if ( in_array( $picker_style, array( 'hover', 'inline' ), true ) ) {
+			$context['engagement_picker_style'] = $picker_style;
+		}
+	}
+
+	if ( ! empty( $template_args['engagement_reactions'] ) && is_array( $template_args['engagement_reactions'] ) ) {
+		$context['engagement_reactions'] = WP_Ulike_Pro_Engagement_Settings::sanitize_reaction_slugs(
+			$template_args['engagement_reactions']
+		);
+	}
+
+	WP_Ulike_Pro_Engagement_Settings::push_context( $item_type, $context );
+}
+add_action( 'wp_ulike_before_template', 'wp_ulike_pro_engagement_push_template_context', 5, 1 );
+
+function wp_ulike_pro_engagement_pop_template_context( $template_args ) {
+	if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) || ! is_array( $template_args ) ) {
+		return;
+	}
+
+	$item_type = isset( $template_args['type'] ) ? sanitize_key( $template_args['type'] ) : '';
+	$style     = isset( $template_args['style'] ) ? sanitize_key( $template_args['style'] ) : '';
+
+	if ( ! $item_type || ! $style || ! WP_Ulike_Pro_Engagement_Settings::is_engagement_template( $style ) ) {
+		return;
+	}
+
+	WP_Ulike_Pro_Engagement_Settings::pop_context( $item_type );
+}
+add_action( 'wp_ulike_after_template', 'wp_ulike_pro_engagement_pop_template_context', 99, 1 );
+
+/**
+ * Normalize engagement reactions and store emoji as HTML entities (utf8mb3-safe).
+ *
+ * @param array $values Settings values.
+ * @return array
+ */
+function wp_ulike_pro_normalize_engagement_reactions_on_save( $values ) {
+	if ( ! is_array( $values ) || ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) ) {
+		return $values;
+	}
+
+	foreach ( array( 'posts_group', 'comments_group', 'buddypress_group', 'bbpress_group' ) as $group ) {
+		if ( empty( $values[ $group ] ) || ! is_array( $values[ $group ] ) || ! array_key_exists( 'engagement_reactions', $values[ $group ] ) ) {
+			continue;
+		}
+
+		$reactions = WP_Ulike_Pro_Engagement_Settings::normalize_reactions_config( $values[ $group ]['engagement_reactions'] );
+
+		// Same approach WordPress uses for post content on utf8/utf8mb3 databases.
+		if ( function_exists( 'wp_encode_emoji' ) ) {
+			foreach ( $reactions as &$reaction ) {
+				if ( ! empty( $reaction['emoji'] ) ) {
+					$reaction['emoji'] = wp_encode_emoji( $reaction['emoji'] );
+				}
+			}
+			unset( $reaction );
+		}
+
+		$values[ $group ]['engagement_reactions'] = $reactions;
+	}
+
+	return $values;
+}
+add_filter( 'wp_ulike_optiwich_save_values', 'wp_ulike_pro_normalize_engagement_reactions_on_save', 20 );
+
+/**
+ * Decode stored reaction emoji entities for the settings UI.
+ *
+ * @param array $values Settings values.
+ * @return array
+ */
+function wp_ulike_pro_decode_engagement_reactions_for_ui( $values ) {
+	if ( ! is_array( $values ) || ! class_exists( 'WP_Ulike_Pro_Engagement_Settings' ) ) {
+		return $values;
+	}
+
+	foreach ( array( 'posts_group', 'comments_group', 'buddypress_group', 'bbpress_group' ) as $group ) {
+		if ( empty( $values[ $group ]['engagement_reactions'] ) || ! is_array( $values[ $group ]['engagement_reactions'] ) ) {
+			continue;
+		}
+		$values[ $group ]['engagement_reactions'] = WP_Ulike_Pro_Engagement_Settings::normalize_reactions_config(
+			$values[ $group ]['engagement_reactions']
+		);
+	}
+
+	return $values;
+}
+add_filter( 'wp_ulike_optiwich_values', 'wp_ulike_pro_decode_engagement_reactions_for_ui', 5 );
+
+/**
+ * Purge third-party page caches after an emoji/star engagement.
+ *
+ * Classic votes are purged by the free plugin on wp_ulike_after_process.
+ * Emoji and star reactions are a Pro feature, so the purge is wired here -- the
+ * free plugin must not know about Pro-only events. Listens on the umbrella
+ * wp_ulike_engagement_recorded hook, which fires for both inserts and updates.
+ *
+ * Without this, a logged-out visitor's reaction was saved and reflected in the
+ * AJAX response, but the next (cached) page view served the stale pre-reaction
+ * markup. It only appeared once something else purged the page, e.g. a classic
+ * like/dislike. Logged-in users never saw it because page caches exclude them.
+ *
+ * Delegates to the free plugin's wp_ulike_purge_cache() so every supported cache
+ * plugin keeps being handled in exactly one place.
+ *
+ * @param array $atts Engagement payload (item_id, item_type, ...).
+ * @return void
+ */
+function wp_ulike_pro_purge_cache_for_engagement( $atts ) {
+	if ( ! is_array( $atts ) || empty( $atts['item_id'] ) || ! function_exists( 'wp_ulike_purge_cache' ) ) {
+		return;
+	}
+
+	$item_id = absint( $atts['item_id'] );
+	if ( ! $item_id ) {
+		return;
+	}
+
+	$item_type = isset( $atts['item_type'] ) ? sanitize_key( $atts['item_type'] ) : 'post';
+
+	// Comment reactions must purge the parent post's page, not the comment.
+	wp_ulike_purge_cache( $item_id, 'comment' === $item_type ? '_commentliked' : '_liked' );
+}
+add_action( 'wp_ulike_engagement_recorded', 'wp_ulike_pro_purge_cache_for_engagement', 10, 1 );
+

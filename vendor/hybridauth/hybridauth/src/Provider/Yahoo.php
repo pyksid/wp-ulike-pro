@@ -102,3 +102,4 @@ class Yahoo extends OAuth2
         return $userProfile;
     }
 }
+

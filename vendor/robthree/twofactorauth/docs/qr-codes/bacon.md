@@ -21,3 +21,4 @@ Argument            | Default value
 `$backgroundColour` | `'#ffffff'`
 `$foregroundColour` | `'#000000'`
 `$format`           | `'png'`
+

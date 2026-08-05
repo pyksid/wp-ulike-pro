@@ -128,3 +128,4 @@ class Session implements StorageInterface
         }
     }
 }
+

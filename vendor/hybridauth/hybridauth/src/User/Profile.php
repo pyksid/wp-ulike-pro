@@ -188,3 +188,4 @@ final class Profile
         throw new UnexpectedValueException(sprintf('Adding new property "%s" to %s is not allowed.', $name, __CLASS__));
     }
 }
+

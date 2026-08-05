@@ -70,3 +70,4 @@ class Strava extends OAuth2
         return $userProfile;
     }
 }
+

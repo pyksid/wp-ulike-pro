@@ -17,7 +17,7 @@ class OAuthConsumer
     public $key;
     public $secret;
     public $callback_url;
-    
+
     /**
      * OAuthConsumer constructor.
      *
@@ -40,3 +40,4 @@ class OAuthConsumer
         return "OAuthConsumer[key=$this->key,secret=$this->secret]";
     }
 }
+

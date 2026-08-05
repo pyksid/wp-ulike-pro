@@ -127,3 +127,4 @@ class Logger implements LoggerInterface
         file_put_contents($this->file, $content, FILE_APPEND);
     }
 }
+

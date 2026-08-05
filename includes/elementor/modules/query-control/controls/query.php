@@ -25,3 +25,4 @@ class Query extends Control_Select2 {
 		);
 	}
 }
+

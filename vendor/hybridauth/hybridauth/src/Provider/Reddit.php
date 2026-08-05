@@ -89,3 +89,4 @@ class Reddit extends OAuth2
         return $userProfile;
     }
 }
+

@@ -2,7 +2,7 @@
 /**
  * WP ULike Pro Tools Class
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -19,12 +19,16 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
      */
     class WP_Ulike_Pro_Tools {
 
+        /** Max lines from debug.log included in the system report. */
+        const DEBUG_ERROR_LOG_MAX_LINES = 200;
+
         /**
          * __construct
          */
         function __construct() {
             add_filter( 'wp_ulike_admin_pages', array( $this, 'register_page' ), 5, 1 );
             add_action( 'admin_init', array( $this, 'handle_rest_api_settings_save' ) );
+            add_action( 'admin_init', array( $this, 'handle_display_automation_save' ) );
         }
 
         /**
@@ -51,6 +55,43 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             // Redirect to prevent resubmission
             wp_safe_redirect( add_query_arg( array( 'page' => 'wp-ulike-pro-tools', 'tab' => 'rest-api', 'settings-updated' => 'true' ), admin_url( 'admin.php' ) ) );
+            exit;
+        }
+
+        /**
+         * Handle Display Automation form submission.
+         *
+         * @return void
+         */
+        public function handle_display_automation_save() {
+            if ( ! isset( $_POST['wp_ulike_display_automation_save'] ) || ! wp_verify_nonce( $_POST['wp_ulike_display_automation_nonce'], 'wp_ulike_display_automation_settings' ) ) {
+                return;
+            }
+
+            if ( ! current_user_can( 'manage_options' ) ) {
+                return;
+            }
+
+            if ( ! WP_Ulike_Pro_API::has_permission() ) {
+                wp_die( esc_html__( 'You need an active license to save display automation rules.', WP_ULIKE_PRO_DOMAIN ) );
+            }
+
+            $rules = isset( $_POST['display_rules'] ) && is_array( $_POST['display_rules'] )
+                ? wp_unslash( $_POST['display_rules'] )
+                : array();
+
+            WP_Ulike_Pro_Display_Automation::save_rules( $rules );
+
+            wp_safe_redirect(
+                add_query_arg(
+                    array(
+                        'page'             => 'wp-ulike-pro-tools',
+                        'tab'              => 'display-automation',
+                        'settings-updated' => 'true',
+                    ),
+                    admin_url( 'admin.php' )
+                )
+            );
             exit;
         }
 
@@ -81,7 +122,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             }
 
             $tools_submenu_page = array( 'tools' => array(
-                'title'       => sprintf( '<span class="wp-ulike-menu-icon"><span class="dashicons dashicons-admin-tools"></span> %s</span>', esc_html__( 'Tools', WP_ULIKE_PRO_DOMAIN ) ),
+                'title'       => esc_html__( 'Tools', WP_ULIKE_PRO_DOMAIN ),
                 'parent_slug' => 'wp-ulike-settings',
                 'capability'  => 'manage_options',
                 'path'        => WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools.php',
@@ -97,6 +138,68 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             }
 
             return $submenus;
+        }
+
+        /**
+         * View data for the Tools admin screen (wp-ulike-about layout).
+         *
+         * @return array<string, mixed>
+         */
+        public static function get_tools_view_data() {
+            $current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'maintenance';
+
+            $tabs = array(
+                'maintenance'        => array(
+                    'label'       => esc_html__( 'Maintenance', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Fix like counts, clean up old data, and keep things running smoothly.', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'admin-tools',
+                ),
+                'display-automation' => array(
+                    'label'       => esc_html__( 'Display Automation', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Choose where like buttons appear with rules and filters.', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'visibility',
+                ),
+                'schema-generator'   => array(
+                    'label'       => esc_html__( 'Schema Generator', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Configure Schema.org markup and FAQ structured data for your posts.', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'media-code',
+                ),
+                'bulk-actions'       => array(
+                    'label'       => esc_html__( 'Bulk Actions', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Search content and adjust vote, emoji, or star counters in bulk.', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'chart-bar',
+                ),
+                'gdpr'               => array(
+                    'label'       => esc_html__( 'GDPR', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Remove all like logs for selected users (cannot be undone).', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'privacy',
+                ),
+                'rest-api'           => array(
+                    'label'       => esc_html__( 'REST API', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Enable the REST API, permissions, and API keys.', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'rest-api',
+                ),
+                'debug'              => array(
+                    'label'       => esc_html__( 'Debug Info', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Copy system details for support tickets (no passwords or keys).', WP_ULIKE_PRO_DOMAIN ),
+                    'icon'        => 'editor-code',
+                ),
+            );
+
+            if ( ! isset( $tabs[ $current_tab ] ) ) {
+                $current_tab = 'maintenance';
+            }
+
+            $tools_base = admin_url( 'admin.php?page=wp-ulike-pro-tools' );
+
+            return array(
+                'tabs'           => $tabs,
+                'current_tab'    => $current_tab,
+                'tab_lead'       => $tabs[ $current_tab ]['description'],
+                'tools_base'     => $tools_base,
+                'pro_version'    => defined( 'WP_ULIKE_PRO_VERSION' ) ? WP_ULIKE_PRO_VERSION : '',
+                'settings_saved' => isset( $_GET['settings-updated'] ) && 'true' === sanitize_key( wp_unslash( $_GET['settings-updated'] ) ),
+            );
         }
 
         /**
@@ -119,111 +222,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $tools = array(
                 'posts' => array(
                     'title' => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
-                    'tools' => array(
-                        array(
-                            'title'  => esc_html__( 'Delete All Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete All', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all like and dislike records for posts. This will remove all like/dislike history and cannot be undone. Your post content will not be affected.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'truncate_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Invalid Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Clean Invalid', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove like/dislike records for posts that no longer exist in your WordPress database. This helps clean up orphaned data. Do not use this if you are using custom post IDs or external post references.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'delete_orphaned_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Duplicate Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Remove Duplicates', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Delete duplicate like/dislike records that may have been created by spam, system errors, or data migration issues. This keeps only the most recent record from each user per post.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'delete_duplicate_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete Stored Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove all stored like/dislike counter values from post meta. The counters will be automatically recalculated from records when needed. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'delete_meta_group'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Sync Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Recalculate and update all counter values from actual like/dislike records. Use this after deleting records, if counters show incorrect numbers, or to ensure meta counters match the actual record data.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'recalculate_counters'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Optimize Database Table', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Clean up unused space in the database table to improve performance and reduce file size. This is safe and recommended for regular maintenance on large databases.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'optimize_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete All View Tracking Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Views', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all view tracking records for posts. This will remove all view history used for engagement rate calculations and cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'post',
-                            'action' => 'delete_views'
-                        )
-                    )
+                    'tools' => self::get_content_maintenance_tools( 'post' ),
                 ),
                 'comments' => array(
                     'title' => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
-                    'tools' => array(
-                        array(
-                            'title'  => esc_html__( 'Delete All Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete All', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all like and dislike records for comments. This will remove all like/dislike history and cannot be undone. Your comments will not be affected.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'truncate_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Invalid Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Clean Invalid', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove like/dislike records for comments that no longer exist in your WordPress database. This helps clean up orphaned data. Do not use this if you are using custom comment IDs or external comment references.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'delete_orphaned_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Duplicate Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Remove Duplicates', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Delete duplicate like/dislike records that may have been created by spam, system errors, or data migration issues. This keeps only the most recent record from each user per comment.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'delete_duplicate_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete Stored Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove all stored like/dislike counter values from comment meta. The counters will be automatically recalculated from records when needed. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'delete_meta_group'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Sync Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Recalculate and update all counter values from actual like/dislike records. Use this after deleting records, if counters show incorrect numbers, or to ensure meta counters match the actual record data.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'recalculate_counters'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Optimize Database Table', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Clean up unused space in the database table to improve performance and reduce file size. This is safe and recommended for regular maintenance on large databases.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'optimize_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete All View Tracking Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Views', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all view tracking records for comments. This will remove all view history used for engagement rate calculations and cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'comment',
-                            'action' => 'delete_views'
-                        )
-                    )
+                    'tools' => self::get_content_maintenance_tools( 'comment' ),
                 )
             );
 
@@ -231,57 +234,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             if( $is_buddypress_active ){
                 $tools['activity'] = array(
                     'title' => esc_html__( 'BuddyPress Activities', WP_ULIKE_PRO_DOMAIN ),
-                    'tools' => array(
-                        array(
-                            'title'  => esc_html__( 'Delete All Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete All', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all like and dislike records for BuddyPress activities. This will remove all like/dislike history and cannot be undone. Your activities will not be affected.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'truncate_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Invalid Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Clean Invalid', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove like/dislike records for activities that no longer exist in your BuddyPress database. This helps clean up orphaned data. Do not use this if you are using custom activity IDs or external activity references.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'delete_orphaned_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Duplicate Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Remove Duplicates', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Delete duplicate like/dislike records that may have been created by spam, system errors, or data migration issues. This keeps only the most recent record from each user per activity.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'delete_duplicate_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete Stored Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove all stored like/dislike counter values from activity meta. The counters will be automatically recalculated from records when needed. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'delete_meta_group'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Sync Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Recalculate and update all counter values from actual like/dislike records. Use this after deleting records, if counters show incorrect numbers, or to ensure meta counters match the actual record data.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'recalculate_counters'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Optimize Database Table', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Clean up unused space in the database table to improve performance and reduce file size. This is safe and recommended for regular maintenance on large databases.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'optimize_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete All View Tracking Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Views', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all view tracking records for BuddyPress activities. This will remove all view history used for engagement rate calculations and cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'activity',
-                            'action' => 'delete_views'
-                        )
-                    )
+                    'tools' => self::get_content_maintenance_tools( 'activity' ),
                 );
             }
 
@@ -289,197 +242,515 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             if( $is_bbpress_active ){
                 $tools['topic'] = array(
                     'title' => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
-                    'tools' => array(
-                        array(
-                            'title'  => esc_html__( 'Delete All Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete All', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all like and dislike records for bbPress topics. This will remove all like/dislike history and cannot be undone. Your topics will not be affected.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'truncate_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Invalid Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Clean Invalid', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove like/dislike records for topics that no longer exist in your bbPress database. This helps clean up orphaned data. Do not use this if you are using custom topic IDs or external topic references.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'delete_orphaned_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Remove Duplicate Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Remove Duplicates', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Delete duplicate like/dislike records that may have been created by spam, system errors, or data migration issues. This keeps only the most recent record from each user per topic.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'delete_duplicate_rows'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete Stored Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Remove all stored like/dislike counter values from topic meta. The counters will be automatically recalculated from records when needed. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'delete_meta_group'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Sync Counter Values', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Recalculate and update all counter values from actual like/dislike records. Use this after deleting records, if counters show incorrect numbers, or to ensure meta counters match the actual record data.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'recalculate_counters'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Optimize Database Table', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Optimize Table', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Clean up unused space in the database table to improve performance and reduce file size. This is safe and recommended for regular maintenance on large databases.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'optimize_table'
-                        ),
-                        array(
-                            'title'  => esc_html__( 'Delete All View Tracking Records', WP_ULIKE_PRO_DOMAIN ),
-                            'label'  => esc_html__( 'Delete Views', WP_ULIKE_PRO_DOMAIN ),
-                            'desc'   => esc_html__( 'Permanently delete all view tracking records for bbPress topics. This will remove all view history used for engagement rate calculations and cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                            'type'   => 'topic',
-                            'action' => 'delete_views'
-                        )
-                    )
+                    'tools' => self::get_content_maintenance_tools( 'topic' ),
                 );
             }
 
             $tools['general'] = array(
-                'title' => esc_html__( 'Other Tools', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'Site', WP_ULIKE_PRO_DOMAIN ),
                 'tools' => array(
                     array(
-                        'title'  => esc_html__( 'Delete All User Vote Status', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Delete Status', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Remove all stored information about which users have liked or disliked content. This will not delete vote records, only the user status tracking. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'user',
-                        'action' => 'delete_meta_group'
+                        'title'   => esc_html__( 'Delete All User Vote Status', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Delete Status', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Remove all stored information about which users have liked or disliked content. This will not delete vote records, only the user status tracking. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Clears who-voted tracking only — your like and dislike records stay intact.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'user',
+                        'action'  => 'delete_meta_group',
                     ),
                     array(
-                        'title'  => esc_html__( 'Delete All Statistics Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Delete Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Clear all cached statistics data. Statistics will be recalculated when needed. This is safe and will not delete actual vote records.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'statistics',
-                        'action' => 'delete_meta_group'
+                        'title'   => esc_html__( 'Remove Empty Post Settings', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Clean Empty', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Delete empty post settings that are no longer needed. This helps reduce database size without affecting your content or votes.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Removes unused empty settings rows to free up database space.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'optimize',
+                        'action'  => 'optimize_post_meta',
                     ),
                     array(
-                        'title'  => esc_html__( 'Remove Empty Post Settings', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clean Empty', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Delete empty post settings that are no longer needed. This helps reduce database size without affecting your content or votes.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'optimize',
-                        'action' => 'optimize_post_meta'
+                        'title'   => esc_html__( 'Create Default Pages', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Create Pages', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Automatically create the required pages for user profiles, login, registration, and account management. Existing pages will not be replaced.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Creates login, profile, and account pages if they are missing.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'create',
+                        'action'  => 'manage_default_pages',
                     ),
                     array(
-                        'title'  => esc_html__( 'Create Default Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Create Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Automatically create the required pages for user profiles, login, registration, and account management. Existing pages will not be replaced.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'create',
-                        'action' => 'manage_default_pages'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Delete Default Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Delete Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Permanently delete all default pages created by the plugin (user profiles, login, registration, etc.). This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'delete',
-                        'action' => 'manage_default_pages'
-                    )
-                )
-            );
-
-            $tools['conversions'] = array(
-                'title' => esc_html__( 'Data Conversions & Migration', WP_ULIKE_PRO_DOMAIN ),
-                'tools' => array(
-                    array(
-                        'title'  => esc_html__( 'Move Post Counters to WordPress Meta', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Move Post Counters', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Transfer counter values from the plugin table to WordPress standard meta tables. Only use this if you are upgrading from very old plugin versions (pre-3.0). Most users do not need this tool.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'post',
-                        'action' => 'migrate_metadata'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Move Comment Counters to WordPress Meta', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Move Comment Counters', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Transfer counter values from the plugin table to WordPress standard meta tables. Only use this if you are upgrading from very old plugin versions (pre-3.0). Most users do not need this tool.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'comment',
-                        'action' => 'migrate_metadata'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Convert to Serialized Format', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Convert Format', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Convert post meta from the old format (each setting stored in separate rows) to the new serialized format (all settings in one row). This improves database performance and reduces storage space. Use this if you upgraded from older plugin versions that used the old structure.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'post',
-                        'action' => 'upgrade_unserialize_post_meta'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Remove Old Format Meta Records', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Remove Old Records', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Remove old format post meta records (individual rows) after successfully converting to serialized format. Only use this after running the conversion tool above. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'delete_all',
-                        'action' => 'optimize_post_meta'
-                    )
-                )
-            );
-
-            $tools['cache'] = array(
-                'title' => esc_html__( 'Cache Management', WP_ULIKE_PRO_DOMAIN ),
-                'tools' => array(
-                    array(
-                        'title'  => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Clear all cached data including WordPress object cache and popular cache plugins (WP Rocket, W3 Total Cache, LiteSpeed Cache, WP Super Cache, etc.). Use this if you notice outdated like counts or cached data.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'cache',
-                        'action' => 'clear_all_cache'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Clear Statistics Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clear Statistics', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Delete all cached statistics and temporary data. Statistics will be recalculated fresh when viewed. This is safe and does not delete any vote records or actual data.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'statistics',
-                        'action' => 'delete_meta_group'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Clear Transient Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clear Transients', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Delete all temporary cached data (transients) stored by the plugin. This helps free up database space. Data will be regenerated when needed. This is safe and does not delete vote records.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'transients',
-                        'action' => 'clear_transients'
-                    ),
-                    array(
-                        'title'  => esc_html__( 'Clean Up Expired Sessions', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clean Sessions', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Remove expired user session data from the database. This helps free up space and improve performance. Active sessions will not be affected.', WP_ULIKE_PRO_DOMAIN ),
-                        'type'   => 'sessions',
-                        'action' => 'cleanup_sessions'
+                        'title'   => esc_html__( 'Delete Default Pages', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Delete Pages', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Remove the plugin-created pages (login, profile, registration, etc.). You can recreate them anytime using Create Default Pages.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Removes plugin pages only. Use Create Default Pages to set them up again.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'delete',
+                        'action'  => 'manage_default_pages',
+                        'risk'    => 'caution',
+                        'confirm' => esc_html__( 'Remove the plugin-created pages? You can recreate them anytime with Create Default Pages.', WP_ULIKE_PRO_DOMAIN ),
                     )
                 )
             );
 
             $tools['repair'] = array(
-                'title' => esc_html__( 'Repair & Maintenance', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'Database', WP_ULIKE_PRO_DOMAIN ),
                 'tools' => array(
                     array(
-                        'title'  => esc_html__( 'Repair Database Tables', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Repair Tables', WP_ULIKE_PRO_DOMAIN ),
                         'label'  => esc_html__( 'Repair Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Fix corrupted or damaged database tables. Use this if you experience database errors or missing data. This may take several minutes on large databases.', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'   => esc_html__( 'Repair plugin tables (meta cache, sessions, views).', WP_ULIKE_PRO_DOMAIN ),
                         'type'   => 'repair',
-                        'action' => 'repair_tables'
+                        'action' => 'repair_tables',
+                        'risk'   => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Analyze Database Tables', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Analyze Tables', WP_ULIKE_PRO_DOMAIN ),
                         'label'  => esc_html__( 'Analyze Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Update database table statistics to help MySQL optimize queries. This improves query performance and is recommended for regular maintenance.', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'   => esc_html__( 'Update MySQL statistics for plugin tables to improve query performance.', WP_ULIKE_PRO_DOMAIN ),
                         'type'   => 'analyze',
-                        'action' => 'analyze_tables'
+                        'action' => 'analyze_tables',
+                        'risk'   => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Sync Database Indexes', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Sync Indexes', WP_ULIKE_PRO_DOMAIN ),
                         'label'  => esc_html__( 'Sync Indexes', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Add missing database indexes to improve query performance. This ensures all tables have the correct indexes as defined in the latest plugin version. Safe to run multiple times.', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'   => esc_html__( 'Add missing indexes on plugin tables. Safe to run multiple times.', WP_ULIKE_PRO_DOMAIN ),
                         'type'   => 'sync',
-                        'action' => 'sync_indexes'
+                        'action' => 'sync_indexes',
+                        'risk'   => 'safe',
+                    ),
+                ),
+            );
+
+            $tools['cache'] = array(
+                'title' => esc_html__( 'Cache', WP_ULIKE_PRO_DOMAIN ),
+                'tools' => array(
+                    array(
+                        'title'   => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Clear plugin query caches and popular page-cache plugins. Use this first when counts look wrong on the front end.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Refreshes vote and counter caches site-wide.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'cache',
+                        'action'  => 'clear_all_cache',
+                        'risk'    => 'safe',
+                    ),
+                    array(
+                        'title'   => esc_html__( 'Clear Statistics Cache', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Clear Statistics', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'    => esc_html__( 'Refresh the statistics dashboard cache. Vote records are not deleted.', WP_ULIKE_PRO_DOMAIN ),
+                        'summary' => esc_html__( 'Statistics dashboard only — your vote data stays intact.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'    => 'statistics',
+                        'action'  => 'delete_meta_group',
+                        'risk'    => 'safe',
+                    ),
+                    array(
+                        'title'  => esc_html__( 'Clear Transient Cache', WP_ULIKE_PRO_DOMAIN ),
+                        'label'  => esc_html__( 'Clear Transients', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'   => esc_html__( 'Delete temporary plugin transients to free database space.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'   => 'transients',
+                        'action' => 'clear_transients',
+                        'risk'   => 'safe',
+                    ),
+                    array(
+                        'title'  => esc_html__( 'Clean Up Expired Sessions', WP_ULIKE_PRO_DOMAIN ),
+                        'label'  => esc_html__( 'Clean Sessions', WP_ULIKE_PRO_DOMAIN ),
+                        'desc'   => esc_html__( 'Remove expired session rows from the sessions table.', WP_ULIKE_PRO_DOMAIN ),
+                        'type'   => 'sessions',
+                        'action' => 'cleanup_sessions',
+                        'risk'   => 'safe',
                     )
                 )
             );
 
+            return self::finalize_maintenance_tool_groups( $tools );
+        }
+
+        /**
+         * Minimal maintenance tools for one content type.
+         *
+         * @param string $type post|comment|activity|topic.
+         * @return array<int, array<string, mixed>>
+         */
+        private static function get_content_maintenance_tools( $type ) {
+            $label = ucfirst( $type );
+
+            $tools = array(
+                array(
+                    'title'   => sprintf( esc_html__( 'Sync Counters (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
+                    'label'   => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
+                    'desc'    => esc_html__( 'Rebuild stored counters from the database. Safe to run anytime counts look wrong.', WP_ULIKE_PRO_DOMAIN ),
+                    'summary' => esc_html__( 'Recommended first step when numbers disagree with the live data.', WP_ULIKE_PRO_DOMAIN ),
+                    'type'    => $type,
+                    'action'  => 'sync_counters',
+                    'risk'    => 'safe',
+                ),
+            );
+
+            if ( 'none' !== wp_ulike_pro_get_engagement_mode_for_type( $type ) ) {
+                $tools[] = array(
+                    'title'   => sprintf( esc_html__( 'Repair Records (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
+                    'label'   => esc_html__( 'Repair Records', WP_ULIKE_PRO_DOMAIN ),
+                    'desc'    => esc_html__( 'Remove invalid and duplicate engagement records for this content type.', WP_ULIKE_PRO_DOMAIN ),
+                    'summary' => esc_html__( 'Fixes broken or duplicate records without deleting valid votes.', WP_ULIKE_PRO_DOMAIN ),
+                    'type'    => $type,
+                    'action'  => 'repair_records',
+                    'risk'    => 'caution',
+                );
+            }
+
+            $tools[] = array(
+                'title'   => sprintf( esc_html__( 'Clear View History (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
+                'label'   => esc_html__( 'Clear Views', WP_ULIKE_PRO_DOMAIN ),
+                'desc'    => esc_html__( 'Permanently delete view tracking records for this content type.', WP_ULIKE_PRO_DOMAIN ),
+                'summary' => esc_html__( 'Removes view history used for engagement rate metrics.', WP_ULIKE_PRO_DOMAIN ),
+                'type'    => $type,
+                'action'  => 'delete_views',
+                'risk'    => 'destructive',
+            );
+
+            $kind_options = array(
+                array(
+                    'value' => 'vote',
+                    'label' => esc_html__( 'Votes only', WP_ULIKE_PRO_DOMAIN ),
+                ),
+            );
+
+            if ( 'none' !== wp_ulike_pro_get_engagement_mode_for_type( $type ) ) {
+                $kind_options[] = array(
+                    'value' => 'engagement',
+                    'label' => esc_html__( 'Emoji & star only', WP_ULIKE_PRO_DOMAIN ),
+                );
+                $kind_options[] = array(
+                    'value' => 'all',
+                    'label' => esc_html__( 'Votes + emoji & star', WP_ULIKE_PRO_DOMAIN ),
+                );
+            }
+
+            $tools[] = array(
+                'title'   => sprintf( esc_html__( 'Purge Pulse Logs (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
+                'label'   => esc_html__( 'Purge Logs', WP_ULIKE_PRO_DOMAIN ),
+                'desc'    => esc_html__( 'Permanently delete matching Pulse log rows for this content type. Use the filters to limit by kind and age. Counters are rebuilt for affected items.', WP_ULIKE_PRO_DOMAIN ),
+                'summary' => esc_html__( 'Delete matching vote or engagement logs. Prefer an age filter when you only need to clear old data.', WP_ULIKE_PRO_DOMAIN ),
+                'type'    => $type,
+                'action'  => 'purge_pulse_logs',
+                'risk'    => 'destructive',
+                'ui'      => 'purge',
+                'confirm' => esc_html__( 'This permanently deletes matching Pulse log rows and cannot be undone. Continue?', WP_ULIKE_PRO_DOMAIN ),
+                'filters' => array(
+                    'kind'       => array(
+                        'label'   => esc_html__( 'What to remove', WP_ULIKE_PRO_DOMAIN ),
+                        'default' => 'vote',
+                        'options' => $kind_options,
+                    ),
+                    'older_than' => array(
+                        'label'   => esc_html__( 'Age filter', WP_ULIKE_PRO_DOMAIN ),
+                        'default' => '90',
+                        'options' => array(
+                            array(
+                                'value' => '30',
+                                'label' => esc_html__( 'Older than 30 days', WP_ULIKE_PRO_DOMAIN ),
+                            ),
+                            array(
+                                'value' => '90',
+                                'label' => esc_html__( 'Older than 90 days', WP_ULIKE_PRO_DOMAIN ),
+                            ),
+                            array(
+                                'value' => '365',
+                                'label' => esc_html__( 'Older than 1 year', WP_ULIKE_PRO_DOMAIN ),
+                            ),
+                            array(
+                                'value' => '0',
+                                'label' => esc_html__( 'All time', WP_ULIKE_PRO_DOMAIN ),
+                            ),
+                        ),
+                    ),
+                ),
+            );
+
             return $tools;
+        }
+
+        /**
+         * Maintenance sections for the switcher UI (one panel visible at a time).
+         *
+         * @return array<string, array<string, mixed>>
+         */
+        public static function get_maintenance_sections() {
+            $groups = self::get_optimization_tools();
+
+            if ( empty( $groups ) ) {
+                return array();
+            }
+
+            $definitions = array(
+                'posts'    => array(
+                    'label'       => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for posts.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'comments' => array(
+                    'label'       => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for comments.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'activity' => array(
+                    'label'       => esc_html__( 'Activities', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for BuddyPress activities.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'topic'    => array(
+                    'label'       => esc_html__( 'Topics', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for bbPress topics.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'general'  => array(
+                    'label'       => esc_html__( 'Site', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Plugin pages and user vote-status cleanup.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'cache'    => array(
+                    'label'       => esc_html__( 'Cache', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Clear query caches, statistics, transients, and expired sessions.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+                'repair'   => array(
+                    'label'       => esc_html__( 'Database', WP_ULIKE_PRO_DOMAIN ),
+                    'description' => esc_html__( 'Maintain plugin database tables. Dropping old legacy log tables is in WP ULike → Pulse.', WP_ULIKE_PRO_DOMAIN ),
+                ),
+            );
+
+            $sections = array();
+
+            foreach ( $definitions as $key => $meta ) {
+                if ( ! isset( $groups[ $key ] ) ) {
+                    continue;
+                }
+
+                $risk_groups = self::group_maintenance_tools_by_risk( $groups[ $key ]['tools'] );
+
+                if ( empty( $risk_groups ) ) {
+                    continue;
+                }
+
+                $sections[ $key ] = array_merge(
+                    $meta,
+                    array(
+                        'risk_groups' => $risk_groups,
+                    )
+                );
+            }
+
+            return $sections;
+        }
+
+        /**
+         * Group maintenance tools by risk level for display.
+         *
+         * @param array<int, array<string, mixed>> $tools Tool definitions.
+         * @return array<string, array<string, mixed>>
+         */
+        private static function group_maintenance_tools_by_risk( $tools ) {
+            $order  = array( 'safe', 'caution', 'destructive' );
+            $labels = array(
+                'safe'        => esc_html__( 'Recommended', WP_ULIKE_PRO_DOMAIN ),
+                'caution'     => esc_html__( 'Review first', WP_ULIKE_PRO_DOMAIN ),
+                'destructive' => esc_html__( 'Permanent removal', WP_ULIKE_PRO_DOMAIN ),
+            );
+
+            $grouped = array(
+                'safe'        => array(),
+                'caution'     => array(),
+                'destructive' => array(),
+            );
+
+            foreach ( $tools as $tool ) {
+                $risk = isset( $tool['risk'] ) ? $tool['risk'] : 'caution';
+
+                if ( ! isset( $grouped[ $risk ] ) ) {
+                    $risk = 'caution';
+                }
+
+                $grouped[ $risk ][] = $tool;
+            }
+
+            $result = array();
+
+            foreach ( $order as $risk ) {
+                if ( empty( $grouped[ $risk ] ) ) {
+                    continue;
+                }
+
+                $result[ $risk ] = array(
+                    'label' => $labels[ $risk ],
+                    'tools' => $grouped[ $risk ],
+                );
+            }
+
+            return $result;
+        }
+
+        /**
+         * Attach risk level and concise summary to each maintenance tool.
+         *
+         * @param array<string, array<string, mixed>> $groups Tool groups.
+         * @return array<string, array<string, mixed>>
+         */
+        private static function finalize_maintenance_tool_groups( $groups ) {
+            foreach ( $groups as $group_key => $group_data ) {
+                if ( empty( $group_data['tools'] ) || ! is_array( $group_data['tools'] ) ) {
+                    continue;
+                }
+
+                foreach ( $group_data['tools'] as $index => $tool ) {
+                    $groups[ $group_key ]['tools'][ $index ] = self::finalize_maintenance_tool( $tool );
+                }
+            }
+
+            return $groups;
+        }
+
+        /**
+         * @param array<string, mixed> $tool Tool definition.
+         * @return array<string, mixed>
+         */
+        private static function finalize_maintenance_tool( $tool ) {
+            $action = isset( $tool['action'] ) ? $tool['action'] : '';
+            $type   = isset( $tool['type'] ) ? $tool['type'] : '';
+
+            if ( empty( $tool['risk'] ) ) {
+                $tool['risk'] = self::resolve_maintenance_tool_risk( $action, $type );
+            }
+
+            if ( empty( $tool['summary'] ) && ! empty( $tool['desc'] ) ) {
+                $tool['summary'] = self::summarize_maintenance_tool_description( $tool['desc'] );
+            }
+
+            return $tool;
+        }
+
+        /**
+         * @param string $action Tool action key.
+         * @param string $type   Tool type key.
+         * @return string safe|caution|destructive
+         */
+        private static function resolve_maintenance_tool_risk( $action, $type ) {
+            if ( 'manage_default_pages' === $action ) {
+                return 'delete' === $type ? 'caution' : 'safe';
+            }
+
+            if ( 'delete_all' === $type ) {
+                return 'destructive';
+            }
+
+            if ( 'delete_meta_group' === $action ) {
+                if ( in_array( $type, array( 'post', 'comment', 'activity', 'topic' ), true ) ) {
+                    return 'caution';
+                }
+
+                if ( 'user' === $type ) {
+                    return 'caution';
+                }
+
+                if ( 'statistics' === $type ) {
+                    return 'safe';
+                }
+
+                return 'caution';
+            }
+
+            $destructive = array( 'delete_views', 'purge_pulse_logs' );
+            $safe        = array(
+                'sync_counters',
+                'clear_all_cache',
+                'clear_transients',
+                'cleanup_sessions',
+                'analyze_tables',
+                'sync_indexes',
+                'repair_tables',
+                'count_pulse_logs',
+            );
+            $caution     = array(
+                'repair_records',
+                'optimize_post_meta',
+            );
+
+            if ( in_array( $action, $destructive, true ) ) {
+                return 'destructive';
+            }
+
+            if ( in_array( $action, $safe, true ) ) {
+                return 'safe';
+            }
+
+            if ( in_array( $action, $caution, true ) ) {
+                return 'caution';
+            }
+
+            return 'caution';
+        }
+
+        /**
+         * @param string $description Full tool description.
+         * @return string
+         */
+        private static function summarize_maintenance_tool_description( $description ) {
+            $plain = wp_strip_all_tags( $description );
+            $parts = preg_split( '/(?<=[.!?])\s+/', $plain, 2 );
+
+            if ( ! empty( $parts[0] ) ) {
+                return trim( $parts[0] );
+            }
+
+            return $plain;
+        }
+
+        /**
+         * Human-readable risk labels for maintenance tools.
+         *
+         * @return array<string, string>
+         */
+        public static function get_maintenance_risk_labels() {
+            return array(
+                'safe'        => esc_html__( 'Safe', WP_ULIKE_PRO_DOMAIN ),
+                'caution'     => esc_html__( 'Review first', WP_ULIKE_PRO_DOMAIN ),
+                'destructive' => esc_html__( 'Cannot undo', WP_ULIKE_PRO_DOMAIN ),
+            );
+        }
+
+        /**
+         * Contextual notices for the Maintenance screen.
+         *
+         * @return array<int, array<string, string>>
+         */
+        public static function get_maintenance_admin_notices() {
+            $notices = array();
+
+            $logging_labels = array(
+                'do_not_log'        => esc_html__( 'Do Not Log', WP_ULIKE_PRO_DOMAIN ),
+                'by_cookie'         => esc_html__( 'By Cookie', WP_ULIKE_PRO_DOMAIN ),
+                'by_username'       => esc_html__( 'By Username', WP_ULIKE_PRO_DOMAIN ),
+                'by_user_ip_cookie' => esc_html__( 'By User/IP + Cookie', WP_ULIKE_PRO_DOMAIN ),
+            );
+
+            $content_groups = array(
+                'posts_group'       => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
+                'comments_group'    => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+                'buddypress_group'  => esc_html__( 'BuddyPress Activities', WP_ULIKE_PRO_DOMAIN ),
+                'bbpress_group'     => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
+            );
+
+            $limited_logging = array();
+
+            foreach ( $content_groups as $group_key => $group_label ) {
+                $method = wp_ulike_get_option( $group_key . '|logging_method', 'by_username' );
+
+                if ( in_array( $method, array( 'do_not_log', 'by_cookie' ), true ) ) {
+                    $method_label       = isset( $logging_labels[ $method ] ) ? $logging_labels[ $method ] : $method;
+                    $limited_logging[] = sprintf(
+                        /* translators: 1: content type label, 2: logging method label */
+                        esc_html__( '%1$s uses "%2$s"', WP_ULIKE_PRO_DOMAIN ),
+                        $group_label,
+                        $method_label
+                    );
+                }
+            }
+
+            if ( ! empty( $limited_logging ) ) {
+                $notices[] = array(
+                    'type'    => 'info',
+                    'message' => esc_html__( 'Some content types store few or no vote logs. Cleanup tools that rely on log rows may have limited effect:', WP_ULIKE_PRO_DOMAIN ) . ' ' . implode( '; ', $limited_logging ) . '.',
+                );
+            }
+
+            return $notices;
         }
 
         /**
@@ -493,51 +764,21 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info = array();
 
             // WordPress Info
-            $user_count = 0;
-            if ( function_exists( 'count_users' ) ) {
-                $cu = count_users();
-                $user_count = isset( $cu['total_users'] ) ? $cu['total_users'] : 0;
-            }
-            $debug_info[] = "=== WordPress Information ===";
-            $debug_info[] = "WordPress Version: " . get_bloginfo( 'version' );
-            $debug_info[] = "Site URL: " . site_url();
-            $debug_info[] = "Home URL: " . home_url();
-            $debug_info[] = "Multisite: " . ( is_multisite() ? 'Yes' : 'No' );
-            $debug_info[] = "Language: " . get_locale();
-            $debug_info[] = "User Count: " . $user_count;
-            $debug_info[] = "Memory limit: " . ( defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'N/A' );
-            $debug_info[] = "";
+            $debug_info[] = '=== WordPress Information ===';
+            $debug_info[] = 'WordPress Version: ' . get_bloginfo( 'version' );
+            $debug_info[] = 'Site URL: ' . site_url();
+            $debug_info[] = 'Home URL: ' . home_url();
+            $debug_info[] = 'Multisite: ' . ( is_multisite() ? 'Yes' : 'No' );
+            $debug_info[] = 'Language: ' . get_locale();
+            $debug_info[] = 'Memory limit: ' . ( defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'N/A' );
+            $debug_info[] = '';
 
             // Server Info
-            $debug_info[] = "=== Server Information ===";
-            $debug_info[] = "PHP Version: " . phpversion();
-            $debug_info[] = "MySQL Version: " . $wpdb->db_version();
-            $debug_info[] = "Server Software: " . ( isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown' );
-            $debug_info[] = "Server Protocol: " . ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_PROTOCOL'] ) ) : 'Unknown' );
-            $debug_info[] = "Server IP (Internal): " . ( isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) : 'Unknown' );
-
-            // Get Remote IP (safely, without exposing full details)
-            $remote_ip = 'Not available';
-            if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-                $ips = explode( ',', sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) );
-                $remote_ip = trim( $ips[0] );
-            } elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-                $remote_ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-            }
-            $debug_info[] = "Remote IP: " . $remote_ip;
-
-            // Get Public IP (using cached method from API class)
-            $public_ip = 'Not available';
-            if ( class_exists( 'WP_Ulike_Pro_API' ) && method_exists( 'WP_Ulike_Pro_API', 'get_public_server_ip' ) ) {
-                try {
-                    $public_ip = WP_Ulike_Pro_API::get_public_server_ip();
-                } catch ( Exception $e ) {
-                    // Silently fail - public IP is not critical
-                }
-            }
-            $debug_info[] = "Public IP: " . $public_ip;
-
-            $debug_info[] = "PHP Memory Limit: " . ini_get( 'memory_limit' );
+            $debug_info[] = '=== Server Information ===';
+            $debug_info[] = 'PHP Version: ' . phpversion();
+            $debug_info[] = 'MySQL Version: ' . $wpdb->db_version();
+            $debug_info[] = 'Server Software: ' . ( isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown' );
+            $debug_info[] = 'PHP Memory Limit: ' . ini_get( 'memory_limit' );
             $debug_info[] = "PHP Max Execution Time: " . ini_get( 'max_execution_time' );
             $debug_info[] = "PHP Upload Max Filesize: " . ini_get( 'upload_max_filesize' );
             $debug_info[] = "PHP Post Max Size: " . ini_get( 'post_max_size' );
@@ -575,11 +816,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             // Theme
             $theme = wp_get_theme();
             $debug_info[] = "=== Theme ===";
-            $debug_info[] = "Theme Name: " . $theme->get( 'Name' );
-            $debug_info[] = "Theme Version: " . $theme->get( 'Version' );
-            $debug_info[] = "Theme Author: " . $theme->get( 'Author' );
-            $debug_info[] = "Theme URI: " . $theme->get( 'ThemeURI' );
-            $debug_info[] = "Parent Theme: " . ( $theme->parent() ? $theme->parent()->get( 'Name' ) : 'None' );
+            $debug_info[] = 'Theme Name: ' . $theme->get( 'Name' );
+            $debug_info[] = 'Theme Version: ' . $theme->get( 'Version' );
+            $debug_info[] = 'Parent Theme: ' . ( $theme->parent() ? $theme->parent()->get( 'Name' ) : 'None' );
             $debug_info[] = "";
 
             // WP ULike Info
@@ -591,16 +830,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             // Database Tables
             $debug_info[] = "=== Database Tables ===";
-            $tables = array( 'ulike', 'ulike_meta', 'ulike_activities', 'ulike_comments', 'ulike_forums', 'ulike_sessions', 'ulike_views' );
+            $tables = array( 'ulike_pulse', 'ulike_meta', 'ulike_sessions', 'ulike_views' );
             foreach ( $tables as $table ) {
                 $table_name = $wpdb->prefix . $table;
                 $exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name;
-                if ( $exists ) {
-                    $count = $wpdb->get_var( sprintf( "SELECT COUNT(*) FROM `%s`", esc_sql( $table_name ) ) );
-                    $debug_info[] = $table . ": Exists ($count rows)";
-                } else {
-                    $debug_info[] = $table . ": Not exists";
-                }
+                $debug_info[] = $table . ': ' . ( $exists ? 'Exists' : 'Not exists' );
             }
             $debug_info[] = "";
 
@@ -610,25 +844,24 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $debug_info[] = "Enable Serialize Storage: " . ( isset( $settings['enable_serialize'] ) && $settings['enable_serialize'] ? 'Yes' : 'No' );
             $debug_info[] = "";
 
-            // Network & Connectivity
-            $debug_info[] = "=== Network & Connectivity ===";
-            $debug_info[] = "WP HTTP API Available: " . ( function_exists( 'wp_remote_get' ) ? 'Yes' : 'No' );
-            $debug_info[] = "DNS Lookup: " . ( function_exists( 'gethostbyname' ) ? 'Available' : 'Not Available' );
-            $debug_info[] = "";
-
-            // Error Log
-            $debug_info[] = "=== Error Log ===";
+            // Error Log (last lines only — see get_error_log_content).
+            $debug_info[] = '=== Error Log (recent lines) ===';
             $error_log_result = self::get_error_log_content();
             if ( $error_log_result['success'] ) {
+                if ( ! empty( $error_log_result['notice'] ) ) {
+                    $debug_info[] = $error_log_result['notice'];
+                }
                 $debug_info[] = $error_log_result['content'];
+            } else {
+                $debug_info[] = ! empty( $error_log_result['message'] )
+                    ? $error_log_result['message']
+                    : 'No readable error log found.';
             }
-            $debug_info[] = "";
+            $debug_info[] = '';
 
             // Timestamp
-            $debug_info[] = "=== Generated ===";
-            $debug_info[] = "Date: " . current_time( 'mysql' );
-            $debug_info[] = "Timezone: " . wp_timezone_string();
-            $debug_info[] = "Server Time: " . date( 'Y-m-d H:i:s' );
+            $debug_info[] = '=== Generated ===';
+            $debug_info[] = 'Date: ' . current_time( 'mysql' ) . ' (' . wp_timezone_string() . ')';
 
             return implode( "\n", $debug_info );
         }
@@ -654,32 +887,87 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
         }
 
         /**
-         * Get error log file content for debug info (similar to Advanced Database Cleaner).
-         * Respects a max size limit to avoid memory/time issues.
+         * Read the last N lines from a log file (reads only a tail chunk for large files).
          *
-         * @return array{success: bool, message?: string, path?: string, content?: string}
+         * @param string $file_path Log file path.
+         * @param int    $max_lines Maximum lines to return.
+         * @return string
+         */
+        private static function read_log_file_tail( $file_path, $max_lines ) {
+            $max_lines = max( 1, (int) $max_lines );
+            $size      = @filesize( $file_path );
+
+            if ( false === $size || 0 === $size ) {
+                return '';
+            }
+
+            // Read up to 512 KB from the end so huge logs stay usable.
+            $read_bytes = (int) min( $size, 512 * 1024 );
+            $offset     = max( 0, $size - $read_bytes );
+
+            $handle = @fopen( $file_path, 'rb' );
+            if ( ! $handle ) {
+                return '';
+            }
+
+            if ( $offset > 0 ) {
+                fseek( $handle, $offset );
+            }
+
+            $chunk = stream_get_contents( $handle );
+            fclose( $handle );
+
+            if ( false === $chunk || '' === $chunk ) {
+                return '';
+            }
+
+            if ( $offset > 0 ) {
+                $chunk = preg_replace( '/^[^\r\n]*[\r\n]+/', '', $chunk, 1 );
+            }
+
+            $lines = preg_split( "/\r\n|\n|\r/", $chunk );
+            $lines = array_filter( $lines, 'strlen' );
+            $lines = array_slice( $lines, -$max_lines );
+
+            return implode( "\n", $lines );
+        }
+
+        /**
+         * Get recent error log lines for the debug report.
+         *
+         * @return array{success: bool, message?: string, notice?: string, path?: string, content?: string}
          */
         private static function get_error_log_content() {
-            $max_size  = 1 * 1024 * 1024; // 1 MB
+            $max_lines = self::DEBUG_ERROR_LOG_MAX_LINES;
             $file_path = self::get_error_log_path();
 
             if ( empty( $file_path ) || ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
-                return array( 'success' => false );
+                return array(
+                    'success' => false,
+                    'message' => 'No readable error log found.',
+                );
             }
 
-            $size = @filesize( $file_path );
-            if ( $size === false || $size > $max_size ) {
-                return array( 'success' => false );
+            $content = self::read_log_file_tail( $file_path, $max_lines );
+            if ( '' === $content ) {
+                return array(
+                    'success' => false,
+                    'message' => 'Error log is empty or could not be read.',
+                );
             }
 
-            $content = @file_get_contents( $file_path );
-            if ( $content === false ) {
-                return array( 'success' => false );
-            }
+            $size    = @filesize( $file_path );
+            $notice  = sprintf(
+                '(Last %d lines from %s%s)',
+                $max_lines,
+                basename( $file_path ),
+                ( false !== $size && $size > 512 * 1024 ) ? '; larger file truncated to recent entries' : ''
+            );
 
             return array(
                 'success' => true,
                 'path'    => $file_path,
+                'notice'  => $notice,
                 'content' => $content,
             );
         }
@@ -855,3 +1143,4 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
         }
     }
 }
+

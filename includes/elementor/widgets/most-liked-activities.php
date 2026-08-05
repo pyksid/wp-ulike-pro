@@ -755,8 +755,8 @@ class MostLikedActivities extends Widget_Base {
                     <div class="wp-ulike-entry-votes">
                     <?php
                         $is_distinct = \wp_ulike_setting_repo::isDistinct('activity');
-                        $likes       = wp_ulike_get_counter_value( $activity->id, 'activity', 'like', $is_distinct  );
-                        $dislikes    = wp_ulike_get_counter_value( $activity->id, 'activity', 'dislike', $is_distinct );
+                        $likes       = wp_ulike_pro_get_counter_value( $activity->id, 'activity', 'like', $is_distinct  );
+                        $dislikes    = wp_ulike_pro_get_counter_value( $activity->id, 'activity', 'dislike', $is_distinct );
 
                         if( ! empty( $likes ) ){
                         ?>
@@ -810,3 +810,4 @@ class MostLikedActivities extends Widget_Base {
     }
 
 }
+

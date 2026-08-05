@@ -185,3 +185,4 @@ catch (Hybridauth\Exception\HttpRequestFailedException $e) {
 catch (\Exception $e) {
     echo 'Oops! We ran into an unknown issue: ' . $e->getMessage();
 }
+

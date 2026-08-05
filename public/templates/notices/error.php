@@ -33,3 +33,4 @@ $multiple = count( $notices ) > 1;
 	</div>
 </div>
 <?php
+

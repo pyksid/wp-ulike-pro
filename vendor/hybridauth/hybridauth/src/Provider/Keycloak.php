@@ -114,3 +114,4 @@ class Keycloak extends OAuth2
         return $userProfile;
     }
 }
+

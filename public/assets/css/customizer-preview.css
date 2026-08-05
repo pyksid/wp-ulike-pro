@@ -1,0 +1,125 @@
+/**
+ * WP ULike Pro — customizer iframe preview helpers (not loaded on the public site).
+ *
+ * Layout-only: do NOT hardcode colors, borders, padding, gaps, or sizes that
+ * Customizer controls own — those must stay editable live in the preview.
+ */
+
+.ulp-customizer-engagement-preview {
+	width: 100%;
+	padding: 1.5rem 1.25rem 6.5rem;
+	text-align: center;
+	overflow: visible;
+}
+
+.ulp-customizer-engagement-preview .wpulike,
+.ulp-customizer-engagement-preview .wp_ulike_general_class,
+.ulp-customizer-engagement-preview .wpulike-engagements,
+.ulp-customizer-engagement-preview .ulp-engagement-main,
+.ulp-customizer-engagement-preview .ulp-engagement-anchor {
+	overflow: visible;
+}
+
+.ulp-customizer-engagement-preview .wpulike {
+	padding: 0;
+	margin: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ulp-customizer-engagement-preview .wp_ulike_general_class {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ulp-customizer-engagement-preview .ulp-engagement-engagers,
+.ulp-customizer-engagement-preview .wp_ulike_likers_wrapper {
+	display: none !important;
+}
+
+/*
+ * Hover picker: pin open below the trigger so it stays in the short iframe.
+ * Appearance (border / background / padding) comes from frontend + Customizer.
+ */
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-picker {
+	position: absolute !important;
+	top: calc(100% + 8px) !important;
+	bottom: auto !important;
+	left: 50% !important;
+	right: auto !important;
+	display: flex !important;
+	align-items: center !important;
+	width: max-content !important;
+	max-width: calc(100vw - 24px) !important;
+	overflow-x: auto !important;
+	overflow-y: hidden !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+	transform: translateX(-50%) translateY(0) !important;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-star .ulp-engagement-stars {
+	direction: ltr;
+	unicode-bidi: isolate;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-reactions {
+	display: flex;
+	flex-wrap: nowrap;
+	width: max-content;
+	min-width: 0;
+}
+
+/* Keep chips circular in the flyout; size/border still follow Customizer vars. */
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-reaction {
+	width: var(--ulp-eng-reaction-size, 36px);
+	height: var(--ulp-eng-reaction-size, 36px);
+	min-width: var(--ulp-eng-reaction-size, 36px);
+	min-height: var(--ulp-eng-reaction-size, 36px);
+	padding: 0;
+	border-radius: 50%;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-count {
+	display: none !important;
+}
+
+/*
+ * Inline mode in the (often narrow) customizer iframe — wrap for visibility.
+ * Do not force gap/size vars (Customizer owns those).
+ */
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline {
+	width: 100%;
+	max-width: 100%;
+	justify-content: center;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-main {
+	width: 100%;
+	justify-content: center;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-inline-bar {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow: visible;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-reactions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	min-width: 0;
+}
+
+.ulp-customizer-engagement-preview .wpulike-engagements-star[data-ulp-hide-zero="1"] .ulp-engagement-rating-summary.is-zero {
+	display: none !important;
+}
+

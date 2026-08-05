@@ -9,3 +9,4 @@ namespace MaxMind\Db\Reader;
  */
 // phpcs:disable
 class InvalidDatabaseException extends \Exception {}
+

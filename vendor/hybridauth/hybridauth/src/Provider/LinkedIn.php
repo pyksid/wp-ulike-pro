@@ -218,3 +218,4 @@ class LinkedIn extends OAuth2
         return 'en_US';
     }
 }
+

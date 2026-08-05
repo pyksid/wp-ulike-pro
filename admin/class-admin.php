@@ -2,7 +2,7 @@
 /**
  * Main Admin Class
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -104,3 +104,4 @@ class WP_Ulike_Pro_Admin {
 }
 
 WP_Ulike_Pro_Admin::get_instance();
+

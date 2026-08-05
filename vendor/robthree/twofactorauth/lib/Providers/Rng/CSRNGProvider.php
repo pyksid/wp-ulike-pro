@@ -20,3 +20,4 @@ class CSRNGProvider implements IRNGProvider
         return true;
     }
 }
+

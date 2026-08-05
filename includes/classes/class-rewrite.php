@@ -2,7 +2,7 @@
 /**
  * Rewrite rules
  *
- * 
+ *
  * @package    wp-ulike-pro
  * @author     TechnoWich 2026
  * @link       https://wpulike.com
@@ -199,14 +199,14 @@ class WP_Ulike_Pro_Rewrite {
 			// SECURITY: Sanitize and retrieve the parameters from the URL
 			$key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
 			$user_id = isset( $_GET['login'] ) ? absint( wp_unslash( $_GET['login'] ) ) : 0;
-			
+
 			// Validate key format
 			if ( empty( $key ) || ! preg_match( '/^[a-zA-Z0-9]+$/', $key ) ) {
 				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
 				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
 				exit;
 			}
-			
+
 			if ( empty( $user_id ) ) {
 				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. Invalid user ID.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
 				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
@@ -401,7 +401,7 @@ class WP_Ulike_Pro_Rewrite {
 						if( ! empty( $display_tabs ) ){
 							$tab_exist = false;
 							$tab_is_restricted = false;
-							
+
 							// Get the logged-in user ID (the actual user viewing, not the profile owner)
 							$logged_in_user_id = 0;
 							if ( ! empty( $this->current_user->ID ) ) {
@@ -409,7 +409,7 @@ class WP_Ulike_Pro_Rewrite {
 							} elseif ( is_user_logged_in() ) {
 								$logged_in_user_id = (int) get_current_user_id();
 							}
-							
+
 							foreach ($display_tabs as $tab_key => $tab_args) {
 								// UTF-8: Use mb_strtolower for proper UTF-8 handling
 								$tab_slug = esc_attr( mb_strtolower( preg_replace( '/\s+/', '-', $tab_args['title'] ), 'UTF-8' ) );
@@ -423,7 +423,7 @@ class WP_Ulike_Pro_Rewrite {
 									break;
 								}
 							}
-							
+
 							// If tab doesn't exist or is restricted for current user, redirect to main profile page
 							if( ! $tab_exist || $tab_is_restricted ){
 								exit( wp_redirect( $this->get_current_user_profile_url( $core_page_id, $user_id ) ) );

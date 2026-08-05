@@ -94,3 +94,4 @@ class Discord extends OAuth2
         return $userProfile;
     }
 }
+
