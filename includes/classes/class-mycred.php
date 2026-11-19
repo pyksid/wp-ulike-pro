@@ -239,32 +239,32 @@ if ( class_exists( 'myCRED_Hook' ) ) :
 
 		?>
 <div class="hook-instance">
-    <h3><?php esc_html_e( 'Points for Disliking content', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+    <h3><?php esc_html_e( 'Points for Disliking content', 'wp-ulike-pro' ); ?></h3>
     <div class="row">
         <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_dislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_dislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'add_dislike' => 'creds' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'add_dislike' => 'creds' ) ); ?>"
                     value="<?php echo $this->core->number( $prefs['add_dislike']['creds'] ); ?>" class="form-control" />
-                <span class="description"><?php esc_html_e( 'Use zero to disable.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                <span class="description"><?php esc_html_e( 'Use zero to disable.', 'wp-ulike-pro' ); ?></span>
             </div>
         </div>
         <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_dislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_dislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', 'wp-ulike-pro' ); ?></label>
                 <?php echo $this->hook_limit_setting( $this->field_name( array( 'add_dislike', 'limit' ) ), $this->field_id( array( 'add_dislike', 'limit' ) ), $prefs['add_dislike']['limit'] ); ?>
             </div>
         </div>
         <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_dislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_dislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'add_dislike' => 'log' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'add_dislike' => 'log' ) ); ?>"
-                    placeholder="<?php esc_html_e( 'required', WP_ULIKE_PRO_DOMAIN ); ?>"
+                    placeholder="<?php esc_html_e( 'required', 'wp-ulike-pro' ); ?>"
                     value="<?php echo esc_attr( $prefs['add_dislike']['log'] ); ?>" class="form-control" />
                 <span class="description"><?php echo $this->available_template_tags( array( 'general' ) ); ?></span>
             </div>
@@ -272,32 +272,32 @@ if ( class_exists( 'myCRED_Hook' ) ) :
     </div>
 </div>
 <div class="hook-instance">
-    <h3><?php esc_html_e( 'Points for Author Who Get Disliked', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+    <h3><?php esc_html_e( 'Points for Author Who Get Disliked', 'wp-ulike-pro' ); ?></h3>
     <div class="row">
         <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_dislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_dislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'get_dislike' => 'creds' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'get_dislike' => 'creds' ) ); ?>"
                     value="<?php echo $this->core->number( $prefs['get_dislike']['creds'] ); ?>" class="form-control" />
-                <span class="description"><?php esc_html_e( 'Use zero to disable.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                <span class="description"><?php esc_html_e( 'Use zero to disable.', 'wp-ulike-pro' ); ?></span>
             </div>
         </div>
         <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_dislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_dislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', 'wp-ulike-pro' ); ?></label>
                 <?php echo $this->hook_limit_setting( $this->field_name( array( 'get_dislike', 'limit' ) ), $this->field_id( array( 'get_dislike', 'limit' ) ), $prefs['get_dislike']['limit'] ); ?>
             </div>
         </div>
         <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_dislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_dislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'get_dislike' => 'log' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'get_dislike' => 'log' ) ); ?>"
-                    placeholder="<?php esc_html_e( 'required', WP_ULIKE_PRO_DOMAIN ); ?>"
+                    placeholder="<?php esc_html_e( 'required', 'wp-ulike-pro' ); ?>"
                     value="<?php echo esc_attr( $prefs['get_dislike']['log'] ); ?>" class="form-control" />
                 <span class="description"><?php echo $this->available_template_tags( array( 'general' ) ); ?></span>
             </div>
@@ -305,33 +305,33 @@ if ( class_exists( 'myCRED_Hook' ) ) :
     </div>
 </div>
 <div class="hook-instance">
-    <h3><?php esc_html_e( 'Points for Undisliking content', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+    <h3><?php esc_html_e( 'Points for Undisliking content', 'wp-ulike-pro' ); ?></h3>
     <div class="row">
         <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_undislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_undislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'add_undislike' => 'creds' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'add_undislike' => 'creds' ) ); ?>"
                     value="<?php echo $this->core->number( $prefs['add_undislike']['creds'] ); ?>"
                     class="form-control" />
-                <span class="description"><?php esc_html_e( 'Use zero to disable.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                <span class="description"><?php esc_html_e( 'Use zero to disable.', 'wp-ulike-pro' ); ?></span>
             </div>
         </div>
         <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_undislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_undislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', 'wp-ulike-pro' ); ?></label>
                 <?php echo $this->hook_limit_setting( $this->field_name( array( 'add_undislike', 'limit' ) ), $this->field_id( array( 'add_undislike', 'limit' ) ), $prefs['add_undislike']['limit'] ); ?>
             </div>
         </div>
         <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'add_undislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'add_undislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'add_undislike' => 'log' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'add_undislike' => 'log' ) ); ?>"
-                    placeholder="<?php esc_html_e( 'required', WP_ULIKE_PRO_DOMAIN ); ?>"
+                    placeholder="<?php esc_html_e( 'required', 'wp-ulike-pro' ); ?>"
                     value="<?php echo esc_attr( $prefs['add_undislike']['log'] ); ?>" class="form-control" />
                 <span class="description"><?php echo $this->available_template_tags( array( 'general' ) ); ?></span>
             </div>
@@ -339,33 +339,33 @@ if ( class_exists( 'myCRED_Hook' ) ) :
     </div>
 </div>
 <div class="hook-instance">
-    <h3><?php esc_html_e( 'Points for Author Who Get Undisliked', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+    <h3><?php esc_html_e( 'Points for Author Who Get Undisliked', 'wp-ulike-pro' ); ?></h3>
     <div class="row">
         <div class="col-lg-2 col-md-6 col-sm-6 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_undislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_undislike' => 'creds' ) ); ?>"><?php esc_html_e( 'Points', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'get_undislike' => 'creds' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'get_undislike' => 'creds' ) ); ?>"
                     value="<?php echo $this->core->number( $prefs['get_undislike']['creds'] ); ?>"
                     class="form-control" />
-                <span class="description"><?php esc_html_e( 'Use zero to disable.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                <span class="description"><?php esc_html_e( 'Use zero to disable.', 'wp-ulike-pro' ); ?></span>
             </div>
         </div>
         <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_undislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_undislike', 'limit' ) ); ?>"><?php esc_html_e( 'Limit', 'wp-ulike-pro' ); ?></label>
                 <?php echo $this->hook_limit_setting( $this->field_name( array( 'get_undislike', 'limit' ) ), $this->field_id( array( 'get_undislike', 'limit' ) ), $prefs['get_undislike']['limit'] ); ?>
             </div>
         </div>
         <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
             <div class="form-group">
                 <label
-                    for="<?php echo $this->field_id( array( 'get_undislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+                    for="<?php echo $this->field_id( array( 'get_undislike' => 'log' ) ); ?>"><?php esc_html_e( 'Log template', 'wp-ulike-pro' ); ?></label>
                 <input type="text" name="<?php echo $this->field_name( array( 'get_undislike' => 'log' ) ); ?>"
                     id="<?php echo $this->field_id( array( 'get_undislike' => 'log' ) ); ?>"
-                    placeholder="<?php esc_html_e( 'required', WP_ULIKE_PRO_DOMAIN ); ?>"
+                    placeholder="<?php esc_html_e( 'required', 'wp-ulike-pro' ); ?>"
                     value="<?php echo esc_attr( $prefs['get_undislike']['log'] ); ?>" class="form-control" />
                 <span class="description"><?php echo $this->available_template_tags( array( 'general' ) ); ?></span>
             </div>
@@ -373,7 +373,7 @@ if ( class_exists( 'myCRED_Hook' ) ) :
     </div>
 </div>
 <div class="hook-instance">
-    <h3><?php esc_html_e( 'Limits', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+    <h3><?php esc_html_e( 'Limits', 'wp-ulike-pro' ); ?></h3>
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="form-group">
@@ -382,7 +382,7 @@ if ( class_exists( 'myCRED_Hook' ) ) :
                             type="checkbox" name="<?php echo $this->field_name( array( 'limits' => 'self_reply' ) ); ?>"
                             id="<?php echo $this->field_id( array( 'limits' => 'self_reply' ) ); ?>"
                             <?php checked( $prefs['limits']['self_reply'], 1 ); ?> value="1" />
-                        <?php echo $this->core->template_tags_general( esc_html__( '%plural% is to be awarded even when item authors Like/Unlike their own item.', WP_ULIKE_PRO_DOMAIN ) ); ?></label>
+                        <?php echo $this->core->template_tags_general( esc_html__( '%plural% is to be awarded even when item authors Like/Unlike their own item.', 'wp-ulike-pro' ) ); ?></label>
                 </div>
             </div>
         </div>

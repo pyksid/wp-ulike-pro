@@ -56,7 +56,7 @@ final class WP_Ulike_Pro_Profile extends wp_ulike_ajax_listener_base {
             $this->afterAction();
 
 			$this->response( array(
-                'message'  => WP_Ulike_Pro_Options::getNoticeMessage( 'profile_success', esc_html__( 'Profile data updated.', WP_ULIKE_PRO_DOMAIN ) ),
+                'message'  => WP_Ulike_Pro_Options::getNoticeMessage( 'profile_success', __( 'Profile data updated.', 'wp-ulike-pro' ) ),
                 'status'   => 'success'
             ) );
 
@@ -91,17 +91,17 @@ final class WP_Ulike_Pro_Profile extends wp_ulike_ajax_listener_base {
 	private function validates(){
 		// Return false in preview mode
 		if( WP_Ulike_Pro::is_preview_mode() ){
-			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ) );
 		}
 
 		// Validate email address
 		if( ! is_email( $this->data['user_email'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_email', esc_html__( 'Email address is not valid!', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_email', __( 'Email address is not valid!', 'wp-ulike-pro' ) ) );
 		}
 
 		// Return false when nonce invalid
 		if( ! $this->user || ( ! wp_verify_nonce( $this->data['security'], 'wp-ulike-pro-forms-nonce') && ! wp_ulike_is_cache_exist() ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
         }
 
 	}

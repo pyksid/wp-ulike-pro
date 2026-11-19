@@ -4,45 +4,56 @@ class WP_Ulike_Pro_Register_Public_Events
 {
 	public function __construct()
 	{
-		// Front End Login
-		add_action( 'wp_ajax_nopriv_ulp_login', array( $this, 'login' ) );
-		add_action( 'wp_ajax_ulp_login', array( $this, 'login' ) );
+		// Form endpoints exist only while Login & Signup is switched on, so a
+		// site that does not use the forms exposes no form endpoints at all.
+		if ( wp_ulike_pro_feature_enabled( 'login_signup' ) ) {
+			// Front End Login
+			add_action( 'wp_ajax_nopriv_ulp_login', array( $this, 'login' ) );
+			add_action( 'wp_ajax_ulp_login', array( $this, 'login' ) );
 
-		// Front End Signup
-		add_action( 'wp_ajax_nopriv_ulp_signup', array( $this, 'signup' ) );
-		add_action( 'wp_ajax_ulp_signup', array( $this, 'signup' ) );
+			// Front End Signup
+			add_action( 'wp_ajax_nopriv_ulp_signup', array( $this, 'signup' ) );
+			add_action( 'wp_ajax_ulp_signup', array( $this, 'signup' ) );
 
-		// Front Reset Password
-		add_action( 'wp_ajax_nopriv_ulp_reset_password', array( $this, 'reset_password' ) );
-		add_action( 'wp_ajax_ulp_reset_password', array( $this, 'reset_password' ) );
+			// Front Reset Password
+			add_action( 'wp_ajax_nopriv_ulp_reset_password', array( $this, 'reset_password' ) );
+			add_action( 'wp_ajax_ulp_reset_password', array( $this, 'reset_password' ) );
 
-		// Front Edit Profile
-		add_action( 'wp_ajax_nopriv_ulp_profile', array( $this, 'profile' ) );
-		add_action( 'wp_ajax_ulp_profile', array( $this, 'profile' ) );
+			// Two Factor Validation
+			add_action( 'wp_ajax_nopriv_ulp_two_factor_validation', array( $this, 'two_factor_validation' ) );
+			add_action( 'wp_ajax_ulp_two_factor_validation', array( $this, 'two_factor_validation' ) );
+
+			// Two Factor Remove
+			add_action( 'wp_ajax_nopriv_ulp_two_factor_remove', array( $this, 'two_factor_remove' ) );
+			add_action( 'wp_ajax_ulp_two_factor_remove', array( $this, 'two_factor_remove' ) );
+
+			// Ajax
+			add_action( 'wp_ajax_nopriv_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
+			add_action( 'wp_ajax_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
+		}
+
+		// Profile edit and avatar upload are reachable from the profile page and
+		// from the edit-account form, so they stay registered while either of
+		// those modules is on.
+		if ( wp_ulike_pro_feature_enabled( 'profiles' ) || wp_ulike_pro_feature_enabled( 'login_signup' ) ) {
+			// Front Edit Profile
+			add_action( 'wp_ajax_nopriv_ulp_profile', array( $this, 'profile' ) );
+			add_action( 'wp_ajax_ulp_profile', array( $this, 'profile' ) );
+
+			// Avatar Upload
+			add_action( 'wp_ajax_nopriv_ulp_avatar', array( $this, 'avatar' ) );
+			add_action( 'wp_ajax_ulp_avatar', array( $this, 'avatar' ) );
+		}
 
 		// Likers List
 		add_action( 'wp_ajax_nopriv_ulp_likers', array( $this, 'get_likers' ) );
 		add_action( 'wp_ajax_ulp_likers', array( $this, 'get_likers' ) );
 
-		// Avatar Upload
-		add_action( 'wp_ajax_nopriv_ulp_avatar', array( $this, 'avatar' ) );
-		add_action( 'wp_ajax_ulp_avatar', array( $this, 'avatar' ) );
-
-		// Two Factor Validation
-		add_action( 'wp_ajax_nopriv_ulp_two_factor_validation', array( $this, 'two_factor_validation' ) );
-		add_action( 'wp_ajax_ulp_two_factor_validation', array( $this, 'two_factor_validation' ) );
-
-		// Two Factor Remove
-		add_action( 'wp_ajax_nopriv_ulp_two_factor_remove', array( $this, 'two_factor_remove' ) );
-		add_action( 'wp_ajax_ulp_two_factor_remove', array( $this, 'two_factor_remove' ) );
-
-		// Ajax
-		add_action( 'wp_ajax_nopriv_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
-		add_action( 'wp_ajax_ulp_forms_toggle', array( $this, 'forms_toggle' ) );
-
-		// Button Views Batch Tracking (for performance)
-		add_action( 'wp_ajax_nopriv_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
-		add_action( 'wp_ajax_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
+		// Views exist only to compute engagement rate in the reports.
+		if ( wp_ulike_pro_feature_enabled( 'statistics' ) ) {
+			add_action( 'wp_ajax_nopriv_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
+			add_action( 'wp_ajax_ulp_track_view_batch', array( $this, 'track_button_view_batch' ) );
+		}
 
 		// Engagements
 		add_action( 'wp_ajax_nopriv_wp_ulike_pro_engagement_process', array( $this, 'engagement_process' ) );

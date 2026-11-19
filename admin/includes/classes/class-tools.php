@@ -73,7 +73,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             }
 
             if ( ! WP_Ulike_Pro_API::has_permission() ) {
-                wp_die( esc_html__( 'You need an active license to save display automation rules.', WP_ULIKE_PRO_DOMAIN ) );
+                wp_die( esc_html__( 'You need an active license to save display automation rules.', 'wp-ulike-pro' ) );
             }
 
             $rules = isset( $_POST['display_rules'] ) && is_array( $_POST['display_rules'] )
@@ -122,7 +122,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             }
 
             $tools_submenu_page = array( 'tools' => array(
-                'title'       => esc_html__( 'Tools', WP_ULIKE_PRO_DOMAIN ),
+                'title'       => esc_html__( 'Tools' ),
                 'parent_slug' => 'wp-ulike-settings',
                 'capability'  => 'manage_options',
                 'path'        => WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/tools.php',
@@ -150,41 +150,51 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             $tabs = array(
                 'maintenance'        => array(
-                    'label'       => esc_html__( 'Maintenance', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Fix like counts, clean up old data, and keep things running smoothly.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Maintenance' ),
+                    'description' => esc_html__( 'Fix like counts, clean up old data, and keep things running smoothly.', 'wp-ulike-pro' ),
                     'icon'        => 'admin-tools',
                 ),
                 'display-automation' => array(
-                    'label'       => esc_html__( 'Display Automation', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Choose where like buttons appear with rules and filters.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Display Automation', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Choose where like buttons appear with rules and filters.', 'wp-ulike-pro' ),
                     'icon'        => 'visibility',
                 ),
                 'schema-generator'   => array(
-                    'label'       => esc_html__( 'Schema Generator', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Configure Schema.org markup and FAQ structured data for your posts.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Schema Generator', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Configure Schema.org markup and FAQ structured data for your posts.', 'wp-ulike-pro' ),
                     'icon'        => 'media-code',
                 ),
                 'bulk-actions'       => array(
-                    'label'       => esc_html__( 'Bulk Actions', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Search content and adjust vote, emoji, or star counters in bulk.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Bulk actions' ),
+                    'description' => esc_html__( 'Search content and adjust vote, emoji, or star counters in bulk.', 'wp-ulike-pro' ),
                     'icon'        => 'chart-bar',
                 ),
                 'gdpr'               => array(
-                    'label'       => esc_html__( 'GDPR', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Remove all like logs for selected users (cannot be undone).', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'GDPR', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Remove all like logs for selected users (cannot be undone).', 'wp-ulike-pro' ),
                     'icon'        => 'privacy',
                 ),
                 'rest-api'           => array(
-                    'label'       => esc_html__( 'REST API', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Enable the REST API, permissions, and API keys.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'REST API', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Enable the REST API, permissions, and API keys.', 'wp-ulike-pro' ),
                     'icon'        => 'rest-api',
                 ),
                 'debug'              => array(
-                    'label'       => esc_html__( 'Debug Info', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Copy system details for support tickets (no passwords or keys).', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Debug Info', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Copy system details for support tickets (no passwords or keys).', 'wp-ulike-pro' ),
                     'icon'        => 'editor-code',
                 ),
             );
+
+            // Drop tabs whose module is switched off, so nothing links to a
+            // screen for a feature that is no longer running.
+            if ( function_exists( 'wp_ulike_pro_feature_enabled' ) ) {
+                foreach ( array( 'display-automation' => 'display_automation', 'schema-generator' => 'schema' ) as $tab => $feature ) {
+                    if ( ! wp_ulike_pro_feature_enabled( $feature ) ) {
+                        unset( $tabs[ $tab ] );
+                    }
+                }
+            }
 
             if ( ! isset( $tabs[ $current_tab ] ) ) {
                 $current_tab = 'maintenance';
@@ -221,11 +231,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             $tools = array(
                 'posts' => array(
-                    'title' => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
+                    'title' => esc_html__( 'Posts' ),
                     'tools' => self::get_content_maintenance_tools( 'post' ),
                 ),
                 'comments' => array(
-                    'title' => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+                    'title' => esc_html__( 'Comments' ),
                     'tools' => self::get_content_maintenance_tools( 'comment' ),
                 )
             );
@@ -233,7 +243,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             // Only add BuddyPress section if plugin is active
             if( $is_buddypress_active ){
                 $tools['activity'] = array(
-                    'title' => esc_html__( 'BuddyPress Activities', WP_ULIKE_PRO_DOMAIN ),
+                    'title' => esc_html__( 'BuddyPress Activities', 'wp-ulike-pro' ),
                     'tools' => self::get_content_maintenance_tools( 'activity' ),
                 );
             }
@@ -241,74 +251,74 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             // Only add bbPress section if plugin is active
             if( $is_bbpress_active ){
                 $tools['topic'] = array(
-                    'title' => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
+                    'title' => esc_html__( 'bbPress Topics', 'wp-ulike-pro' ),
                     'tools' => self::get_content_maintenance_tools( 'topic' ),
                 );
             }
 
             $tools['general'] = array(
-                'title' => esc_html__( 'Site', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'Site' ),
                 'tools' => array(
                     array(
-                        'title'   => esc_html__( 'Delete All User Vote Status', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Delete Status', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Remove all stored information about which users have liked or disliked content. This will not delete vote records, only the user status tracking. This action cannot be undone.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Clears who-voted tracking only — your like and dislike records stay intact.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Delete All User Vote Status', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Delete Status', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Remove all stored information about which users have liked or disliked content. This will not delete vote records, only the user status tracking. This action cannot be undone.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Clears who-voted tracking only — your like and dislike records stay intact.', 'wp-ulike-pro' ),
                         'type'    => 'user',
                         'action'  => 'delete_meta_group',
                     ),
                     array(
-                        'title'   => esc_html__( 'Remove Empty Post Settings', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Clean Empty', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Delete empty post settings that are no longer needed. This helps reduce database size without affecting your content or votes.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Removes unused empty settings rows to free up database space.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Remove Empty Post Settings', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Clean Empty', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Delete empty post settings that are no longer needed. This helps reduce database size without affecting your content or votes.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Removes unused empty settings rows to free up database space.', 'wp-ulike-pro' ),
                         'type'    => 'optimize',
                         'action'  => 'optimize_post_meta',
                     ),
                     array(
-                        'title'   => esc_html__( 'Create Default Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Create Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Automatically create the required pages for user profiles, login, registration, and account management. Existing pages will not be replaced.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Creates login, profile, and account pages if they are missing.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Create Default Pages', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Create Pages', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Automatically create the required pages for user profiles, login, registration, and account management. Existing pages will not be replaced.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Creates login, profile, and account pages if they are missing.', 'wp-ulike-pro' ),
                         'type'    => 'create',
                         'action'  => 'manage_default_pages',
                     ),
                     array(
-                        'title'   => esc_html__( 'Delete Default Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Delete Pages', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Remove the plugin-created pages (login, profile, registration, etc.). You can recreate them anytime using Create Default Pages.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Removes plugin pages only. Use Create Default Pages to set them up again.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Delete Default Pages', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Delete Pages', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Remove the plugin-created pages (login, profile, registration, etc.). You can recreate them anytime using Create Default Pages.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Removes plugin pages only. Use Create Default Pages to set them up again.', 'wp-ulike-pro' ),
                         'type'    => 'delete',
                         'action'  => 'manage_default_pages',
                         'risk'    => 'caution',
-                        'confirm' => esc_html__( 'Remove the plugin-created pages? You can recreate them anytime with Create Default Pages.', WP_ULIKE_PRO_DOMAIN ),
+                        'confirm' => esc_html__( 'Remove the plugin-created pages? You can recreate them anytime with Create Default Pages.', 'wp-ulike-pro' ),
                     )
                 )
             );
 
             $tools['repair'] = array(
-                'title' => esc_html__( 'Database', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'Database' ),
                 'tools' => array(
                     array(
-                        'title'  => esc_html__( 'Repair Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Repair Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Repair plugin tables (meta cache, sessions, views).', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Repair Tables', 'wp-ulike-pro' ),
+                        'label'  => esc_html__( 'Repair Tables', 'wp-ulike-pro' ),
+                        'desc'   => esc_html__( 'Repair plugin tables (meta cache, sessions, views).', 'wp-ulike-pro' ),
                         'type'   => 'repair',
                         'action' => 'repair_tables',
                         'risk'   => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Analyze Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Analyze Tables', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Update MySQL statistics for plugin tables to improve query performance.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Analyze Tables', 'wp-ulike-pro' ),
+                        'label'  => esc_html__( 'Analyze Tables', 'wp-ulike-pro' ),
+                        'desc'   => esc_html__( 'Update MySQL statistics for plugin tables to improve query performance.', 'wp-ulike-pro' ),
                         'type'   => 'analyze',
                         'action' => 'analyze_tables',
                         'risk'   => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Sync Indexes', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Sync Indexes', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Add missing indexes on plugin tables. Safe to run multiple times.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Sync Indexes', 'wp-ulike-pro' ),
+                        'label'  => esc_html__( 'Sync Indexes', 'wp-ulike-pro' ),
+                        'desc'   => esc_html__( 'Add missing indexes on plugin tables. Safe to run multiple times.', 'wp-ulike-pro' ),
                         'type'   => 'sync',
                         'action' => 'sync_indexes',
                         'risk'   => 'safe',
@@ -317,38 +327,38 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             );
 
             $tools['cache'] = array(
-                'title' => esc_html__( 'Cache', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'Cache', 'wp-ulike-pro' ),
                 'tools' => array(
                     array(
-                        'title'   => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Clear All Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Clear plugin query caches and popular page-cache plugins. Use this first when counts look wrong on the front end.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Refreshes vote and counter caches site-wide.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Clear All Cache', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Clear All Cache', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Clear plugin query caches and popular page-cache plugins. Use this first when counts look wrong on the front end.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Refreshes vote and counter caches site-wide.', 'wp-ulike-pro' ),
                         'type'    => 'cache',
                         'action'  => 'clear_all_cache',
                         'risk'    => 'safe',
                     ),
                     array(
-                        'title'   => esc_html__( 'Clear Statistics Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'   => esc_html__( 'Clear Statistics', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'    => esc_html__( 'Refresh the statistics dashboard cache. Vote records are not deleted.', WP_ULIKE_PRO_DOMAIN ),
-                        'summary' => esc_html__( 'Statistics dashboard only — your vote data stays intact.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'   => esc_html__( 'Clear Statistics Cache', 'wp-ulike-pro' ),
+                        'label'   => esc_html__( 'Clear Statistics', 'wp-ulike-pro' ),
+                        'desc'    => esc_html__( 'Refresh the statistics dashboard cache. Vote records are not deleted.', 'wp-ulike-pro' ),
+                        'summary' => esc_html__( 'Statistics dashboard only — your vote data stays intact.', 'wp-ulike-pro' ),
                         'type'    => 'statistics',
                         'action'  => 'delete_meta_group',
                         'risk'    => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Clear Transient Cache', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clear Transients', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Delete temporary plugin transients to free database space.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Clear Transient Cache', 'wp-ulike-pro' ),
+                        'label'  => esc_html__( 'Clear Transients', 'wp-ulike-pro' ),
+                        'desc'   => esc_html__( 'Delete temporary plugin transients to free database space.', 'wp-ulike-pro' ),
                         'type'   => 'transients',
                         'action' => 'clear_transients',
                         'risk'   => 'safe',
                     ),
                     array(
-                        'title'  => esc_html__( 'Clean Up Expired Sessions', WP_ULIKE_PRO_DOMAIN ),
-                        'label'  => esc_html__( 'Clean Sessions', WP_ULIKE_PRO_DOMAIN ),
-                        'desc'   => esc_html__( 'Remove expired session rows from the sessions table.', WP_ULIKE_PRO_DOMAIN ),
+                        'title'  => esc_html__( 'Clean Up Expired Sessions', 'wp-ulike-pro' ),
+                        'label'  => esc_html__( 'Clean Sessions', 'wp-ulike-pro' ),
+                        'desc'   => esc_html__( 'Remove expired session rows from the sessions table.', 'wp-ulike-pro' ),
                         'type'   => 'sessions',
                         'action' => 'cleanup_sessions',
                         'risk'   => 'safe',
@@ -370,10 +380,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             $tools = array(
                 array(
-                    'title'   => sprintf( esc_html__( 'Sync Counters (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
-                    'label'   => esc_html__( 'Sync Counters', WP_ULIKE_PRO_DOMAIN ),
-                    'desc'    => esc_html__( 'Rebuild stored counters from the database. Safe to run anytime counts look wrong.', WP_ULIKE_PRO_DOMAIN ),
-                    'summary' => esc_html__( 'Recommended first step when numbers disagree with the live data.', WP_ULIKE_PRO_DOMAIN ),
+                    'title'   => sprintf( esc_html__( 'Sync Counters (%s)', 'wp-ulike-pro' ), $label ),
+                    'label'   => esc_html__( 'Sync Counters', 'wp-ulike-pro' ),
+                    'desc'    => esc_html__( 'Rebuild stored counters from the database. Safe to run anytime counts look wrong.', 'wp-ulike-pro' ),
+                    'summary' => esc_html__( 'Recommended first step when numbers disagree with the live data.', 'wp-ulike-pro' ),
                     'type'    => $type,
                     'action'  => 'sync_counters',
                     'risk'    => 'safe',
@@ -382,10 +392,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             if ( 'none' !== wp_ulike_pro_get_engagement_mode_for_type( $type ) ) {
                 $tools[] = array(
-                    'title'   => sprintf( esc_html__( 'Repair Records (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
-                    'label'   => esc_html__( 'Repair Records', WP_ULIKE_PRO_DOMAIN ),
-                    'desc'    => esc_html__( 'Remove invalid and duplicate engagement records for this content type.', WP_ULIKE_PRO_DOMAIN ),
-                    'summary' => esc_html__( 'Fixes broken or duplicate records without deleting valid votes.', WP_ULIKE_PRO_DOMAIN ),
+                    'title'   => sprintf( esc_html__( 'Repair Records (%s)', 'wp-ulike-pro' ), $label ),
+                    'label'   => esc_html__( 'Repair Records', 'wp-ulike-pro' ),
+                    'desc'    => esc_html__( 'Remove invalid and duplicate engagement records for this content type.', 'wp-ulike-pro' ),
+                    'summary' => esc_html__( 'Fixes broken or duplicate records without deleting valid votes.', 'wp-ulike-pro' ),
                     'type'    => $type,
                     'action'  => 'repair_records',
                     'risk'    => 'caution',
@@ -393,10 +403,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             }
 
             $tools[] = array(
-                'title'   => sprintf( esc_html__( 'Clear View History (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
-                'label'   => esc_html__( 'Clear Views', WP_ULIKE_PRO_DOMAIN ),
-                'desc'    => esc_html__( 'Permanently delete view tracking records for this content type.', WP_ULIKE_PRO_DOMAIN ),
-                'summary' => esc_html__( 'Removes view history used for engagement rate metrics.', WP_ULIKE_PRO_DOMAIN ),
+                'title'   => sprintf( esc_html__( 'Clear View History (%s)', 'wp-ulike-pro' ), $label ),
+                'label'   => esc_html__( 'Clear Views', 'wp-ulike-pro' ),
+                'desc'    => esc_html__( 'Permanently delete view tracking records for this content type.', 'wp-ulike-pro' ),
+                'summary' => esc_html__( 'Removes view history used for engagement rate metrics.', 'wp-ulike-pro' ),
                 'type'    => $type,
                 'action'  => 'delete_views',
                 'risk'    => 'destructive',
@@ -405,56 +415,56 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $kind_options = array(
                 array(
                     'value' => 'vote',
-                    'label' => esc_html__( 'Votes only', WP_ULIKE_PRO_DOMAIN ),
+                    'label' => esc_html__( 'Votes only', 'wp-ulike-pro' ),
                 ),
             );
 
             if ( 'none' !== wp_ulike_pro_get_engagement_mode_for_type( $type ) ) {
                 $kind_options[] = array(
                     'value' => 'engagement',
-                    'label' => esc_html__( 'Emoji & star only', WP_ULIKE_PRO_DOMAIN ),
+                    'label' => esc_html__( 'Emoji & star only', 'wp-ulike-pro' ),
                 );
                 $kind_options[] = array(
                     'value' => 'all',
-                    'label' => esc_html__( 'Votes + emoji & star', WP_ULIKE_PRO_DOMAIN ),
+                    'label' => esc_html__( 'Votes + emoji & star', 'wp-ulike-pro' ),
                 );
             }
 
             $tools[] = array(
-                'title'   => sprintf( esc_html__( 'Purge Pulse Logs (%s)', WP_ULIKE_PRO_DOMAIN ), $label ),
-                'label'   => esc_html__( 'Purge Logs', WP_ULIKE_PRO_DOMAIN ),
-                'desc'    => esc_html__( 'Permanently delete matching Pulse log rows for this content type. Use the filters to limit by kind and age. Counters are rebuilt for affected items.', WP_ULIKE_PRO_DOMAIN ),
-                'summary' => esc_html__( 'Delete matching vote or engagement logs. Prefer an age filter when you only need to clear old data.', WP_ULIKE_PRO_DOMAIN ),
+                'title'   => sprintf( esc_html__( 'Purge Pulse Logs (%s)', 'wp-ulike-pro' ), $label ),
+                'label'   => esc_html__( 'Purge Logs', 'wp-ulike-pro' ),
+                'desc'    => esc_html__( 'Permanently delete matching Pulse log rows for this content type. Use the filters to limit by kind and age. Counters are rebuilt for affected items.', 'wp-ulike-pro' ),
+                'summary' => esc_html__( 'Delete matching vote or engagement logs. Prefer an age filter when you only need to clear old data.', 'wp-ulike-pro' ),
                 'type'    => $type,
                 'action'  => 'purge_pulse_logs',
                 'risk'    => 'destructive',
                 'ui'      => 'purge',
-                'confirm' => esc_html__( 'This permanently deletes matching Pulse log rows and cannot be undone. Continue?', WP_ULIKE_PRO_DOMAIN ),
+                'confirm' => esc_html__( 'This permanently deletes matching Pulse log rows and cannot be undone. Continue?', 'wp-ulike-pro' ),
                 'filters' => array(
                     'kind'       => array(
-                        'label'   => esc_html__( 'What to remove', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'What to remove', 'wp-ulike-pro' ),
                         'default' => 'vote',
                         'options' => $kind_options,
                     ),
                     'older_than' => array(
-                        'label'   => esc_html__( 'Age filter', WP_ULIKE_PRO_DOMAIN ),
+                        'label'   => esc_html__( 'Age filter', 'wp-ulike-pro' ),
                         'default' => '90',
                         'options' => array(
                             array(
                                 'value' => '30',
-                                'label' => esc_html__( 'Older than 30 days', WP_ULIKE_PRO_DOMAIN ),
+                                'label' => esc_html__( 'Older than 30 days', 'wp-ulike-pro' ),
                             ),
                             array(
                                 'value' => '90',
-                                'label' => esc_html__( 'Older than 90 days', WP_ULIKE_PRO_DOMAIN ),
+                                'label' => esc_html__( 'Older than 90 days', 'wp-ulike-pro' ),
                             ),
                             array(
                                 'value' => '365',
-                                'label' => esc_html__( 'Older than 1 year', WP_ULIKE_PRO_DOMAIN ),
+                                'label' => esc_html__( 'Older than 1 year', 'wp-ulike-pro' ),
                             ),
                             array(
                                 'value' => '0',
-                                'label' => esc_html__( 'All time', WP_ULIKE_PRO_DOMAIN ),
+                                'label' => esc_html__( 'All time', 'wp-ulike-pro' ),
                             ),
                         ),
                     ),
@@ -478,32 +488,32 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
 
             $definitions = array(
                 'posts'    => array(
-                    'label'       => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for posts.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Posts' ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for posts.', 'wp-ulike-pro' ),
                 ),
                 'comments' => array(
-                    'label'       => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for comments.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Comments' ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for comments.', 'wp-ulike-pro' ),
                 ),
                 'activity' => array(
-                    'label'       => esc_html__( 'Activities', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for BuddyPress activities.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Activities', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for BuddyPress activities.', 'wp-ulike-pro' ),
                 ),
                 'topic'    => array(
-                    'label'       => esc_html__( 'Topics', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for bbPress topics.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Topics', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Sync counters, repair records, purge Pulse logs, and manage view history for bbPress topics.', 'wp-ulike-pro' ),
                 ),
                 'general'  => array(
-                    'label'       => esc_html__( 'Site', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Plugin pages and user vote-status cleanup.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Site' ),
+                    'description' => esc_html__( 'Plugin pages and user vote-status cleanup.', 'wp-ulike-pro' ),
                 ),
                 'cache'    => array(
-                    'label'       => esc_html__( 'Cache', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Clear query caches, statistics, transients, and expired sessions.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Cache', 'wp-ulike-pro' ),
+                    'description' => esc_html__( 'Clear query caches, statistics, transients, and expired sessions.', 'wp-ulike-pro' ),
                 ),
                 'repair'   => array(
-                    'label'       => esc_html__( 'Database', WP_ULIKE_PRO_DOMAIN ),
-                    'description' => esc_html__( 'Maintain plugin database tables. Dropping old legacy log tables is in WP ULike → Pulse.', WP_ULIKE_PRO_DOMAIN ),
+                    'label'       => esc_html__( 'Database' ),
+                    'description' => esc_html__( 'Maintain plugin database tables. Dropping old legacy log tables is in WP ULike → Pulse.', 'wp-ulike-pro' ),
                 ),
             );
 
@@ -540,9 +550,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
         private static function group_maintenance_tools_by_risk( $tools ) {
             $order  = array( 'safe', 'caution', 'destructive' );
             $labels = array(
-                'safe'        => esc_html__( 'Recommended', WP_ULIKE_PRO_DOMAIN ),
-                'caution'     => esc_html__( 'Review first', WP_ULIKE_PRO_DOMAIN ),
-                'destructive' => esc_html__( 'Permanent removal', WP_ULIKE_PRO_DOMAIN ),
+                'safe'        => esc_html__( 'Recommended' ),
+                'caution'     => esc_html__( 'Review first', 'wp-ulike-pro' ),
+                'destructive' => esc_html__( 'Permanent removal', 'wp-ulike-pro' ),
             );
 
             $grouped = array(
@@ -699,9 +709,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
          */
         public static function get_maintenance_risk_labels() {
             return array(
-                'safe'        => esc_html__( 'Safe', WP_ULIKE_PRO_DOMAIN ),
-                'caution'     => esc_html__( 'Review first', WP_ULIKE_PRO_DOMAIN ),
-                'destructive' => esc_html__( 'Cannot undo', WP_ULIKE_PRO_DOMAIN ),
+                'safe'        => esc_html__( 'Safe', 'wp-ulike-pro' ),
+                'caution'     => esc_html__( 'Review first', 'wp-ulike-pro' ),
+                'destructive' => esc_html__( 'Cannot undo', 'wp-ulike-pro' ),
             );
         }
 
@@ -714,17 +724,17 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             $notices = array();
 
             $logging_labels = array(
-                'do_not_log'        => esc_html__( 'Do Not Log', WP_ULIKE_PRO_DOMAIN ),
-                'by_cookie'         => esc_html__( 'By Cookie', WP_ULIKE_PRO_DOMAIN ),
-                'by_username'       => esc_html__( 'By Username', WP_ULIKE_PRO_DOMAIN ),
-                'by_user_ip_cookie' => esc_html__( 'By User/IP + Cookie', WP_ULIKE_PRO_DOMAIN ),
+                'do_not_log'        => esc_html__( 'Do Not Log', 'wp-ulike-pro' ),
+                'by_cookie'         => esc_html__( 'By Cookie', 'wp-ulike-pro' ),
+                'by_username'       => esc_html__( 'By Username', 'wp-ulike-pro' ),
+                'by_user_ip_cookie' => esc_html__( 'By User/IP + Cookie', 'wp-ulike-pro' ),
             );
 
             $content_groups = array(
-                'posts_group'       => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
-                'comments_group'    => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
-                'buddypress_group'  => esc_html__( 'BuddyPress Activities', WP_ULIKE_PRO_DOMAIN ),
-                'bbpress_group'     => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
+                'posts_group'       => esc_html__( 'Posts' ),
+                'comments_group'    => esc_html__( 'Comments' ),
+                'buddypress_group'  => esc_html__( 'BuddyPress Activities', 'wp-ulike-pro' ),
+                'bbpress_group'     => esc_html__( 'bbPress Topics', 'wp-ulike-pro' ),
             );
 
             $limited_logging = array();
@@ -736,7 +746,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
                     $method_label       = isset( $logging_labels[ $method ] ) ? $logging_labels[ $method ] : $method;
                     $limited_logging[] = sprintf(
                         /* translators: 1: content type label, 2: logging method label */
-                        esc_html__( '%1$s uses "%2$s"', WP_ULIKE_PRO_DOMAIN ),
+                        esc_html__( '%1$s uses "%2$s"', 'wp-ulike-pro' ),
                         $group_label,
                         $method_label
                     );
@@ -746,7 +756,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             if ( ! empty( $limited_logging ) ) {
                 $notices[] = array(
                     'type'    => 'info',
-                    'message' => esc_html__( 'Some content types store few or no vote logs. Cleanup tools that rely on log rows may have limited effect:', WP_ULIKE_PRO_DOMAIN ) . ' ' . implode( '; ', $limited_logging ) . '.',
+                    'message' => esc_html__( 'Some content types store few or no vote logs. Cleanup tools that rely on log rows may have limited effect:', 'wp-ulike-pro' ) . ' ' . implode( '; ', $limited_logging ) . '.',
                 );
             }
 
@@ -1079,10 +1089,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
         public static function render_api_keys_section() {
             $get_keys = get_option( 'wp_ulike_rest_api_keys', array() );
             ?>
-            <p style="margin-top: 0;"><?php esc_html_e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+            <p style="margin-top: 0;"><?php esc_html_e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', 'wp-ulike-pro' ); ?></p>
 
             <div class="wp-ulike-pro-api-keys-actions">
-                <input type="button" id="wp-ulike-pro-generate-api-key" class="button button-primary" value="<?php esc_attr_e( 'Generate New API Key', WP_ULIKE_PRO_DOMAIN ); ?>">
+                <input type="button" id="wp-ulike-pro-generate-api-key" class="button button-primary" value="<?php esc_attr_e( 'Generate New API Key', 'wp-ulike-pro' ); ?>">
                 <?php wp_nonce_field( 'wp_ulike_generate_api_keys', 'wp-ulike-pro-api-keys-nonce-field' ); ?>
             </div>
 
@@ -1099,7 +1109,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
             ?>
             <?php if ( ! empty( $valid_keys ) ) : ?>
                 <div class="wp-ulike-pro-api-keys-list">
-                    <h3><?php esc_html_e( 'Generated API Keys', WP_ULIKE_PRO_DOMAIN ); ?></h3>
+                    <h3><?php esc_html_e( 'Generated API Keys', 'wp-ulike-pro' ); ?></h3>
                     <div class="wp-ulike-pro-api-keys-items">
                         <?php
                         // Reverse array to show newest first (without preserving keys)
@@ -1112,15 +1122,15 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
                             <div class="wp-ulike-pro-api-key-item" data-token="<?php echo esc_attr( $token ); ?>">
                                 <div class="wp-ulike-pro-api-key-header">
                                     <div class="wp-ulike-pro-api-key-info">
-                                        <div class="wp-ulike-pro-api-key-label-main"><?php esc_html_e( 'Secret Token', WP_ULIKE_PRO_DOMAIN ); ?></div>
+                                        <div class="wp-ulike-pro-api-key-label-main"><?php esc_html_e( 'Secret Token', 'wp-ulike-pro' ); ?></div>
                                         <div class="wp-ulike-pro-api-key-date-info">
-                                            <span class="wp-ulike-pro-api-key-label-small"><?php esc_html_e( 'Created:', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                            <span class="wp-ulike-pro-api-key-label-small"><?php esc_html_e( 'Created:', 'wp-ulike-pro' ); ?></span>
                                             <span class="wp-ulike-pro-api-key-date-value"><?php echo esc_html( isset( $value['date'] ) ? $value['date'] : '' ); ?></span>
                                         </div>
                                     </div>
-                                    <button type="button" class="wp-ulike-pro-delete-api-key button button-link-delete" data-token="<?php echo esc_attr( $token ); ?>" title="<?php esc_attr_e( 'Delete this API key', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                    <button type="button" class="wp-ulike-pro-delete-api-key button button-link-delete" data-token="<?php echo esc_attr( $token ); ?>" title="<?php esc_attr_e( 'Delete this API key', 'wp-ulike-pro' ); ?>">
                                         <span class="dashicons dashicons-trash"></span>
-                                        <span class="screen-reader-text"><?php esc_html_e( 'Delete', WP_ULIKE_PRO_DOMAIN ); ?></span>
+                                        <span class="screen-reader-text"><?php echo esc_html( 'Delete' ); ?></span>
                                     </button>
                                 </div>
                                 <div class="wp-ulike-pro-api-key-token-wrapper">
@@ -1135,8 +1145,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Tools' ) ) {
                     <div class="wp-ulike-pro-api-keys-empty-icon">
                         <span class="dashicons dashicons-admin-network"></span>
                     </div>
-                    <h3><?php esc_html_e( 'No API Keys Yet', WP_ULIKE_PRO_DOMAIN ); ?></h3>
-                    <p><?php esc_html_e( 'Generate your first API key to start using the REST API. API keys allow external applications to securely access your WP ULike data.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+                    <h3><?php esc_html_e( 'No API Keys Yet', 'wp-ulike-pro' ); ?></h3>
+                    <p><?php esc_html_e( 'Generate your first API key to start using the REST API. API keys allow external applications to securely access your WP ULike data.', 'wp-ulike-pro' ); ?></p>
                 </div>
             <?php endif; ?>
             <?php

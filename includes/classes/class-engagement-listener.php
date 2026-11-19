@@ -24,6 +24,18 @@ final class WP_Ulike_Pro_Engagement_Listener extends wp_ulike_ajax_listener_base
 
 	public function __construct() {
 		parent::__construct();
+
+		// Customizer / builder preview is styling only — never process engagements.
+		if ( class_exists( 'WP_Ulike_Pro' ) && WP_Ulike_Pro::is_preview_mode() ) {
+			$this->sendError(
+				array(
+					'message'     => __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ),
+					'messageType' => 'error',
+					'hasToast'    => false,
+				)
+			);
+		}
+
 		$this->set_form_data();
 		$this->process();
 	}
@@ -70,7 +82,7 @@ final class WP_Ulike_Pro_Engagement_Listener extends wp_ulike_ajax_listener_base
 			);
 
 			if ( ! WP_Ulike_Pro_Engagement_Settings::allows_engagement_kind( $this->data['type'], $this->data['engagement_kind'] ) ) {
-				throw new Exception( esc_html__( 'Engagements are not enabled for this content type.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( __( 'Engagements are not enabled for this content type.', 'wp-ulike-pro' ) );
 			}
 
 			$settings = wp_ulike_setting_type::get_instance( $this->data['type'] );
@@ -87,7 +99,7 @@ final class WP_Ulike_Pro_Engagement_Listener extends wp_ulike_ajax_listener_base
 			$fp_lock   = wp_ulike_acquire_lock( $lock_type, $this->data['id'] );
 
 			if ( false === $fp_lock ) {
-				throw new Exception( esc_html__( 'Unable to obtain lock for this request.', 'wp-ulike' ) );
+				throw new Exception( __( 'Unable to obtain lock for this request.', 'wp-ulike' ) );
 			}
 
 			$processor = new WP_Ulike_Pro_Engagement_Process(
@@ -201,41 +213,30 @@ final class WP_Ulike_Pro_Engagement_Listener extends wp_ulike_ajax_listener_base
 	private function get_notice_message( WP_Ulike_Pro_Engagement_Process $processor ) {
 		if ( 'removed' === $processor->get_current_status() ) {
 			if ( 'star' === $this->data['engagement_kind'] ) {
-				return esc_html__( 'Your rating was removed.', WP_ULIKE_PRO_DOMAIN );
+				return WP_Ulike_Pro_Options::getNoticeMessage( 'rating_removed', __( 'Your rating was removed.', 'wp-ulike-pro' ) );
 			}
 
-			return esc_html__( 'Your reaction was removed.', WP_ULIKE_PRO_DOMAIN );
+			return WP_Ulike_Pro_Options::getNoticeMessage( 'reaction_removed', __( 'Your reaction was removed.', 'wp-ulike-pro' ) );
 		}
 
 		if ( 'emoji' === $this->data['engagement_kind'] ) {
 			$reaction = WP_Ulike_Pro_Engagement_Registry::get_reaction( $processor->get_engagement_key(), $this->data['type'] );
 			$label    = $reaction ? wp_strip_all_tags( $reaction['label'] ) : $processor->get_engagement_key();
+			$format   = WP_Ulike_Pro_Options::getNoticeMessage( 'reaction_success', __( 'Thanks! You reacted with %s.', 'wp-ulike-pro' ) );
 
-			return sprintf(
-				/* translators: %s: reaction label */
-				esc_html__( 'Thanks! You reacted with %s.', WP_ULIKE_PRO_DOMAIN ),
-				esc_html( $label )
-			);
+			return sprintf( $format, esc_html( $label ) );
 		}
 
 		if ( 'star' === $this->data['engagement_kind'] && $processor->get_value() ) {
-			$value = (int) $processor->get_value();
+			$value  = (int) $processor->get_value();
+			$format = ( 1 === $value )
+				? WP_Ulike_Pro_Options::getNoticeMessage( 'rated_star', __( 'Thanks! You rated this %d star.', 'wp-ulike-pro' ) )
+				: WP_Ulike_Pro_Options::getNoticeMessage( 'rated_stars', __( 'Thanks! You rated this %d stars.', 'wp-ulike-pro' ) );
 
-			return esc_html(
-				sprintf(
-					/* translators: %d: star value */
-					_n(
-						'Thanks! You rated this %d star.',
-						'Thanks! You rated this %d stars.',
-						$value,
-						WP_ULIKE_PRO_DOMAIN
-					),
-					$value
-				)
-			);
+			return esc_html( sprintf( $format, $value ) );
 		}
 
-		return esc_html__( 'Thanks for your feedback!', WP_ULIKE_PRO_DOMAIN );
+		return WP_Ulike_Pro_Options::getNoticeMessage( 'engagement_feedback', __( 'Thanks for your feedback!', 'wp-ulike-pro' ) );
 	}
 
 	/**
@@ -249,14 +250,18 @@ final class WP_Ulike_Pro_Engagement_Listener extends wp_ulike_ajax_listener_base
 			$limit = (int) wp_ulike_setting_repo::getVoteLimitNumber( $this->data['type'] );
 
 			if ( $limit > 0 ) {
-				return sprintf(
-					/* translators: %d: maximum votes allowed per visitor */
-					esc_html__( 'You have reached the limit of %d reactions for this item.', WP_ULIKE_PRO_DOMAIN ),
-					$limit
+				$format = WP_Ulike_Pro_Options::getNoticeMessage(
+					'reaction_limit',
+					__( 'You have reached the limit of %d reactions for this item.', 'wp-ulike-pro' )
 				);
+
+				return sprintf( $format, $limit );
 			}
 
-			return esc_html__( 'Your reaction could not be saved. Please refresh and try again.', WP_ULIKE_PRO_DOMAIN );
+			return WP_Ulike_Pro_Options::getNoticeMessage(
+				'reaction_failed',
+				__( 'Your reaction could not be saved. Please refresh and try again.', 'wp-ulike-pro' )
+			);
 		}
 
 		$notice = wp_ulike_setting_repo::getPermissionNotice();

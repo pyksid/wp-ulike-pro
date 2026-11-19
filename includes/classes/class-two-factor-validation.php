@@ -31,12 +31,12 @@ final class WP_Ulike_Pro_Two_Factor_Validation extends wp_ulike_ajax_listener_ba
 			$this->beforeAction();
 
 			if ( !$this->validates() ){
-				throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+				throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
 			}
 
 			// check two factor is enabled
 			if( ! WP_Ulike_Pro_Options::is2FactorAuthEnabled() ){
-				throw new \Exception(  esc_html__( '2-factor support is not enabled!', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception(  __( '2-factor support is not enabled!', 'wp-ulike-pro' ) );
 			}
 
 			// create secret args
@@ -46,7 +46,7 @@ final class WP_Ulike_Pro_Two_Factor_Validation extends wp_ulike_ajax_listener_ba
 			) );
 
             if( ! wp_ulike_pro_is_valid_otp( $this->data['otp'], $secret ) ){
-                throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'incorrect_tfa', esc_html__( 'The one-time password (TFA code) you entered was incorrect', WP_ULIKE_PRO_DOMAIN ) ) );
+                throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'incorrect_tfa', __( 'The one-time password (TFA code) you entered was incorrect', 'wp-ulike-pro' ) ) );
             }
 
 			// update user meta

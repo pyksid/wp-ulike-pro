@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pro WPML/Polylang config — complete for Pro installs.
+  Includes free Strings keys plus Pro-only keys and custom fields.
+  Keep this as a full superset of free's wpml-config.xml so Pro WPML
+  users are not affected when both plugins are active.
+-->
 <wpml-config>
   <custom-fields>
     <custom-field action="copy">wp_ulike_pro_meta_box</custom-field>
@@ -127,14 +134,31 @@
         <key name="likers_modal_template"/>
       </key>
       <key name="logged_in_message"/>
+      <key name="validate_notice"/>
       <key name="already_registered_notice"/>
       <key name="login_required_notice"/>
       <key name="like_notice"/>
       <key name="unlike_notice"/>
-      <key name="like_button_aria_label"/>
+      <key name="ajax_error_notice"/>
+      <key name="no_results_notice"/>
+      <key name="user_no_likes_notice"/>
+      <key name="bp_multiple_likes_notice"/>
+      <key name="bp_single_like_notice"/>
+      <key name="um_no_likes_notice"/>
       <key name="dislike_notice"/>
       <key name="undislike_notice"/>
-      <key name="dislike_button_aria_label"/>
+      <key name="reaction_success_notice"/>
+      <key name="reaction_removed_notice"/>
+      <key name="rated_star_notice"/>
+      <key name="rated_stars_notice"/>
+      <key name="rating_removed_notice"/>
+      <key name="engagement_feedback_notice"/>
+      <key name="reaction_limit_notice"/>
+      <key name="reaction_failed_notice"/>
+      <key name="no_engagers_notice"/>
+      <key name="engagers_login_required_notice"/>
+      <key name="engagement_rating_status"/>
+      <key name="engagement_no_rating"/>
       <key name="user_not_found"/>
       <key name="required_fields_notice"/>
       <key name="permission_denied_notice"/>
@@ -156,6 +180,8 @@
       <key name="invalid_email_notice"/>
       <key name="email_exist_notice"/>
       <key name="username_exist_notice"/>
+      <key name="profile_success_notice"/>
+      <key name="rate_limit_exceeded_notice"/>
       <key name="missing_input_secret_notice"/>
       <key name="invalid_input_secret_notice"/>
       <key name="missing_input_response_notice"/>
@@ -165,6 +191,18 @@
       <key name="avatar_edit_text"/>
       <key name="avatar_delete_text"/>
       <key name="avatar_logout_text"/>
+      <key name="avatar_choose_picture"/>
+      <key name="avatar_confirm_remove"/>
+      <key name="avatar_please_select"/>
+      <key name="avatar_file_size"/>
+      <key name="avatar_min_size"/>
+      <key name="avatar_uploaded_success"/>
+      <key name="avatar_removed_success"/>
+      <key name="avatar_upload_failed"/>
+      <key name="avatar_save_text"/>
+      <key name="avatar_cancel_text"/>
+      <key name="profile_edit_text"/>
+      <key name="profile_empty_tab"/>
       <key name="timeout_or_duplicate_notice"/>
       <key name="undefined_notice"/>
       <key name="score_notice"/>

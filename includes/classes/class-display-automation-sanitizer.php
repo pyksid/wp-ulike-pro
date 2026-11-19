@@ -128,7 +128,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation_Sanitizer' ) ) {
 				$sanitized[] = array(
 					'id'                      => ! empty( $rule['id'] ) ? sanitize_key( $rule['id'] ) : 'rule_' . ( $index + 1 ),
 					'enabled'                 => ! empty( $rule['enabled'] ),
-					'title'                   => sanitize_text_field( $rule['title'] ?? sprintf( esc_html__( 'Rule %d', WP_ULIKE_PRO_DOMAIN ), $index + 1 ) ),
+					'title'                   => sanitize_text_field( $rule['title'] ?? sprintf( esc_html__( 'Rule %d', 'wp-ulike-pro' ), $index + 1 ) ),
 					'content_type'            => $content_type,
 					'placement'               => $placement,
 					'placement_group'         => $placement_group,

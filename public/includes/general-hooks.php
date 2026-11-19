@@ -16,6 +16,10 @@
  */
 function wp_ulike_pro_generate_schema(){
 
+    if( ! wp_ulike_pro_feature_enabled( 'schema' ) ){
+        return;
+    }
+
     if( is_singular() && ! WP_Ulike_Pro::is_preview_mode() ){
         // Get schema generator class
         $schema = new WP_Ulike_Pro_Schema_Generator( wp_ulike_get_the_id() );

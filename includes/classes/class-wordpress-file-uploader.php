@@ -165,17 +165,17 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		// Check for upload errors
 		if ( ! empty( $this->file['error'] ) ) {
 			$error_messages = array(
-				UPLOAD_ERR_INI_SIZE   => esc_html__( 'File exceeds upload_max_filesize in php.ini.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_FORM_SIZE  => esc_html__( 'File exceeds MAX_FILE_SIZE in form.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_PARTIAL    => esc_html__( 'File was only partially uploaded.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_NO_FILE    => esc_html__( 'No file uploaded.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_NO_TMP_DIR => esc_html__( 'Missing temporary folder.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_CANT_WRITE => esc_html__( 'Failed to write file to disk.', 'wp-ulike-pro' ),
-				UPLOAD_ERR_EXTENSION  => esc_html__( 'File upload stopped by extension.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_INI_SIZE   => __( 'File exceeds upload_max_filesize in php.ini.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_FORM_SIZE  => __( 'File exceeds MAX_FILE_SIZE in form.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_PARTIAL    => __( 'File was only partially uploaded.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_NO_FILE    => __( 'No file uploaded.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_NO_TMP_DIR => __( 'Missing temporary folder.', 'wp-ulike-pro' ),
+				UPLOAD_ERR_CANT_WRITE => __( 'Failed to write file to disk.' ),
+				UPLOAD_ERR_EXTENSION  => __( 'File upload stopped by extension.' ),
 			);
 			$message = isset( $error_messages[ $this->file['error'] ] )
 				? $error_messages[ $this->file['error'] ]
-				: esc_html__( 'Unknown upload error.', 'wp-ulike-pro' );
+				: __( 'Unknown upload error.', 'wp-ulike-pro' );
 			return new \WP_Error( 'upload_error', $message );
 		}
 
@@ -185,7 +185,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 			return new \WP_Error(
 				'file_too_large',
 				sprintf(
-					esc_html__( 'File is too large. Maximum size is %s.', 'wp-ulike-pro' ),
+					__( 'File is too large. Maximum size is %s.', 'wp-ulike-pro' ),
 					size_format( $max_size )
 				)
 			);
@@ -195,7 +195,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( ! is_uploaded_file( $this->file['tmp_name'] ) ) {
 			return new \WP_Error(
 				'invalid_upload',
-				esc_html__( 'Invalid file upload. Security check failed.', 'wp-ulike-pro' )
+				__( 'Invalid file upload. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -206,7 +206,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( empty( $file_type['ext'] ) || ! in_array( strtolower( $file_type['ext'] ), $allowed_types, true ) ) {
 			return new \WP_Error(
 				'invalid_file_type',
-				esc_html__( 'Invalid file type. Allowed types: ', 'wp-ulike-pro' ) . implode( ', ', $allowed_types )
+				__( 'Invalid file type. Allowed types: ', 'wp-ulike-pro' ) . implode( ', ', $allowed_types )
 			);
 		}
 
@@ -220,7 +220,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 				if ( substr( $filename_without_last_ext, -strlen( $danger_ext ) - 1 ) === '.' . $danger_ext ) {
 					return new \WP_Error(
 						'double_extension',
-						esc_html__( 'File contains dangerous double extension. Security check failed.', 'wp-ulike-pro' )
+						__( 'File contains dangerous double extension. Security check failed.', 'wp-ulike-pro' )
 					);
 				}
 			}
@@ -231,7 +231,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( in_array( strtolower( $file_type['ext'] ), $disallowed_extensions, true ) ) {
 			return new \WP_Error(
 				'disallowed_file_type',
-				esc_html__( 'File type is not allowed for security reasons.', 'wp-ulike-pro' )
+				__( 'File type is not allowed for security reasons.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -265,7 +265,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( ! in_array( strtolower( $real_mime_type ), $allowed_mime_types, true ) ) {
 			return new \WP_Error(
 				'invalid_mime_type',
-				esc_html__( 'File MIME type does not match image format. Security check failed.', 'wp-ulike-pro' )
+				__( 'File MIME type does not match image format. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -275,7 +275,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( false === $image_info || empty( $image_info[2] ) ) {
 			return new \WP_Error(
 				'invalid_image',
-				esc_html__( 'File is not a valid image. Security check failed.', 'wp-ulike-pro' )
+				__( 'File is not a valid image. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -292,14 +292,14 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( ! isset( $image_type_mapping[ $detected_type ] ) ) {
 			return new \WP_Error(
 				'unsupported_image_type',
-				esc_html__( 'Image type is not supported.', 'wp-ulike-pro' )
+				__( 'Image type is not supported.', 'wp-ulike-pro' )
 			);
 		}
 
 		if ( ! in_array( strtolower( $file_type['ext'] ), $image_type_mapping[ $detected_type ], true ) ) {
 			return new \WP_Error(
 				'mime_extension_mismatch',
-				esc_html__( 'File extension does not match image type. Security check failed.', 'wp-ulike-pro' )
+				__( 'File extension does not match image type. Security check failed.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -323,7 +323,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 			if ( ! $created ) {
 				return new \WP_Error(
 					'cannot_create_dir',
-					esc_html__( 'Unable to create upload directory.', 'wp-ulike-pro' )
+					__( 'Unable to create upload directory.', 'wp-ulike-pro' )
 				);
 			}
 		}
@@ -331,7 +331,7 @@ class WP_Ulike_Pro_WordPress_File_Uploader {
 		if ( ! is_writable( $upload_dir ) ) {
 			return new \WP_Error(
 				'not_writable',
-				esc_html__( 'Upload directory is not writable.', 'wp-ulike-pro' )
+				__( 'Upload directory is not writable.', 'wp-ulike-pro' )
 			);
 		}
 

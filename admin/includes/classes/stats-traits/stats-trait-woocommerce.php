@@ -442,7 +442,7 @@ trait WP_Ulike_Pro_Stats_Trait_WooCommerce {
 					'type'    => 'warning',
 					'message' => sprintf(
 						/* translators: 1: product title, 2: engagement count */
-						esc_html__( '%1$s gets strong interest (%2$s engagements) but lower sales — review pricing, photos, stock, or checkout friction.', 'wp-ulike-pro' ),
+						__( '%1$s gets strong interest (%2$s engagements) but lower sales — review pricing, photos, stock, or checkout friction.', 'wp-ulike-pro' ),
 						$item['title'],
 						number_format_i18n( $item['engagement_count'] ?? 0 )
 					),
@@ -455,7 +455,7 @@ trait WP_Ulike_Pro_Stats_Trait_WooCommerce {
 					'type'    => 'info',
 					'message' => sprintf(
 						/* translators: %s: product title */
-						esc_html__( '%s sells well with few likes — add or highlight like buttons to capture social proof.', 'wp-ulike-pro' ),
+						__( '%s sells well with few likes — add or highlight like buttons to capture social proof.', 'wp-ulike-pro' ),
 						$item['title']
 					),
 				);
@@ -466,7 +466,7 @@ trait WP_Ulike_Pro_Stats_Trait_WooCommerce {
 					'type'    => 'positive',
 					'message' => sprintf(
 						/* translators: %s: engagements per order */
-						esc_html__( 'Shoppers engage before buying — about %s reactions per order in this period.', 'wp-ulike-pro' ),
+						__( 'Shoppers engage before buying — about %s reactions per order in this period.', 'wp-ulike-pro' ),
 						number_format_i18n( $summary['engagement_per_order'], 1 )
 					),
 				);
@@ -475,14 +475,14 @@ trait WP_Ulike_Pro_Stats_Trait_WooCommerce {
 			if ( empty( $nav_meta['review_likes'] ) && ! empty( $nav_meta['product_likes'] ) ) {
 				$tips[] = array(
 					'type'    => 'info',
-					'message' => esc_html__( 'Enable likes on product reviews to learn which feedback drives purchase decisions.', 'wp-ulike-pro' ),
+					'message' => __( 'Enable likes on product reviews to learn which feedback drives purchase decisions.', 'wp-ulike-pro' ),
 				);
 			} elseif ( ( $summary['review_engagement'] ?? 0 ) > 0 ) {
 				$tips[] = array(
 					'type'    => 'positive',
 					'message' => sprintf(
 						/* translators: %s: review engagement count */
-						esc_html__( 'Review reactions are active — %s engagements on customer reviews this period.', 'wp-ulike-pro' ),
+						__( 'Review reactions are active — %s engagements on customer reviews this period.', 'wp-ulike-pro' ),
 						number_format_i18n( $summary['review_engagement'] )
 					),
 				);
@@ -494,7 +494,7 @@ trait WP_Ulike_Pro_Stats_Trait_WooCommerce {
 					'type'    => 'positive',
 					'message' => sprintf(
 						/* translators: 1: product title, 2: likes count, 3: revenue formatted */
-						esc_html__( '%1$s leads engagement with %2$s likes and %3$s in sales — double down in campaigns.', 'wp-ulike-pro' ),
+						__( '%1$s leads engagement with %2$s likes and %3$s in sales — double down in campaigns.', 'wp-ulike-pro' ),
 						$leader['title'],
 						number_format_i18n( $leader['likes_count'] ?? 0 ),
 						$leader['revenue_formatted'] ?? WP_Ulike_Pro_WooCommerce::format_money( 0 )

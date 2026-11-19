@@ -32,7 +32,7 @@ final class WP_Ulike_Pro_Engagement_Engagers_Listener extends wp_ulike_ajax_list
 			$format  = isset( $_REQUEST['format'] ) ? sanitize_key( wp_unslash( $_REQUEST['format'] ) ) : 'modal';
 
 			if ( ! $item_id || ! $type || ! $kind ) {
-				throw new Exception( esc_html__( 'Invalid request.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( __( 'Invalid request.', 'wp-ulike-pro' ) );
 			}
 
 			$template = isset( $_REQUEST['engagement_template'] )
@@ -51,7 +51,7 @@ final class WP_Ulike_Pro_Engagement_Engagers_Listener extends wp_ulike_ajax_list
 					WP_Ulike_Pro_Engagement_Settings::get_engagers_nonce_action( $type, $item_id, $kind, $template )
 				)
 			) {
-				throw new Exception( esc_html__( 'Invalid request.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( __( 'Invalid request.', 'wp-ulike-pro' ) );
 			}
 
 			$context_bootstrapped = WP_Ulike_Pro_Engagement_Settings::bootstrap_ajax_context(
@@ -63,11 +63,11 @@ final class WP_Ulike_Pro_Engagement_Engagers_Listener extends wp_ulike_ajax_list
 			);
 
 			if ( ! WP_Ulike_Pro_Engagement_Settings::show_engagers( $type ) ) {
-				throw new Exception( esc_html__( 'Engagers are not available for this content.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( __( 'Engagers are not available for this content.', 'wp-ulike-pro' ) );
 			}
 
 			if ( wp_ulike_setting_repo::restrictLikersBox( $type ) && ! $this->user ) {
-				throw new Exception( esc_html__( 'Please log in to view engagers.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'engagers_login_required', __( 'Please log in to view engagers.', 'wp-ulike-pro' ) ) );
 			}
 
 			if ( 'markup' === $format ) {
@@ -79,7 +79,7 @@ final class WP_Ulike_Pro_Engagement_Engagers_Listener extends wp_ulike_ajax_list
 			}
 
 			if ( empty( $template ) ) {
-				throw new Exception( esc_html__( 'No engagers yet.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'no_engagers', __( 'No engagers yet.', 'wp-ulike-pro' ) ) );
 			}
 
 			$template = apply_filters( 'wp_ulike_pro_engagement_engagers_template', $template, $item_id, $type, $kind );

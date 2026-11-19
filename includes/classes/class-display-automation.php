@@ -1252,35 +1252,35 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 		public static function get_placement_groups() {
 			$groups = array(
 				'wordpress' => array(
-					'label'       => esc_html__( 'WordPress', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Blog posts, pages, and standard site content.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'WordPress' ),
+					'description' => esc_html__( 'Blog posts, pages, and standard site content.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-wordpress',
 					'placements'  => array(
 						'the_content' => array(
-							'label'       => esc_html__( 'Inside Post/Page Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Inserts the button into post or page content.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Inside Post/Page Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Inserts the button into post or page content.', 'wp-ulike-pro' ),
 							'type'        => 'filter',
 							'hook'        => 'the_content',
 							'content_types' => array( 'post' ),
 						),
 						'the_excerpt' => array(
-							'label'       => esc_html__( 'Inside Post Excerpt', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Useful for archive and blog listing templates.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Inside Post Excerpt', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Useful for archive and blog listing templates.', 'wp-ulike-pro' ),
 							'type'        => 'filter',
 							'hook'        => 'the_excerpt',
 							'content_types' => array( 'post' ),
 						),
 						'comment_text' => array(
-							'label'         => esc_html__( 'Below Each Comment', WP_ULIKE_PRO_DOMAIN ),
-							'description'   => esc_html__( 'Inserts the like button under blog comments on posts and pages.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Below Each Comment', 'wp-ulike-pro' ),
+							'description'   => esc_html__( 'Inserts the like button under blog comments on posts and pages.', 'wp-ulike-pro' ),
 							'type'          => 'filter',
 							'hook'          => 'comment_text',
 							'content_types' => array( 'comment' ),
 							'accepted_args' => 2,
 						),
 						'custom'      => array(
-							'label'       => esc_html__( 'Custom Theme Hook', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Enter any WordPress action hook from your theme or plugin.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Custom Theme Hook', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Enter any WordPress action hook from your theme or plugin.', 'wp-ulike-pro' ),
 							'type'        => 'custom',
 							'content_types' => array( 'post', 'comment', 'product_review', 'activity', 'topic' ),
 						),
@@ -1290,68 +1290,68 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 			if ( WP_Ulike_Pro_WooCommerce::is_active() ) {
 				$groups['woocommerce'] = array(
-					'label'       => esc_html__( 'WooCommerce', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Online store product pages, shop listings, and cart areas.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'WooCommerce', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Online store product pages, shop listings, and cart areas.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-cart',
 					'placements'  => array(
 						'wc_single_after_cart' => array(
-							'label'       => esc_html__( 'Product Page — After Add to Cart', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Recommended for single product pages.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — After Add to Cart', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Recommended for single product pages.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_single_product_summary',
 							'priority'    => 35,
 						),
 						'wc_single_after_price' => array(
-							'label'       => esc_html__( 'Product Page — After Price', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows the button right after the product price.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — After Price', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows the button right after the product price.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_single_product_summary',
 							'priority'    => 11,
 						),
 						'wc_single_after_summary' => array(
-							'label'       => esc_html__( 'Product Page — After Summary Block', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows after the entire product summary section.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — After Summary Block', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows after the entire product summary section.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_after_single_product_summary',
 							'priority'    => 10,
 						),
 						'wc_single_before_cart' => array(
-							'label'       => esc_html__( 'Product Page — Before Add to Cart', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows above the quantity and add-to-cart controls.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — Before Add to Cart', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows above the quantity and add-to-cart controls.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_single_product_summary',
 							'priority'    => 25,
 						),
 						'wc_single_meta_end' => array(
-							'label'       => esc_html__( 'Product Page — After Meta (SKU, Categories)', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows after product meta information.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — After Meta (SKU, Categories)', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows after product meta information.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_product_meta_end',
 						),
 						'wc_shop_loop_item' => array(
-							'label'       => esc_html__( 'Shop & Categories — Below Each Product', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows on shop, category, and tag archive loops.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Shop & Categories — Below Each Product', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows on shop, category, and tag archive loops.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_after_shop_loop_item',
 						),
 						'wc_after_single_product' => array(
-							'label'       => esc_html__( 'Product Page — After Product Area', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows below the full single product container.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Product Page — After Product Area', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows below the full single product container.', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'woocommerce_after_single_product',
 							'content_types' => array( 'post' ),
 						),
 						'wc_product_reviews' => array(
-							'label'         => esc_html__( 'Product Reviews — Below Each Review', WP_ULIKE_PRO_DOMAIN ),
-							'description'   => esc_html__( 'Adds likes on WooCommerce customer reviews (stored as comments).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Product Reviews — Below Each Review', 'wp-ulike-pro' ),
+							'description'   => esc_html__( 'Adds likes on WooCommerce customer reviews (stored as comments).', 'wp-ulike-pro' ),
 							'type'          => 'filter',
 							'hook'          => 'comment_text',
 							'content_types' => array( 'product_review' ),
 							'accepted_args' => 2,
 						),
 						'custom' => array(
-							'label'       => esc_html__( 'Custom WooCommerce Hook', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Example: woocommerce_share, woocommerce_product_thumbnails', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Custom WooCommerce Hook', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Example: woocommerce_share, woocommerce_product_thumbnails', 'wp-ulike-pro' ),
 							'type'        => 'custom',
 							'content_types' => array( 'post', 'product_review' ),
 						),
@@ -1361,41 +1361,41 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 			if ( WP_Ulike_Pro_BuddyPress::is_active() ) {
 				$groups['buddypress'] = array(
-					'label'       => esc_html__( 'BuddyPress', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Activity updates and comments in the community stream.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'BuddyPress', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Activity updates and comments in the community stream.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-groups',
 					'placements'  => array(
 						'bp_activity_meta' => array(
-							'label'         => esc_html__( 'Activity Post — Meta Area', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Beside activity buttons (stream, profile, groups; includes AJAX load more).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Activity Post — Meta Area', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Beside activity buttons (stream, profile, groups; includes AJAX load more).', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bp_activity_entry_meta',
 							'content_types' => array( 'activity' ),
 						),
 						'bp_activity_content' => array(
-							'label'         => esc_html__( 'Activity Post — Content Area', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Below the activity text (includes AJAX load more and read more).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Activity Post — Content Area', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Below the activity text (includes AJAX load more and read more).', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bp_activity_entry_content',
 							'content_types' => array( 'activity' ),
 						),
 						'bp_activity_comment_options' => array(
-							'label'         => esc_html__( 'Activity Comment — Meta Area', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Beside comment action buttons (same as WP ULike meta position).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Activity Comment — Meta Area', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Beside comment action buttons (same as WP ULike meta position).', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bp_activity_comment_options',
 							'content_types' => array( 'activity_comment' ),
 						),
 						'bp_activity_comment_content' => array(
-							'label'         => esc_html__( 'Activity Comment — Inside Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Inside the comment text with top/bottom control (same as WP ULike content position).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Activity Comment — Inside Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Inside the comment text with top/bottom control (same as WP ULike content position).', 'wp-ulike-pro' ),
 							'type'          => 'filter',
 							'hook'          => 'bp_activity_comment_content',
 							'content_types' => array( 'activity_comment' ),
 						),
 						'custom' => array(
-							'label'       => esc_html__( 'Custom BuddyPress Hook', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Use any BuddyPress action hook.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Custom BuddyPress Hook', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Use any BuddyPress action hook.', 'wp-ulike-pro' ),
 							'type'        => 'custom',
 						),
 					),
@@ -1404,20 +1404,20 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 			if ( WP_Ulike_Pro_Easy_Digital_Downloads::is_active() ) {
 				$groups['edd'] = array(
-					'label'       => esc_html__( 'Easy Digital Downloads', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Single download pages and the main downloads shop/archive listing.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'Easy Digital Downloads', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Single download pages and the main downloads shop/archive listing.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-download',
 					'placements'  => array(
 						'edd_single_after_content' => array(
-							'label'       => esc_html__( 'Single Download Page', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows on each individual download page (after the description / purchase area).', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Single Download Page', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows on each individual download page (after the description / purchase area).', 'wp-ulike-pro' ),
 							'type'        => 'action',
 							'hook'        => 'edd_after_download_content',
 							'priority'    => 15,
 						),
 						'edd_shop_excerpt' => array(
-							'label'         => esc_html__( 'Downloads Shop / Archive', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Shows on each download in shop listings — before the purchase button when available, otherwise after the title.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Downloads Shop / Archive', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Shows on each download in shop listings — before the purchase button when available, otherwise after the title.', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'edd_purchase_link_top',
 							'priority'      => 15,
@@ -1429,55 +1429,55 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 			if ( WP_Ulike_Pro_BbPress::is_active() ) {
 				$groups['bbpress'] = array(
-					'label'       => esc_html__( 'bbPress', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Forum topics and replies with flexible theme hooks.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'bbPress', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Forum topics and replies with flexible theme hooks.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-format-chat',
 					'placements'  => array(
 						'bbp_after_topic_title' => array(
-							'label'         => esc_html__( 'Topic — After Title', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'After the topic title in lists and single topics (recommended).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Topic — After Title', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'After the topic title in lists and single topics (recommended).', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bbp_theme_after_topic_title',
 							'content_types' => array( 'topic' ),
 						),
 						'bbp_after_topic' => array(
-							'label'         => esc_html__( 'Topic — After Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Below the topic body when shown; on forum lists, after the topic meta line.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Topic — After Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Below the topic body when shown; on forum lists, after the topic meta line.', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bbp_theme_after_topic_content',
 							'content_types' => array( 'topic' ),
 						),
 						'bbp_before_topic' => array(
-							'label'         => esc_html__( 'Topic — Before Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Above the topic body when shown; on forum lists, before the topic meta line.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Topic — Before Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Above the topic body when shown; on forum lists, before the topic meta line.', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bbp_theme_before_topic_content',
 							'content_types' => array( 'topic' ),
 						),
 						'bbp_topic_content' => array(
-							'label'         => esc_html__( 'Topic — Inside Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Inside the single topic opening post (lead topic or first post when lead topic is off).', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Topic — Inside Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Inside the single topic opening post (lead topic or first post when lead topic is off).', 'wp-ulike-pro' ),
 							'type'          => 'filter',
 							'hook'          => 'bbp_get_topic_content',
 							'content_types' => array( 'topic' ),
 						),
 						'bbp_before_reply' => array(
-							'label'         => esc_html__( 'Reply — Before Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Above each reply in a topic thread.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Reply — Before Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Above each reply in a topic thread.', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bbp_theme_before_reply_content',
 							'content_types' => array( 'topic' ),
 						),
 						'bbp_after_reply' => array(
-							'label'         => esc_html__( 'Reply — After Content', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Below each reply in a topic thread.', WP_ULIKE_PRO_DOMAIN ),
+							'label'         => esc_html__( 'Reply — After Content', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Below each reply in a topic thread.', 'wp-ulike-pro' ),
 							'type'          => 'action',
 							'hook'          => 'bbp_theme_after_reply_content',
 							'content_types' => array( 'topic' ),
 						),
 						'custom' => array(
-							'label'       => esc_html__( 'Custom bbPress Hook', WP_ULIKE_PRO_DOMAIN ),
-							'description' => esc_html__( 'Use any bbPress theme hook.', WP_ULIKE_PRO_DOMAIN ),
+							'label'       => esc_html__( 'Custom bbPress Hook', 'wp-ulike-pro' ),
+							'description' => esc_html__( 'Use any bbPress theme hook.', 'wp-ulike-pro' ),
 							'type'        => 'custom',
 						),
 					),
@@ -1521,19 +1521,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 		 */
 		public static function get_active_basic_auto_display_labels() {
 			$types = array(
-				'post'    => esc_html__( 'Posts', WP_ULIKE_PRO_DOMAIN ),
-				'comment' => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+				'post'    => esc_html__( 'Posts' ),
+				'comment' => esc_html__( 'Comments' ),
 			);
 
 			if ( WP_Ulike_Pro_BuddyPress::is_active() ) {
-				$types['activity'] = esc_html__( 'BuddyPress Activities', WP_ULIKE_PRO_DOMAIN );
+				$types['activity'] = esc_html__( 'BuddyPress Activities', 'wp-ulike-pro' );
 				if ( function_exists( 'wp_ulike_get_option' ) && wp_ulike_is_true( wp_ulike_get_option( 'buddypress_group|enable_comments', false ) ) ) {
-					$types['activity_comment'] = esc_html__( 'BuddyPress Activity Comments', WP_ULIKE_PRO_DOMAIN );
+					$types['activity_comment'] = esc_html__( 'BuddyPress Activity Comments', 'wp-ulike-pro' );
 				}
 			}
 
 			if ( function_exists( 'is_bbpress' ) ) {
-				$types['topic'] = esc_html__( 'bbPress', WP_ULIKE_PRO_DOMAIN );
+				$types['topic'] = esc_html__( 'bbPress', 'wp-ulike-pro' );
 			}
 
 			$active = array();
@@ -1661,39 +1661,39 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 		 */
 		public static function get_context_options() {
 			$options = array(
-				'home'        => esc_html__( 'Blog Home', WP_ULIKE_PRO_DOMAIN ),
-				'single'      => esc_html__( 'Singular Pages', WP_ULIKE_PRO_DOMAIN ),
-				'archive'     => esc_html__( 'Archives', WP_ULIKE_PRO_DOMAIN ),
-				'category'    => esc_html__( 'Categories', WP_ULIKE_PRO_DOMAIN ),
-				'search'      => esc_html__( 'Search Results', WP_ULIKE_PRO_DOMAIN ),
-				'tag'         => esc_html__( 'Tags', WP_ULIKE_PRO_DOMAIN ),
-				'author'      => esc_html__( 'Author Pages', WP_ULIKE_PRO_DOMAIN ),
-				'buddypress'            => esc_html__( 'BuddyPress (all)', WP_ULIKE_PRO_DOMAIN ),
-				'bp_activity_directory' => esc_html__( 'Activity Directory', WP_ULIKE_PRO_DOMAIN ),
-				'bp_member_profile'   => esc_html__( 'Member Profiles', WP_ULIKE_PRO_DOMAIN ),
-				'bp_groups'             => esc_html__( 'Groups', WP_ULIKE_PRO_DOMAIN ),
-				'bbpress'               => esc_html__( 'bbPress (all)', WP_ULIKE_PRO_DOMAIN ),
-				'bbp_forum'             => esc_html__( 'Forum Pages', WP_ULIKE_PRO_DOMAIN ),
-				'bbp_topic'             => esc_html__( 'Single Topic', WP_ULIKE_PRO_DOMAIN ),
-				'bbp_reply'             => esc_html__( 'Single Reply', WP_ULIKE_PRO_DOMAIN ),
-				'bbp_topic_archive'   => esc_html__( 'Topic Archives', WP_ULIKE_PRO_DOMAIN ),
-				'bbp_search'            => esc_html__( 'Forum Search', WP_ULIKE_PRO_DOMAIN ),
-				'woocommerce' => esc_html__( 'WooCommerce Pages', WP_ULIKE_PRO_DOMAIN ),
+				'home'        => esc_html__( 'Blog Home' ),
+				'single'      => esc_html__( 'Singular Pages', 'wp-ulike-pro' ),
+				'archive'     => esc_html__( 'Archives' ),
+				'category'    => esc_html__( 'Categories' ),
+				'search'      => esc_html__( 'Search Results' ),
+				'tag'         => esc_html__( 'Tags' ),
+				'author'      => esc_html__( 'Author Pages', 'wp-ulike-pro' ),
+				'buddypress'            => esc_html__( 'BuddyPress (all)', 'wp-ulike-pro' ),
+				'bp_activity_directory' => esc_html__( 'Activity Directory', 'wp-ulike-pro' ),
+				'bp_member_profile'   => esc_html__( 'Member Profiles', 'wp-ulike-pro' ),
+				'bp_groups'             => esc_html__( 'Groups', 'wp-ulike-pro' ),
+				'bbpress'               => esc_html__( 'bbPress (all)', 'wp-ulike-pro' ),
+				'bbp_forum'             => esc_html__( 'Forum Pages', 'wp-ulike-pro' ),
+				'bbp_topic'             => esc_html__( 'Single Topic', 'wp-ulike-pro' ),
+				'bbp_reply'             => esc_html__( 'Single Reply', 'wp-ulike-pro' ),
+				'bbp_topic_archive'   => esc_html__( 'Topic Archives', 'wp-ulike-pro' ),
+				'bbp_search'            => esc_html__( 'Forum Search', 'wp-ulike-pro' ),
+				'woocommerce' => esc_html__( 'WooCommerce Pages', 'wp-ulike-pro' ),
 			);
 
 			if ( WP_Ulike_Pro_WooCommerce::is_active() ) {
-				$options['woocommerce_shop']     = esc_html__( 'WooCommerce Shop', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_product']  = esc_html__( 'Single Product', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_category'] = esc_html__( 'Product Category', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_tag']      = esc_html__( 'Product Tag', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_cart']     = esc_html__( 'Cart', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_checkout'] = esc_html__( 'Checkout', WP_ULIKE_PRO_DOMAIN );
-				$options['woocommerce_account']  = esc_html__( 'My Account', WP_ULIKE_PRO_DOMAIN );
+				$options['woocommerce_shop']     = esc_html__( 'WooCommerce Shop', 'wp-ulike-pro' );
+				$options['woocommerce_product']  = esc_html__( 'Single Product', 'wp-ulike-pro' );
+				$options['woocommerce_category'] = esc_html__( 'Product Category', 'wp-ulike-pro' );
+				$options['woocommerce_tag']      = esc_html__( 'Product Tag', 'wp-ulike-pro' );
+				$options['woocommerce_cart']     = esc_html__( 'Cart' );
+				$options['woocommerce_checkout'] = esc_html__( 'Checkout', 'wp-ulike-pro' );
+				$options['woocommerce_account']  = esc_html__( 'My Account', 'wp-ulike-pro' );
 			}
 
 			if ( WP_Ulike_Pro_Easy_Digital_Downloads::is_active() ) {
-				$options['edd_single_download'] = esc_html__( 'Single Download Page', WP_ULIKE_PRO_DOMAIN );
-				$options['edd_download_shop']   = esc_html__( 'Downloads Shop / Archive', WP_ULIKE_PRO_DOMAIN );
+				$options['edd_single_download'] = esc_html__( 'Single Download Page', 'wp-ulike-pro' );
+				$options['edd_download_shop']   = esc_html__( 'Downloads Shop / Archive', 'wp-ulike-pro' );
 			}
 
 			return apply_filters( 'wp_ulike_pro_display_automation_context_options', $options );
@@ -1773,52 +1773,52 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 		public static function get_ui_copy_profiles() {
 			return array(
 				'post' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'Choose whether this rule targets posts, pages, or products.', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where should the button appear?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'Pick the exact area on the page where visitors will see the like button.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Button position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'Choose whether this rule targets posts, pages, or products.', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where should the button appear?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'Pick the exact area on the page where visitors will see the like button.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Button position', 'wp-ulike-pro' ),
 				),
 				'comment' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'This rule will add likes on blog comments (not product reviews).', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where on comments?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'Usually you want the button directly below each comment.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Comment position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'This rule will add likes on blog comments (not product reviews).', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where on comments?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'Usually you want the button directly below each comment.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Comment position', 'wp-ulike-pro' ),
 				),
 				'product_review' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'WooCommerce reviews are stored as comments on products.', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where on reviews?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'The button appears below each customer review on the product page.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Review position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'WooCommerce reviews are stored as comments on products.', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where on reviews?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'The button appears below each customer review on the product page.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Review position', 'wp-ulike-pro' ),
 				),
 				'activity' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'Top-level BuddyPress activity updates (not comments on activities).', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where on activities?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'Meta area or content area — same choices as WP ULike BuddyPress auto display.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Activity position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'Top-level BuddyPress activity updates (not comments on activities).', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where on activities?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'Meta area or content area — same choices as WP ULike BuddyPress auto display.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Activity position', 'wp-ulike-pro' ),
 				),
 				'activity_comment' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'Comments on BuddyPress activity items (requires BuddyPress comments enabled in WP ULike settings).', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where on activity comments?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'Meta area or inside content — same choices as WP ULike activity comment auto display.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Comment position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'Comments on BuddyPress activity items (requires BuddyPress comments enabled in WP ULike settings).', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where on activity comments?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'Meta area or inside content — same choices as WP ULike activity comment auto display.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Comment position', 'wp-ulike-pro' ),
 				),
 				'topic' => array(
-					'step_content_title'  => esc_html__( 'What should be liked?', WP_ULIKE_PRO_DOMAIN ),
-					'step_content_desc'   => esc_html__( 'Forum topics and replies powered by bbPress.', WP_ULIKE_PRO_DOMAIN ),
-					'content_type_label'  => esc_html__( 'Apply to', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_title' => esc_html__( 'Where on forum content?', WP_ULIKE_PRO_DOMAIN ),
-					'step_placement_desc'  => esc_html__( 'Choose where the button appears on topics or replies.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_label'     => esc_html__( 'Forum position', WP_ULIKE_PRO_DOMAIN ),
+					'step_content_title'  => esc_html__( 'What should be liked?', 'wp-ulike-pro' ),
+					'step_content_desc'   => esc_html__( 'Forum topics and replies powered by bbPress.', 'wp-ulike-pro' ),
+					'content_type_label'  => esc_html__( 'Apply to', 'wp-ulike-pro' ),
+					'step_placement_title' => esc_html__( 'Where on forum content?', 'wp-ulike-pro' ),
+					'step_placement_desc'  => esc_html__( 'Choose where the button appears on topics or replies.', 'wp-ulike-pro' ),
+					'placement_label'     => esc_html__( 'Forum position', 'wp-ulike-pro' ),
 				),
 			);
 		}
@@ -1903,13 +1903,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			$presets = array(
 				array(
 					'id'          => 'blog_posts',
-					'label'       => esc_html__( 'Blog Posts', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Like button at the end of single blog posts.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'Blog Posts', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Like button at the end of single blog posts.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-admin-post',
 					'rule'        => array(
 						'id'               => 'rule_blog_posts',
 						'enabled'          => true,
-						'title'            => esc_html__( 'Blog Posts', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'Blog Posts', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'the_content',
 						'placement_group'  => 'wordpress',
@@ -1924,13 +1924,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 				),
 				array(
 					'id'          => 'blog_archives',
-					'label'       => esc_html__( 'Blog Archives', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Compact likes in blog, category, and tag listings.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'Blog Archives', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Compact likes in blog, category, and tag listings.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-grid-view',
 					'rule'        => array(
 						'id'               => 'rule_blog_archives',
 						'enabled'          => true,
-						'title'            => esc_html__( 'Blog Archives', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'Blog Archives', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'the_excerpt',
 						'placement_group'  => 'wordpress',
@@ -1946,13 +1946,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 				),
 				array(
 					'id'          => 'pages',
-					'label'       => esc_html__( 'Pages', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Like button on static pages.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'Pages' ),
+					'description' => esc_html__( 'Like button on static pages.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-admin-page',
 					'rule'        => array(
 						'id'               => 'rule_pages',
 						'enabled'          => true,
-						'title'            => esc_html__( 'Pages', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'Pages' ),
 						'content_type'     => 'post',
 						'placement'        => 'the_content',
 						'placement_group'  => 'wordpress',
@@ -1967,13 +1967,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 				),
 				array(
 					'id'          => 'comments',
-					'label'       => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Likes below each blog or page comment.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'Comments' ),
+					'description' => esc_html__( 'Likes below each blog or page comment.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-admin-comments',
 					'rule'        => array(
 						'id'               => 'rule_comments',
 						'enabled'          => true,
-						'title'            => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'Comments' ),
 						'content_type'     => 'comment',
 						'placement'        => 'comment_text',
 						'placement_group'  => 'wordpress',
@@ -1986,13 +1986,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			if ( WP_Ulike_Pro_WooCommerce::is_active() ) {
 				$presets[] = array(
 					'id'          => 'wc_single',
-					'label'       => esc_html__( 'WooCommerce Product', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'After add to cart on single product pages.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'WooCommerce Product', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'After add to cart on single product pages.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-cart',
 					'rule'        => array(
 						'id'               => 'rule_wc_single',
 						'enabled'          => false,
-						'title'            => esc_html__( 'WooCommerce Single Product', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'WooCommerce Single Product', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'wc_single_after_cart',
 						'placement_group'  => 'woocommerce',
@@ -2008,13 +2008,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 				$presets[] = array(
 					'id'          => 'wc_shop',
-					'label'       => esc_html__( 'WooCommerce Shop', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Below each product in shop and category loops.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'WooCommerce Shop', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Below each product in shop and category loops.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-store',
 					'rule'        => array(
 						'id'               => 'rule_wc_shop',
 						'enabled'          => false,
-						'title'            => esc_html__( 'WooCommerce Shop Loop', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'WooCommerce Shop Loop', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'wc_shop_loop_item',
 						'placement_group'  => 'woocommerce',
@@ -2031,13 +2031,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 				$presets[] = array(
 					'id'          => 'wc_reviews',
-					'label'       => esc_html__( 'WooCommerce Reviews', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Likes below each customer review on product pages.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'WooCommerce Reviews', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Likes below each customer review on product pages.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-star-filled',
 					'rule'        => array(
 						'id'               => 'rule_wc_reviews',
 						'enabled'          => false,
-						'title'            => esc_html__( 'WooCommerce Reviews', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'WooCommerce Reviews', 'wp-ulike-pro' ),
 						'content_type'     => 'product_review',
 						'placement'        => 'wc_product_reviews',
 						'placement_group'  => 'woocommerce',
@@ -2054,13 +2054,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			if ( WP_Ulike_Pro_Easy_Digital_Downloads::is_active() ) {
 				$presets[] = array(
 					'id'          => 'edd_single',
-					'label'       => esc_html__( 'EDD Download', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'On each single download page.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'EDD Download', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'On each single download page.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-download',
 					'rule'        => array(
 						'id'               => 'rule_edd_single',
 						'enabled'          => false,
-						'title'            => esc_html__( 'EDD Single Download', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'EDD Single Download', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'edd_single_after_content',
 						'placement_group'  => 'edd',
@@ -2075,13 +2075,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 
 				$presets[] = array(
 					'id'          => 'edd_shop',
-					'label'       => esc_html__( 'EDD Shop', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'In the downloads shop and archive listings.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'EDD Shop', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'In the downloads shop and archive listings.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-list-view',
 					'rule'        => array(
 						'id'               => 'rule_edd_shop',
 						'enabled'          => false,
-						'title'            => esc_html__( 'EDD Downloads Shop', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'EDD Downloads Shop', 'wp-ulike-pro' ),
 						'content_type'     => 'post',
 						'placement'        => 'edd_shop_excerpt',
 						'placement_group'  => 'edd',
@@ -2099,13 +2099,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			if ( WP_Ulike_Pro_BuddyPress::is_active() ) {
 				$presets[] = array(
 					'id'          => 'bp_activity',
-					'label'       => esc_html__( 'BuddyPress Activity', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'Beside activity stream buttons.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'BuddyPress Activity', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'Beside activity stream buttons.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-groups',
 					'rule'        => array(
 						'id'               => 'rule_bp_activity',
 						'enabled'          => false,
-						'title'            => esc_html__( 'BuddyPress Activity', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'BuddyPress Activity', 'wp-ulike-pro' ),
 						'content_type'     => 'activity',
 						'placement'        => 'bp_activity_meta',
 						'placement_group'  => 'buddypress',
@@ -2122,13 +2122,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			if ( WP_Ulike_Pro_BbPress::is_active() ) {
 				$presets[] = array(
 					'id'          => 'bbp_topics',
-					'label'       => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
-					'description' => esc_html__( 'After topic titles in forums and threads.', WP_ULIKE_PRO_DOMAIN ),
+					'label'       => esc_html__( 'bbPress Topics', 'wp-ulike-pro' ),
+					'description' => esc_html__( 'After topic titles in forums and threads.', 'wp-ulike-pro' ),
 					'icon'        => 'dashicons-format-chat',
 					'rule'        => array(
 						'id'               => 'rule_bbp_topics',
 						'enabled'          => false,
-						'title'            => esc_html__( 'bbPress Topics', WP_ULIKE_PRO_DOMAIN ),
+						'title'            => esc_html__( 'bbPress Topics', 'wp-ulike-pro' ),
 						'content_type'     => 'topic',
 						'placement'        => 'bbp_after_topic_title',
 						'placement_group'  => 'bbpress',
@@ -2182,7 +2182,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 			return array(
 				'id'               => 'rule_new',
 				'enabled'          => false,
-				'title'            => esc_html__( 'New Rule', WP_ULIKE_PRO_DOMAIN ),
+				'title'            => esc_html__( 'New Rule', 'wp-ulike-pro' ),
 				'content_type'     => 'post',
 				'placement'        => 'the_content',
 				'placement_group'  => 'wordpress',
@@ -2244,41 +2244,41 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 		 */
 		public static function get_content_types_for_group( $group_key ) {
 			$types = array(
-				'post' => esc_html__( 'Posts & Pages', WP_ULIKE_PRO_DOMAIN ),
+				'post' => esc_html__( 'Posts & Pages', 'wp-ulike-pro' ),
 			);
 
 			switch ( $group_key ) {
 				case 'woocommerce':
 					$types = array(
-						'post'           => esc_html__( 'Products', WP_ULIKE_PRO_DOMAIN ),
-						'product_review' => esc_html__( 'Product Reviews', WP_ULIKE_PRO_DOMAIN ),
+						'post'           => esc_html__( 'Products', 'wp-ulike-pro' ),
+						'product_review' => esc_html__( 'Product Reviews', 'wp-ulike-pro' ),
 					);
 					break;
 
 				case 'edd':
 					$types = array(
-						'post' => esc_html__( 'Downloads', WP_ULIKE_PRO_DOMAIN ),
+						'post' => esc_html__( 'Downloads', 'wp-ulike-pro' ),
 					);
 					break;
 
 				case 'buddypress':
 					$types = array(
-						'activity'         => esc_html__( 'Activity Posts', WP_ULIKE_PRO_DOMAIN ),
-						'activity_comment' => esc_html__( 'Activity Comments', WP_ULIKE_PRO_DOMAIN ),
+						'activity'         => esc_html__( 'Activity Posts', 'wp-ulike-pro' ),
+						'activity_comment' => esc_html__( 'Activity Comments', 'wp-ulike-pro' ),
 					);
 					break;
 
 				case 'bbpress':
 					$types = array(
-						'topic' => esc_html__( 'Forum Topics & Replies', WP_ULIKE_PRO_DOMAIN ),
+						'topic' => esc_html__( 'Forum Topics & Replies', 'wp-ulike-pro' ),
 					);
 					break;
 
 				case 'wordpress':
 				default:
 					$types = array(
-						'post'    => esc_html__( 'Posts & Pages', WP_ULIKE_PRO_DOMAIN ),
-						'comment' => esc_html__( 'Comments', WP_ULIKE_PRO_DOMAIN ),
+						'post'    => esc_html__( 'Posts & Pages', 'wp-ulike-pro' ),
+						'comment' => esc_html__( 'Comments' ),
 					);
 					break;
 			}
@@ -2556,21 +2556,21 @@ if ( ! class_exists( 'WP_Ulike_Pro_Display_Automation' ) ) {
 				),
 				'engagement_reactions_by_content_type' => self::get_engagement_reactions_admin_options(),
 				'strings' => array(
-					'confirm_remove_rule'      => esc_html__( 'Remove this display rule?', WP_ULIKE_PRO_DOMAIN ),
-					'custom_hook_required'   => esc_html__( 'Enter a custom hook name for rules that use a custom theme hook placement.', WP_ULIKE_PRO_DOMAIN ),
-					'taxonomy_any'           => esc_html__( 'Any', WP_ULIKE_PRO_DOMAIN ),
-					'taxonomy_select'        => esc_html__( 'Select taxonomy', WP_ULIKE_PRO_DOMAIN ),
-					'post_type_label'        => esc_html__( 'Content types', WP_ULIKE_PRO_DOMAIN ),
-					'post_type_parent_label' => esc_html__( 'Parent content types', WP_ULIKE_PRO_DOMAIN ),
-					'multiselect_placeholder' => esc_html__( 'Select options…', WP_ULIKE_PRO_DOMAIN ),
-					'multiselect_search'      => esc_html__( 'Search…', WP_ULIKE_PRO_DOMAIN ),
-					'load_error'             => esc_html__( 'Could not load options. Please try again.', WP_ULIKE_PRO_DOMAIN ),
-					'placement_one_per_rule' => esc_html__( 'Each rule controls one button location. To show likes in more than one place (for example product page and shop archive), add a separate rule for each location.', WP_ULIKE_PRO_DOMAIN ),
-					'duplicate_rule_suffix'  => esc_html__( '(copy)', WP_ULIKE_PRO_DOMAIN ),
-					'unsaved_changes_notice' => esc_html__( 'You have unsaved changes', WP_ULIKE_PRO_DOMAIN ),
-					'unsaved_changes_tab'    => esc_html__( 'You have unsaved changes. Switch sections anyway?', WP_ULIKE_PRO_DOMAIN ),
-					'same_location_label'    => esc_html__( 'Same location', WP_ULIKE_PRO_DOMAIN ),
-					'same_location_hint'     => esc_html__( 'Same button location as rule %s', WP_ULIKE_PRO_DOMAIN ),
+					'confirm_remove_rule'      => esc_html__( 'Remove this display rule?', 'wp-ulike-pro' ),
+					'custom_hook_required'   => esc_html__( 'Enter a custom hook name for rules that use a custom theme hook placement.', 'wp-ulike-pro' ),
+					'taxonomy_any'           => esc_html__( 'Any', 'wp-ulike-pro' ),
+					'taxonomy_select'        => esc_html__( 'Select taxonomy', 'wp-ulike-pro' ),
+					'post_type_label'        => esc_html__( 'Content types', 'wp-ulike-pro' ),
+					'post_type_parent_label' => esc_html__( 'Parent content types', 'wp-ulike-pro' ),
+					'multiselect_placeholder' => esc_html__( 'Select taxonomy', 'wp-ulike-pro' ),
+					'multiselect_search'      => esc_html__( 'Search…', 'wp-ulike-pro' ),
+					'load_error'             => esc_html__( 'Could not load options. Please try again.', 'wp-ulike-pro' ),
+					'placement_one_per_rule' => esc_html__( 'Each rule controls one button location. To show likes in more than one place (for example product page and shop archive), add a separate rule for each location.', 'wp-ulike-pro' ),
+					'duplicate_rule_suffix'  => esc_html__( '(copy)', 'wp-ulike-pro' ),
+					'unsaved_changes_notice' => esc_html__( 'You have unsaved changes', 'wp-ulike-pro' ),
+					'unsaved_changes_tab'    => esc_html__( 'You have unsaved changes. Switch sections anyway?', 'wp-ulike-pro' ),
+					'same_location_label'    => esc_html__( 'Same location', 'wp-ulike-pro' ),
+					'same_location_hint'     => esc_html__( 'Same button location as rule %s', 'wp-ulike-pro' ),
 				),
 			);
 		}

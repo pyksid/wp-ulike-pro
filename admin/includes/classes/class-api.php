@@ -188,7 +188,7 @@ class WP_Ulike_Pro_API {
 
 			return self::license_api_wp_error(
 				$error_code,
-				esc_html__( 'Could not connect to the WP ULike license server. Check firewall, security plugins, and “Details for support” on the License page.', WP_ULIKE_PRO_DOMAIN ),
+				__( 'Could not connect to the WP ULike license server. Check firewall, security plugins, and “Details for support” on the License page.', 'wp-ulike-pro' ),
 				array(
 					'http_code'  => 0,
 					'http_message' => $error_message,
@@ -235,7 +235,7 @@ class WP_Ulike_Pro_API {
 		if ( ! isset( $data['data'] ) ) {
 			return self::license_api_wp_error(
 				'invalid_response',
-				esc_html__( 'Invalid response format from license server.', WP_ULIKE_PRO_DOMAIN ),
+				__( 'Invalid response format from license server.', 'wp-ulike-pro' ),
 				array(
 					'http_code'    => (int) $response_code,
 					'http_message' => $response_message,
@@ -342,13 +342,13 @@ class WP_Ulike_Pro_API {
 	 */
 	private static function get_short_license_api_error_message( $response_code, $response_message, $invalid_json = false ) {
 		if ( $invalid_json || 0 === (int) $response_code ) {
-			return esc_html__( 'The license server returned an unexpected response. Copy “Details for support” and contact us if this continues.', WP_ULIKE_PRO_DOMAIN );
+			return __( 'The license server returned an unexpected response. Copy “Details for support” and contact us if this continues.', 'wp-ulike-pro' );
 		}
 
 		if ( $response_code >= 500 ) {
 			return sprintf(
 				/* translators: %d: HTTP status code */
-				esc_html__( 'License server error (HTTP %d). Try again in a few minutes.', WP_ULIKE_PRO_DOMAIN ),
+				__( 'License server error (HTTP %d). Try again in a few minutes.', 'wp-ulike-pro' ),
 				(int) $response_code
 			);
 		}
@@ -356,12 +356,12 @@ class WP_Ulike_Pro_API {
 		if ( $response_code >= 400 ) {
 			return sprintf(
 				/* translators: %d: HTTP status code */
-				esc_html__( 'License request blocked or rejected (HTTP %d). Check your firewall or security plugins, then copy “Details for support”.', WP_ULIKE_PRO_DOMAIN ),
+				__( 'License request blocked or rejected (HTTP %d). Check your firewall or security plugins, then copy “Details for support”.', 'wp-ulike-pro' ),
 				(int) $response_code
 			);
 		}
 
-		return esc_html__( 'Could not verify the license with WP ULike. Use “Details for support” on the License page.', WP_ULIKE_PRO_DOMAIN );
+		return __( 'Could not verify the license with WP ULike. Use “Details for support” on the License page.', 'wp-ulike-pro' );
 	}
 
 	/**
@@ -630,7 +630,7 @@ class WP_Ulike_Pro_API {
 					return $info_data;
 				}
 
-				return new \WP_Error( esc_html__( 'Another check is in progress.', WP_ULIKE_PRO_DOMAIN ) );
+				return new \WP_Error( __( 'Another check is in progress.', 'wp-ulike-pro' ) );
 			}
 
 			$body_args = array(
@@ -642,7 +642,7 @@ class WP_Ulike_Pro_API {
 			$info_data = self::remote_post( $body_args );
 
 			if ( is_wp_error( $info_data ) || empty( $info_data['new_version'] ) ) {
-				return new \WP_Error( esc_html__( 'HTTP Error', WP_ULIKE_PRO_DOMAIN ) );
+				return new \WP_Error( __( 'HTTP Error', 'wp-ulike-pro' ) );
 			}
 
 			set_site_transient( $cache_key, $info_data, 12 * HOUR_IN_SECONDS );
@@ -655,7 +655,7 @@ class WP_Ulike_Pro_API {
 		return [
 			'no_activations_left' => sprintf(
 				/* translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link opening tag, 4: Link closing tag. */
-				esc_html__( '%1$sYou have no more activations left.%2$s %3$sPlease upgrade to a more advanced license%4$s (you\'ll only need to cover the difference).', WP_ULIKE_PRO_DOMAIN ),
+				__( '%1$sYou have no more activations left.%2$s %3$sPlease upgrade to a more advanced license%4$s (you\'ll only need to cover the difference).', 'wp-ulike-pro' ),
 				'<strong>',
 				'</strong>',
 				'<a href="' . esc_url( self::get_account_url( 'upgrade-license', 'wp-dash' ) ) . '" target="_blank">',
@@ -663,20 +663,20 @@ class WP_Ulike_Pro_API {
 			),
 			'expired'             => sprintf(
 				/* translators: 1: Bold text opening tag, 2: Bold text closing tag, 3: Link opening tag, 4: Link closing tag. */
-				esc_html__( '%1$sOh no! Your WP ULike Pro license has expired.%2$s Want to keep creating better marketing and high-performing websites? Renew your subscription to regain access to all of the new pro features, templates, updates & more. %3$sRenew now%4$s', WP_ULIKE_PRO_DOMAIN ),
+				__( '%1$sOh no! Your WP ULike Pro license has expired.%2$s Want to keep creating better marketing and high-performing websites? Renew your subscription to regain access to all of the new pro features, templates, updates & more. %3$sRenew now%4$s', 'wp-ulike-pro' ),
 				'<strong>',
 				'</strong>',
 				'<a href="' . esc_url( self::get_pricing_url( 'renew-license', 'wp-dash' ) ) . '" target="_blank">',
 				'</a>'
 			),
-			'missing'             => esc_html__( 'Your license is missing. Please check your key again.', WP_ULIKE_PRO_DOMAIN ),
+			'missing'             => __( 'Your license is missing. Please check your key again.', 'wp-ulike-pro' ),
 			'disabled'            => sprintf(
 				/* translators: 1: Bold text opening tag, 2: Bold text closing tag. */
-				esc_html__( '%1$sYour license key has been cancelled%2$s (most likely due to a refund request). Please consider acquiring a new license.', WP_ULIKE_PRO_DOMAIN ),
+				__( '%1$sYour license key has been cancelled%2$s (most likely due to a refund request). Please consider acquiring a new license.', 'wp-ulike-pro' ),
 				'<strong>',
 				'</strong>'
 			),
-			'key_mismatch'        => esc_html__( 'Your license is invalid for this domain. Please check your key again.', WP_ULIKE_PRO_DOMAIN ),
+			'key_mismatch'        => __( 'Your license is invalid for this domain. Please check your key again.', 'wp-ulike-pro' ),
 		];
 	}
 
@@ -686,7 +686,7 @@ class WP_Ulike_Pro_API {
 		if ( isset( $errors[ $error ] ) ) {
 			$error_msg = $errors[ $error ];
 		} else {
-			$error_msg = esc_html__( 'An error occurred. Please check your internet connection and try again. If the problem persists, contact our support.', WP_ULIKE_PRO_DOMAIN ) . ' (' . $error . ')';
+			$error_msg = __( 'An error occurred. Please check your internet connection and try again. If the problem persists, contact our support.', 'wp-ulike-pro' ) . ' (' . $error . ')';
 		}
 
 		return $error_msg;

@@ -29,7 +29,7 @@ final class WP_Ulike_Pro_Two_Factor_Remove extends wp_ulike_ajax_listener_base {
 		try {
 			$this->beforeAction();
 
-			$permission_denied =  WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) );
+			$permission_denied =  WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) );
 
 			if ( !$this->validates() ){
 				throw new \Exception( $permission_denied );
@@ -37,7 +37,7 @@ final class WP_Ulike_Pro_Two_Factor_Remove extends wp_ulike_ajax_listener_base {
 
 			// check two factor is enabled
 			if( ! WP_Ulike_Pro_Options::is2FactorAuthEnabled() ){
-				throw new \Exception(  esc_html__( '2-factor support is not enabled!', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception(  __( '2-factor support is not enabled!', 'wp-ulike-pro' ) );
 			}
 
 			$removed = false;
@@ -64,7 +64,7 @@ final class WP_Ulike_Pro_Two_Factor_Remove extends wp_ulike_ajax_listener_base {
             $this->afterAction();
 
 			$this->response( array(
-				'message' => esc_html__( '2-factor account has been removed', WP_ULIKE_PRO_DOMAIN ),
+				'message' => __( '2-factor account has been removed', 'wp-ulike-pro' ),
 				'status'  => 'success',
 			) );
 

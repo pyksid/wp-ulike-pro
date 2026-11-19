@@ -60,7 +60,7 @@ class WP_Ulike_Pro_Post_Display_Meta {
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
 				'wp_ulike_pro_display_meta',
-				esc_html__( 'WP ULike', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( 'WP ULike', 'wp-ulike-pro' ),
 				array( $this, 'render' ),
 				$post_type,
 				'side',
@@ -93,16 +93,16 @@ class WP_Ulike_Pro_Post_Display_Meta {
 			<div class="wp-ulike-pro-editor-meta__section">
 				<label class="wp-ulike-pro-editor-meta__toggle">
 					<input type="checkbox" name="wp_ulike_pro_display[auto_display]" value="1" <?php checked( $show_panel ); ?>>
-					<span><?php esc_html_e( 'Display button on this post', WP_ULIKE_PRO_DOMAIN ); ?></span>
+					<span><?php esc_html_e( 'Display button on this post', 'wp-ulike-pro' ); ?></span>
 				</label>
-				<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Overrides global settings when enabled. For site-wide rules, use Display Automation in Tools.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+				<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Overrides global settings when enabled. For site-wide rules, use Display Automation in Tools.', 'wp-ulike-pro' ); ?></p>
 			</div>
 
 			<div class="wp-ulike-pro-editor-meta__panel" id="wp-ulike-pro-display-meta-conditional" <?php echo $show_panel ? '' : 'hidden'; ?>>
 				<div class="wp-ulike-pro-editor-meta__field">
-					<label for="wp_ulike_pro_display_template"><?php esc_html_e( 'Template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+					<label for="wp_ulike_pro_display_template"><?php esc_html_e( 'Template' ); ?></label>
 					<select name="wp_ulike_pro_display[template]" id="wp_ulike_pro_display_template" class="widefat">
-						<option value=""><?php esc_html_e( 'Default', WP_ULIKE_PRO_DOMAIN ); ?></option>
+						<option value=""><?php esc_html_e( 'Default' ); ?></option>
 						<?php foreach ( $templates as $key => $label ) : ?>
 							<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $template, $key ); ?>><?php echo esc_html( $label ); ?></option>
 						<?php endforeach; ?>
@@ -110,19 +110,19 @@ class WP_Ulike_Pro_Post_Display_Meta {
 				</div>
 
 				<fieldset class="wp-ulike-pro-editor-meta__fieldset">
-					<legend><?php esc_html_e( 'Position', WP_ULIKE_PRO_DOMAIN ); ?></legend>
+					<legend><?php esc_html_e( 'Position' ); ?></legend>
 					<div class="wp-ulike-pro-editor-meta__choices">
 						<label class="wp-ulike-pro-editor-meta__choice">
 							<input type="radio" name="wp_ulike_pro_display[display_position]" value="top" <?php checked( $position, 'top' ); ?>>
-							<span><?php esc_html_e( 'Top of content', WP_ULIKE_PRO_DOMAIN ); ?></span>
+							<span><?php esc_html_e( 'Top of content', 'wp-ulike-pro' ); ?></span>
 						</label>
 						<label class="wp-ulike-pro-editor-meta__choice">
 							<input type="radio" name="wp_ulike_pro_display[display_position]" value="bottom" <?php checked( $position ? $position : 'bottom', 'bottom' ); ?>>
-							<span><?php esc_html_e( 'Bottom of content', WP_ULIKE_PRO_DOMAIN ); ?></span>
+							<span><?php esc_html_e( 'Bottom of content', 'wp-ulike-pro' ); ?></span>
 						</label>
 						<label class="wp-ulike-pro-editor-meta__choice">
 							<input type="radio" name="wp_ulike_pro_display[display_position]" value="top_bottom" <?php checked( $position, 'top_bottom' ); ?>>
-							<span><?php esc_html_e( 'Top and bottom', WP_ULIKE_PRO_DOMAIN ); ?></span>
+							<span><?php esc_html_e( 'Top and bottom', 'wp-ulike-pro' ); ?></span>
 						</label>
 					</div>
 				</fieldset>
@@ -130,20 +130,20 @@ class WP_Ulike_Pro_Post_Display_Meta {
 
 			<div class="wp-ulike-pro-editor-meta__section wp-ulike-pro-editor-meta__section--divider">
 				<div class="wp-ulike-pro-editor-meta__field">
-					<label for="wp_ulike_pro_likes_qty"><?php esc_html_e( 'Starting like count', WP_ULIKE_PRO_DOMAIN ); ?></label>
+					<label for="wp_ulike_pro_likes_qty"><?php esc_html_e( 'Starting like count', 'wp-ulike-pro' ); ?></label>
 					<input type="number" class="small-text widefat" min="0" step="1" name="wp_ulike_pro_display[likes_counter_quantity]" id="wp_ulike_pro_likes_qty" value="<?php echo esc_attr( $likes_qty_display ); ?>" placeholder="0">
-					<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Extra likes added to the real count shown on this post. Leave at 0 for no boost. Does not create votes in the database.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+					<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Extra likes added to the real count shown on this post. Leave at 0 for no boost. Does not create votes in the database.', 'wp-ulike-pro' ); ?></p>
 				</div>
 				<div class="wp-ulike-pro-editor-meta__field">
-					<label for="wp_ulike_pro_dislikes_qty"><?php esc_html_e( 'Starting dislike count', WP_ULIKE_PRO_DOMAIN ); ?></label>
+					<label for="wp_ulike_pro_dislikes_qty"><?php esc_html_e( 'Starting dislike count', 'wp-ulike-pro' ); ?></label>
 					<input type="number" class="small-text widefat" min="0" step="1" name="wp_ulike_pro_display[dislikes_counter_quantity]" id="wp_ulike_pro_dislikes_qty" value="<?php echo esc_attr( $dislikes_qty_display ); ?>" placeholder="0">
-					<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Extra dislikes added to the real count shown on this post. Leave at 0 for no boost. Does not create votes in the database.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+					<p class="wp-ulike-pro-editor-meta__help"><?php esc_html_e( 'Extra dislikes added to the real count shown on this post. Leave at 0 for no boost. Does not create votes in the database.', 'wp-ulike-pro' ); ?></p>
 				</div>
 			</div>
 
 			<div class="wp-ulike-pro-editor-meta__footer">
 				<a href="<?php echo esc_url( $tools_url ); ?>" class="wp-ulike-pro-editor-meta__footer-link">
-					<?php esc_html_e( 'Configure star ratings & schema in Tools', WP_ULIKE_PRO_DOMAIN ); ?>
+					<?php esc_html_e( 'Configure star ratings & schema in Tools', 'wp-ulike-pro' ); ?>
 					<span class="dashicons dashicons-external" aria-hidden="true"></span>
 				</a>
 			</div>

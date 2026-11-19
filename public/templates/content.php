@@ -58,13 +58,13 @@ if( !empty( $query_args['type'] ) ){
                 include( sprintf(  $template_path, $query_args['type'] ) );
                 echo apply_filters( 'wp_ulike_pro_content_template_for_' . $query_args['type'] , ob_get_clean(), $wp_ulike_query, $query_args );
             } else {
-                echo esc_html__( 'Template type not exist!', WP_ULIKE_PRO_DOMAIN );
+                echo esc_html__( 'Template type not exist!', 'wp-ulike-pro' );
             }
         ?>
     </div>
     <?php else: ?>
     <div class="wp-ulike-pro-items-container wp-ulike-content-not-found">
-        <p><?php echo empty( $query_args['empty_text'] ) ? esc_html__( 'No Results Found!', WP_ULIKE_PRO_DOMAIN ) : wp_kses_post( $query_args['empty_text'] ); ?>
+        <p><?php echo empty( $query_args['empty_text'] ) ? esc_html__( 'No results found.' ) : wp_kses_post( $query_args['empty_text'] ); ?>
         </p>
     </div>
     <?php endif; ?>

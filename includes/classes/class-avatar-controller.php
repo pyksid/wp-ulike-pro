@@ -64,7 +64,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 
 				// Validate file upload exists
 				if ( ! isset( $_FILES['files'] ) || empty( $_FILES['files']['tmp_name'] ) ) {
-					throw new \Exception( esc_html__( 'No file uploaded.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'No file uploaded.', 'wp-ulike-pro' ) );
 				}
 
 				// Prepare uploader configuration
@@ -157,7 +157,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 				// Security: Verify user can only delete their own avatar
 				$user_id = ! empty( $this->user ) ? (int) $this->user : 0;
 				if ( empty( $user_id ) ) {
-					throw new \Exception( esc_html__( 'Invalid item.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Invalid item.', 'wp-ulike-pro' ) );
 				}
 
 				// Sanitize filename to prevent directory traversal
@@ -167,7 +167,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 				// Security: Verify filename matches user's avatar (user_id prefix)
 				// This prevents users from deleting other users' avatars
 				if ( ! preg_match( '/^' . preg_quote( $user_id, '/' ) . '-/', $filename ) ) {
-					throw new \Exception( esc_html__( 'You can only delete your own avatar.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'You can only delete your own avatar.', 'wp-ulike-pro' ) );
 				}
 
 				$file = $this->data['configs']['uploadDir'] . $filename;
@@ -177,21 +177,21 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 				$real_file = realpath( $file );
 
 				if ( ! $real_upload_dir ) {
-					throw new \Exception( esc_html__( 'Upload directory does not exist.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Upload directory does not exist.', 'wp-ulike-pro' ) );
 				}
 
 				if ( ! $real_file ) {
-					throw new \Exception( esc_html__( 'Item does not exist.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Item does not exist.', 'wp-ulike-pro' ) );
 				}
 
 				// Critical security check: ensure file is actually within upload directory
 				if ( strpos( $real_file, $real_upload_dir ) !== 0 ) {
-					throw new \Exception( esc_html__( 'Security check failed. Invalid file path.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Security check failed. Invalid file path.', 'wp-ulike-pro' ) );
 				}
 
 				// Verify it's actually a file (not directory)
 				if ( ! is_file( $real_file ) ) {
-					throw new \Exception( esc_html__( 'Invalid item.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Invalid item.', 'wp-ulike-pro' ) );
 				}
 
 				// Additional security: Verify file belongs to this user by checking user meta
@@ -211,7 +211,7 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 					// Change message
 					$data['isSuccess'] = true;
 				} else {
-					throw new \Exception( esc_html__( 'Failed to delete file.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'Failed to delete file.', 'wp-ulike-pro' ) );
 				}
 			}
 
@@ -249,11 +249,11 @@ final class WP_Ulike_Pro_Avatar_Controller extends wp_ulike_ajax_listener_base {
 	private function validates(){
 		// Return false when nonce invalid
 		if( ! wp_verify_nonce( $this->data['security'], WP_ULIKE_PRO_DOMAIN ) || ! $this->user ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
         }
 		// Check methods
 		if( empty( $this->data['method'] ) || ! in_array( $this->data['method'], array( 'upload','delete' ) ) ){
-			throw new \Exception( esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'Not found!', 'wp-ulike-pro' ) );
 		}
 	}
 

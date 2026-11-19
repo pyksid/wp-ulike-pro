@@ -34,11 +34,11 @@ final class WP_Ulike_Pro_Likers {
 			$this->settings_type = new wp_ulike_setting_type( $this->data['type'] );
 
 			if ( !$this->validates() ){
-				throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+				throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
 			}
 
 			if( empty( $this->settings_type->getType() ) ){
-				throw new \Exception( esc_html__( 'Invalid item type.', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception( __( 'Invalid item type.', 'wp-ulike-pro' ) );
 			}
 
 			// Final template
@@ -47,7 +47,7 @@ final class WP_Ulike_Pro_Likers {
 			$get_users = wp_ulike_pro_get_likers_list_per_post( $this->settings_type->getTableName(), $this->settings_type->getColumnName(), $this->data['id'], NULL );
 
 			if( empty( $get_users ) ){
-				throw new \Exception( esc_html__( 'This item has not been liked by any user!', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception( __( 'This item has not been liked by any user!', 'wp-ulike-pro' ) );
 			}
 
 			// Generate users list

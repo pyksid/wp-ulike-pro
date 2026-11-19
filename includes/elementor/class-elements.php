@@ -230,7 +230,7 @@ final class Elements {
                 } elseif( class_exists( __NAMESPACE__ . '\\' . $widget['class'] ) ){
                     $class_name = __NAMESPACE__ . '\\' . $widget['class'];
                 } else {
-                    trigger_error( sprintf( esc_html__('Element class "%s" not found.', WP_ULIKE_PRO_DOMAIN ), $class_name ) );
+                    trigger_error( sprintf( esc_html__('Element class "%s" not found.', 'wp-ulike-pro' ), $class_name ) );
                     continue;
                 }
                 $widgets_manager->register_widget_type( new $class_name() );
@@ -271,7 +271,7 @@ final class Elements {
                 if( class_exists( __NAMESPACE__ . '\\' . $module['class'] ) ){
                     $class_name = __NAMESPACE__ . '\\' . $module['class'];
                 } else {
-                    trigger_error( sprintf( esc_html__('Module class "%s" not found.', WP_ULIKE_PRO_DOMAIN ), $class_name ) );
+                    trigger_error( sprintf( esc_html__('Module class "%s" not found.', 'wp-ulike-pro' ), $class_name ) );
                     continue;
                 }
                 new $class_name();
@@ -329,7 +329,7 @@ final class Elements {
         $categories_manager->add_category(
             WP_ULIKE_PRO_DOMAIN,
             array(
-                'title' => esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ),
+                'title' => esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ),
                 'icon' => 'eicon-font',
             )
         );
@@ -364,9 +364,9 @@ final class Elements {
         if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
 
         $message = sprintf(
-          esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', WP_ULIKE_PRO_DOMAIN ),
-          '<strong>' . esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
-          '<strong>' . esc_html__( 'Elementor', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
+          esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', 'wp-ulike-pro' ),
+          '<strong>' . esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ) . '</strong>',
+          '<strong>' . esc_html__( 'Elementor', 'wp-ulike-pro' ) . '</strong>',
            self::MINIMUM_ELEMENTOR_VERSION
         );
 
@@ -388,9 +388,9 @@ final class Elements {
 
         $message = sprintf(
           /* translators: 1: Plugin name 2: PHP 3: Required PHP version */
-          esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', WP_ULIKE_PRO_DOMAIN ),
-          '<strong>' . esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
-          '<strong>' . esc_html__( 'PHP', WP_ULIKE_PRO_DOMAIN ) . '</strong>',
+          esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', 'wp-ulike-pro' ),
+          '<strong>' . esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ) . '</strong>',
+          '<strong>' . esc_html__( 'PHP', 'wp-ulike-pro' ) . '</strong>',
            self::MINIMUM_PHP_VERSION
         );
 

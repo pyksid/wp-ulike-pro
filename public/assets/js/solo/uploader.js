@@ -22,12 +22,12 @@
       nonce: '',
       captions: config.captions || {
         changePhoto: 'Change photo',
-        removePhoto: 'Remove photo',
+        removePhoto: 'Remove',
         save: 'Save',
         cancel: 'Cancel'
       },
       messages: config.messages || {
-        chooseProfilePicture: 'Choose profile picture',
+        chooseProfilePicture: 'Select',
         confirmRemoveAvatar: 'Are you sure you want to remove your avatar?',
         pleaseSelectImage: 'Please select an image file',
         fileSizeMustBeLess: 'File size must be less than %sMB',

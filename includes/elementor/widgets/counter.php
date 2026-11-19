@@ -51,7 +51,7 @@ class Counter extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__('Like/Dislike Counter', WP_ULIKE_PRO_DOMAIN );
+        return esc_html__('Like/Dislike Counter', 'wp-ulike-pro' );
     }
 
     /**
@@ -99,19 +99,19 @@ class Counter extends Widget_Base {
         $this->start_controls_section(
             'general',
             array(
-                'label'      => esc_html__('General', WP_ULIKE_PRO_DOMAIN ),
+                'label'      => esc_html__( 'General' ),
             )
         );
 
         $this->add_control(
             'status',
             array(
-                'label'       => esc_html__('Select Status', WP_ULIKE_PRO_DOMAIN),
+                'label'       => esc_html__( 'Select Status', 'wp-ulike-pro' ),
                 'type'        => Controls_Manager::SELECT,
                 'default'     => 'like',
                 'options'     => array(
-                    'like'    => esc_html__('Like', WP_ULIKE_PRO_DOMAIN),
-                    'dislike' => esc_html__('Dislike', WP_ULIKE_PRO_DOMAIN)
+                    'like'    => esc_html__( 'Like', 'wp-ulike-pro' ),
+                    'dislike' => esc_html__('Dislike', 'wp-ulike-pro')
                 )
             )
         );
@@ -119,14 +119,14 @@ class Counter extends Widget_Base {
         // $this->add_control(
         //     'type',
         //     array(
-        //         'label'       => esc_html__('Select Counter Type', WP_ULIKE_PRO_DOMAIN),
+        //         'label'       => esc_html__( 'Select Status', 'wp-ulike-pro' ),
         //         'type'        => Controls_Manager::SELECT,
         //         'default'     => 'post',
         //         'options'     => array(
-        //             'post'     => esc_html__('Post', WP_ULIKE_PRO_DOMAIN),
-        //             'comment'  => esc_html__('Comment', WP_ULIKE_PRO_DOMAIN),
-        //             'activity' => esc_html__('Activity', WP_ULIKE_PRO_DOMAIN),
-        //             'topic'    => esc_html__('Topic', WP_ULIKE_PRO_DOMAIN)
+        //             'post'     => esc_html__( 'Post' ),
+        //             'comment'  => esc_html__( 'Comment' ),
+        //             'activity' => esc_html__( 'Activity' ),
+        //             'topic'    => esc_html__('Topic', 'wp-ulike-pro')
         //         )
         //     )
         // );
@@ -134,7 +134,7 @@ class Counter extends Widget_Base {
         $this->add_control(
             'selected_icon',
             array(
-                'label'        => esc_html__('Icon', WP_ULIKE_PRO_DOMAIN ),
+                'label'        => esc_html__( 'Icon' ),
                 'type'         => Controls_Manager::ICONS
             )
         );
@@ -143,12 +143,12 @@ class Counter extends Widget_Base {
 		$this->add_control(
 			'icon_align',
 			[
-				'label' => esc_html__( 'Icon Position', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Icon Position', 'wp-ulike-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'default' => 'left',
 				'options' => [
-					'left' => esc_html__( 'Before', WP_ULIKE_PRO_DOMAIN ),
-					'right' => esc_html__( 'After', WP_ULIKE_PRO_DOMAIN ),
+					'left' => esc_html__( 'Before', 'wp-ulike-pro' ),
+					'right' => esc_html__( 'After', 'wp-ulike-pro' ),
 				],
 				'condition' => [
 					'selected_icon[value]!' => '',
@@ -159,10 +159,10 @@ class Counter extends Widget_Base {
         $this->add_control(
             'custom_id',
             array(
-                'label'        => esc_html__('Enable Custom ID',WP_ULIKE_PRO_DOMAIN ),
+                'label'        => esc_html__('Enable Custom ID','wp-ulike-pro' ),
                 'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'On', WP_ULIKE_PRO_DOMAIN ),
-                'label_off'    => esc_html__( 'Off', WP_ULIKE_PRO_DOMAIN ),
+                'label_on'     => esc_html__( 'On', 'wp-ulike-pro' ),
+                'label_off'    => esc_html__( 'Off', 'wp-ulike-pro' ),
                 'return_value' => 'yes',
                 'default'      => 'no'
             )
@@ -171,8 +171,8 @@ class Counter extends Widget_Base {
         $this->add_control(
             'item_id',
             array(
-                'label'       => esc_html__('Enter a Post ID',WP_ULIKE_PRO_DOMAIN ),
-                'description' => esc_html__('You can set a custom id instead of our automattic get id function to make multiple buttons in a page.',WP_ULIKE_PRO_DOMAIN ),
+                'label'       => esc_html__('Enter a Post ID','wp-ulike-pro' ),
+                'description' => esc_html__('You can set a custom id instead of our automattic get id function to make multiple buttons in a page.','wp-ulike-pro' ),
                 'type'        => Controls_Manager::NUMBER,
                 'default'     => '',
                 'step'        => 1,
@@ -188,7 +188,7 @@ class Counter extends Widget_Base {
         $this->start_controls_section(
 			'section_style_icon',
 			[
-				'label'      => esc_html__( 'Icon', WP_ULIKE_PRO_DOMAIN ),
+				'label'      => esc_html__( 'Icon' ),
 				'tab'        => Controls_Manager::TAB_STYLE,
 				'conditions' => array(
                     'relation' => 'or',
@@ -208,14 +208,14 @@ class Counter extends Widget_Base {
 		$this->start_controls_tab(
 			'icon_colors_normal',
 			[
-				'label' => esc_html__( 'Normal', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Normal', 'wp-ulike-pro' ),
 			]
 		);
 
 		$this->add_control(
 			'primary_color',
 			[
-				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Primary Color', 'wp-ulike-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
@@ -235,14 +235,14 @@ class Counter extends Widget_Base {
 		$this->start_controls_tab(
 			'icon_colors_hover',
 			[
-				'label' => esc_html__( 'Hover', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Hover', 'wp-ulike-pro' ),
 			]
 		);
 
 		$this->add_control(
 			'hover_primary_color',
 			[
-				'label' => esc_html__( 'Primary Color', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Primary Color', 'wp-ulike-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
@@ -264,7 +264,7 @@ class Counter extends Widget_Base {
 		$this->add_responsive_control(
 			'size',
 			[
-				'label' => esc_html__( 'Size', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Size' ),
 				'type' => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
@@ -281,7 +281,7 @@ class Counter extends Widget_Base {
 		$this->add_responsive_control(
 			'rotate',
 			[
-				'label' => esc_html__( 'Rotate', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Rotate', 'wp-ulike-pro' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'deg' ],
 				'default' => [
@@ -305,7 +305,7 @@ class Counter extends Widget_Base {
         $this->start_controls_section(
 			'section_style_counter',
 			[
-				'label'      => esc_html__( 'Counter', WP_ULIKE_PRO_DOMAIN ),
+				'label'      => esc_html__( 'Counter', 'wp-ulike-pro' ),
 				'tab'        => Controls_Manager::TAB_STYLE
 			]
         );
@@ -322,7 +322,7 @@ class Counter extends Widget_Base {
         $this->add_responsive_control(
             'counter_padding',
             array(
-                'label'      => esc_html__( 'Padding', WP_ULIKE_PRO_DOMAIN ),
+                'label'      => esc_html__( 'Padding', 'wp-ulike-pro' ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px' ),
                 'selectors'  => array(

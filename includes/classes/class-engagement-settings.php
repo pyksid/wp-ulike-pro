@@ -646,7 +646,7 @@ class WP_Ulike_Pro_Engagement_Settings {
 					? wp_strip_all_tags( $registry[ $slug ]['label'] )
 					: sprintf(
 						/* translators: %d: reaction number */
-						esc_html__( 'Reaction %d', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'Reaction %d', 'wp-ulike-pro' ),
 						count( $out ) + 1
 					);
 			}
@@ -735,8 +735,8 @@ class WP_Ulike_Pro_Engagement_Settings {
 			'engagement_reactions' => array(
 				'id'         => 'engagement_reactions',
 				'type'       => 'emoji_repeater',
-				'title'      => esc_html__( 'Reactions', WP_ULIKE_PRO_DOMAIN ),
-				'desc'       => esc_html__( 'Pick emojis from the catalog and optional labels. Slugs are generated automatically for stats and logs.', WP_ULIKE_PRO_DOMAIN ),
+				'title'      => esc_html__( 'Reactions', 'wp-ulike-pro' ),
+				'desc'       => esc_html__( 'Pick emojis from the catalog and optional labels. Slugs are generated automatically for stats and logs.', 'wp-ulike-pro' ),
 				'default'    => self::get_default_reactions_config(),
 				'min'        => 1,
 				'max'        => 16,
@@ -745,13 +745,13 @@ class WP_Ulike_Pro_Engagement_Settings {
 			'engagement_picker_style' => array(
 				'id'         => 'engagement_picker_style',
 				'type'       => 'button_set',
-				'title'      => esc_html__( 'Reaction Picker', WP_ULIKE_PRO_DOMAIN ),
-				'desc'       => esc_html__( 'Hover shows a LinkedIn-style bar on the trigger (hover on desktop, long-press on mobile). Inline displays all reactions in a row at all times.', WP_ULIKE_PRO_DOMAIN ),
+				'title'      => esc_html__( 'Reaction Picker', 'wp-ulike-pro' ),
+				'desc'       => esc_html__( 'Hover shows a LinkedIn-style bar on the trigger (hover on desktop, long-press on mobile). Inline displays all reactions in a row at all times.', 'wp-ulike-pro' ),
 				'default'     => 'hover',
 				'allow_empty' => false,
 				'options'    => array(
-					'hover'  => esc_html__( 'Hover', WP_ULIKE_PRO_DOMAIN ),
-					'inline' => esc_html__( 'Inline', WP_ULIKE_PRO_DOMAIN ),
+					'hover'  => esc_html__( 'Hover', 'wp-ulike-pro' ),
+					'inline' => esc_html__( 'Inline' ),
 				),
 				'dependency' => array( 'template', '==', self::TEMPLATE_EMOJI ),
 			),

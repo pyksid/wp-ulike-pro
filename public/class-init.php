@@ -68,6 +68,8 @@ if ( ! class_exists( 'WP_Ulike_Pro' ) ) :
 
       // load packages
       include_once( WP_ULIKE_PRO_DIR . '/vendor/autoload.php' );
+      // Feature switches first: everything below asks whether it should load.
+      include_once( WP_ULIKE_PRO_DIR . '/includes/features.php' );
       // load common functionalities
       include_once( WP_ULIKE_PRO_DIR . '/includes/index.php' );
 

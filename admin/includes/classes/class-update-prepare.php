@@ -196,7 +196,7 @@ class WP_Ulike_Pro_Update_Prepare {
 
 			$api_request_transient = new \stdClass();
 
-			$api_request_transient->name          = esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN );
+			$api_request_transient->name          = esc_html__( 'WP ULike Pro', 'wp-ulike-pro' );
 			$api_request_transient->slug          = $this->plugin_slug;
 			$homepage_url = WP_Ulike_Pro_API::get_homepage_url( 'api', 'wp-dash', 'plugin-uri' );
 

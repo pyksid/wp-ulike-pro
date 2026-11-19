@@ -44,13 +44,13 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
             $this->data['_redirect_to'] = '';
             if( ! empty( $this->data['rp_key'] ) ){
 				$this->change_password();
-				$this->data['message']  = WP_Ulike_Pro_Options::getNoticeMessage( 'password_reset', esc_html__( 'Your password has been reset.', WP_ULIKE_PRO_DOMAIN ) );
+				$this->data['message']  = WP_Ulike_Pro_Options::getNoticeMessage( 'password_reset', __( 'Your password has been reset.' ) );
 				$this->data['_redirect_to'] = WP_Ulike_Pro_Permalinks::get_login_url();
 			} else {
 				$this->retrieve_password();
 				// add notice
-				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getFormLabel( 'rp', 'mail_message', esc_html__( 'Check your e-mail address linked to the account for the confirmation link, including the spam or junk folder.
-				', WP_ULIKE_PRO_DOMAIN ) ), 'success' );
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getFormLabel( 'rp', 'mail_message', __( 'Check your e-mail address linked to the account for the confirmation link, including the spam or junk folder.
+				', 'wp-ulike-pro' ) ), 'success' );
 
 				$this->data['_redirect_to'] = add_query_arg( array(
 					'action' => 'checkemail'
@@ -87,11 +87,11 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 	private function change_password(){
 
 		if( empty( $this->data['newpassword'] ) || empty( $this->data['repassword'] ) ){
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ) ) );
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', __( 'Please enter required fields', 'wp-ulike-pro' ) ) );
 		}
 
 		if( $this->data['repassword'] !== $this->data['newpassword'] ){
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'password_match', esc_html__( 'Oops! Password did not match! Try again.', WP_ULIKE_PRO_DOMAIN ) ) );
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'password_match', __( 'Oops! Password did not match! Try again.', 'wp-ulike-pro' ) ) );
 		}
 
 		$rp_cookie = 'wp-resetpass-' . COOKIEHASH;
@@ -107,7 +107,7 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 
 		if ( ! $user  || is_wp_error( $user ) ) {
 			wp_ulike_pro_setcookie( $rp_cookie, false );
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ));
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ));
 		}
 
 		wp_set_password( $this->data['newpassword'], $user->ID );
@@ -130,7 +130,7 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 	private function retrieve_password(){
 
 		if ( empty( $this->data['username'] ) || ! is_string( $this->data['username'] ) ) {
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'empty_username', esc_html__( 'Enter a username or email address.', WP_ULIKE_PRO_DOMAIN ) ) );
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'empty_username', __( 'Enter a username or email address.', 'wp-ulike-pro' ) ) );
 		}
 
 		// Prevent user enumeration - always show the same message whether user exists or not
@@ -184,18 +184,18 @@ final class WP_Ulike_Pro_Password extends wp_ulike_ajax_listener_base {
 	private function validates(){
 		// Return false in preview mode
 		if( WP_Ulike_Pro::is_preview_mode() ){
-			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ) );
 		}
 
 		// Check rate limiting (only for password reset requests, not password change)
 		// 3 attempts per hour
 		if( empty( $this->data['rp_key'] ) ){
-			wp_ulike_pro_check_rate_limit( 'password_reset', 3, HOUR_IN_SECONDS, esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ) );
+			wp_ulike_pro_check_rate_limit( 'password_reset', 3, HOUR_IN_SECONDS, __( 'Too many attempts. Please try again in %d minute(s).', 'wp-ulike-pro' ) );
 		}
 
 		// Return false when nonce invalid
 		if( WP_Ulike_Pro_Options::getResetPasswordPage() == '' || ( ! wp_verify_nonce( $this->data['security'], 'wp-ulike-pro-forms-nonce') && ! wp_ulike_is_cache_exist() ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
         }
 
 	}

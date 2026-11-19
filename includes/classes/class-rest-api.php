@@ -210,11 +210,11 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         if ( ! empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'All information received successfully.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'All information received successfully.', 'wp-ulike-pro' ),
                 'data'    => $data
             ), 200 );
         } else {
-            return new WP_Error( 'empty-list', esc_html__( 'Votes list are empty.', WP_ULIKE_PRO_DOMAIN ) );
+            return new WP_Error( 'empty-list', __( 'Votes list are empty.', 'wp-ulike-pro' ) );
         }
     }
 
@@ -229,12 +229,12 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         $info   = $this->get_table_info( $params['type'] );
 
         if ( empty( $info ) || empty( $info['table'] ) || empty( $info['column'] ) ) {
-            return new WP_Error( 'invalid-table', esc_html__( 'Invalid table type.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+            return new WP_Error( 'invalid-table', __( 'Invalid table type.', 'wp-ulike-pro' ), array( 'status' => 400 ) );
         }
 
         $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
         if ( $item_id <= 0 ) {
-            return new WP_Error( 'invalid-item-id', esc_html__( 'Invalid item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+            return new WP_Error( 'invalid-item-id', __( 'Invalid item ID.' ), array( 'status' => 400 ) );
         }
 
         $output = isset( $params['output'] ) ? strtolower( $params['output'] ) : 'logs';
@@ -254,11 +254,11 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         if ( ! empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Item information successfully obtained.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Item information successfully obtained.', 'wp-ulike-pro' ),
                 'data'    => $data
             ), 200 );
         } else {
-            return new WP_Error( 'not-found', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ) );
+            return new WP_Error( 'not-found', __( 'Not found!', 'wp-ulike-pro' ) );
         }
     }
 
@@ -308,7 +308,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Item Inserted.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Item Inserted.', 'wp-ulike-pro' ),
                 'data'    => array(
                     'status_code'   => $entities_instance->getStatusCode(),
                     'counter_value' => $entities_instance->getCounterValue()
@@ -316,7 +316,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             ), 200 );
         }
 
-        return new WP_Error( 'cant-create', esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'cant-create', __( 'Something wrong happened!', 'wp-ulike-pro' ), array( 'status' => 500 ) );
     }
 
     /**
@@ -348,7 +348,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Item Updated.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Item updated.' ),
                 'data'    => array(
                     'status_code'   => $entities_instance->getStatusCode(),
                     'counter_value' => $entities_instance->getCounterValue()
@@ -356,7 +356,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             ), 200 );
         }
 
-        return new WP_Error( 'cant-update', esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'cant-update', __( 'Something wrong happened!', 'wp-ulike-pro' ), array( 'status' => 500 ) );
     }
 
     /**
@@ -402,7 +402,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Item Updated.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Item updated.' ),
                 'data'    => array(
                     'status_code'   => $entities_instance->getStatusCode(),
                     'counter_value' => $entities_instance->getCounterValue()
@@ -410,7 +410,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
             ), 200 );
         }
 
-        return new WP_Error( 'cant-update', esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'cant-update', __( 'Something wrong happened!', 'wp-ulike-pro' ), array( 'status' => 500 ) );
     }
 
     /**
@@ -427,7 +427,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         $item_id = isset( $params['item_id'] ) ? absint( $params['item_id'] ) : 0;
 
         if ( $user_id <= 0 || $item_id <= 0 ) {
-            return new WP_Error( 'invalid-params', esc_html__( 'Invalid user ID or item ID.', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 400 ) );
+            return new WP_Error( 'invalid-params', __( 'Invalid user ID or item ID.', 'wp-ulike-pro' ), array( 'status' => 400 ) );
         }
 
         $activity = wp_ulike_pro_get_user_latest_activity( $item_id, $user_id, $type );
@@ -436,12 +436,12 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         if ( !empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Ok, we found it.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Ok, we found it.', 'wp-ulike-pro' ),
                 'data'    => sanitize_text_field( $data )
             ), 200 );
         }
 
-        return new WP_Error( 'status-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 404 ) );
+        return new WP_Error( 'status-not-exist', __( 'Not found!', 'wp-ulike-pro' ), array( 'status' => 404 ) );
     }
 
     /**
@@ -468,12 +468,12 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         if ( !empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Ok, we found it.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Ok, we found it.', 'wp-ulike-pro' ),
                 'data'    => $data
             ), 200 );
         }
 
-        return new WP_Error( 'user-data-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'user-data-not-exist', __( 'Not found!', 'wp-ulike-pro' ), array( 'status' => 500 ) );
     }
 
 
@@ -502,12 +502,12 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
         if ( !empty( $data ) ) {
             return new WP_REST_Response( array(
                 'code'    => 'success',
-                'message' => esc_html__( 'Ok, we found it.', WP_ULIKE_PRO_DOMAIN ),
+                'message' => __( 'Ok, we found it.', 'wp-ulike-pro' ),
                 'data'    => $data
             ), 200 );
         }
 
-        return new WP_Error( 'user-data-not-exist', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ), array( 'status' => 500 ) );
+        return new WP_Error( 'user-data-not-exist', __( 'Not found!', 'wp-ulike-pro' ), array( 'status' => 500 ) );
     }
 
     /**
@@ -530,7 +530,7 @@ class WP_Ulike_Pro_Rest_API extends WP_REST_Controller {
 
         return new WP_REST_Response( array(
             'code'    => 'success',
-            'message' => esc_html__( 'Ok, we found it.', WP_ULIKE_PRO_DOMAIN ),
+            'message' => __( 'Ok, we found it.', 'wp-ulike-pro' ),
             'data'    => $instance->get_data( $range, $status, $params['dataset'], $filter, true )
         ), 200 );
     }

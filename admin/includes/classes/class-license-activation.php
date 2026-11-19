@@ -72,13 +72,13 @@ class WP_Ulike_Pro_License_Activation{
 		$purchase_code = sanitize_text_field( trim( $purchase_code ) );
 
 		if( empty( $purchase_code ) ){
-	    	$output['message'] = esc_html__( 'Your license is missing. Please check your key again.', WP_ULIKE_PRO_DOMAIN );
+	    	$output['message'] = esc_html__( 'Your license is missing. Please check your key again.', 'wp-ulike-pro' );
 	    	return $output;
 		}
 
 		// Basic validation
 		if ( strlen( $purchase_code ) < 10 ) {
-			$output['message'] = esc_html__( 'Invalid license key format. Please check your key and try again.', WP_ULIKE_PRO_DOMAIN );
+			$output['message'] = esc_html__( 'Invalid license key format. Please check your key and try again.', 'wp-ulike-pro' );
 			return $output;
 		}
 
@@ -104,7 +104,7 @@ class WP_Ulike_Pro_License_Activation{
                 update_site_option( $this->option_prefix, $license_info );
 
 				$output['status']  = 'valid';
-				$output['message'] = esc_html__( 'License has been activated successfully.', WP_ULIKE_PRO_DOMAIN );
+				$output['message'] = esc_html__( 'License has been activated successfully.', 'wp-ulike-pro' );
 				$output['success'] = 1;
 			}
 		}

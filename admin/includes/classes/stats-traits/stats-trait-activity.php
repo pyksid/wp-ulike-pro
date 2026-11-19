@@ -288,26 +288,26 @@ trait WP_Ulike_Pro_Stats_Trait_Activity {
 			$windows_def = array(
 				array(
 					'key'   => 'night',
-					'label' => esc_html__( 'Night', 'wp-ulike-pro' ),
-					'range' => esc_html__( '12 AM – 6 AM', 'wp-ulike-pro' ),
+					'label' => __( 'Night', 'wp-ulike-pro' ),
+					'range' => __( '12 AM – 6 AM', 'wp-ulike-pro' ),
 					'hours' => range( 0, 5 ),
 				),
 				array(
 					'key'   => 'morning',
-					'label' => esc_html__( 'Morning', 'wp-ulike-pro' ),
-					'range' => esc_html__( '6 AM – 12 PM', 'wp-ulike-pro' ),
+					'label' => __( 'Morning', 'wp-ulike-pro' ),
+					'range' => __( '6 AM – 12 PM', 'wp-ulike-pro' ),
 					'hours' => range( 6, 11 ),
 				),
 				array(
 					'key'   => 'afternoon',
-					'label' => esc_html__( 'Afternoon', 'wp-ulike-pro' ),
-					'range' => esc_html__( '12 PM – 6 PM', 'wp-ulike-pro' ),
+					'label' => __( 'Afternoon', 'wp-ulike-pro' ),
+					'range' => __( '12 PM – 6 PM', 'wp-ulike-pro' ),
 					'hours' => range( 12, 17 ),
 				),
 				array(
 					'key'   => 'evening',
-					'label' => esc_html__( 'Evening', 'wp-ulike-pro' ),
-					'range' => esc_html__( '6 PM – 12 AM', 'wp-ulike-pro' ),
+					'label' => __( 'Evening', 'wp-ulike-pro' ),
+					'range' => __( '6 PM – 12 AM', 'wp-ulike-pro' ),
 					'hours' => range( 18, 23 ),
 				),
 			);

@@ -71,7 +71,7 @@ final class WP_Ulike_Pro_Logout {
 
 		// Return false when nonce invalid
 		if( ! wp_verify_nonce( $this->data['security'], 'log-out' ) || ! is_user_logged_in() || ! $this->data['action'] ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ));
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ));
         }
 
 	}

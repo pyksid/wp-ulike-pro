@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $license_message = ! empty( $license_message )
 	? $license_message
-	: esc_html__( 'You need an active license to use this tool. Open the License page to activate or refresh your key.', WP_ULIKE_PRO_DOMAIN );
+	: esc_html__( 'You need an active license to use this tool. Open the License page to activate or refresh your key.', 'wp-ulike-pro' );
 
 $license_url = class_exists( 'WP_Ulike_Pro_License' )
 	? WP_Ulike_Pro_License::get_url()
@@ -19,11 +19,11 @@ $license_url = class_exists( 'WP_Ulike_Pro_License' )
 ?>
 
 <div class="wp-ulike-about-card wp-ulike-about-card--pro">
-	<h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'License required', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+	<h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'License required', 'wp-ulike-pro' ); ?></h2>
 	<p class="wp-ulike-about-summary"><?php echo esc_html( $license_message ); ?></p>
 	<p class="wp-ulike-about-tools">
 		<a class="button button-primary" href="<?php echo esc_url( $license_url ); ?>">
-			<?php esc_html_e( 'Go to License', WP_ULIKE_PRO_DOMAIN ); ?>
+			<?php esc_html_e( 'Go to License', 'wp-ulike-pro' ); ?>
 		</a>
 	</p>
 </div>

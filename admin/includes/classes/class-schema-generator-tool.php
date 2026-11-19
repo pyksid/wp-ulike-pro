@@ -44,56 +44,56 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 			'requiredRules' => self::get_required_field_rules(),
 			'initialPostId' => isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0,
 			'i18n'          => array(
-				'selectPost'   => esc_html__( 'Select a post from the list to edit its schema.', WP_ULIKE_PRO_DOMAIN ),
-				'loading'      => esc_html__( 'Loading…', WP_ULIKE_PRO_DOMAIN ),
-				'schemaActive' => esc_html__( 'Schema active', WP_ULIKE_PRO_DOMAIN ),
-				'faqActive'    => esc_html__( 'FAQ active', WP_ULIKE_PRO_DOMAIN ),
-				'configured'   => esc_html__( 'Draft data', WP_ULIKE_PRO_DOMAIN ),
-				'noResults'    => esc_html__( 'No posts found. Try different filters.', WP_ULIKE_PRO_DOMAIN ),
-				'searchFailed' => esc_html__( 'Search failed. Please try again.', WP_ULIKE_PRO_DOMAIN ),
-				'loadFailed'   => esc_html__( 'Could not load post data.', WP_ULIKE_PRO_DOMAIN ),
-				'addFaq'       => esc_html__( 'Add FAQ Item', WP_ULIKE_PRO_DOMAIN ),
-				'addReview'    => esc_html__( 'Add Review', WP_ULIKE_PRO_DOMAIN ),
-				'removeRow'    => esc_html__( 'Remove', WP_ULIKE_PRO_DOMAIN ),
-				'resultsSummary' => esc_html__( 'Showing %1$d of %2$d results (max %3$d per page).', WP_ULIKE_PRO_DOMAIN ),
-				'resultsExact'   => esc_html__( 'Showing %1$d results.', WP_ULIKE_PRO_DOMAIN ),
-				'resultsPaged'   => esc_html__( 'Showing %1$d results. More matches are available.', WP_ULIKE_PRO_DOMAIN ),
-				'loadMore'       => esc_html__( 'Load more', WP_ULIKE_PRO_DOMAIN ),
-				'loadingMore'    => esc_html__( 'Loading more…', WP_ULIKE_PRO_DOMAIN ),
-				'saveSuccess'    => esc_html__( 'Schema settings saved.', WP_ULIKE_PRO_DOMAIN ),
-				'saveFailed'     => esc_html__( 'Could not save schema settings. Please try again.', WP_ULIKE_PRO_DOMAIN ),
-				'saving'         => esc_html__( 'Saving…', WP_ULIKE_PRO_DOMAIN ),
-				'requiredFields' => esc_html__( 'Please fill in the required fields.', WP_ULIKE_PRO_DOMAIN ),
-				'schemaTypeRequired' => esc_html__( 'Schema type is required when schema is enabled.', WP_ULIKE_PRO_DOMAIN ),
-				'ratingValueRequired' => esc_html__( 'Rating value is required when custom star rating is enabled.', WP_ULIKE_PRO_DOMAIN ),
-				'faqItemRequired'    => esc_html__( 'Each FAQ item must include both a question and an answer.', WP_ULIKE_PRO_DOMAIN ),
-				'questionLabel'      => esc_html__( 'Question', WP_ULIKE_PRO_DOMAIN ),
-				'answerLabel'        => esc_html__( 'Answer', WP_ULIKE_PRO_DOMAIN ),
-				'unsavedChanges'     => esc_html__( 'You have unsaved changes. Switch posts anyway?', WP_ULIKE_PRO_DOMAIN ),
-				'selectImage'        => esc_html__( 'Select Image', WP_ULIKE_PRO_DOMAIN ),
-				'addImages'          => esc_html__( 'Add Images', WP_ULIKE_PRO_DOMAIN ),
-				'removeImage'        => esc_html__( 'Remove', WP_ULIKE_PRO_DOMAIN ),
-				'addTrack'           => esc_html__( 'Add Track', WP_ULIKE_PRO_DOMAIN ),
-				'addSupply'          => esc_html__( 'Add Supply', WP_ULIKE_PRO_DOMAIN ),
-				'addTool'            => esc_html__( 'Add Tool', WP_ULIKE_PRO_DOMAIN ),
-				'addStep'            => esc_html__( 'Add Step', WP_ULIKE_PRO_DOMAIN ),
-				'addStepListItem'    => esc_html__( 'Add Direction', WP_ULIKE_PRO_DOMAIN ),
-				'trackLabel'         => esc_html__( 'Track', WP_ULIKE_PRO_DOMAIN ),
-				'supplyLabel'        => esc_html__( 'Supply', WP_ULIKE_PRO_DOMAIN ),
-				'toolLabel'          => esc_html__( 'Tool', WP_ULIKE_PRO_DOMAIN ),
-				'stepLabel'          => esc_html__( 'Step', WP_ULIKE_PRO_DOMAIN ),
-				'directionLabel'     => esc_html__( 'Direction', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewDisabled' => esc_html__( 'Star ratings are disabled for this post.', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewEmpty'    => esc_html__( 'No likes or dislikes yet — ratings will appear once visitors vote.', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewAuto'     => esc_html__( 'Estimated output: %1$s / %2$s from %3$d votes (%4$d likes, %5$d dislikes).', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewAutoTime' => esc_html__( 'Estimated output: %1$s / %2$s using time-weighted likes (%3$d total votes).', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewEngagementStar' => esc_html__( 'Output from star votes: %1$s / %2$s (%3$d ratings).', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewEngagementStarEmpty' => esc_html__( 'No star ratings yet — ratings will appear once visitors rate.', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewCustom'   => esc_html__( 'Manual rating: %1$s / %2$s (%3$d ratings).', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewCustomEmpty' => esc_html__( 'Enter a rating value to preview manual output.', WP_ULIKE_PRO_DOMAIN ),
-				'ratingPreviewUnavailable' => esc_html__( 'Select a post to preview star ratings.', WP_ULIKE_PRO_DOMAIN ),
-				'viewPost'              => esc_html__( 'View Post', WP_ULIKE_PRO_DOMAIN ),
-				'testRichResults'       => esc_html__( 'Test Rich Results', WP_ULIKE_PRO_DOMAIN ),
+				'selectPost'   => __( 'Select a post from the list to edit its schema.', 'wp-ulike-pro' ),
+				'loading'      => __( 'Loading…', 'wp-ulike-pro' ),
+				'schemaActive' => __( 'Schema active', 'wp-ulike-pro' ),
+				'faqActive'    => __( 'FAQ active', 'wp-ulike-pro' ),
+				'configured'   => __( 'Draft data', 'wp-ulike-pro' ),
+				'noResults'    => __( 'No posts found. Try different filters.', 'wp-ulike-pro' ),
+				'searchFailed' => __( 'Search failed. Please try again.', 'wp-ulike-pro' ),
+				'loadFailed'   => __( 'Could not load post data.', 'wp-ulike-pro' ),
+				'addFaq'       => __( 'Add' ),
+				'addReview'    => __( 'Add' ),
+				'removeRow'    => __( 'Remove' ),
+				'resultsSummary' => __( 'Showing %1$d of %2$d results (max %3$d per page).', 'wp-ulike-pro' ),
+				'resultsExact'   => __( 'Showing %1$d results.', 'wp-ulike-pro' ),
+				'resultsPaged'   => __( 'Showing %1$d results. More matches are available.', 'wp-ulike-pro' ),
+				'loadMore'       => __( 'Load more', 'wp-ulike-pro' ),
+				'loadingMore'    => __( 'Loading more…', 'wp-ulike-pro' ),
+				'saveSuccess'    => __( 'Schema settings saved.', 'wp-ulike-pro' ),
+				'saveFailed'     => __( 'Could not save schema settings. Please try again.', 'wp-ulike-pro' ),
+				'saving'         => __( 'Saving…', 'wp-ulike-pro' ),
+				'requiredFields' => __( 'Please fill in the required fields.', 'wp-ulike-pro' ),
+				'schemaTypeRequired' => __( 'Schema type is required when schema is enabled.', 'wp-ulike-pro' ),
+				'ratingValueRequired' => __( 'Rating value is required when custom star rating is enabled.', 'wp-ulike-pro' ),
+				'faqItemRequired'    => __( 'Each FAQ item must include both a question and an answer.', 'wp-ulike-pro' ),
+				'questionLabel'      => __( 'Question', 'wp-ulike-pro' ),
+				'answerLabel'        => __( 'Answer', 'wp-ulike-pro' ),
+				'unsavedChanges'     => __( 'You have unsaved changes. Switch posts anyway?', 'wp-ulike-pro' ),
+				'selectImage'        => __( 'Select Image' ),
+				'addImages'          => __( 'Add Images' ),
+				'removeImage'        => __( 'Remove' ),
+				'addTrack'           => __( 'Add' ),
+				'addSupply'          => __( 'Add' ),
+				'addTool'            => __( 'Add' ),
+				'addStep'            => __( 'Add' ),
+				'addStepListItem'    => __( 'Add' ),
+				'trackLabel'         => __( 'Track', 'wp-ulike-pro' ),
+				'supplyLabel'        => __( 'Supply', 'wp-ulike-pro' ),
+				'toolLabel'          => __( 'Tool', 'wp-ulike-pro' ),
+				'stepLabel'          => __( 'Step', 'wp-ulike-pro' ),
+				'directionLabel'     => __( 'Direction', 'wp-ulike-pro' ),
+				'ratingPreviewDisabled' => __( 'Star ratings are disabled for this post.', 'wp-ulike-pro' ),
+				'ratingPreviewEmpty'    => __( 'No likes or dislikes yet — ratings will appear once visitors vote.', 'wp-ulike-pro' ),
+				'ratingPreviewAuto'     => __( 'Estimated output: %1$s / %2$s from %3$d votes (%4$d likes, %5$d dislikes).', 'wp-ulike-pro' ),
+				'ratingPreviewAutoTime' => __( 'Estimated output: %1$s / %2$s using time-weighted likes (%3$d total votes).', 'wp-ulike-pro' ),
+				'ratingPreviewEngagementStar' => __( 'Output from star votes: %1$s / %2$s (%3$d ratings).', 'wp-ulike-pro' ),
+				'ratingPreviewEngagementStarEmpty' => __( 'No star ratings yet — ratings will appear once visitors rate.', 'wp-ulike-pro' ),
+				'ratingPreviewCustom'   => __( 'Manual rating: %1$s / %2$s (%3$d ratings).', 'wp-ulike-pro' ),
+				'ratingPreviewCustomEmpty' => __( 'Enter a rating value to preview manual output.', 'wp-ulike-pro' ),
+				'ratingPreviewUnavailable' => __( 'Select a post to preview star ratings.', 'wp-ulike-pro' ),
+				'viewPost'              => __( 'View Post' ),
+				'testRichResults'       => __( 'Test Rich Results', 'wp-ulike-pro' ),
 			),
 			'searchLimit'       => self::SEARCH_RESULTS_LIMIT,
 			'richResultsTestUrl' => 'https://search.google.com/test/rich-results',
@@ -146,12 +146,12 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 		}
 
 		if ( ! WP_Ulike_Pro_API::has_permission() ) {
-			wp_die( esc_html__( 'You need an active license to save schema settings.', WP_ULIKE_PRO_DOMAIN ) );
+			wp_die( __( 'You need an active license to save schema settings.', 'wp-ulike-pro' ) );
 		}
 
 		$post_id = isset( $_POST['schema_post_id'] ) ? absint( $_POST['schema_post_id'] ) : 0;
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_die( esc_html__( 'Invalid post.', WP_ULIKE_PRO_DOMAIN ) );
+			wp_die( __( 'Invalid post.' ) );
 		}
 
 		$raw    = isset( $_POST['schema'] ) && is_array( $_POST['schema'] ) ? wp_unslash( $_POST['schema'] ) : array();
@@ -206,7 +206,7 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 		$values = self::normalize_schema_submission( $raw );
 
 		if ( wp_ulike_is_true( $values['enable_schema'] ?? '' ) && empty( $values['schema_type'] ) ) {
-			$errors[] = esc_html__( 'Schema type is required when schema is enabled.', WP_ULIKE_PRO_DOMAIN );
+			$errors[] = __( 'Schema type is required when schema is enabled.', 'wp-ulike-pro' );
 		}
 
 		if (
@@ -215,7 +215,7 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 			&& wp_ulike_is_true( $values['enable_custom_rating'] ?? '' )
 			&& '' === trim( (string) ( $values['rating_value'] ?? '' ) )
 		) {
-			$errors[] = esc_html__( 'Rating value is required when custom star rating is enabled.', WP_ULIKE_PRO_DOMAIN );
+			$errors[] = __( 'Rating value is required when custom star rating is enabled.', 'wp-ulike-pro' );
 		}
 
 		if ( wp_ulike_is_true( $values['enable_faq'] ?? '' ) && ! empty( $values['faq'] ) && is_array( $values['faq'] ) ) {
@@ -228,7 +228,7 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 				$answer   = trim( wp_strip_all_tags( (string) ( $row['answer'] ?? '' ) ) );
 
 				if ( ( $question && ! $answer ) || ( $answer && ! $question ) ) {
-					$errors[] = esc_html__( 'Each FAQ item must include both a question and an answer.', WP_ULIKE_PRO_DOMAIN );
+					$errors[] = __( 'Each FAQ item must include both a question and an answer.', 'wp-ulike-pro' );
 					break;
 				}
 			}
@@ -307,21 +307,21 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 	 */
 	public static function get_schema_types() {
 		return array(
-			'Book'                => esc_html__( 'Book', WP_ULIKE_PRO_DOMAIN ),
-			'Course'              => esc_html__( 'Course', WP_ULIKE_PRO_DOMAIN ),
-			'HowTo'               => esc_html__( 'How-to', WP_ULIKE_PRO_DOMAIN ),
-			'Event'               => esc_html__( 'Event', WP_ULIKE_PRO_DOMAIN ),
-			'LocalBusiness'       => esc_html__( 'Local Business', WP_ULIKE_PRO_DOMAIN ),
-			'Movie'               => esc_html__( 'Movie', WP_ULIKE_PRO_DOMAIN ),
-			'Product'             => esc_html__( 'Product', WP_ULIKE_PRO_DOMAIN ),
-			'SoftwareApplication' => esc_html__( 'Software App', WP_ULIKE_PRO_DOMAIN ),
-			'CreativeWorkSeason'  => esc_html__( 'CreativeWork Season', WP_ULIKE_PRO_DOMAIN ),
-			'CreativeWorkSeries'  => esc_html__( 'CreativeWork Series', WP_ULIKE_PRO_DOMAIN ),
-			'Episode'             => esc_html__( 'Episode', WP_ULIKE_PRO_DOMAIN ),
-			'Game'                => esc_html__( 'Game', WP_ULIKE_PRO_DOMAIN ),
-			'MediaObject'         => esc_html__( 'Media Object', WP_ULIKE_PRO_DOMAIN ),
-			'MusicPlaylist'       => esc_html__( 'Music Playlist', WP_ULIKE_PRO_DOMAIN ),
-			'Organization'        => esc_html__( 'Organization', WP_ULIKE_PRO_DOMAIN ),
+			'Book'                => __( 'Book', 'wp-ulike-pro' ),
+			'Course'              => __( 'Course', 'wp-ulike-pro' ),
+			'HowTo'               => __( 'How-to', 'wp-ulike-pro' ),
+			'Event'               => __( 'Event', 'wp-ulike-pro' ),
+			'LocalBusiness'       => __( 'Local Business', 'wp-ulike-pro' ),
+			'Movie'               => __( 'Movie', 'wp-ulike-pro' ),
+			'Product'             => __( 'Product', 'wp-ulike-pro' ),
+			'SoftwareApplication' => __( 'Software App', 'wp-ulike-pro' ),
+			'CreativeWorkSeason'  => __( 'CreativeWork Season', 'wp-ulike-pro' ),
+			'CreativeWorkSeries'  => __( 'CreativeWork Series', 'wp-ulike-pro' ),
+			'Episode'             => __( 'Episode', 'wp-ulike-pro' ),
+			'Game'                => __( 'Game', 'wp-ulike-pro' ),
+			'MediaObject'         => __( 'Media Object', 'wp-ulike-pro' ),
+			'MusicPlaylist'       => __( 'Music Playlist', 'wp-ulike-pro' ),
+			'Organization'        => __( 'Organization', 'wp-ulike-pro' ),
 		);
 	}
 
@@ -366,13 +366,13 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 	 */
 	public static function get_days_of_week() {
 		return array(
-			'Sunday'    => esc_html__( 'Sunday', WP_ULIKE_PRO_DOMAIN ),
-			'Monday'    => esc_html__( 'Monday', WP_ULIKE_PRO_DOMAIN ),
-			'Tuesday'   => esc_html__( 'Tuesday', WP_ULIKE_PRO_DOMAIN ),
-			'Wednesday' => esc_html__( 'Wednesday', WP_ULIKE_PRO_DOMAIN ),
-			'Thursday'  => esc_html__( 'Thursday', WP_ULIKE_PRO_DOMAIN ),
-			'Friday'    => esc_html__( 'Friday', WP_ULIKE_PRO_DOMAIN ),
-			'Saturday'  => esc_html__( 'Saturday', WP_ULIKE_PRO_DOMAIN ),
+			'Sunday'    => __( 'Sunday' ),
+			'Monday'    => __( 'Monday' ),
+			'Tuesday'   => __( 'Tuesday' ),
+			'Wednesday' => __( 'Wednesday' ),
+			'Thursday'  => __( 'Thursday' ),
+			'Friday'    => __( 'Friday' ),
+			'Saturday'  => __( 'Saturday' ),
 		);
 	}
 
@@ -521,7 +521,7 @@ class WP_Ulike_Pro_Schema_Generator_Tool {
 
 			$posts[] = array(
 				'id'          => $id,
-				'title'       => $post->post_title ? $post->post_title : sprintf( esc_html__( '(no title) #%d', WP_ULIKE_PRO_DOMAIN ), $id ),
+				'title'       => $post->post_title ? $post->post_title : sprintf( __( '(no title) #%d', 'wp-ulike-pro' ), $id ),
 				'type'        => $post->post_type,
 				'edit_link'   => current_user_can( 'edit_post', $id ) ? get_edit_post_link( $id, 'raw' ) : '',
 				'has_schema'  => $status['has_data'],

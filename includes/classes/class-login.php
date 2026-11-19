@@ -54,7 +54,7 @@ final class WP_Ulike_Pro_Login extends wp_ulike_ajax_listener_base {
                 // Don't reveal whether username/email exists
                 $error_code = $user->get_error_code();
                 if ( in_array( $error_code, array( 'invalid_username', 'invalid_email', 'incorrect_password' ), true ) ) {
-                    throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'login_failed', esc_html__( 'Invalid username or incorrect password!', WP_ULIKE_PRO_DOMAIN ) ) );
+                    throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'login_failed', __( 'Invalid username or incorrect password!', 'wp-ulike-pro' ) ) );
                 } else {
                     // For other errors, show the actual message (e.g., account locked, etc.)
                     throw new \Exception( wp_ulike_pro_clean_tags( $user->get_error_message() ) );
@@ -79,7 +79,7 @@ final class WP_Ulike_Pro_Login extends wp_ulike_ajax_listener_base {
 			wp_ulike_pro_clear_rate_limit( 'login' );
 
 			$this->response( array(
-                'message'  => WP_Ulike_Pro_Options::getNoticeMessage( 'login_success', esc_html__( 'Login successful', WP_ULIKE_PRO_DOMAIN ) ),
+                'message'  => WP_Ulike_Pro_Options::getNoticeMessage( 'login_success', __( 'Login successful', 'wp-ulike-pro' ) ),
                 'status'   => 'success',
                 'redirect' => esc_url( $this->data['_redirect_to'] )
             ) );
@@ -116,22 +116,22 @@ final class WP_Ulike_Pro_Login extends wp_ulike_ajax_listener_base {
 	private function validates(){
 		// Return false in preview mode
 		if( WP_Ulike_Pro::is_preview_mode() ){
-			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ) );
 		}
 
 		// Return false when fields are empty
 		if( empty( $this->data['username'] ) || empty( $this->data['password'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', __( 'Please enter required fields', 'wp-ulike-pro' ) ) );
         }
 
 		// Return false when nonce invalid
 		if( ! wp_verify_nonce( $this->data['security'], 'wp-ulike-pro-forms-nonce') && ! wp_ulike_is_cache_exist() ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
         }
 
 		// Check rate limiting AFTER basic validation passes (5 attempts per 15 minutes)
 		// This ensures we only count actual login attempts, not validation errors
-		wp_ulike_pro_check_rate_limit( 'login', 5, 15 * MINUTE_IN_SECONDS, esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ) );
+		wp_ulike_pro_check_rate_limit( 'login', 5, 15 * MINUTE_IN_SECONDS, __( 'Too many attempts. Please try again in %d minute(s).', 'wp-ulike-pro' ) );
 
 	}
 }

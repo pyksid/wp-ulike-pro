@@ -46,7 +46,7 @@ function  wp_ulike_pro_profile_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'profile', $args['user_id'] );
 }
-add_shortcode( 'wp_ulike_pro_completeness_profile', 'wp_ulike_pro_profile_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'profiles', 'wp_ulike_pro_completeness_profile', 'wp_ulike_pro_profile_shortcode' );
 
 
 /**
@@ -248,7 +248,7 @@ function  wp_ulike_pro_user_info_shortcode( $atts ){
 
     return empty( $result ) && !is_numeric( $result ) ? wp_kses_post( $empty_text ) :  wp_kses_post( sprintf( '%s %s %s', $before_text, $result, $after_text ) );
 }
-add_shortcode( 'wp_ulike_pro_user_info', 'wp_ulike_pro_user_info_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'profiles', 'wp_ulike_pro_user_info', 'wp_ulike_pro_user_info_shortcode' );
 
 
 /**
@@ -274,7 +274,7 @@ function  wp_ulike_pro_items_shortcode( $atts ){
         "style"          => 'default',
         "has_pagination" => false,
         "limit"          => 10,
-        "empty_text"     => esc_html__( 'No Results Found!', WP_ULIKE_PRO_DOMAIN ),
+        "empty_text"     => __( 'No results found.' ),
         "desktop_column" => 1,
         "tablet_column"  => 1,
         "mobile_column"  => 1,
@@ -297,7 +297,7 @@ function  wp_ulike_pro_items_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'content', $args['user_id'] );
 }
-add_shortcode( 'wp_ulike_pro_items', 'wp_ulike_pro_items_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'profiles', 'wp_ulike_pro_items', 'wp_ulike_pro_items_shortcode' );
 
 /**
  * Create shortcode: [wp_ulike_pro_login_form]
@@ -321,14 +321,14 @@ function  wp_ulike_pro_login_form_shortcode( $atts ){
     // Default Args
     $args = shortcode_atts( array(
         "form_id"        => 1,
-        "username"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'username', esc_html__( 'Username', WP_ULIKE_PRO_DOMAIN ) ),
-        "password"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'password',esc_html__( 'Password', WP_ULIKE_PRO_DOMAIN ) ),
-        "remember"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'remember',esc_html__( 'Remember Me', WP_ULIKE_PRO_DOMAIN )),
-        "button"         => WP_Ulike_Pro_Options::getFormLabel( 'login', 'button',esc_html__( 'Log in', WP_ULIKE_PRO_DOMAIN ) ),
-        "reset_password" => WP_Ulike_Pro_Options::getFormLabel( 'login', 'reset_password',esc_html__( 'Forgot Password?', WP_ULIKE_PRO_DOMAIN ) ),
+        "username"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'username', __( 'Username' ) ),
+        "password"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'password',__( 'Password' ) ),
+        "remember"       => WP_Ulike_Pro_Options::getFormLabel( 'login', 'remember',__( 'Remember Me' )),
+        "button"         => WP_Ulike_Pro_Options::getFormLabel( 'login', 'button',__( 'Log in' ) ),
+        "reset_password" => WP_Ulike_Pro_Options::getFormLabel( 'login', 'reset_password',__( 'Lost your password?' ) ),
         "reset_url"      => WP_Ulike_Pro_Options::getResetPasswordPageUrl(),
-        "signup_message" => WP_Ulike_Pro_Options::getFormLabel( 'login', 'signup_message',esc_html__( 'Don\'t have an account?', WP_ULIKE_PRO_DOMAIN ) ),
-        "signup_text"    => WP_Ulike_Pro_Options::getFormLabel( 'login', 'signup_text',esc_html__( 'Create Account', WP_ULIKE_PRO_DOMAIN ) ),
+        "signup_message" => WP_Ulike_Pro_Options::getFormLabel( 'login', 'signup_message',__( 'Don\'t have an account?', 'wp-ulike-pro' ) ),
+        "signup_text"    => WP_Ulike_Pro_Options::getFormLabel( 'login', 'signup_text',__( 'Register' ) ),
         "redirect_to"    => '',
         "ajax_toggle"    => false
     ), $atts );
@@ -347,7 +347,7 @@ function  wp_ulike_pro_login_form_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'form/login' );
 }
-add_shortcode( 'wp_ulike_pro_login_form', 'wp_ulike_pro_login_form_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'login_signup', 'wp_ulike_pro_login_form', 'wp_ulike_pro_login_form_shortcode' );
 
 
 /**
@@ -364,14 +364,14 @@ function  wp_ulike_pro_signup_form_shortcode( $atts ){
     // Default Args
     $args = shortcode_atts( array(
         "form_id"       => 1,
-        "username"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'username', esc_html__( 'Username', WP_ULIKE_PRO_DOMAIN ) ),
-        "firstname"     => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'firstname', esc_html__( 'First Name', WP_ULIKE_PRO_DOMAIN ) ),
-        "lastname"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'lastname', esc_html__( 'Last Name', WP_ULIKE_PRO_DOMAIN ) ),
-        "email"         => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'email', esc_html__( 'Email Address', WP_ULIKE_PRO_DOMAIN ) ),
-        "password"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'password', esc_html__( 'Password', WP_ULIKE_PRO_DOMAIN ) ),
-        "button"        => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'button', esc_html__( 'Register', WP_ULIKE_PRO_DOMAIN ) ),
-        "login_message" => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'login_message', esc_html__( 'Already have an account?', WP_ULIKE_PRO_DOMAIN ) ),
-        "login_text"    => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'login_text', esc_html__( 'Sign In', WP_ULIKE_PRO_DOMAIN ) ),
+        "username"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'username', __( 'Username' ) ),
+        "firstname"     => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'firstname', __( 'First Name' ) ),
+        "lastname"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'lastname', __( 'Last Name' ) ),
+        "email"         => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'email', __( 'Email Address', 'wp-ulike-pro' ) ),
+        "password"      => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'password', __( 'Password' ) ),
+        "button"        => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'button', __( 'Register' ) ),
+        "login_message" => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'login_message', __( 'Already have an account?', 'wp-ulike-pro' ) ),
+        "login_text"    => WP_Ulike_Pro_Options::getFormLabel( 'signup', 'login_text', __( 'Log In' ) ),
         "redirect_to"   => '',
         "ajax_toggle"   => false
     ), $atts );
@@ -390,7 +390,7 @@ function  wp_ulike_pro_signup_form_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'form/signup' );
 }
-add_shortcode( 'wp_ulike_pro_signup_form', 'wp_ulike_pro_signup_form_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'login_signup', 'wp_ulike_pro_signup_form', 'wp_ulike_pro_signup_form_shortcode' );
 
 /**
  * Create shortcode: [wp_ulike_pro_reset_password_form]
@@ -406,14 +406,14 @@ function  wp_ulike_pro_reset_password_form_shortcode( $atts ){
     // Default Args
     $args = shortcode_atts( array(
         "form_id"        => 1,
-        "reset_message"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'reset_message', esc_html__( 'To reset your password, please enter your email address or username below', WP_ULIKE_PRO_DOMAIN ) ),
-        "change_message" => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'change_message', esc_html__( 'Enter your new password below.', WP_ULIKE_PRO_DOMAIN ) ),
-        "username"       => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'username', esc_html__( 'Username or Email', WP_ULIKE_PRO_DOMAIN ) ),
-        "new_pass"       => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'new_pass', esc_html__( 'New Password', WP_ULIKE_PRO_DOMAIN ) ),
-        "re_new_pass"    => WP_Ulike_Pro_Options::getFormLabel( 'rp', 're_new_pass', esc_html__( 'Re-enter New Password', WP_ULIKE_PRO_DOMAIN ) ),
-        "reset_button"   => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'reset_button', esc_html__( 'Get New Password', WP_ULIKE_PRO_DOMAIN ) ),
-        "change_button"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'change_button', esc_html__( 'Reset password', WP_ULIKE_PRO_DOMAIN ) ),
-        "login_message"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'login_message', esc_html__( 'Go to login page', WP_ULIKE_PRO_DOMAIN ) ),
+        "reset_message"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'reset_message', __( 'To reset your password, please enter your email address or username below', 'wp-ulike-pro' ) ),
+        "change_message" => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'change_message', __( 'Enter your new password below.', 'wp-ulike-pro' ) ),
+        "username"       => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'username', __( 'Username or Email Address' ) ),
+        "new_pass"       => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'new_pass', __( 'New Password' ) ),
+        "re_new_pass"    => WP_Ulike_Pro_Options::getFormLabel( 'rp', 're_new_pass', __( 'Confirm new password' ) ),
+        "reset_button"   => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'reset_button', __( 'Get New Password' ) ),
+        "change_button"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'change_button', __( 'Reset Password' ) ),
+        "login_message"  => WP_Ulike_Pro_Options::getFormLabel( 'rp', 'login_message', __( 'Go to login page', 'wp-ulike-pro' ) ),
         "ajax_toggle"    => false
     ), $atts );
 
@@ -426,7 +426,7 @@ function  wp_ulike_pro_reset_password_form_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'form/reset-password' );
 }
-add_shortcode( 'wp_ulike_pro_reset_password_form', 'wp_ulike_pro_reset_password_form_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'login_signup', 'wp_ulike_pro_reset_password_form', 'wp_ulike_pro_reset_password_form_shortcode' );
 
 /**
  * Create shortcode: [wp_ulike_pro_account_form]
@@ -442,14 +442,14 @@ function  wp_ulike_pro_account_form_shortcode( $atts ){
     // Default Args
     $args = shortcode_atts( array(
         "form_id"            => 1,
-        "firstname"          => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'firstname', esc_html__( 'First Name', WP_ULIKE_PRO_DOMAIN ) ),
-        "lastname"           => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'lastname', esc_html__( 'Last Name', WP_ULIKE_PRO_DOMAIN ) ),
-        "website"            => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'website', esc_html__( 'Website', WP_ULIKE_PRO_DOMAIN ) ),
-        "description"        => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'description', esc_html__( 'Biographical Info', WP_ULIKE_PRO_DOMAIN ) ),
-        "email"              => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'email', esc_html__( 'Email Address', WP_ULIKE_PRO_DOMAIN ) ),
-        "avatar"             => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'avatar', esc_html__( 'Upload Avatar', WP_ULIKE_PRO_DOMAIN ) ),
-        "button"             => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'button', esc_html__( 'Submit', WP_ULIKE_PRO_DOMAIN ) ),
-        "permission_message" => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'permission_message', esc_html__( 'You don\'t have access to edit the information on this page!', WP_ULIKE_PRO_DOMAIN ))
+        "firstname"          => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'firstname', __( 'First Name' ) ),
+        "lastname"           => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'lastname', __( 'Last Name' ) ),
+        "website"            => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'website', __( 'Website' ) ),
+        "description"        => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'description', __( 'Biographical Info' ) ),
+        "email"              => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'email', __( 'Email Address', 'wp-ulike-pro' ) ),
+        "avatar"             => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'avatar', __( 'Upload' ) ),
+        "button"             => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'button', __( 'Submit' ) ),
+        "permission_message" => WP_Ulike_Pro_Options::getFormLabel( 'ea', 'permission_message', __( 'You don\'t have access to edit the information on this page!', 'wp-ulike-pro' ))
     ), $atts );
 
     // Hash form id parameter for secutiry reasons
@@ -481,7 +481,7 @@ function  wp_ulike_pro_account_form_shortcode( $atts ){
     // Load template
     return wp_ulike_pro_get_public_template( 'form/profile' );
 }
-add_shortcode( 'wp_ulike_pro_account_form', 'wp_ulike_pro_account_form_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'login_signup', 'wp_ulike_pro_account_form', 'wp_ulike_pro_account_form_shortcode' );
 
 
 /**
@@ -543,7 +543,7 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
 
     // If still no buttons, return error
     if ( empty( $buttons ) ) {
-        return esc_html__( 'Social network are empty! Please provide buttons parameter or configure in settings.', WP_ULIKE_PRO_DOMAIN );
+        return esc_html__( 'Social network are empty! Please provide buttons parameter or configure in settings.', 'wp-ulike-pro' );
     }
 
     // Determine display options (use params first, then options, then defaults)
@@ -609,7 +609,7 @@ function  wp_ulike_pro_social_share_shortcode( $atts ){
 
     return ob_get_clean();
 }
-add_shortcode( 'wp_ulike_pro_social_share', 'wp_ulike_pro_social_share_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'share_buttons', 'wp_ulike_pro_social_share', 'wp_ulike_pro_social_share_shortcode' );
 
 /**
  * Create shortcode: [wp_ulike_pro_two_factor_setup]
@@ -624,24 +624,24 @@ function  wp_ulike_pro_two_factor_shortcode( $atts ){
 
     // check two factor is enabled
     if( ! WP_Ulike_Pro_Options::is2FactorAuthEnabled() ){
-        return wpautop( esc_html__( '2-factor support is not enabled!', WP_ULIKE_PRO_DOMAIN ) );
+        return wpautop( esc_html__( '2-factor support is not enabled!', 'wp-ulike-pro' ) );
     }
 
     $description = sprintf( 'Download the free %s app, add a new account, then scan this barcode to set up your account.',
-    sprintf( '<a target="_blank" href="https://support.google.com/accounts/answer/1066447?hl=en">%s</a>', esc_html__( 'Google Authenticator', WP_ULIKE_PRO_DOMAIN ) ) );
+    sprintf( '<a target="_blank" href="https://support.google.com/accounts/answer/1066447?hl=en">%s</a>', esc_html__( 'Google Authenticator', 'wp-ulike-pro' ) ) );
 
     // Default Args
     $args = shortcode_atts( array(
-        "title"              => esc_html__( 'Setup 2-factor Authentication', WP_ULIKE_PRO_DOMAIN ),
+        "title"              => __( 'Setup 2-factor Authentication', 'wp-ulike-pro' ),
         "description"        => $description,
-        "accounts_title"     => esc_html__( 'Usable authentication accounts', WP_ULIKE_PRO_DOMAIN ),
-        "app_name"           => esc_html__( 'Authenticator app', WP_ULIKE_PRO_DOMAIN ),
-        "ago_text"           => esc_html__( 'ago', WP_ULIKE_PRO_DOMAIN ),
-        "button"             => esc_html__( 'Submit', WP_ULIKE_PRO_DOMAIN ),
+        "accounts_title"     => __( 'Usable authentication accounts', 'wp-ulike-pro' ),
+        "app_name"           => __( 'Authenticator app', 'wp-ulike-pro' ),
+        "ago_text"           => __( 'ago', 'wp-ulike-pro' ),
+        "button"             => __( 'Submit' ),
         "limit_accounts"     => 5,
         "qrcode_size"        => 256,
-        "limit_message"      => esc_html__( 'You have reached the limit for requesting authentication acccounts for this user. If you want to update your authentication account, try to remove some of the following apps.', WP_ULIKE_PRO_DOMAIN ),
-        "permission_message" => esc_html__( 'You don\'t have access to edit the information on this page!', WP_ULIKE_PRO_DOMAIN )
+        "limit_message"      => __( 'You have reached the limit for requesting authentication acccounts for this user. If you want to update your authentication account, try to remove some of the following apps.', 'wp-ulike-pro' ),
+        "permission_message" => __( 'You don\'t have access to edit the information on this page!', 'wp-ulike-pro' )
     ), $atts );
 
     if( ! is_user_logged_in() ){
@@ -733,7 +733,7 @@ function  wp_ulike_pro_two_factor_shortcode( $atts ){
 <?php
     return ob_get_clean();
 }
-add_shortcode( 'wp_ulike_pro_two_factor_setup', 'wp_ulike_pro_two_factor_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'login_signup', 'wp_ulike_pro_two_factor_setup', 'wp_ulike_pro_two_factor_shortcode' );
 
 
 /**
@@ -756,10 +756,13 @@ function  wp_ulike_pro_social_login_shortcode( $atts ){
 
     return wp_ulike_pro_get_social_logins( $args );
 }
-add_shortcode( 'wp_ulike_pro_social_login', 'wp_ulike_pro_social_login_shortcode' );
+wp_ulike_pro_add_feature_shortcode( 'social_logins', 'wp_ulike_pro_social_login', 'wp_ulike_pro_social_login_shortcode' );
 
 /**
  * Shortcode: [wp_ulike_pro_engagements]
+ *
+ * Intentionally not a feature-switch shortcode. Engagements are core Pro
+ * voting (emoji / stars), not a module in the registry.
  *
  * @param array $atts Shortcode attributes.
  * @return string

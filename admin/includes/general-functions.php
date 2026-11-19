@@ -58,13 +58,13 @@ function wp_ulike_pro_get_bulk_engagement_config() {
 			'label'         => ucfirst( $item_type ),
 			'modes'         => array(
 				'vote'  => array(
-					'label' => __( 'Votes', WP_ULIKE_PRO_DOMAIN ),
+					'label' => __( 'Votes', 'wp-ulike-pro' ),
 				),
 				'emoji' => array(
-					'label' => __( 'Emoji', WP_ULIKE_PRO_DOMAIN ),
+					'label' => __( 'Emoji', 'wp-ulike-pro' ),
 				),
 				'star'  => array(
-					'label' => __( 'Stars', WP_ULIKE_PRO_DOMAIN ),
+					'label' => __( 'Stars', 'wp-ulike-pro' ),
 				),
 			),
 		);
@@ -418,7 +418,7 @@ function wp_ulike_pro_validate_bulk_item( $item_id, $item_type ) {
 			'invalid_type',
 			sprintf(
 				/* translators: %d: item ID */
-				esc_html__( 'Invalid type for item ID %d.', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( 'Invalid type for item ID %d.', 'wp-ulike-pro' ),
 				$item_id
 			)
 		);
@@ -444,7 +444,7 @@ function wp_ulike_pro_validate_bulk_item( $item_id, $item_type ) {
 				'missing_item',
 				sprintf(
 					/* translators: 1: item ID, 2: content type */
-					esc_html__( 'Item ID %1$d (type: %2$s) does not exist.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Item ID %1$d (type: %2$s) does not exist.', 'wp-ulike-pro' ),
 					$item_id,
 					$item_type
 				)
@@ -470,7 +470,7 @@ function wp_ulike_pro_validate_bulk_item( $item_id, $item_type ) {
 				'missing_item',
 				sprintf(
 					/* translators: 1: item ID, 2: content type */
-					esc_html__( 'Item ID %1$d (type: %2$s) does not exist.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Item ID %1$d (type: %2$s) does not exist.', 'wp-ulike-pro' ),
 					$item_id,
 					$item_type
 				)
@@ -497,7 +497,7 @@ function wp_ulike_pro_bulk_update_likes( $posts_data ) {
 	if ( ! is_array( $posts_data ) || empty( $posts_data ) ) {
 		return array(
 			'success' => false,
-			'message' => esc_html__( 'Invalid posts data provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => esc_html__( 'Invalid posts data provided.', 'wp-ulike-pro' ),
 		);
 	}
 
@@ -525,7 +525,7 @@ function wp_ulike_pro_bulk_update_likes( $posts_data ) {
 			if ( empty( $post_data['reactions'] ) || ! is_array( $post_data['reactions'] ) || ! class_exists( 'WP_Ulike_Pro_Engagement_Counter' ) ) {
 				$errors[] = sprintf(
 					/* translators: %d: item ID */
-					esc_html__( 'Missing reaction counts for item ID %d.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Missing reaction counts for item ID %d.', 'wp-ulike-pro' ),
 					$item_id
 				);
 				continue;
@@ -587,12 +587,12 @@ function wp_ulike_pro_bulk_update_likes( $posts_data ) {
 
 	$message = sprintf(
 		/* translators: %d: number of updated items */
-		esc_html__( 'Successfully updated %d item(s).', WP_ULIKE_PRO_DOMAIN ),
+		esc_html__( 'Successfully updated %d item(s).', 'wp-ulike-pro' ),
 		$processed
 	);
 
 	if ( ! empty( $errors ) ) {
-		$message .= ' ' . esc_html__( 'Errors:', WP_ULIKE_PRO_DOMAIN ) . ' ' . implode( ', ', $errors );
+		$message .= ' ' . esc_html__( 'Errors:', 'wp-ulike-pro' ) . ' ' . implode( ', ', $errors );
 	}
 
 	return array(
@@ -624,7 +624,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	if ( function_exists( 'wp_ulike_writes_pulse' ) && wp_ulike_writes_pulse() ) {
 		return array(
 			'success' => false,
-			'message' => esc_html__( 'Bulk add likes cannot adjust counters only while Pulse storage is active. That would desync logs and statistics. Insert real votes or use legacy mode.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => esc_html__( 'Bulk add likes cannot adjust counters only while Pulse storage is active. That would desync logs and statistics. Insert real votes or use legacy mode.', 'wp-ulike-pro' ),
 		);
 	}
 
@@ -632,7 +632,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	if ( ! is_array( $post_ids ) || empty( $post_ids ) ) {
 		return array(
 			'success' => false,
-			'message' => esc_html__( 'Invalid post IDs provided.', WP_ULIKE_PRO_DOMAIN )
+			'message' => esc_html__( 'Invalid post IDs provided.', 'wp-ulike-pro' )
 		);
 	}
 
@@ -644,7 +644,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	if ( empty( $post_ids ) ) {
 		return array(
 			'success' => false,
-			'message' => esc_html__( 'No valid post IDs provided.', WP_ULIKE_PRO_DOMAIN )
+			'message' => esc_html__( 'No valid post IDs provided.', 'wp-ulike-pro' )
 		);
 	}
 
@@ -654,7 +654,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	if ( $likes === 0 && $dislikes === 0 ) {
 		return array(
 			'success' => false,
-			'message' => esc_html__( 'Please enter at least one like or dislike count.', WP_ULIKE_PRO_DOMAIN )
+			'message' => esc_html__( 'Please enter at least one like or dislike count.', 'wp-ulike-pro' )
 		);
 	}
 
@@ -672,7 +672,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	foreach ( $post_ids as $post_id ) {
 		// Verify post exists
 		if ( ! get_post( $post_id ) ) {
-			$errors[] = sprintf( esc_html__( 'Post ID %d does not exist.', WP_ULIKE_PRO_DOMAIN ), $post_id );
+			$errors[] = sprintf( esc_html__( 'Post ID %d does not exist.', 'wp-ulike-pro' ), $post_id );
 			continue;
 		}
 
@@ -711,14 +711,14 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
 	}
 
 	$message = sprintf(
-		esc_html__( 'Successfully added %d likes and %d dislikes to %d post(s).', WP_ULIKE_PRO_DOMAIN ),
+		esc_html__( 'Successfully added %d likes and %d dislikes to %d post(s).', 'wp-ulike-pro' ),
 		$likes,
 		$dislikes,
 		$processed
 	);
 
 	if ( ! empty( $errors ) ) {
-		$message .= ' ' . esc_html__( 'Errors:', WP_ULIKE_PRO_DOMAIN ) . ' ' . implode( ', ', $errors );
+		$message .= ' ' . esc_html__( 'Errors:', 'wp-ulike-pro' ) . ' ' . implode( ', ', $errors );
 	}
 
 	return array(
@@ -737,7 +737,7 @@ function wp_ulike_pro_bulk_add_likes( $post_ids, $likes, $dislikes ) {
  */
 function wp_ulike_pro_get_daterange_of_tops( $type ){
 	$period = wp_ulike_get_transient( 'wp_ulike_pro_daterange_of_top_' . $type );
-	return is_array( $period ) ? implode( ' - ', $period ) : esc_html__( 'All Times', WP_ULIKE_PRO_DOMAIN );
+	return is_array( $period ) ? implode( ' - ', $period ) : esc_html__( 'All Times', 'wp-ulike-pro' );
 }
 
 /**
@@ -848,7 +848,7 @@ function wp_ulike_pro_admin_avatar_box_callback(){
             <div class="ulf--wrap">%s</div>
             <div class="clear"></div>
         </div>',
-        esc_html__('Upload Avatar', WP_ULIKE_PRO_DOMAIN),
+        esc_html__( 'Upload' ),
         WP_Ulike_Pro_Avatar::get_avatar_uploader()
     );
 }

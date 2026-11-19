@@ -18,7 +18,7 @@ $default_section      = ! empty( $section_keys ) ? $section_keys[0] : '';
 
 <div class="wp-ulike-pro-maintenance" data-default-section="<?php echo esc_attr( $default_section ); ?>">
 	<p class="wp-ulike-pro-maintenance__lead">
-		<?php esc_html_e( 'Choose what you want to work on, then run one action at a time. Your posts and comments stay untouched unless you choose a removal tool.', WP_ULIKE_PRO_DOMAIN ); ?>
+		<?php esc_html_e( 'Choose what you want to work on, then run one action at a time. Your posts and comments stay untouched unless you choose a removal tool.', 'wp-ulike-pro' ); ?>
 	</p>
 
 	<?php foreach ( $maintenance_notices as $notice ) : ?>
@@ -27,7 +27,7 @@ $default_section      = ! empty( $section_keys ) ? $section_keys[0] : '';
 		</div>
 	<?php endforeach; ?>
 
-	<div class="wp-ulike-tools-tabs wp-ulike-pro-maintenance-switcher" role="tablist" aria-label="<?php esc_attr_e( 'Maintenance categories', WP_ULIKE_PRO_DOMAIN ); ?>">
+	<div class="wp-ulike-tools-tabs wp-ulike-pro-maintenance-switcher" role="tablist" aria-label="<?php echo esc_attr( 'Maintenance categories' ); ?>">
 		<div class="wp-ulike-tools-tabs__scroll">
 			<?php foreach ( $maintenance_sections as $section_key => $section ) : ?>
 				<?php
@@ -130,7 +130,7 @@ $default_section      = ! empty( $section_keys ) ? $section_keys[0] : '';
 														</label>
 													<?php endforeach; ?>
 													<p class="wp-ulike-pro-purge-filters__count" data-purge-count aria-live="polite">
-														<?php esc_html_e( 'Change filters or run purge to count matching rows.', WP_ULIKE_PRO_DOMAIN ); ?>
+														<?php esc_html_e( 'Change filters or run purge to count matching rows.', 'wp-ulike-pro' ); ?>
 													</p>
 												</div>
 											<?php endif; ?>

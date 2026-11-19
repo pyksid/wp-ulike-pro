@@ -89,7 +89,7 @@ class WP_Ulike_Pro_Admin_Assets {
                 'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
                 'worldSvg'      => WP_ULIKE_PRO_ADMIN_URL . '/includes/statistics/world.svg',
                 'logo'          => WP_ULIKE_ASSETS_URL . '/img/icon.svg',
-                'title'         => esc_html__( 'Metrics Dashboard', 'wp-ulike-pro' ),
+                'title'         => __( 'Metrics Dashboard', 'wp-ulike-pro' ),
                 'buildType'     => 'pro',
                 'loaderSvg'     => $this->get_loader_svg(),
                 'siteUrl'       => wp_ulike_pro_get_license_site_url(),
@@ -100,6 +100,10 @@ class WP_Ulike_Pro_Admin_Assets {
                     : array(),
                 'migrationNotice' => $this->get_migration_notice_config(),
             ) );
+
+            if ( class_exists( 'WP_Ulike_Stats_User_Prefs' ) ) {
+                WP_Ulike_Stats_User_Prefs::enqueue_theme_boot_script( 'wp_ulike_pro_admin_react' );
+            }
         }
 
         // Enqueue third-party styles
@@ -136,9 +140,9 @@ class WP_Ulike_Pro_Admin_Assets {
         ) {
             return array(
                 'id'       => 'pro_pulse_cleanup',
-                'title'    => esc_html__( 'Free up disk space.', WP_ULIKE_PRO_DOMAIN ),
-                'message'  => esc_html__( 'Like records already use the faster storage. Remove the old log tables when you are ready to reclaim disk space.', WP_ULIKE_PRO_DOMAIN ),
-                'ctaLabel' => esc_html__( 'Review cleanup', WP_ULIKE_PRO_DOMAIN ),
+                'title'    => __( 'Free up disk space.', 'wp-ulike-pro' ),
+                'message'  => __( 'Like records already use the faster storage. Remove the old log tables when you are ready to reclaim disk space.', 'wp-ulike-pro' ),
+                'ctaLabel' => __( 'Review cleanup', 'wp-ulike-pro' ),
                 'ctaUrl'   => esc_url( $url ),
             );
         }
@@ -149,9 +153,9 @@ class WP_Ulike_Pro_Admin_Assets {
 
         return array(
             'id'       => 'pro_pulse_migration',
-            'title'    => esc_html__( 'Faster statistics with Pulse storage.', WP_ULIKE_PRO_DOMAIN ),
-            'message'  => esc_html__( 'Your statistics are already complete — WP ULike reads both legacy and Pulse data automatically. Migrating fully to Pulse storage makes charts faster and lets you clean up the old tables.', WP_ULIKE_PRO_DOMAIN ),
-            'ctaLabel' => esc_html__( 'Upgrade like storage', WP_ULIKE_PRO_DOMAIN ),
+            'title'    => __( 'Faster statistics with Pulse storage.', 'wp-ulike-pro' ),
+            'message'  => __( 'Your statistics are already complete — WP ULike reads both legacy and Pulse data automatically. Migrating fully to Pulse storage makes charts faster and lets you clean up the old tables.', 'wp-ulike-pro' ),
+            'ctaLabel' => __( 'Upgrade like storage', 'wp-ulike-pro' ),
             'ctaUrl'   => esc_url( $url ),
         );
     }

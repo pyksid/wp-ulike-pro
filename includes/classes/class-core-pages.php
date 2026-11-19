@@ -13,27 +13,27 @@ class WP_Ulike_Pro_Core_Pages {
 
 		self::$core_pages = array(
 			'user-profile' => array(
-				'title'       => esc_html__( 'User Profile', WP_ULIKE_PRO_DOMAIN ),
+				'title'       => __( 'User Profile', 'wp-ulike-pro' ),
 				'content'     => '[wp_ulike_pro_completeness_profile]',
 				'option_name' => 'user_profiles_core_page'
 			),
 			'login' => array(
-				'title'       => esc_html__( 'Login', WP_ULIKE_PRO_DOMAIN ),
+				'title'       => __( 'Log In' ),
 				'content'     => '[wp_ulike_pro_login_form]',
 				'option_name' => 'login_core_page'
 			),
 			'signup' => array(
-				'title'       => esc_html__( 'Sign Up', WP_ULIKE_PRO_DOMAIN ),
+				'title'       => __( 'Sign up' ),
 				'content'     => '[wp_ulike_pro_signup_form]',
 				'option_name' => 'signup_core_page'
 			),
 			'password-reset' => array(
-				'title'       => esc_html__( 'Password Reset', WP_ULIKE_PRO_DOMAIN ),
+				'title'       => __( 'Password Reset' ),
 				'content'     => '[wp_ulike_pro_reset_password_form]',
 				'option_name' => 'reset_password_core_page'
 			),
 			'edit-account' => array(
-				'title'       => esc_html__( 'Edit Account', WP_ULIKE_PRO_DOMAIN ),
+				'title'       => __( 'Edit Account', 'wp-ulike-pro' ),
 				'content'     => '[wp_ulike_pro_account_form]',
 				'option_name' => 'edit_account_core_page'
 			)

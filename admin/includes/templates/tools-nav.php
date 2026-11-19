@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<nav class="wp-ulike-tools-tabs" aria-label="<?php esc_attr_e( 'Tools sections', WP_ULIKE_PRO_DOMAIN ); ?>">
+<nav class="wp-ulike-tools-tabs" aria-label="<?php echo esc_attr( 'Tools sections' ); ?>">
 	<div class="wp-ulike-tools-tabs__scroll" tabindex="-1">
 		<?php foreach ( $data['tabs'] as $tab_key => $tab ) : ?>
 			<?php

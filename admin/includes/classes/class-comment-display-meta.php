@@ -56,7 +56,7 @@ class WP_Ulike_Pro_Comment_Display_Meta {
 
 		add_meta_box(
 			'wp_ulike_pro_comment_display_meta',
-			esc_html__( 'WP ULike', WP_ULIKE_PRO_DOMAIN ),
+			esc_html__( 'WP ULike', 'wp-ulike-pro' ),
 			array( $this, 'render' ),
 			'comment',
 			'normal',
@@ -95,19 +95,19 @@ class WP_Ulike_Pro_Comment_Display_Meta {
 			<table class="form-table" role="presentation">
 				<tbody>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Display', WP_ULIKE_PRO_DOMAIN ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Display' ); ?></th>
 						<td>
 							<label class="wp-ulike-pro-editor-meta__toggle">
 								<input type="checkbox" name="wp_ulike_pro_comment_display[auto_display]" value="1" <?php checked( $show_panel ); ?>>
-								<span><?php esc_html_e( 'Show like button on this comment', WP_ULIKE_PRO_DOMAIN ); ?></span>
+								<span><?php esc_html_e( 'Show like button on this comment', 'wp-ulike-pro' ); ?></span>
 							</label>
 						</td>
 					</tr>
 					<tr class="wp-ulike-pro-comment-display-conditional" <?php echo $show_panel ? '' : 'style="display:none;"'; ?>>
-						<th scope="row"><label for="wp_ulike_pro_comment_template"><?php esc_html_e( 'Template', WP_ULIKE_PRO_DOMAIN ); ?></label></th>
+						<th scope="row"><label for="wp_ulike_pro_comment_template"><?php esc_html_e( 'Template' ); ?></label></th>
 						<td>
 							<select name="wp_ulike_pro_comment_display[template]" id="wp_ulike_pro_comment_template" class="regular-text">
-								<option value=""><?php esc_html_e( 'Default', WP_ULIKE_PRO_DOMAIN ); ?></option>
+								<option value=""><?php esc_html_e( 'Default' ); ?></option>
 								<?php foreach ( $templates as $key => $label ) : ?>
 									<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $template, $key ); ?>><?php echo esc_html( $label ); ?></option>
 								<?php endforeach; ?>
@@ -115,36 +115,36 @@ class WP_Ulike_Pro_Comment_Display_Meta {
 						</td>
 					</tr>
 					<tr class="wp-ulike-pro-comment-display-conditional" <?php echo $show_panel ? '' : 'style="display:none;"'; ?>>
-						<th scope="row"><?php esc_html_e( 'Position', WP_ULIKE_PRO_DOMAIN ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Position' ); ?></th>
 						<td>
 							<div class="wp-ulike-pro-editor-meta__choices">
 								<label class="wp-ulike-pro-editor-meta__choice">
 									<input type="radio" name="wp_ulike_pro_comment_display[display_position]" value="top" <?php checked( $position, 'top' ); ?>>
-									<span><?php esc_html_e( 'Top', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span><?php esc_html_e( 'Top' ); ?></span>
 								</label>
 								<label class="wp-ulike-pro-editor-meta__choice">
 									<input type="radio" name="wp_ulike_pro_comment_display[display_position]" value="bottom" <?php checked( $position ? $position : 'bottom', 'bottom' ); ?>>
-									<span><?php esc_html_e( 'Bottom', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span><?php esc_html_e( 'Bottom' ); ?></span>
 								</label>
 								<label class="wp-ulike-pro-editor-meta__choice">
 									<input type="radio" name="wp_ulike_pro_comment_display[display_position]" value="top_bottom" <?php checked( $position, 'top_bottom' ); ?>>
-									<span><?php esc_html_e( 'Top and bottom', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span><?php esc_html_e( 'Top and bottom', 'wp-ulike-pro' ); ?></span>
 								</label>
 							</div>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="wp_ulike_pro_comment_likes_qty"><?php esc_html_e( 'Starting like count', WP_ULIKE_PRO_DOMAIN ); ?></label></th>
+						<th scope="row"><label for="wp_ulike_pro_comment_likes_qty"><?php esc_html_e( 'Starting like count', 'wp-ulike-pro' ); ?></label></th>
 						<td>
 							<input type="number" class="small-text" min="0" step="1" name="wp_ulike_pro_comment_display[likes_counter_quantity]" id="wp_ulike_pro_comment_likes_qty" value="<?php echo esc_attr( $likes_qty_display ); ?>" placeholder="0">
-							<p class="description"><?php esc_html_e( 'Extra likes added to the real count shown on this comment. Leave at 0 for no boost. Does not create votes in the database.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description"><?php esc_html_e( 'Extra likes added to the real count shown on this comment. Leave at 0 for no boost. Does not create votes in the database.', 'wp-ulike-pro' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="wp_ulike_pro_comment_dislikes_qty"><?php esc_html_e( 'Starting dislike count', WP_ULIKE_PRO_DOMAIN ); ?></label></th>
+						<th scope="row"><label for="wp_ulike_pro_comment_dislikes_qty"><?php esc_html_e( 'Starting dislike count', 'wp-ulike-pro' ); ?></label></th>
 						<td>
 							<input type="number" class="small-text" min="0" step="1" name="wp_ulike_pro_comment_display[dislikes_counter_quantity]" id="wp_ulike_pro_comment_dislikes_qty" value="<?php echo esc_attr( $dislikes_qty_display ); ?>" placeholder="0">
-							<p class="description"><?php esc_html_e( 'Extra dislikes added to the real count shown on this comment. Leave at 0 for no boost. Does not create votes in the database.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description"><?php esc_html_e( 'Extra dislikes added to the real count shown on this comment. Leave at 0 for no boost. Does not create votes in the database.', 'wp-ulike-pro' ); ?></p>
 						</td>
 					</tr>
 				</tbody>

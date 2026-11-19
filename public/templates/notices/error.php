@@ -17,7 +17,7 @@ $multiple = count( $notices ) > 1;
 	</svg>
 	<div class="ulp-notice-banner__content">
 		<?php if ( $multiple ) { ?>
-			<p class="ulp-notice-banner__summary"><?php esc_html_e( 'The following problems were found:', WP_ULIKE_PRO_DOMAIN ); ?></p>
+			<p class="ulp-notice-banner__summary"><?php esc_html_e( 'The following problems were found:', 'wp-ulike-pro' ); ?></p>
 			<ul>
 			<?php foreach ( $notices as $notice ) : ?>
 				<li>

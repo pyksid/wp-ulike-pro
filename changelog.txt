@@ -1,3 +1,48 @@
+= 2.3.3 =
+* New: Module switches — WP ULike Pro now loads only the modules a site actually uses (profiles, login & signup, social logins, share buttons, schema, display automation). Everything stays on until you choose otherwise.
+* New: A retention setting for old device details. Device, OS, and browser recorded alongside each vote can be cleared once they pass an age you choose. Votes, counters, totals, and country are never touched.
+* Improved: Switching a module off now says what stops working first — profile links, login forms, or statistics recording — instead of leaving you to find out.
+* Improved: Likers avatars load in one go instead of one lookup per person, which is far lighter on pages showing many like buttons at once.
+* Improved: With Statistics switched off, Pro stops recording views and device details, so those extra writes disappear from every vote.
+* Improved: Overview no longer repeats what the free plugin already shows, and only reports on modules it is actually running.
+
+= 2.3.2 =
+* Improved: **Customizer** — richer styling for Emoji, Stars, Social, Forms, Modals, and Profile, plus alignment controls, Pile likers preview, and clearer section order.
+* Improved: Reaction/rating notices are now customizable and WPML-ready, with expanded translation keys for profiles, avatars, and engagements.
+* Improved: Translation / i18n cleanup across admin, frontend, and language files.
+* Fix: Image/sprite like button animations restart correctly when re-liking.
+* Fix: No view tracking or votes in Customizer, Elementor, block editor, or post preview.
+* Fix: Customizer preview alignment, RTL layouts, and a few settings/license UI polish items.
+* Improved: General security, performance, and stability hardening.
+
+= 2.3.1 =
+* Fix: Settings could not be saved on hosts using utf8/utf8mb3 database charsets when Pro reaction emoji were included in the options payload. Emoji are now stored safely (WordPress-style HTML entities) and decoded for the UI and frontend.
+* Fix: When Display Automation owns emoji/star for a content type, the global engagement template no longer bleeds onto basic auto-display placements (e.g. archives).
+* Fix: Engagement AJAX (votes/ratings and engagers) now bootstraps the correct template context and fails closed when engagements are not enabled for that request.
+* Improved: Emoji picker dismiss behavior, counter UI when counters are hidden, star rating keyboard/hover preview, customizer engagement previews, and clearer singular/plural notices.
+
+= 2.3.0 =
+* New: **Emoji Reactions & Star Rating templates**. Go beyond like/dislike — let visitors react with a set of emoji or rate with stars, chosen per rule in Display Automation. Reactions get their own engager lists, counts, and schema.org star-rating support.
+* Improved: Statistics, Top Content, Top Members, and Logs now read from WP ULike's new Pulse storage engine, with faster queries and less lag on large, high-traffic sites.
+* Requires: WP ULike (free) 5.2.1 or later — needed for the new Pulse storage engine that this release's statistics and reactions features read from.
+
+= 2.2.2 =
+* New: **Statistics dashboard**. Open **WP ULike → Statistics** for a full analytics workspace with dark mode and focus mode.
+* New: **Overview**. Engagement rate, likes and interactions, button impressions, unique voters, sentiment breakdown, and daily trend charts for the last 30 days.
+* New: **Growth tips**. Practical suggestions based on your engagement, views, categories, and store data.
+* New: **Engagement reports**. Charts, metrics, and top-content lists for posts, comments, BuddyPress activities, bbPress topics, and other supported types.
+* New: **Top members**. See your most active engagers and drill into who liked each piece of content.
+* New: **Content intelligence**. When to publish (peak hours and time windows), activity heatmap, and category performance.
+* New: **WooCommerce commerce intelligence** under **Intelligence → WooCommerce**: store snapshot KPIs, engagement vs orders trend, top products, opportunities, category correlation, and actionable tips — with date-range filters and HPOS-compatible sales data.
+* New: **Countries report**. Interactive world map, country rankings, growth trends, and filters by content type.
+* New: **Technology report**. Device, operating system, and browser breakdowns with date-range filters.
+* New: **Logs**. Search and filter vote history, delete entries, and download CSV exports.
+* New: **Button appearance options in Display Automation**. Per rule, pick a button template and control the vote counter, likers box, and likers display style. Useful when archives and product pages need different looks.
+* Improved: Faster loading when switching between Overview, reports, and logs.
+* Improved: Reports adapt to your voting mode (likes only, likes + dislikes, or logged-in members).
+* Improved: WooCommerce sales queries use analytics lookup tables with `wc_get_orders()` fallback; optimized commerce API caching and queries.
+* Fix: Stats API reliability and minor stability improvements.
+
 = 2.2.1 =
 * Performance: Lighter plugin — replaced heavy third-party packages with built-in schema and analytics helpers.
 * Improved: Schema.org output, Tools page, overview dashboard, and editor display options.

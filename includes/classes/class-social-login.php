@@ -78,7 +78,7 @@ class WP_Ulike_Pro_Social_Login {
 
 			// Return false in preview mode
 			if( WP_Ulike_Pro::is_preview_mode() ){
-				throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception( __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ) );
 			}
 
 			// SECURITY: Rate limiting
@@ -86,7 +86,7 @@ class WP_Ulike_Pro_Social_Login {
 				'social_login',
 				10,
 				15 * MINUTE_IN_SECONDS,
-				esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN )
+				__( 'Too many attempts. Please try again in %d minute(s).', 'wp-ulike-pro' )
 			);
 
 			// set callback url for provider
@@ -107,7 +107,7 @@ class WP_Ulike_Pro_Social_Login {
 					// Store the provider for the callback event
 					$storage->set('provider', $provider);
 				} else {
-					throw new \Exception( esc_html__( 'No provider class found!', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'No provider class found!', 'wp-ulike-pro' ) );
 				}
 			}
 
@@ -117,7 +117,7 @@ class WP_Ulike_Pro_Social_Login {
 				$ha_profile = $adapter->getUserProfile();
 
 			} else {
-				throw new \Exception( __( 'No provider class found!', WP_ULIKE_PRO_DOMAIN ) );
+				throw new \Exception( __( 'No provider class found!', 'wp-ulike-pro' ) );
 			}
 
 		} catch ( \Exception $e ) {
@@ -198,7 +198,7 @@ class WP_Ulike_Pro_Social_Login {
 
 		// this should never happen, but let's make sure we handle this anyway
 		if ( ! $provider_id ) {
-			throw new \Exception( sprintf( __( 'No provider class found for %s', WP_ULIKE_PRO_DOMAIN ), $profile->get_provider_id() ) );
+			throw new \Exception( sprintf( __( 'No provider class found for %s', 'wp-ulike-pro' ), $profile->get_provider_id() ) );
 		}
 
 		$user         = null;
@@ -207,7 +207,7 @@ class WP_Ulike_Pro_Social_Login {
 
 		// ensure that providers can't return a blank identifier
 		if ( ! $profile->get_identifier() ) {
-			throw new \Exception( sprintf( __( '%s returned an invalid user identifier.', WP_ULIKE_PRO_DOMAIN ), $profile->get_provider_id() ) );
+			throw new \Exception( sprintf( __( '%s returned an invalid user identifier.', 'wp-ulike-pro' ), $profile->get_provider_id() ) );
 		}
 
 		// look up if the user already exists on WP
@@ -218,7 +218,7 @@ class WP_Ulike_Pro_Social_Login {
 		// SECURITY: Sanitize identifier and build meta key safely
 		$identifier = sanitize_text_field( $profile->get_identifier() );
 		if ( empty( $identifier ) ) {
-			throw new \Exception( esc_html__( 'Invalid user identifier from provider.', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'Invalid user identifier from provider.', 'wp-ulike-pro' ) );
 		}
 
 		// Use provider_id as-is (original case) to match how it's stored in update_user_profile()
@@ -261,9 +261,9 @@ class WP_Ulike_Pro_Social_Login {
 			if ( $user && get_current_user_id() !== $user->ID ) {
 
 				if ( 'identifier' === $found_via ) {
-					throw new \Exception( __( 'This account is already linked to another user account.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'This account is already linked to another user account.', 'wp-ulike-pro' ) );
 				} else {
-					throw new \Exception( __( 'A user account using the same email address as this account already exists.', WP_ULIKE_PRO_DOMAIN ) );
+					throw new \Exception( __( 'A user account using the same email address as this account already exists.', 'wp-ulike-pro' ) );
 				}
 			}
 
@@ -276,7 +276,7 @@ class WP_Ulike_Pro_Social_Login {
 
 		// check if a user is found via email and not in one of the allowed roles
 		if ( ! is_user_logged_in() && $user && 'email' === $found_via && isset( $user->roles[0] ) && ! in_array( $user->roles[0], apply_filters( 'wp_like_pro_social_login_find_by_email_allowed_user_roles', array( 'subscriber' ) ) ) ) {
-			throw new \Exception( __( 'Oops, it looks like you may already have an account&hellip; please log in to link your profile.', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'Oops, it looks like you may already have an account&hellip; please log in to link your profile.', 'wp-ulike-pro' ) );
 		}
 
 		// if no user was found, create one
@@ -372,7 +372,7 @@ class WP_Ulike_Pro_Social_Login {
 
 			// if that didn't work, replace the empty username with a unique user_* ID (tries to use a localized name for user first)
 			if ( '' === $username ) {
-				$user     = sanitize_user( strtolower( __( 'User', WP_ULIKE_PRO_DOMAIN ) ), true );
+				$user     = sanitize_user( strtolower( __( 'User' ) ), true );
 				$username = uniqid( empty( $user ) ? 'user_' : "{$user}_", false );
 			}
 
@@ -390,7 +390,7 @@ class WP_Ulike_Pro_Social_Login {
 		$user_id = wp_insert_user( $userdata );
 
 		if ( is_wp_error( $user_id ) ) {
-			throw new \Exception( '<strong>' . __( 'ERROR', WP_ULIKE_PRO_DOMAIN ) . '</strong>: ' . __( 'Couldn&#8217;t register you&hellip; please contact us if you continue to have problems.', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( '<strong>' . __( 'Error' ) . '</strong>: ' . __( 'Couldn&#8217;t register you&hellip; please contact us if you continue to have problems.', 'wp-ulike-pro' ) );
 		}
 
 		// trigger New Account email
@@ -509,7 +509,7 @@ class WP_Ulike_Pro_Social_Login {
 	 */
 	private function validate_provider( $provider ) {
 		if ( empty( $provider ) ) {
-			throw new \Exception( esc_html__( 'No provider specified.', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'No provider specified.', 'wp-ulike-pro' ) );
 		}
 
 		// Get allowed providers (must match options panel network names exactly)
@@ -541,7 +541,7 @@ class WP_Ulike_Pro_Social_Login {
 		}
 
 		if ( $matched_provider === null ) {
-			throw new \Exception( esc_html__( 'Invalid provider specified.', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'Invalid provider specified.', 'wp-ulike-pro' ) );
 		}
 
 		// Return the original case provider name (as stored in options) for HybridAuth compatibility

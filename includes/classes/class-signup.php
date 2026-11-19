@@ -70,7 +70,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 				// Send verification email
 				$mail->send( $this->data['email'], 'checkmail', array( 'user_id' => $user_id ) );
 				// message
-				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'email_verification', esc_html__( 'Please check your email to activate your account.', WP_ULIKE_PRO_DOMAIN ) );
+				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'email_verification', __( 'Please check your email to activate your account.', 'wp-ulike-pro' ) );
 			} else {
 				// auto login
 				if( WP_Ulike_Pro_Options::checkAutoLogin() ){
@@ -94,7 +94,7 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 				$mail->send( $this->data['email'], 'welcome', array( 'user_id' => $user_id ) );
 
 				// message
-				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', esc_html__( 'Signup successful', WP_ULIKE_PRO_DOMAIN ) );
+				$message = WP_Ulike_Pro_Options::getNoticeMessage( 'signup_success', __( 'Signup successful', 'wp-ulike-pro' ) );
 			}
 
 			// Add user id param for use in after action hook
@@ -146,39 +146,39 @@ final class WP_Ulike_Pro_SignUp extends wp_ulike_ajax_listener_base {
 	private function validates(){
 		// Return false in preview mode
 		if( WP_Ulike_Pro::is_preview_mode() ){
-			throw new \Exception( esc_html__( 'It is not possible to perform this process in preview mode!', WP_ULIKE_PRO_DOMAIN ) );
+			throw new \Exception( __( 'It is not possible to perform this process in preview mode!', 'wp-ulike-pro' ) );
 		}
 
 		// Check rate limiting (3 signups per hour)
-		wp_ulike_pro_check_rate_limit( 'signup', 3, HOUR_IN_SECONDS, esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ) );
+		wp_ulike_pro_check_rate_limit( 'signup', 3, HOUR_IN_SECONDS, __( 'Too many attempts. Please try again in %d minute(s).', 'wp-ulike-pro' ) );
 
 		// Return false when nonce invalid
 		if( ! wp_verify_nonce( $this->data['security'], 'wp-ulike-pro-forms-nonce') && ! wp_ulike_is_cache_exist() ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) ) );
         }
 
 		// Return false when nonce invalid
 		if( empty( $this->data['username'] ) || empty( $this->data['password'] ) || empty( $this->data['email'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'required_fields', __( 'Please enter required fields', 'wp-ulike-pro' ) ) );
 		}
 
 		if ( ! get_option( 'users_can_register' ) ) {
-			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'disabled_registration', esc_html__( 'Registration is currently disabled.', WP_ULIKE_PRO_DOMAIN ) ) );
+			throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'disabled_registration', __( 'Registration is currently disabled.', 'wp-ulike-pro' ) ) );
 		}
 
 		// Validate email address
 		if( ! is_email( $this->data['email'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_email', esc_html__( 'Email address is not valid!', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'invalid_email', __( 'Email address is not valid!', 'wp-ulike-pro' ) ) );
 		}
 
 		// Check email exists
 		if( email_exists( $this->data['email'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'email_exist', esc_html__( 'Sorry, that email address is already used!', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'email_exist', __( 'Sorry, that email address is already used!' ) ) );
         }
 
 		// Check username exists
 		if( username_exists( $this->data['username'] ) ){
-            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'username_exist', esc_html__( 'Sorry, that username is already used!', WP_ULIKE_PRO_DOMAIN ) ) );
+            throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'username_exist', __( 'Sorry, that username is already used!', 'wp-ulike-pro' ) ) );
         }
 
 	}

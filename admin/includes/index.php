@@ -20,7 +20,9 @@ include_once( 'classes/class-maintenance.php' );
 // Tools Controller
 include_once( 'classes/class-tools.php' );
 new WP_Ulike_Pro_Tools();
-new WP_Ulike_Pro_Schema_Generator_Tool();
+if ( wp_ulike_pro_feature_enabled( 'schema' ) ) {
+	new WP_Ulike_Pro_Schema_Generator_Tool();
+}
 
 // Overview screen (hooks into free WP ULike Overview)
 include_once( 'classes/class-overview.php' );
@@ -32,6 +34,7 @@ include_once( 'classes/class-wp-ulike-pro-backup.php' );
 include_once( 'classes/class-update-prepare.php' );
 new WP_Ulike_Pro_Update_Prepare();
 
+// Engagement counter reconciliation — not the Statistics module. Always on.
 if ( class_exists( 'WP_Ulike_Pro_Stats_Cron' ) ) {
 	WP_Ulike_Pro_Stats_Cron::init();
 }

@@ -45,12 +45,21 @@ class WP_Ulike_Pro_Rewrite {
 		}
 
 
-		// Template redirects
-		add_action( 'template_redirect', array( &$this, 'redirect_author_page' ), 1000 );
-		add_action( 'template_redirect', array( &$this, 'account_redirect'     ), 1000 );
-		add_action( 'template_redirect', array( &$this, 'logout_redirect'      ), 1000 );
-		add_action( 'template_redirect', array( &$this, 'change_password'      ), 1000 );
-		add_action( 'template_redirect', array( &$this, 'email_verification'   ), 1000 );
+		// Template redirects. Author pages are only redirected while profiles
+		// exist to redirect them to, and the account flows below all end on a
+		// login or account page whose forms only render while Login & Signup is
+		// switched on — sending someone to a blank page is worse than leaving
+		// them where they were.
+		if( ! function_exists( 'wp_ulike_pro_feature_enabled' ) || wp_ulike_pro_feature_enabled( 'profiles' ) ){
+			add_action( 'template_redirect', array( &$this, 'redirect_author_page' ), 1000 );
+		}
+
+		if( ! function_exists( 'wp_ulike_pro_feature_enabled' ) || wp_ulike_pro_feature_enabled( 'login_signup' ) ){
+			add_action( 'template_redirect', array( &$this, 'account_redirect'     ), 1000 );
+			add_action( 'template_redirect', array( &$this, 'logout_redirect'      ), 1000 );
+			add_action( 'template_redirect', array( &$this, 'change_password'      ), 1000 );
+			add_action( 'template_redirect', array( &$this, 'email_verification'   ), 1000 );
+		}
 	}
 
 	/**
@@ -171,10 +180,10 @@ class WP_Ulike_Pro_Rewrite {
 				// Delete cookie if password was reset
 				wp_ulike_pro_setcookie( $rp_cookie, false );
 
-				$message = WP_Ulike_Pro_Options::getFormLabel( 'rp', 'invalidkey', esc_html__( 'Your password reset link appears to be invalid. Please request a new link below.', WP_ULIKE_PRO_DOMAIN ) );
+				$message = WP_Ulike_Pro_Options::getFormLabel( 'rp', 'invalidkey', __( 'Your password reset link appears to be invalid. Please request a new link below.', 'wp-ulike-pro' ) );
 
 				if ( $user && $user->get_error_code() === 'expired_key' ) {
-					$message = WP_Ulike_Pro_Options::getFormLabel( 'rp', 'expiredkey', esc_html__( 'Your password reset link has expired. Please request a new link below.', WP_ULIKE_PRO_DOMAIN ) );
+					$message = WP_Ulike_Pro_Options::getFormLabel( 'rp', 'expiredkey', __( 'Your password reset link has expired. Please request a new link below.', 'wp-ulike-pro' ) );
 				}
 
 				// add notice
@@ -202,13 +211,13 @@ class WP_Ulike_Pro_Rewrite {
 
 			// Validate key format
 			if ( empty( $key ) || ! preg_match( '/^[a-zA-Z0-9]+$/', $key ) ) {
-				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification', __( 'Verification failed. The link might be expired or invalid.', 'wp-ulike-pro' ) ), 'error' );
 				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
 				exit;
 			}
 
 			if ( empty( $user_id ) ) {
-				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. Invalid user ID.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification', __( 'Verification failed. Invalid user ID.', 'wp-ulike-pro' ) ), 'error' );
 				wp_redirect( WP_Ulike_Pro_Permalinks::get_login_url() );
 				exit;
 			}
@@ -233,9 +242,9 @@ class WP_Ulike_Pro_Rewrite {
 				$mail = new WP_Ulike_Pro_Mail();
 				$mail->send( $user->user_email, 'approved', array( 'user_id' => $user_id ) );
 
-				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'success_verification_notice', esc_html__( 'Your email has been successfully verified. You can now log in.', WP_ULIKE_PRO_DOMAIN ) ), 'success' );
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'success_verification', __( 'Your email has been successfully verified. You can now log in.', 'wp-ulike-pro' ) ), 'success' );
 			} else {
-				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification_notice', esc_html__( 'Verification failed. The link might be expired or invalid.', WP_ULIKE_PRO_DOMAIN ) ), 'error' );
+				wp_ulike_pro_add_notice( WP_Ulike_Pro_Options::getNoticeMessage( 'failed_verification', __( 'Verification failed. The link might be expired or invalid.', 'wp-ulike-pro' ) ), 'error' );
 			}
 
 			// Handle invalid key

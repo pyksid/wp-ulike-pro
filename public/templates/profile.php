@@ -90,11 +90,11 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
                                 if( ! empty( $edit_account_page ) ):
                                     $edit_account_url = get_permalink( $edit_account_page );
                                 ?>
-                                <a href="<?php echo esc_url( $edit_account_url ); ?>" class="wp-ulike-pro-profile-action-btn wp-ulike-pro-profile-edit-btn" title="<?php echo esc_attr__( 'Edit Profile', WP_ULIKE_PRO_DOMAIN ); ?>" aria-label="<?php echo esc_attr__( 'Edit Profile', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                <a href="<?php echo esc_url( $edit_account_url ); ?>" class="wp-ulike-pro-profile-action-btn wp-ulike-pro-profile-edit-btn" title="<?php echo esc_attr( wp_ulike_get_option( 'profile_edit_text', __( 'Edit Profile' ) ) ); ?>" aria-label="<?php echo esc_attr( wp_ulike_get_option( 'profile_edit_text', 'Edit Profile' ) ); ?>">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path d="M11.3333 2.00004C11.5084 1.82493 11.7163 1.68607 11.9441 1.59131C12.1719 1.49655 12.4151 1.44775 12.6667 1.44775C12.9182 1.44775 13.1614 1.49655 13.3892 1.59131C13.617 1.68607 13.8249 1.82493 14 2.00004C14.1751 2.17515 14.314 2.38305 14.4087 2.61087C14.5035 2.83869 14.5523 3.08189 14.5523 3.33337C14.5523 3.58486 14.5035 3.82806 14.4087 4.05588C14.314 4.2837 14.1751 4.4916 14 4.66671L5.00001 13.6667L1.33334 14.6667L2.33334 11L11.3333 2.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span><?php echo esc_html( wp_ulike_get_option( 'avatar_edit_text', esc_html__( 'Edit', WP_ULIKE_PRO_DOMAIN ) ) ); ?></span>
+                                    <span><?php echo esc_html( wp_ulike_get_option( 'avatar_edit_text', __( 'Edit' ) ) ); ?></span>
                                 </a>
                                 <?php endif; ?>
 
@@ -102,13 +102,13 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
                                 $logout_url = WP_Ulike_Pro_Permalinks::get_logout_url();
                                 if( ! empty( $logout_url ) ):
                                 ?>
-                                <a href="<?php echo esc_url( $logout_url ); ?>" class="wp-ulike-pro-profile-action-btn wp-ulike-pro-profile-logout-btn" title="<?php echo esc_attr__( 'Log Out', WP_ULIKE_PRO_DOMAIN ); ?>" aria-label="<?php echo esc_attr__( 'Log Out', WP_ULIKE_PRO_DOMAIN ); ?>">
+                                <a href="<?php echo esc_url( $logout_url ); ?>" class="wp-ulike-pro-profile-action-btn wp-ulike-pro-profile-logout-btn" title="<?php echo esc_attr__( 'Log Out' ); ?>" aria-label="<?php echo esc_attr( 'Log Out' ); ?>">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path d="M6 14H3.33333C2.89131 14 2.46738 13.8244 2.15482 13.5118C1.84226 13.1993 1.66667 12.7754 1.66667 12.3333V3.66667C1.66667 3.22464 1.84226 2.80072 2.15482 2.48816C2.46738 2.17559 2.89131 2 3.33333 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M10.6667 11.3333L14.3333 7.66667L10.6667 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M14.3333 7.66667H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span><?php echo esc_html( wp_ulike_get_option( 'avatar_logout_text', esc_html__( 'Log Out', WP_ULIKE_PRO_DOMAIN ) ) ); ?></span>
+                                    <span><?php echo esc_html( wp_ulike_get_option( 'avatar_logout_text', __( 'Log Out' ) ) ); ?></span>
                                 </a>
                                 <?php endif; ?>
                             </div>
@@ -291,7 +291,7 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
                     endforeach;
                     // Check tab content exist
                     if( ! $content_exist ){
-                        echo sprintf( '<div class="tab_content">%s</div>', esc_html__( 'This tab is looking a little empty!', WP_ULIKE_PRO_DOMAIN ) );
+                        echo sprintf( '<div class="tab_content">%s</div>', esc_html( wp_ulike_get_option( 'profile_empty_tab', __( 'This tab is looking a little empty!', 'wp-ulike-pro' ) ) ) );
                     }
                     ?>
                     </div>
@@ -304,7 +304,7 @@ $header_wrapper_width =  ! empty( $options['header_wrapper_width'] ) ? $options[
     <?php else: ?>
 
     <div class="wp-ulike-pro-user-not-found">
-        <?php echo wp_kses_post( wp_ulike_get_option( 'user_not_found', esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN ) ) ); ?>
+        <?php echo wp_kses_post( wp_ulike_get_option( 'user_not_found', __( 'Not found!', 'wp-ulike-pro' ) ) ); ?>
     </div>
 
     <?php endif; ?>

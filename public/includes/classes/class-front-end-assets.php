@@ -40,10 +40,14 @@ class WP_Ulike_Pro_Front_End_Assets {
             WP_Ulike_Pro_reCAPTCHA_Enqueue::wp_enqueue_scripts();
         }
 
-        // Get view tracking enabled types
-        $view_tracking_enabled = wp_ulike_get_option( 'view_tracking_enabled_types', array( 'post') );
-        if ( empty( $view_tracking_enabled ) || ! is_array( $view_tracking_enabled ) ) {
-            $view_tracking_enabled = array( 'post' );
+        // Views only feed the Statistics reports. An empty list tells the
+        // front-end script not to queue ulp_track_view_batch at all.
+        $view_tracking_enabled = array();
+        if ( wp_ulike_pro_feature_enabled( 'statistics' ) ) {
+            $view_tracking_enabled = wp_ulike_get_option( 'view_tracking_enabled_types', array( 'post' ) );
+            if ( ! is_array( $view_tracking_enabled ) ) {
+                $view_tracking_enabled = array( 'post' );
+            }
         }
 
         $localize_args = array(
@@ -55,14 +59,16 @@ class WP_Ulike_Pro_Front_End_Assets {
             ),
             'notifications' => wp_ulike_get_option( 'enable_toast_notice', true ),
             'ajax_error'    => wp_ulike_setting_repo::getAjaxErrorNotice(),
-            'modalClose'    => esc_html__( 'Close dialog', WP_ULIKE_PRO_DOMAIN ),
+            'modalClose'    => __( 'Close dialog' ),
         );
 
         if( ! WP_Ulike_Pro::is_preview_mode() ){
             // Add social share buttons script
-            $social_items = wp_ulike_get_option( 'social_share', array() );
-            if( ! empty( $social_items ) ){
-                wp_enqueue_script( 'ulp-share-buttons', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/share.min.js', array(), WP_ULIKE_PRO_VERSION, true );
+            if ( wp_ulike_pro_feature_enabled( 'share_buttons' ) ) {
+                $social_items = wp_ulike_get_option( 'social_share', array() );
+                if ( ! empty( $social_items ) ) {
+                    wp_enqueue_script( 'ulp-share-buttons', WP_ULIKE_PRO_PUBLIC_URL . '/assets/js/solo/share.min.js', array(), WP_ULIKE_PRO_VERSION, true );
+                }
             }
 
             // Avatar uploader scripts (Standalone vanilla JS version)

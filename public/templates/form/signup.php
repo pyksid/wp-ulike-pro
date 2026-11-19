@@ -27,7 +27,7 @@ if( ! empty( $_GET['redirect_to'] ) ){
 
 <div class="ulp-form ulp-form-center ulp-ajax-form ulp-signup">
     <form id="ulp-signup-<?php echo esc_attr( $wp_ulike_form_args->form_id ); ?>" method="post" action=""
-        autocomplete="off" aria-label="<?php esc_attr_e( 'Signup form', 'wp-ulike-pro' ); ?>">
+        autocomplete="off" aria-label="<?php echo esc_attr( 'Signup form' ); ?>">
 
         <?php wp_ulike_pro_print_notices(); ?>
 
@@ -91,11 +91,11 @@ if( ! empty( $_GET['redirect_to'] ) ){
                         <span
                             class="ulp-hidden-visually"><?php echo esc_html( $wp_ulike_form_args->password ); ?></span>
                     </label>
-                    <button type="button" class="ulp-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'wp-ulike-pro' ); ?>" aria-pressed="false" tabindex="-1">
+                    <button type="button" class="ulp-password-toggle" aria-label="<?php echo esc_attr( 'Show password' ); ?>" aria-pressed="false" tabindex="-1">
                         <span class="ulp-password-toggle-icon" aria-hidden="true"></span>
-                        <span class="ulp-hidden-visually"><?php esc_html_e( 'Show password', 'wp-ulike-pro' ); ?></span>
+                        <span class="ulp-hidden-visually"><?php echo esc_html( 'Show password' ); ?></span>
                     </button>
-                    <span id="ulp-password-strength-description" class="ulp-hidden-visually"><?php esc_html_e( 'Password strength indicator', 'wp-ulike-pro' ); ?></span>
+                    <span id="ulp-password-strength-description" class="ulp-hidden-visually"><?php echo esc_html( 'Password strength indicator' ); ?></span>
                     <div id="ulp-password-requirements" class="ulp-password-requirements" role="status" aria-live="polite">
                         <div class="ulp-password-strength">
                             <div class="ulp-password-strength-bar">

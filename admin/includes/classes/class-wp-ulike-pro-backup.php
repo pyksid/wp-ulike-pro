@@ -88,7 +88,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Backup' ) ) {
 		 * @return string
 		 */
 		public function filter_backup_intro( $intro ) {
-			return __( 'Download your settings, customizer values, display rules, and REST API configuration as JSON. Per-post schema/FAQ data and REST API keys are not included.', WP_ULIKE_PRO_DOMAIN );
+			return __( 'Download your settings, customizer values, display rules, and REST API configuration as JSON. Per-post schema/FAQ data and REST API keys are not included.', 'wp-ulike-pro' );
 		}
 
 		/**
@@ -98,7 +98,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Backup' ) ) {
 		 * @return string
 		 */
 		public function filter_import_confirm( $message ) {
-			return __( 'Import will replace your current WP ULike settings, customizer values, display rules, and REST API configuration. Continue?', WP_ULIKE_PRO_DOMAIN );
+			return __( 'Import will replace your current WP ULike settings, customizer values, display rules, and REST API configuration. Continue?', 'wp-ulike-pro' );
 		}
 
 		/**

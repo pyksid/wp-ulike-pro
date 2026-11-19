@@ -294,17 +294,21 @@ class WP_Ulike_Pro_Permalinks {
 	 * @return string
 	 */
 	public static function get_logout_url( $redirect = '' ) {
+		$login_page = self::get_login_url();
+		if ( ! $login_page ) {
+			return apply_filters( 'wp_ulike_pro_logout_url', '', $redirect );
+		}
+
 		$args = array( 'action' => 'logout' );
 		if ( ! empty( $redirect ) ) {
 			$args['redirect_to'] = urlencode( $redirect );
 		}
 
 		$custom_redirect = WP_Ulike_Pro_Options::getLogoutRedirectUrl();
-		if( ! empty( $custom_redirect ) ){
+		if ( ! empty( $custom_redirect ) ) {
 			$args['redirect_to'] = urlencode( $custom_redirect );
 		}
 
-		$login_page = self::get_login_url();
 		$logout_url = add_query_arg( $args, $login_page );
 		$logout_url = wp_nonce_url( $logout_url, 'log-out' );
 
@@ -319,7 +323,7 @@ class WP_Ulike_Pro_Permalinks {
 	public static function get_login_url() {
 		$login_page = WP_Ulike_Pro_Options::getLoginPageUrl();
 
-		if ( get_option('permalink_structure') ) {
+		if ( $login_page && get_option( 'permalink_structure' ) ) {
 			$login_page = trailingslashit( untrailingslashit( $login_page ) );
 		}
 

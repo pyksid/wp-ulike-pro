@@ -29,7 +29,7 @@ final class WP_Ulike_Pro_Forms_Toggle extends wp_ulike_ajax_listener_base {
 		try {
 			$this->beforeAction();
 
-			$permission_denied =  WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', esc_html__( 'Something went wrong. Please try again or contact the admin.', WP_ULIKE_PRO_DOMAIN ) );
+			$permission_denied =  WP_Ulike_Pro_Options::getNoticeMessage( 'permission_denied', __( 'Something went wrong. Please try again or contact the admin.', 'wp-ulike-pro' ) );
 
 			if ( !$this->validates() ){
 				throw new \Exception( $permission_denied );

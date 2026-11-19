@@ -43,11 +43,11 @@ class Group_Control_Query extends Group_Control_Base {
 		$name .= '_';
 
 		$fields['post_type'] = [
-			'label' => esc_html__( 'Source', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Source' ),
 			'type' => Controls_Manager::SELECT,
 			'options' => [
-				'by_id' => esc_html__( 'Manual Selection', WP_ULIKE_PRO_DOMAIN ),
-				'current_query' => esc_html__( 'Current Query', WP_ULIKE_PRO_DOMAIN ),
+				'by_id' => esc_html__( 'Manual Selection', 'wp-ulike-pro' ),
+				'current_query' => esc_html__( 'Current Query', 'wp-ulike-pro' ),
 			],
 		];
 
@@ -61,7 +61,7 @@ class Group_Control_Query extends Group_Control_Base {
 
 		$fields['query_include'] = [
 			'type' => Controls_Manager::TAB,
-			'label' => esc_html__( 'Include', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Include', 'wp-ulike-pro' ),
 			'tabs_wrapper' => $tabs_wrapper,
 			'condition' => [
 				'post_type!' => [
@@ -72,7 +72,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['posts_ids'] = [
-			'label' => esc_html__( 'Search & Select', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Search & Select', 'wp-ulike-pro' ),
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'options' => [],
 			'label_block' => true,
@@ -89,12 +89,12 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['include'] = [
-			'label' => esc_html__( 'Include By', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Include By', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::SELECT2,
 			'multiple' => true,
 			'options' => [
-				'terms' => esc_html__( 'Term', WP_ULIKE_PRO_DOMAIN ),
-				'authors' => esc_html__( 'Author', WP_ULIKE_PRO_DOMAIN ),
+				'terms' => esc_html__( 'Term', 'wp-ulike-pro' ),
+				'authors' => esc_html__( 'Author' ),
 			],
 			'condition' => [
 				'post_type!' => [
@@ -108,8 +108,8 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['include_term_ids'] = [
-			'label' => esc_html__( 'Term', WP_ULIKE_PRO_DOMAIN ),
-			'description' => esc_html__( 'Terms are items in a taxonomy. The available taxonomies are: Categories, Tags, Formats and custom taxonomies.', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Term', 'wp-ulike-pro' ),
+			'description' => esc_html__( 'Terms are items in a taxonomy. The available taxonomies are: Categories, Tags, Formats and custom taxonomies.', 'wp-ulike-pro' ),
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'options' => [],
 			'label_block' => true,
@@ -131,7 +131,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['include_authors'] = [
-			'label' => esc_html__( 'Author', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Author' ),
 			'label_block' => true,
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'multiple' => true,
@@ -154,7 +154,7 @@ class Group_Control_Query extends Group_Control_Base {
 
 		$fields['query_exclude'] = [
 			'type' => Controls_Manager::TAB,
-			'label' => esc_html__( 'Exclude', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Exclude', 'wp-ulike-pro' ),
 			'tabs_wrapper' => $tabs_wrapper,
 			'condition' => [
 				'post_type!' => [
@@ -165,14 +165,14 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['exclude'] = [
-			'label' => esc_html__( 'Exclude By', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Exclude By', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::SELECT2,
 			'multiple' => true,
 			'options' => [
-				'current_post' => esc_html__( 'Current Post', WP_ULIKE_PRO_DOMAIN ),
-				'manual_selection' => esc_html__( 'Manual Selection', WP_ULIKE_PRO_DOMAIN ),
-				'terms' => esc_html__( 'Term', WP_ULIKE_PRO_DOMAIN ),
-				'authors' => esc_html__( 'Author', WP_ULIKE_PRO_DOMAIN ),
+				'current_post' => esc_html__( 'Current Post', 'wp-ulike-pro' ),
+				'manual_selection' => esc_html__( 'Manual Selection', 'wp-ulike-pro' ),
+				'terms' => esc_html__( 'Term', 'wp-ulike-pro' ),
+				'authors' => esc_html__( 'Author' ),
 			],
 			'condition' => [
 				'post_type!' => [
@@ -186,7 +186,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['exclude_ids'] = [
-			'label' => esc_html__( 'Search & Select', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Search & Select', 'wp-ulike-pro' ),
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'options' => [],
 			'label_block' => true,
@@ -207,7 +207,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['exclude_term_ids'] = [
-			'label' => esc_html__( 'Term', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Term', 'wp-ulike-pro' ),
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'options' => [],
 			'label_block' => true,
@@ -230,7 +230,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['exclude_authors'] = [
-			'label' => esc_html__( 'Author', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Author' ),
 			'type' => Query_Module::QUERY_CONTROL_ID,
 			'options' => [],
 			'label_block' => true,
@@ -252,10 +252,10 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['avoid_duplicates'] = [
-			'label' => esc_html__( 'Avoid Duplicates', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Avoid Duplicates', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::SWITCHER,
 			'default' => '',
-			'description' => esc_html__( 'Set to Yes to avoid duplicate posts from showing up. This only effects the frontend.', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Set to Yes to avoid duplicate posts from showing up. This only effects the frontend.', 'wp-ulike-pro' ),
 			'tabs_wrapper' => $tabs_wrapper,
 			'inner_tab' => $exclude_wrapper,
 			'condition' => [
@@ -267,7 +267,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['offset'] = [
-			'label' => esc_html__( 'Offset', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Offset' ),
 			'type' => Controls_Manager::NUMBER,
 			'default' => 0,
 			'condition' => [
@@ -276,23 +276,23 @@ class Group_Control_Query extends Group_Control_Base {
 					'current_query',
 				],
 			],
-			'description' => esc_html__( 'Use this setting to skip over posts (e.g. \'2\' to skip over 2 posts).', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Use this setting to skip over posts (e.g. \'2\' to skip over 2 posts).', 'wp-ulike-pro' ),
 			'tabs_wrapper' => $tabs_wrapper,
 			'inner_tab' => $exclude_wrapper,
 		];
 
 		$fields['select_date'] = [
-			'label' => esc_html__( 'Date', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Date' ),
 			'type' => Controls_Manager::SELECT,
 			'post_type' => '',
 			'options' => [
-				'anytime' => esc_html__( 'All', WP_ULIKE_PRO_DOMAIN ),
-				'today' => esc_html__( 'Past Day', WP_ULIKE_PRO_DOMAIN ),
-				'week' => esc_html__( 'Past Week', WP_ULIKE_PRO_DOMAIN ),
-				'month'  => esc_html__( 'Past Month', WP_ULIKE_PRO_DOMAIN ),
-				'quarter' => esc_html__( 'Past Quarter', WP_ULIKE_PRO_DOMAIN ),
-				'year' => esc_html__( 'Past Year', WP_ULIKE_PRO_DOMAIN ),
-				'exact' => esc_html__( 'Custom', WP_ULIKE_PRO_DOMAIN ),
+				'anytime' => esc_html__( 'All' ),
+				'today' => esc_html__( 'Past Day', 'wp-ulike-pro' ),
+				'week' => esc_html__( 'Past Week', 'wp-ulike-pro' ),
+				'month'  => esc_html__( 'Past Month', 'wp-ulike-pro' ),
+				'quarter' => esc_html__( 'Past Quarter', 'wp-ulike-pro' ),
+				'year' => esc_html__( 'Past Year', 'wp-ulike-pro' ),
+				'exact' => esc_html__( 'Custom' ),
 			],
 			'default' => 'anytime',
 			'multiple' => false,
@@ -306,12 +306,12 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['date_before'] = [
-			'label' => esc_html__( 'Before', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Before', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::DATE_TIME,
 			'post_type' => '',
 			'label_block' => false,
 			'multiple' => false,
-			'placeholder' => esc_html__( 'Choose', WP_ULIKE_PRO_DOMAIN ),
+			'placeholder' => esc_html__( 'Choose', 'wp-ulike-pro' ),
 			'condition' => [
 				'select_date' => 'exact',
 				'post_type!' => [
@@ -319,16 +319,16 @@ class Group_Control_Query extends Group_Control_Base {
 					'current_query',
 				],
 			],
-			'description' => esc_html__( 'Setting a ‘Before’ date will show all the posts published until the chosen date (inclusive).', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Setting a ‘Before’ date will show all the posts published until the chosen date (inclusive).', 'wp-ulike-pro' ),
 		];
 
 		$fields['date_after'] = [
-			'label' => esc_html__( 'After', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'After', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::DATE_TIME,
 			'post_type' => '',
 			'label_block' => false,
 			'multiple' => false,
-			'placeholder' => esc_html__( 'Choose', WP_ULIKE_PRO_DOMAIN ),
+			'placeholder' => esc_html__( 'Choose', 'wp-ulike-pro' ),
 			'condition' => [
 				'select_date' => 'exact',
 				'post_type!' => [
@@ -336,18 +336,18 @@ class Group_Control_Query extends Group_Control_Base {
 					'current_query',
 				],
 			],
-			'description' => esc_html__( 'Setting an ‘After’ date will show all the posts published since the chosen date (inclusive).', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Setting an ‘After’ date will show all the posts published since the chosen date (inclusive).', 'wp-ulike-pro' ),
 		];
 
 		$fields['orderby'] = [
-			'label' => esc_html__( 'Order By', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Order By', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::SELECT,
 			'default' => 'post_date',
 			'options' => [
-				'post_date' => esc_html__( 'Date', WP_ULIKE_PRO_DOMAIN ),
-				'post_title' => esc_html__( 'Title', WP_ULIKE_PRO_DOMAIN ),
-				'menu_order' => esc_html__( 'Menu Order', WP_ULIKE_PRO_DOMAIN ),
-				'rand' => esc_html__( 'Random', WP_ULIKE_PRO_DOMAIN ),
+				'post_date' => esc_html__( 'Date' ),
+				'post_title' => esc_html__( 'Title' ),
+				'menu_order' => esc_html__( 'Menu Order' ),
+				'rand' => esc_html__( 'Random' ),
 			],
 			'condition' => [
 				'post_type!' => 'current_query',
@@ -355,12 +355,12 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['order'] = [
-			'label' => esc_html__( 'Order', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Order' ),
 			'type' => Controls_Manager::SELECT,
 			'default' => 'desc',
 			'options' => [
-				'asc' => esc_html__( 'ASC', WP_ULIKE_PRO_DOMAIN ),
-				'desc' => esc_html__( 'DESC', WP_ULIKE_PRO_DOMAIN ),
+				'asc' => esc_html__( 'ASC', 'wp-ulike-pro' ),
+				'desc' => esc_html__( 'DESC', 'wp-ulike-pro' ),
 			],
 			'condition' => [
 				'post_type!' => 'current_query',
@@ -368,7 +368,7 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['posts_per_page'] = [
-			'label' => esc_html__( 'Posts Per Page', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Posts Per Page', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::NUMBER,
 			'default' => 3,
 			'condition' => [
@@ -377,20 +377,20 @@ class Group_Control_Query extends Group_Control_Base {
 		];
 
 		$fields['ignore_sticky_posts'] = [
-			'label' => esc_html__( 'Ignore Sticky Posts', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Ignore Sticky Posts', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::SWITCHER,
 			'default' => 'yes',
 			'condition' => [
 				'post_type' => 'post',
 			],
-			'description' => esc_html__( 'Sticky-posts ordering is visible on frontend only', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Sticky-posts ordering is visible on frontend only', 'wp-ulike-pro' ),
 		];
 
 		$fields['query_id'] = [
-			'label' => esc_html__( 'Query ID', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Query ID', 'wp-ulike-pro' ),
 			'type' => Controls_Manager::TEXT,
 			'default' => '',
-			'description' => esc_html__( 'Give your Query a custom unique id to allow server side filtering', WP_ULIKE_PRO_DOMAIN ),
+			'description' => esc_html__( 'Give your Query a custom unique id to allow server side filtering', 'wp-ulike-pro' ),
 			'separator' => 'before',
 			'dynamic' => [
 				'active' => true,

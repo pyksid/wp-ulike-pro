@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! current_user_can( 'manage_options' ) ) {
-	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', WP_ULIKE_PRO_DOMAIN ) );
+	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-ulike-pro' ) );
 }
 
 $data = WP_Ulike_Pro_License::get_license_view_data();
@@ -23,7 +23,7 @@ $data = WP_Ulike_Pro_License::get_license_view_data();
 >
 
 	<h1 class="wp-ulike-about__title">
-		<?php esc_html_e( 'License', WP_ULIKE_PRO_DOMAIN ); ?>
+		<?php esc_html_e( 'License', 'wp-ulike-pro' ); ?>
 		<?php if ( ! empty( $data['pro_version'] ) ) : ?>
 			<span class="wp-ulike-about__badge wp-ulike-about__badge--pro"><?php echo esc_html( 'Pro ' . $data['pro_version'] ); ?></span>
 		<?php endif; ?>

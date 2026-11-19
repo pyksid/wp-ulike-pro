@@ -77,7 +77,7 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 ?>
 <div class="wp-ulike-pro-display-rule<?php echo $rule_is_collapsed ? ' is-collapsed' : ''; ?>" data-index="<?php echo esc_attr( $index ); ?>" data-content-type="<?php echo esc_attr( $content_type ); ?>"<?php echo $preset_id ? ' data-preset-id="' . esc_attr( $preset_id ) . '"' : ''; ?>>
 	<div class="wp-ulike-pro-display-rule-header">
-		<button type="button" class="wp-ulike-pro-display-rule-toggle" aria-expanded="<?php echo $rule_is_collapsed ? 'false' : 'true'; ?>" aria-controls="<?php echo esc_attr( $rule_body_id ); ?>" aria-label="<?php esc_attr_e( 'Toggle rule details', WP_ULIKE_PRO_DOMAIN ); ?>">
+		<button type="button" class="wp-ulike-pro-display-rule-toggle" aria-expanded="<?php echo $rule_is_collapsed ? 'false' : 'true'; ?>" aria-controls="<?php echo esc_attr( $rule_body_id ); ?>" aria-label="<?php echo esc_attr( 'Toggle rule details' ); ?>">
 			<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 		</button>
 		<div class="wp-ulike-pro-display-rule-heading">
@@ -85,41 +85,41 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				   name="display_rules[<?php echo esc_attr( $index ); ?>][title]"
 				   class="wp-ulike-pro-display-rule-title"
 				   value="<?php echo esc_attr( $rule['title'] ?? '' ); ?>"
-				   placeholder="<?php esc_attr_e( 'Rule name (optional)', WP_ULIKE_PRO_DOMAIN ); ?>"
-				   aria-label="<?php esc_attr_e( 'Rule name', WP_ULIKE_PRO_DOMAIN ); ?>">
+				   placeholder="<?php esc_attr_e( 'Rule name (optional)', 'wp-ulike-pro' ); ?>"
+				   aria-label="<?php echo esc_attr( 'Rule name' ); ?>">
 			<span class="wp-ulike-pro-display-rule-summary wp-ulike-pro-display-bidi-auto"><?php echo esc_html( $rule_summary ); ?></span>
 		</div>
 		<div class="wp-ulike-pro-display-rule-header-meta">
 			<span class="wp-ulike-pro-display-rule-same-location-badge"
 				  aria-hidden="true"
 				  title="">
-				<?php esc_html_e( 'Same location', WP_ULIKE_PRO_DOMAIN ); ?>
+				<?php esc_html_e( 'Same location', 'wp-ulike-pro' ); ?>
 			</span>
-			<label class="wp-ulike-pro-display-rule-status" title="<?php esc_attr_e( 'Enable or disable this rule', WP_ULIKE_PRO_DOMAIN ); ?>">
+			<label class="wp-ulike-pro-display-rule-status" title="<?php esc_attr_e( 'Enable or disable this rule', 'wp-ulike-pro' ); ?>">
 				<input type="checkbox"
 					   class="wp-ulike-pro-display-rule-enabled-input"
 					   name="display_rules[<?php echo esc_attr( $index ); ?>][enabled]"
 					   value="1"
 					   <?php checked( ! empty( $rule['enabled'] ) ); ?>>
 				<span class="wp-ulike-pro-display-rule-status-switch" aria-hidden="true"></span>
-				<span class="wp-ulike-pro-display-rule-status-label"><?php esc_html_e( 'Active', WP_ULIKE_PRO_DOMAIN ); ?></span>
+				<span class="wp-ulike-pro-display-rule-status-label"><?php esc_html_e( 'Active' ); ?></span>
 			</label>
 			<div class="wp-ulike-pro-display-rule-actions">
-				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-move-up" title="<?php esc_attr_e( 'Move up', WP_ULIKE_PRO_DOMAIN ); ?>">
+				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-move-up" title="<?php esc_attr_e( 'Move up' ); ?>">
 					<span class="dashicons dashicons-arrow-up-alt2" aria-hidden="true"></span>
-					<span class="screen-reader-text"><?php esc_html_e( 'Move up', WP_ULIKE_PRO_DOMAIN ); ?></span>
+					<span class="screen-reader-text"><?php echo esc_html( 'Move up' ); ?></span>
 				</button>
-				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-move-down" title="<?php esc_attr_e( 'Move down', WP_ULIKE_PRO_DOMAIN ); ?>">
+				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-move-down" title="<?php esc_attr_e( 'Move down' ); ?>">
 					<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
-					<span class="screen-reader-text"><?php esc_html_e( 'Move down', WP_ULIKE_PRO_DOMAIN ); ?></span>
+					<span class="screen-reader-text"><?php echo esc_html( 'Move down' ); ?></span>
 				</button>
-				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-duplicate" title="<?php esc_attr_e( 'Duplicate rule', WP_ULIKE_PRO_DOMAIN ); ?>">
+				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-rule-duplicate" title="<?php esc_attr_e( 'Duplicate rule', 'wp-ulike-pro' ); ?>">
 					<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>
-					<span class="screen-reader-text"><?php esc_html_e( 'Duplicate rule', WP_ULIKE_PRO_DOMAIN ); ?></span>
+					<span class="screen-reader-text"><?php echo esc_html( 'Duplicate rule' ); ?></span>
 				</button>
-				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-icon-btn-danger wp-ulike-pro-display-rule-remove" title="<?php esc_attr_e( 'Remove rule', WP_ULIKE_PRO_DOMAIN ); ?>">
+				<button type="button" class="wp-ulike-pro-display-icon-btn wp-ulike-pro-display-icon-btn-danger wp-ulike-pro-display-rule-remove" title="<?php esc_attr_e( 'Remove' ); ?>">
 					<span class="dashicons dashicons-trash" aria-hidden="true"></span>
-					<span class="screen-reader-text"><?php esc_html_e( 'Remove rule', WP_ULIKE_PRO_DOMAIN ); ?></span>
+					<span class="screen-reader-text"><?php echo esc_html( 'Remove' ); ?></span>
 				</button>
 			</div>
 		</div>
@@ -134,12 +134,12 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				<div class="wp-ulike-pro-display-step-heading">
 					<span class="wp-ulike-pro-display-step-number" aria-hidden="true">1</span>
 					<div class="wp-ulike-pro-display-step-intro">
-						<h4><?php esc_html_e( 'Choose a platform', WP_ULIKE_PRO_DOMAIN ); ?></h4>
-						<p class="wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Where does your site show the content you want people to like?', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<h4><?php esc_html_e( 'Choose a platform', 'wp-ulike-pro' ); ?></h4>
+						<p class="wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Where does your site show the content you want people to like?', 'wp-ulike-pro' ); ?></p>
 					</div>
 				</div>
 				<div class="wp-ulike-pro-display-step-content">
-					<div class="wp-ulike-pro-display-integration-cards" role="radiogroup" aria-label="<?php esc_attr_e( 'Platform', WP_ULIKE_PRO_DOMAIN ); ?>">
+					<div class="wp-ulike-pro-display-integration-cards" role="radiogroup" aria-label="<?php echo esc_attr( 'Platform' ); ?>">
 						<?php foreach ( $placement_groups as $group_id => $group ) : ?>
 							<label class="wp-ulike-pro-display-integration-card">
 								<input type="radio"
@@ -168,7 +168,7 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				</div>
 				<div class="wp-ulike-pro-display-step-content">
 					<div class="wp-ulike-pro-display-field-row">
-						<label class="wp-ulike-pro-display-field-label wp-ulike-pro-display-content-type-label-dynamic" for="display-rule-content-type-<?php echo esc_attr( $index ); ?>" data-key="content_type_label"><?php echo esc_html( $step_copy['content_type_label'] ?? __( 'Apply to', WP_ULIKE_PRO_DOMAIN ) ); ?></label>
+						<label class="wp-ulike-pro-display-field-label wp-ulike-pro-display-content-type-label-dynamic" for="display-rule-content-type-<?php echo esc_attr( $index ); ?>" data-key="content_type_label"><?php echo esc_html( $step_copy['content_type_label'] ?? __( 'Apply to', 'wp-ulike-pro' ) ); ?></label>
 						<select id="display-rule-content-type-<?php echo esc_attr( $index ); ?>" name="display_rules[<?php echo esc_attr( $index ); ?>][content_type]" class="wp-ulike-pro-display-rule-content-type">
 							<?php foreach ( $content_types as $type_key => $type_label ) : ?>
 								<option value="<?php echo esc_attr( $type_key ); ?>" <?php selected( $content_type, $type_key ); ?>>
@@ -202,39 +202,39 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 							<?php endforeach; ?>
 						</select>
 						<p class="description wp-ulike-pro-display-placement-help wp-ulike-pro-display-bidi-auto"><?php echo esc_html( $placement_help ); ?></p>
-						<p class="description wp-ulike-pro-display-placement-multi-hint wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Each rule = one location. Add another rule for shop, product page, reviews, etc.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<p class="description wp-ulike-pro-display-placement-multi-hint wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Each rule = one location. Add another rule for shop, product page, reviews, etc.', 'wp-ulike-pro' ); ?></p>
 					</div>
 
 					<div class="wp-ulike-pro-display-field-row wp-ulike-pro-display-content-position" <?php echo $show_content_pos ? '' : 'style="display:none;"'; ?>>
 						<label class="wp-ulike-pro-display-field-label" for="display-rule-position-<?php echo esc_attr( $index ); ?>">
-							<?php echo $is_comment_like ? esc_html__( 'Inside each item', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'Inside content', WP_ULIKE_PRO_DOMAIN ); ?>
+							<?php echo $is_comment_like ? esc_html__( 'Inside each item', 'wp-ulike-pro' ) : esc_html__( 'Inside content', 'wp-ulike-pro' ); ?>
 						</label>
 						<select id="display-rule-position-<?php echo esc_attr( $index ); ?>" name="display_rules[<?php echo esc_attr( $index ); ?>][position]" class="wp-ulike-pro-display-rule-position">
-							<option value="top" <?php selected( $rule['position'] ?? 'bottom', 'top' ); ?>><?php esc_html_e( 'Top', WP_ULIKE_PRO_DOMAIN ); ?></option>
-							<option value="bottom" <?php selected( $rule['position'] ?? 'bottom', 'bottom' ); ?>><?php esc_html_e( 'Bottom', WP_ULIKE_PRO_DOMAIN ); ?></option>
-							<option value="top_bottom" <?php selected( $rule['position'] ?? '', 'top_bottom' ); ?>><?php esc_html_e( 'Top and bottom', WP_ULIKE_PRO_DOMAIN ); ?></option>
+							<option value="top" <?php selected( $rule['position'] ?? 'bottom', 'top' ); ?>><?php esc_html_e( 'Top' ); ?></option>
+							<option value="bottom" <?php selected( $rule['position'] ?? 'bottom', 'bottom' ); ?>><?php esc_html_e( 'Bottom' ); ?></option>
+							<option value="top_bottom" <?php selected( $rule['position'] ?? '', 'top_bottom' ); ?>><?php esc_html_e( 'Top and bottom', 'wp-ulike-pro' ); ?></option>
 						</select>
 						<p class="description wp-ulike-pro-display-content-position-help">
 							<?php
 							if ( $is_comment_like ) {
-								esc_html_e( 'Controls whether the button appears above or below the comment or review text.', WP_ULIKE_PRO_DOMAIN );
+								esc_html_e( 'Controls whether the button appears above or below the comment or review text.', 'wp-ulike-pro' );
 							} else {
-								esc_html_e( 'Only applies when the button is inserted inside post or page content.', WP_ULIKE_PRO_DOMAIN );
+								esc_html_e( 'Only applies when the button is inserted inside post or page content.', 'wp-ulike-pro' );
 							}
 							?>
 						</p>
 					</div>
 
 					<div class="wp-ulike-pro-display-field-row wp-ulike-pro-display-custom-hook" <?php echo ( 'custom' === $current_placement ) ? '' : 'style="display:none;"'; ?>>
-						<label class="wp-ulike-pro-display-field-label" for="display-rule-hook-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Custom hook name', WP_ULIKE_PRO_DOMAIN ); ?> <span class="required">*</span></label>
+						<label class="wp-ulike-pro-display-field-label" for="display-rule-hook-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Custom hook name', 'wp-ulike-pro' ); ?> <span class="required">*</span></label>
 						<input type="text"
 							   id="display-rule-hook-<?php echo esc_attr( $index ); ?>"
 							   name="display_rules[<?php echo esc_attr( $index ); ?>][custom_hook]"
 							   class="regular-text wp-ulike-pro-display-custom-hook-input wp-ulike-pro-display-ltr"
 							   value="<?php echo esc_attr( $rule['custom_hook'] ?? '' ); ?>"
-							   placeholder="<?php esc_attr_e( 'e.g. woocommerce_share', WP_ULIKE_PRO_DOMAIN ); ?>"
+							   placeholder="<?php esc_attr_e( 'e.g. woocommerce_share', 'wp-ulike-pro' ); ?>"
 							   aria-required="true">
-						<p class="description"><?php esc_html_e( 'For developers: enter a theme or plugin hook name. Leave blank if you are not sure.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<p class="description"><?php esc_html_e( 'For developers: enter a theme or plugin hook name. Leave blank if you are not sure.', 'wp-ulike-pro' ); ?></p>
 					</div>
 				</div>
 			</div>
@@ -243,19 +243,19 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				<button type="button" class="wp-ulike-pro-display-step-toggle" aria-expanded="<?php echo $appearance_step_collapsed ? 'false' : 'true'; ?>">
 					<span class="wp-ulike-pro-display-step-number" aria-hidden="true">4</span>
 					<span class="wp-ulike-pro-display-step-toggle-text">
-						<strong><?php esc_html_e( 'Button appearance (optional)', WP_ULIKE_PRO_DOMAIN ); ?></strong>
+						<strong><?php esc_html_e( 'Button appearance (optional)', 'wp-ulike-pro' ); ?></strong>
 						<span class="wp-ulike-pro-display-optional-step-desc wp-ulike-pro-display-appearance-step-desc wp-ulike-pro-display-bidi-auto">
 							<?php
 							if ( $template_label ) {
 								echo esc_html(
 									sprintf(
 										/* translators: %s: template name */
-										__( 'Template: %s', WP_ULIKE_PRO_DOMAIN ),
+										__( 'Template: %s', 'wp-ulike-pro' ),
 										$template_label
 									)
 								);
 							} else {
-								esc_html_e( 'Template, counter, and likers box — inherits Settings when left as Default.', WP_ULIKE_PRO_DOMAIN );
+								esc_html_e( 'Template, counter, and likers box — inherits Settings when left as Default.', 'wp-ulike-pro' );
 							}
 							?>
 						</span>
@@ -263,14 +263,14 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 					<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 				</button>
 				<div class="wp-ulike-pro-display-step-content">
-					<p class="description wp-ulike-pro-display-step-note wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Customize how buttons look for this rule. Useful when shop archives should hide counters but single product pages should show them.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+					<p class="description wp-ulike-pro-display-step-note wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Customize how buttons look for this rule. Useful when shop archives should hide counters but single product pages should show them.', 'wp-ulike-pro' ); ?></p>
 
 					<div class="wp-ulike-pro-display-field-row">
-						<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Button template', WP_ULIKE_PRO_DOMAIN ); ?></label>
+						<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Button template', 'wp-ulike-pro' ); ?></label>
 					</div>
 
 					<div class="wp-ulike-pro-display-template-cards-wrap">
-					<div class="wp-ulike-pro-display-template-cards" role="radiogroup" aria-label="<?php esc_attr_e( 'Button template', WP_ULIKE_PRO_DOMAIN ); ?>">
+					<div class="wp-ulike-pro-display-template-cards" role="radiogroup" aria-label="<?php echo esc_attr( 'Button template' ); ?>">
 						<label class="wp-ulike-pro-display-template-card">
 							<input type="radio"
 								   name="display_rules[<?php echo esc_attr( $index ); ?>][template]"
@@ -281,7 +281,7 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 								<span class="wp-ulike-pro-display-template-card-preview wp-ulike-pro-display-template-card-preview--default" aria-hidden="true">
 									<span class="dashicons dashicons-admin-appearance"></span>
 								</span>
-								<span class="wp-ulike-pro-display-template-card-label"><?php esc_html_e( 'Default', WP_ULIKE_PRO_DOMAIN ); ?></span>
+								<span class="wp-ulike-pro-display-template-card-label"><?php esc_html_e( 'Default' ); ?></span>
 							</span>
 						</label>
 						<?php foreach ( $button_templates as $template_item ) : ?>
@@ -314,12 +314,12 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 
 					<div class="wp-ulike-pro-display-engagement-options" data-emoji-template="<?php echo esc_attr( $emoji_template_id ); ?>" <?php echo $show_engagement_options ? '' : 'style="display:none;"'; ?>>
 						<div class="wp-ulike-pro-display-field-row">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Reactions', WP_ULIKE_PRO_DOMAIN ); ?></label>
-							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Same reactions as Settings for this content type. Tap to limit this rule — none selected uses all.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Reactions', 'wp-ulike-pro' ); ?></label>
+							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Same reactions as Settings for this content type. Tap to limit this rule — none selected uses all.', 'wp-ulike-pro' ); ?></p>
 						</div>
-						<div class="wp-ulike-pro-display-reaction-chips wp-ulike-pro-display-engagement-reactions wp-exclude-emoji" role="group" aria-label="<?php esc_attr_e( 'Reactions', WP_ULIKE_PRO_DOMAIN ); ?>">
+						<div class="wp-ulike-pro-display-reaction-chips wp-ulike-pro-display-engagement-reactions wp-exclude-emoji" role="group" aria-label="<?php echo esc_attr( 'Reactions' ); ?>">
 							<?php if ( empty( $configured_reactions ) ) : ?>
-								<p class="description wp-ulike-pro-display-reaction-chips-empty"><?php esc_html_e( 'No reactions configured yet. Choose the Emoji Reactions template in Settings first.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+								<p class="description wp-ulike-pro-display-reaction-chips-empty"><?php echo esc_html( 'No reactions configured yet. Choose the Emoji Reactions template in Settings first.' ); ?></p>
 							<?php else : ?>
 								<?php foreach ( $configured_reactions as $reaction ) : ?>
 									<?php
@@ -347,15 +347,15 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Reaction Picker', WP_ULIKE_PRO_DOMAIN ); ?></label>
-							<div class="wp-ulike-pro-display-button-set" role="radiogroup" aria-label="<?php esc_attr_e( 'Reaction Picker', WP_ULIKE_PRO_DOMAIN ); ?>">
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Reaction Picker', 'wp-ulike-pro' ); ?></label>
+							<div class="wp-ulike-pro-display-button-set" role="radiogroup" aria-label="<?php echo esc_attr( 'Reaction Picker' ); ?>">
 								<label class="wp-ulike-pro-display-button-set-option">
 									<input type="radio"
 										name="display_rules[<?php echo esc_attr( $index ); ?>][engagement_picker_style]"
 										value=""
 										class="wp-ulike-pro-display-rule-engagement-picker-style"
 										<?php checked( $engagement_picker_style, '' ); ?>>
-									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Default', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Default' ); ?></span>
 								</label>
 								<label class="wp-ulike-pro-display-button-set-option">
 									<input type="radio"
@@ -363,7 +363,7 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 										value="hover"
 										class="wp-ulike-pro-display-rule-engagement-picker-style"
 										<?php checked( $engagement_picker_style, 'hover' ); ?>>
-									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Hover', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Hover', 'wp-ulike-pro' ); ?></span>
 								</label>
 								<label class="wp-ulike-pro-display-button-set-option">
 									<input type="radio"
@@ -371,40 +371,40 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 										value="inline"
 										class="wp-ulike-pro-display-rule-engagement-picker-style"
 										<?php checked( $engagement_picker_style, 'inline' ); ?>>
-									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Inline', WP_ULIKE_PRO_DOMAIN ); ?></span>
+									<span class="wp-ulike-pro-display-button-set-label"><?php esc_html_e( 'Inline' ); ?></span>
 								</label>
 							</div>
-							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Default inherits from Settings. Hover shows a popup bar; Inline shows all reactions in a row.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Default inherits from Settings. Hover shows a popup bar; Inline shows all reactions in a row.', 'wp-ulike-pro' ); ?></p>
 						</div>
 					</div>
 
 					<div class="wp-ulike-pro-display-field-grid wp-ulike-pro-display-button-options">
 						<div class="wp-ulike-pro-display-field-row">
-							<label class="wp-ulike-pro-display-field-label" for="display-rule-counter-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Counter', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label" for="display-rule-counter-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Counter', 'wp-ulike-pro' ); ?></label>
 							<select id="display-rule-counter-<?php echo esc_attr( $index ); ?>" name="display_rules[<?php echo esc_attr( $index ); ?>][display_counter]" class="wp-ulike-pro-display-rule-display-counter">
-								<option value="" <?php selected( $display_counter, '' ); ?>><?php esc_html_e( 'Default (from Settings)', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="no" <?php selected( $display_counter, 'no' ); ?>><?php esc_html_e( 'Hidden', WP_ULIKE_PRO_DOMAIN ); ?></option>
+								<option value="" <?php selected( $display_counter, '' ); ?>><?php esc_html_e( 'Default (from Settings)', 'wp-ulike-pro' ); ?></option>
+								<option value="no" <?php selected( $display_counter, 'no' ); ?>><?php esc_html_e( 'Hidden', 'wp-ulike-pro' ); ?></option>
 							</select>
-							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Hide the count summary (likes, reaction totals, or star average) — handy for compact shop or archive layouts.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Hide the count summary (likes, reaction totals, or star average) — handy for compact shop or archive layouts.', 'wp-ulike-pro' ); ?></p>
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row">
-							<label class="wp-ulike-pro-display-field-label" for="display-rule-likers-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Engagers box', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label" for="display-rule-likers-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Engagers box', 'wp-ulike-pro' ); ?></label>
 							<select id="display-rule-likers-<?php echo esc_attr( $index ); ?>" name="display_rules[<?php echo esc_attr( $index ); ?>][display_likers]" class="wp-ulike-pro-display-rule-display-likers">
-								<option value="" <?php selected( $display_likers, '' ); ?>><?php esc_html_e( 'Default (from Settings)', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="yes" <?php selected( $display_likers, 'yes' ); ?>><?php esc_html_e( 'Show', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="no" <?php selected( $display_likers, 'no' ); ?>><?php esc_html_e( 'Hidden', WP_ULIKE_PRO_DOMAIN ); ?></option>
+								<option value="" <?php selected( $display_likers, '' ); ?>><?php esc_html_e( 'Default (from Settings)', 'wp-ulike-pro' ); ?></option>
+								<option value="yes" <?php selected( $display_likers, 'yes' ); ?>><?php esc_html_e( 'Show' ); ?></option>
+								<option value="no" <?php selected( $display_likers, 'no' ); ?>><?php esc_html_e( 'Hidden', 'wp-ulike-pro' ); ?></option>
 							</select>
-							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Shows who engaged with the item — likers, reactors, or raters (avatar list, popover, or pile).', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Shows who engaged with the item — likers, reactors, or raters (avatar list, popover, or pile).', 'wp-ulike-pro' ); ?></p>
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row wp-ulike-pro-display-likers-style" <?php echo $show_likers_style ? '' : 'style="display:none;"'; ?>>
-							<label class="wp-ulike-pro-display-field-label" for="display-rule-likers-style-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Likers display', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label" for="display-rule-likers-style-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Likers Display', 'wp-ulike-pro' ); ?></label>
 							<select id="display-rule-likers-style-<?php echo esc_attr( $index ); ?>" name="display_rules[<?php echo esc_attr( $index ); ?>][likers_style]" class="wp-ulike-pro-display-rule-likers-style">
-								<option value="" <?php selected( $likers_style, '' ); ?>><?php esc_html_e( 'Default (from Settings)', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="default" <?php selected( $likers_style, 'default' ); ?>><?php esc_html_e( 'Default list', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="popover" <?php selected( $likers_style, 'popover' ); ?>><?php esc_html_e( 'Popover', WP_ULIKE_PRO_DOMAIN ); ?></option>
-								<option value="pile" <?php selected( $likers_style, 'pile' ); ?>><?php esc_html_e( 'Pile + Modal', WP_ULIKE_PRO_DOMAIN ); ?></option>
+								<option value="" <?php selected( $likers_style, '' ); ?>><?php esc_html_e( 'Default (from Settings)', 'wp-ulike-pro' ); ?></option>
+								<option value="default" <?php selected( $likers_style, 'default' ); ?>><?php esc_html_e( 'Default list', 'wp-ulike-pro' ); ?></option>
+								<option value="popover" <?php selected( $likers_style, 'popover' ); ?>><?php esc_html_e( 'Popover', 'wp-ulike-pro' ); ?></option>
+								<option value="pile" <?php selected( $likers_style, 'pile' ); ?>><?php esc_html_e( 'Pile + Modal', 'wp-ulike-pro' ); ?></option>
 							</select>
 						</div>
 					</div>
@@ -415,17 +415,17 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				<button type="button" class="wp-ulike-pro-display-step-toggle" aria-expanded="false">
 					<span class="wp-ulike-pro-display-step-number" aria-hidden="true">5</span>
 					<span class="wp-ulike-pro-display-step-toggle-text">
-						<strong><?php esc_html_e( 'Limit where this shows (optional)', WP_ULIKE_PRO_DOMAIN ); ?></strong>
-						<span class="wp-ulike-pro-display-optional-step-desc wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Skip this if you want the button everywhere on the chosen platform.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+						<strong><?php esc_html_e( 'Limit where this shows (optional)', 'wp-ulike-pro' ); ?></strong>
+						<span class="wp-ulike-pro-display-optional-step-desc wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Skip this if you want the button everywhere on the chosen platform.', 'wp-ulike-pro' ); ?></span>
 					</span>
 					<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 				</button>
 				<div class="wp-ulike-pro-display-step-content">
-					<p class="description wp-ulike-pro-display-step-note wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'All fields below are optional. Leave them empty to show on every matching page.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+					<p class="description wp-ulike-pro-display-step-note wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'All fields below are optional. Leave them empty to show on every matching page.', 'wp-ulike-pro' ); ?></p>
 
 					<div class="wp-ulike-pro-display-field-grid wp-ulike-pro-display-limit-context-grid">
 						<div class="wp-ulike-pro-display-field-row" data-filter-scope="page-context">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Only show on', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Only show on', 'wp-ulike-pro' ); ?></label>
 							<div class="wp-ulike-pro-display-checkbox-list wp-ulike-pro-display-context-show">
 								<?php foreach ( $context_options as $context_key => $context_label ) : ?>
 									<label class="wp-ulike-pro-display-checkbox-item">
@@ -437,11 +437,11 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 									</label>
 								<?php endforeach; ?>
 							</div>
-							<p class="description wp-ulike-pro-display-filter-help wp-ulike-pro-display-filter-help-show" data-for="page-context"><?php esc_html_e( 'Example: only single posts, or only product pages.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-filter-help wp-ulike-pro-display-filter-help-show" data-for="page-context"><?php esc_html_e( 'Example: only single posts, or only product pages.', 'wp-ulike-pro' ); ?></p>
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row" data-filter-scope="page-context">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Hide on', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Hide on', 'wp-ulike-pro' ); ?></label>
 							<div class="wp-ulike-pro-display-checkbox-list wp-ulike-pro-display-context-hide">
 								<?php foreach ( $context_options as $context_key => $context_label ) : ?>
 									<label class="wp-ulike-pro-display-checkbox-item">
@@ -453,11 +453,11 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 									</label>
 								<?php endforeach; ?>
 							</div>
-							<p class="description wp-ulike-pro-display-filter-help wp-ulike-pro-display-filter-help-hide" data-for="page-context"><?php esc_html_e( 'Example: hide on search results or shop archives.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-filter-help wp-ulike-pro-display-filter-help-hide" data-for="page-context"><?php esc_html_e( 'Example: hide on search results or shop archives.', 'wp-ulike-pro' ); ?></p>
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row" data-filter-scope="post-type">
-							<label class="wp-ulike-pro-display-field-label wp-ulike-pro-display-post-type-label"><?php echo $is_comment_like ? esc_html__( 'Parent content types', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'Content types', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label wp-ulike-pro-display-post-type-label"><?php echo $is_comment_like ? esc_html__( 'Parent content types', 'wp-ulike-pro' ) : esc_html__( 'Content types', 'wp-ulike-pro' ); ?></label>
 							<div class="wp-ulike-pro-display-checkbox-list wp-ulike-pro-display-post-types">
 								<?php foreach ( $post_types as $post_type => $label ) : ?>
 									<label class="wp-ulike-pro-display-checkbox-item">
@@ -469,30 +469,30 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 									</label>
 								<?php endforeach; ?>
 							</div>
-							<p class="description wp-ulike-pro-display-filter-help" data-for="post-type"><?php echo $is_comment_like ? esc_html__( 'Example: only comments on blog posts, or only reviews on products.', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'Example: only blog posts, only pages, or only products.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description wp-ulike-pro-display-filter-help" data-for="post-type"><?php echo $is_comment_like ? esc_html__( 'Example: only comments on blog posts, or only reviews on products.', 'wp-ulike-pro' ) : esc_html__( 'Example: only blog posts, only pages, or only products.', 'wp-ulike-pro' ); ?></p>
 						</div>
 					</div>
 
 					<div class="wp-ulike-pro-display-field-grid wp-ulike-pro-display-field-grid-secondary" data-filter-scope="taxonomy">
 						<div class="wp-ulike-pro-display-field-row wp-ulike-pro-display-taxonomy-group"
 							 data-nonce="<?php echo esc_attr( wp_create_nonce( 'wp_ulike_pro_get_categories' ) ); ?>">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Category or taxonomy', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Category or taxonomy', 'wp-ulike-pro' ); ?></label>
 							<div class="wp-ulike-pro-display-select-wrapper">
-								<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][taxonomy]" class="wp-ulike-pro-display-taxonomy" data-placeholder="<?php esc_attr_e( 'Any', WP_ULIKE_PRO_DOMAIN ); ?>">
-									<option value=""><?php esc_html_e( 'Any', WP_ULIKE_PRO_DOMAIN ); ?></option>
+								<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][taxonomy]" class="wp-ulike-pro-display-taxonomy" data-placeholder="<?php esc_attr_e( 'Any', 'wp-ulike-pro' ); ?>">
+									<option value=""><?php esc_html_e( 'Any', 'wp-ulike-pro' ); ?></option>
 								</select>
 								<span class="spinner wp-ulike-pro-inline-spinner wp-ulike-pro-display-field-spinner" aria-hidden="true"></span>
 							</div>
 							<p class="description wp-ulike-pro-display-taxonomy-help"
-							   data-default-wp="<?php esc_attr_e( 'Limit by category or taxonomy. Choose content types above first if you filter posts and pages differently.', WP_ULIKE_PRO_DOMAIN ); ?>"
-							   data-default-wc="<?php esc_attr_e( 'Pick a product category, tag, or custom taxonomy.', WP_ULIKE_PRO_DOMAIN ); ?>"
-							   data-default-edd="<?php esc_attr_e( 'Pick a download category, tag, or custom taxonomy.', WP_ULIKE_PRO_DOMAIN ); ?>">
-								<?php esc_html_e( 'Limit by category or taxonomy. Choose content types above first if you filter posts and pages differently.', WP_ULIKE_PRO_DOMAIN ); ?>
+							   data-default-wp="<?php esc_attr_e( 'Limit by category or taxonomy. Choose content types above first if you filter posts and pages differently.', 'wp-ulike-pro' ); ?>"
+							   data-default-wc="<?php esc_attr_e( 'Pick a product category, tag, or custom taxonomy.', 'wp-ulike-pro' ); ?>"
+							   data-default-edd="<?php esc_attr_e( 'Pick a download category, tag, or custom taxonomy.', 'wp-ulike-pro' ); ?>">
+								<?php esc_html_e( 'Limit by category or taxonomy. Choose content types above first if you filter posts and pages differently.', 'wp-ulike-pro' ); ?>
 							</p>
 						</div>
 
 						<div class="wp-ulike-pro-display-field-row wp-ulike-pro-display-terms-group">
-							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Specific terms', WP_ULIKE_PRO_DOMAIN ); ?></label>
+							<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Specific terms', 'wp-ulike-pro' ); ?></label>
 							<div class="wp-ulike-pro-display-select-wrapper">
 								<div class="wp-ulike-pro-display-checkbox-list wp-ulike-pro-display-term-ids"
 									 data-name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][term_ids][]"
@@ -501,34 +501,34 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 								</div>
 								<span class="spinner wp-ulike-pro-inline-spinner wp-ulike-pro-display-field-spinner" aria-hidden="true"></span>
 							</div>
-							<p class="description"><?php esc_html_e( 'Example: only posts in “News” or products in “Shoes”.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+							<p class="description"><?php esc_html_e( 'Example: only posts in “News” or products in “Shoes”.', 'wp-ulike-pro' ); ?></p>
 						</div>
 					</div>
 
 					<?php if ( $is_woocommerce ) : ?>
 						<div class="wp-ulike-pro-display-woocommerce-filters" data-filter-scope="woocommerce" <?php echo $show_wc_filters ? '' : 'style="display:none;"'; ?>>
-							<h5><?php esc_html_e( 'WooCommerce product filters', WP_ULIKE_PRO_DOMAIN ); ?></h5>
+							<h5><?php esc_html_e( 'WooCommerce product filters', 'wp-ulike-pro' ); ?></h5>
 							<div class="wp-ulike-pro-display-field-grid">
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'On sale', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'On sale', 'wp-ulike-pro' ); ?></label>
 									<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][woocommerce][on_sale]">
-										<option value="" <?php selected( $wc['on_sale'] ?? '', '' ); ?>><?php esc_html_e( 'Any product', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="yes" <?php selected( $wc['on_sale'] ?? '', 'yes' ); ?>><?php esc_html_e( 'On sale only', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="no" <?php selected( $wc['on_sale'] ?? '', 'no' ); ?>><?php esc_html_e( 'Not on sale', WP_ULIKE_PRO_DOMAIN ); ?></option>
+										<option value="" <?php selected( $wc['on_sale'] ?? '', '' ); ?>><?php esc_html_e( 'Any product', 'wp-ulike-pro' ); ?></option>
+										<option value="yes" <?php selected( $wc['on_sale'] ?? '', 'yes' ); ?>><?php esc_html_e( 'On sale only', 'wp-ulike-pro' ); ?></option>
+										<option value="no" <?php selected( $wc['on_sale'] ?? '', 'no' ); ?>><?php esc_html_e( 'Not on sale', 'wp-ulike-pro' ); ?></option>
 									</select>
 								</div>
 
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Featured', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Featured' ); ?></label>
 									<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][woocommerce][featured]">
-										<option value="" <?php selected( $wc['featured'] ?? '', '' ); ?>><?php esc_html_e( 'Any product', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="yes" <?php selected( $wc['featured'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Featured only', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="no" <?php selected( $wc['featured'] ?? '', 'no' ); ?>><?php esc_html_e( 'Not featured', WP_ULIKE_PRO_DOMAIN ); ?></option>
+										<option value="" <?php selected( $wc['featured'] ?? '', '' ); ?>><?php esc_html_e( 'Any product', 'wp-ulike-pro' ); ?></option>
+										<option value="yes" <?php selected( $wc['featured'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Featured only', 'wp-ulike-pro' ); ?></option>
+										<option value="no" <?php selected( $wc['featured'] ?? '', 'no' ); ?>><?php esc_html_e( 'Not featured', 'wp-ulike-pro' ); ?></option>
 									</select>
 								</div>
 
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Product type', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Product type', 'wp-ulike-pro' ); ?></label>
 									<div class="wp-ulike-pro-display-checkbox-list wp-ulike-pro-display-product-types">
 										<?php foreach ( $product_types as $type_key => $type_label ) : ?>
 											<label class="wp-ulike-pro-display-checkbox-item">
@@ -547,23 +547,23 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 
 					<?php if ( $is_edd ) : ?>
 						<div class="wp-ulike-pro-display-edd-filters" data-filter-scope="edd" <?php echo $show_edd_filters ? '' : 'style="display:none;"'; ?>>
-							<h5><?php esc_html_e( 'EDD download filters', WP_ULIKE_PRO_DOMAIN ); ?></h5>
+							<h5><?php esc_html_e( 'EDD download filters', 'wp-ulike-pro' ); ?></h5>
 							<div class="wp-ulike-pro-display-field-grid">
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Free download', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Free download', 'wp-ulike-pro' ); ?></label>
 									<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][edd][free]">
-										<option value="" <?php selected( $edd['free'] ?? '', '' ); ?>><?php esc_html_e( 'Any download', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="yes" <?php selected( $edd['free'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Free only', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="no" <?php selected( $edd['free'] ?? '', 'no' ); ?>><?php esc_html_e( 'Paid only', WP_ULIKE_PRO_DOMAIN ); ?></option>
+										<option value="" <?php selected( $edd['free'] ?? '', '' ); ?>><?php esc_html_e( 'Any download', 'wp-ulike-pro' ); ?></option>
+										<option value="yes" <?php selected( $edd['free'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Free only', 'wp-ulike-pro' ); ?></option>
+										<option value="no" <?php selected( $edd['free'] ?? '', 'no' ); ?>><?php esc_html_e( 'Paid only', 'wp-ulike-pro' ); ?></option>
 									</select>
 								</div>
 
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Variable pricing', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Variable pricing', 'wp-ulike-pro' ); ?></label>
 									<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][edd][variable_pricing]">
-										<option value="" <?php selected( $edd['variable_pricing'] ?? '', '' ); ?>><?php esc_html_e( 'Any download', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="yes" <?php selected( $edd['variable_pricing'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Variable pricing only', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="no" <?php selected( $edd['variable_pricing'] ?? '', 'no' ); ?>><?php esc_html_e( 'Single price only', WP_ULIKE_PRO_DOMAIN ); ?></option>
+										<option value="" <?php selected( $edd['variable_pricing'] ?? '', '' ); ?>><?php esc_html_e( 'Any download', 'wp-ulike-pro' ); ?></option>
+										<option value="yes" <?php selected( $edd['variable_pricing'] ?? '', 'yes' ); ?>><?php esc_html_e( 'Variable pricing only', 'wp-ulike-pro' ); ?></option>
+										<option value="no" <?php selected( $edd['variable_pricing'] ?? '', 'no' ); ?>><?php esc_html_e( 'Single price only', 'wp-ulike-pro' ); ?></option>
 									</select>
 								</div>
 							</div>
@@ -572,21 +572,21 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 
 					<?php if ( $is_bbpress ) : ?>
 						<div class="wp-ulike-pro-display-bbpress-filters" data-filter-scope="bbpress" <?php echo $show_bbpress_filters ? '' : 'style="display:none;"'; ?>>
-							<h5><?php esc_html_e( 'bbPress filters', WP_ULIKE_PRO_DOMAIN ); ?></h5>
+							<h5><?php esc_html_e( 'bbPress filters', 'wp-ulike-pro' ); ?></h5>
 							<div class="wp-ulike-pro-display-field-grid">
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Item type', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Item type', 'wp-ulike-pro' ); ?></label>
 									<select name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][bbpress][item_type]">
-										<option value="" <?php selected( $bbp['item_type'] ?? '', '' ); ?>><?php esc_html_e( 'Topics and replies', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="topic" <?php selected( $bbp['item_type'] ?? '', 'topic' ); ?>><?php esc_html_e( 'Topics only', WP_ULIKE_PRO_DOMAIN ); ?></option>
-										<option value="reply" <?php selected( $bbp['item_type'] ?? '', 'reply' ); ?>><?php esc_html_e( 'Replies only', WP_ULIKE_PRO_DOMAIN ); ?></option>
+										<option value="" <?php selected( $bbp['item_type'] ?? '', '' ); ?>><?php esc_html_e( 'Topics and replies', 'wp-ulike-pro' ); ?></option>
+										<option value="topic" <?php selected( $bbp['item_type'] ?? '', 'topic' ); ?>><?php esc_html_e( 'Topics only', 'wp-ulike-pro' ); ?></option>
+										<option value="reply" <?php selected( $bbp['item_type'] ?? '', 'reply' ); ?>><?php esc_html_e( 'Replies only', 'wp-ulike-pro' ); ?></option>
 									</select>
-									<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Use separate rules with different placements for topics vs replies when needed.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+									<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Use separate rules with different placements for topics vs replies when needed.', 'wp-ulike-pro' ); ?></p>
 								</div>
 
 								<?php if ( ! empty( $bbpress_forums ) ) : ?>
 									<div class="wp-ulike-pro-display-field-row">
-										<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Forums', WP_ULIKE_PRO_DOMAIN ); ?></label>
+										<label class="wp-ulike-pro-display-field-label"><?php esc_html_e( 'Forums', 'wp-ulike-pro' ); ?></label>
 										<div class="wp-ulike-pro-display-checkbox-list">
 											<?php foreach ( $bbpress_forums as $forum_id => $forum_label ) : ?>
 												<label class="wp-ulike-pro-display-checkbox-item">
@@ -602,14 +602,14 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 								<?php endif; ?>
 
 								<div class="wp-ulike-pro-display-field-row">
-									<label class="wp-ulike-pro-display-field-label" for="display-rule-bbp-topics-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Specific topic IDs', WP_ULIKE_PRO_DOMAIN ); ?></label>
+									<label class="wp-ulike-pro-display-field-label" for="display-rule-bbp-topics-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Specific topic IDs', 'wp-ulike-pro' ); ?></label>
 									<input type="text"
 										   id="display-rule-bbp-topics-<?php echo esc_attr( $index ); ?>"
 										   class="regular-text wp-ulike-pro-display-ltr"
 										   name="display_rules[<?php echo esc_attr( $index ); ?>][conditions][bbpress][topic_ids]"
 										   value="<?php echo esc_attr( $bbp_topic_ids ); ?>"
-										   placeholder="<?php esc_attr_e( 'e.g. 12, 45, 102', WP_ULIKE_PRO_DOMAIN ); ?>">
-									<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Optional. Comma-separated topic IDs. Replies inherit the parent topic.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+										   placeholder="<?php esc_attr_e( 'e.g. 12, 45, 102', 'wp-ulike-pro' ); ?>">
+									<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Optional. Comma-separated topic IDs. Replies inherit the parent topic.', 'wp-ulike-pro' ); ?></p>
 								</div>
 							</div>
 						</div>
@@ -621,14 +621,14 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 				<button type="button" class="wp-ulike-pro-display-step-toggle" aria-expanded="false">
 					<span class="wp-ulike-pro-display-step-number" aria-hidden="true">6</span>
 					<span class="wp-ulike-pro-display-step-toggle-text">
-						<strong><?php esc_html_e( 'Advanced settings (optional)', WP_ULIKE_PRO_DOMAIN ); ?></strong>
-						<span><?php esc_html_e( 'Technical options — most users can skip this.', WP_ULIKE_PRO_DOMAIN ); ?></span>
+						<strong><?php esc_html_e( 'Advanced settings (optional)', 'wp-ulike-pro' ); ?></strong>
+						<span><?php esc_html_e( 'Technical options — most users can skip this.', 'wp-ulike-pro' ); ?></span>
 					</span>
 					<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 				</button>
 				<div class="wp-ulike-pro-display-step-content">
 					<div class="wp-ulike-pro-display-field-row">
-						<label class="wp-ulike-pro-display-field-label" for="display-rule-priority-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Hook priority', WP_ULIKE_PRO_DOMAIN ); ?></label>
+						<label class="wp-ulike-pro-display-field-label" for="display-rule-priority-<?php echo esc_attr( $index ); ?>"><?php esc_html_e( 'Hook priority', 'wp-ulike-pro' ); ?></label>
 						<input type="number"
 							   id="display-rule-priority-<?php echo esc_attr( $index ); ?>"
 							   name="display_rules[<?php echo esc_attr( $index ); ?>][hook_priority]"
@@ -636,14 +636,14 @@ $preset_id                 = isset( $preset_id ) ? sanitize_key( (string) $prese
 							   min="1"
 							   max="100"
 							   value="<?php echo esc_attr( $rule['hook_priority'] ?? 10 ); ?>">
-						<p class="description"><?php esc_html_e( 'Controls the WordPress hook execution order on the same action. Lower numbers run earlier. This is separate from the rule list order above.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<p class="description"><?php esc_html_e( 'Controls the WordPress hook execution order on the same action. Lower numbers run earlier. This is separate from the rule list order above.', 'wp-ulike-pro' ); ?></p>
 					</div>
 					<label class="wp-ulike-pro-display-rule-override">
 						<input type="checkbox"
 							   name="display_rules[<?php echo esc_attr( $index ); ?>][override_default]"
 							   value="1"
 							   <?php checked( ! empty( $rule['override_default'] ) ); ?>>
-						<?php esc_html_e( 'Replace basic Automatic Display for matching content when this rule uses content or comment filters (not custom theme hooks).', WP_ULIKE_PRO_DOMAIN ); ?>
+						<?php esc_html_e( 'Replace basic Automatic Display for matching content when this rule uses content or comment filters (not custom theme hooks).', 'wp-ulike-pro' ); ?>
 					</label>
 				</div>
 			</div>

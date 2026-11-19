@@ -33,7 +33,7 @@ $has_quick_start     = ! empty( $quick_start_presets );
 
 <?php if ( isset( $_GET['settings-updated'] ) && 'true' === $_GET['settings-updated'] ) : ?>
 	<div class="notice notice-success is-dismissible wp-ulike-pro-tools-notice">
-		<p><?php esc_html_e( 'Display rules saved successfully.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+		<p><?php esc_html_e( 'Display rules saved successfully.', 'wp-ulike-pro' ); ?></p>
 	</div>
 <?php endif; ?>
 
@@ -48,7 +48,7 @@ if ( ! empty( $active_auto_display ) ) :
 			echo wp_kses_post(
 				sprintf(
 					/* translators: 1: comma-separated content types, 2: opening anchor, 3: closing anchor */
-					__( 'Basic Automatic Display is enabled for %1$s. To avoid duplicate buttons, turn it off under %2$sSettings → Configuration → Content Types%3$s for those types. If multiple rules target the same placement, only keep one active rule or use different filters.', WP_ULIKE_PRO_DOMAIN ),
+					__( 'Basic Automatic Display is enabled for %1$s. To avoid duplicate buttons, turn it off under %2$sSettings → Configuration → Content Types%3$s for those types. If multiple rules target the same placement, only keep one active rule or use different filters.', 'wp-ulike-pro' ),
 					'<strong>' . esc_html( implode( ', ', $active_auto_display ) ) . '</strong>',
 					'<a href="' . esc_url( $settings_url ) . '">',
 					'</a>'
@@ -61,10 +61,10 @@ if ( ! empty( $active_auto_display ) ) :
 
 <div class="wp-ulike-pro-tools-card">
 	<div class="wp-ulike-pro-tools-card-header">
-		<h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'Display Automation', WP_ULIKE_PRO_DOMAIN ); ?></h2>
+		<h2 class="wp-ulike-about-card__title"><?php esc_html_e( 'Display Automation', 'wp-ulike-pro' ); ?></h2>
 	</div>
 	<div class="wp-ulike-pro-tools-card-content">
-		<p class="wp-ulike-tools-panel__intro wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Automatically place like buttons on your site without writing code. Each rule controls one button location — create multiple rules if you need the button in more than one place (for example product page and shop archive). Works with custom post types, category filters, and custom theme hooks for page builders. Steps 1–3 are required; steps 4–6 add optional template, filter, and advanced settings.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+		<p class="wp-ulike-tools-panel__intro wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Automatically place like buttons on your site without writing code. Each rule controls one button location — create multiple rules if you need the button in more than one place (for example product page and shop archive). Works with custom post types, category filters, and custom theme hooks for page builders. Steps 1–3 are required; steps 4–6 add optional template, filter, and advanced settings.', 'wp-ulike-pro' ); ?></p>
 
 		<form method="post" action="" id="wp-ulike-pro-display-automation-form" class="wp-ulike-pro-display-automation-form"<?php echo is_rtl() ? ' dir="rtl"' : ''; ?>>
 			<?php wp_nonce_field( 'wp_ulike_display_automation_settings', 'wp_ulike_display_automation_nonce' ); ?>
@@ -75,7 +75,7 @@ if ( ! empty( $active_auto_display ) ) :
 					<div class="wp-ulike-pro-display-automation-toolbar-actions">
 						<button type="button" class="button button-secondary" id="wp-ulike-pro-add-display-rule">
 							<span class="dashicons dashicons-plus-alt2"></span>
-							<?php esc_html_e( 'Add Blank Rule', WP_ULIKE_PRO_DOMAIN ); ?>
+							<?php esc_html_e( 'Add' ); ?>
 						</button>
 						<?php if ( $has_quick_start ) : ?>
 							<button type="button"
@@ -84,12 +84,12 @@ if ( ! empty( $active_auto_display ) ) :
 									aria-expanded="false"
 									aria-controls="wp-ulike-pro-display-preset-picker-toolbar">
 								<span class="dashicons dashicons-lightbulb" aria-hidden="true"></span>
-								<?php esc_html_e( 'Quick Start', WP_ULIKE_PRO_DOMAIN ); ?>
+								<?php esc_html_e( 'Quick Start', 'wp-ulike-pro' ); ?>
 							</button>
 						<?php endif; ?>
 					</div>
 					<p class="description wp-ulike-pro-display-automation-toolbar-help wp-ulike-pro-display-bidi-auto">
-						<?php esc_html_e( 'One rule = one button location. Use Quick Start for ready-made rules, or add a blank rule to build your own.', WP_ULIKE_PRO_DOMAIN ); ?>
+						<?php esc_html_e( 'One rule = one button location. Use Quick Start for ready-made rules, or add a blank rule to build your own.', 'wp-ulike-pro' ); ?>
 					</p>
 				</div>
 
@@ -97,7 +97,7 @@ if ( ! empty( $active_auto_display ) ) :
 					<div id="wp-ulike-pro-display-preset-picker-toolbar"
 						 class="wp-ulike-pro-display-preset-picker wp-ulike-pro-display-preset-picker--toolbar"
 						 hidden>
-						<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Pick a preset to add another ready-made rule. Each adds one location — review it, adjust if needed, then save.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<p class="description wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Pick a preset to add another ready-made rule. Each adds one location — review it, adjust if needed, then save.', 'wp-ulike-pro' ); ?></p>
 						<?php include __DIR__ . '/display-automation-preset-picker.php'; ?>
 					</div>
 				<?php endif; ?>
@@ -108,14 +108,14 @@ if ( ! empty( $active_auto_display ) ) :
 						<div class="wp-ulike-pro-display-empty-icon" aria-hidden="true">
 							<span class="dashicons dashicons-location-alt"></span>
 						</div>
-						<h3><?php esc_html_e( 'No display rules yet', WP_ULIKE_PRO_DOMAIN ); ?></h3>
-						<p class="wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Pick a quick start below or build a custom rule from scratch. Each preset adds one ready-to-edit rule — review the steps, adjust filters if needed, then save.', WP_ULIKE_PRO_DOMAIN ); ?></p>
+						<h3><?php esc_html_e( 'No display rules yet', 'wp-ulike-pro' ); ?></h3>
+						<p class="wp-ulike-pro-display-bidi-auto"><?php esc_html_e( 'Pick a quick start below or build a custom rule from scratch. Each preset adds one ready-to-edit rule — review the steps, adjust filters if needed, then save.', 'wp-ulike-pro' ); ?></p>
 						<?php if ( $has_quick_start ) : ?>
 							<?php include __DIR__ . '/display-automation-preset-picker.php'; ?>
 						<?php endif; ?>
 						<div class="wp-ulike-pro-display-empty-actions">
 							<button type="button" class="button button-secondary" id="wp-ulike-pro-add-first-rule">
-								<?php esc_html_e( 'Start from Scratch', WP_ULIKE_PRO_DOMAIN ); ?>
+								<?php esc_html_e( 'Start from Scratch', 'wp-ulike-pro' ); ?>
 							</button>
 						</div>
 					</div>
@@ -137,11 +137,11 @@ if ( ! empty( $active_auto_display ) ) :
 						 role="status"
 						 aria-live="polite">
 						<span class="wp-ulike-pro-display-automation-unsaved-indicator" aria-hidden="true"></span>
-						<span class="wp-ulike-pro-display-automation-unsaved-text"><?php esc_html_e( 'You have unsaved changes', WP_ULIKE_PRO_DOMAIN ); ?></span>
+						<span class="wp-ulike-pro-display-automation-unsaved-text"><?php esc_html_e( 'You have unsaved changes', 'wp-ulike-pro' ); ?></span>
 					</div>
 					<input type="submit"
 						   class="button button-primary wp-ulike-pro-display-automation-save-btn"
-						   value="<?php esc_attr_e( 'Save Display Rules', WP_ULIKE_PRO_DOMAIN ); ?>">
+						   value="<?php esc_attr_e( 'Save' ); ?>">
 				</div>
 			</div>
 		</form>

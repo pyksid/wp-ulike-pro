@@ -234,10 +234,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_Pulse_Reader' ) ) {
 			}
 
 			$labels = array(
-				'like'      => esc_html__( 'Like (Up Vote)', WP_ULIKE_PRO_DOMAIN ),
-				'unlike'    => esc_html__( 'Un-Like (Removed Up Vote)', WP_ULIKE_PRO_DOMAIN ),
-				'dislike'   => esc_html__( 'Dislike (Down Vote)', WP_ULIKE_PRO_DOMAIN ),
-				'undislike' => esc_html__( 'Un-Dislike (Removed Down Vote)', WP_ULIKE_PRO_DOMAIN ),
+				'like'      => esc_html__( 'Like (Up Vote)', 'wp-ulike-pro' ),
+				'unlike'    => esc_html__( 'Un-Like (Removed Up Vote)', 'wp-ulike-pro' ),
+				'dislike'   => esc_html__( 'Dislike (Down Vote)', 'wp-ulike-pro' ),
+				'undislike' => esc_html__( 'Un-Dislike (Removed Down Vote)', 'wp-ulike-pro' ),
 			);
 
 			return array(

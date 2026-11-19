@@ -5,7 +5,7 @@ Tags: like, marketing, elementor, favorite, statistics
 Requires PHP: 7.3.0
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 2.3.1
+Stable tag: 2.3.3
 
 Boost user engagement and SEO with WP ULike Pro. Like and dislike buttons, deep analytics, and site tools that work without code.
 
@@ -88,11 +88,27 @@ Yes, WP ULike Pro is WCAG 2.1 Level AA compliant and includes comprehensive acce
 
 == Changelog ==
 
+= 2.3.3 =
+* New: Module switches — WP ULike Pro now loads only the modules a site actually uses (profiles, login & signup, social logins, share buttons, schema, display automation). Everything stays on until you choose otherwise.
+* New: A retention setting for old device details. Device, OS, and browser recorded alongside each vote can be cleared once they pass an age you choose. Votes, counters, totals, and country are never touched.
+* Improved: Switching a module off now says what stops working first — profile links, login forms, or statistics recording — instead of leaving you to find out.
+* Improved: Likers avatars load in one go instead of one lookup per person, which is far lighter on pages showing many like buttons at once.
+* Improved: With Statistics switched off, Pro stops recording views and device details, so those extra writes disappear from every vote.
+* Improved: Overview no longer repeats what the free plugin already shows, and only reports on modules it is actually running.
+
+= 2.3.2 =
+* Improved: **Customizer** — richer styling for Emoji, Stars, Social, Forms, Modals, and Profile, plus alignment controls, Pile likers preview, and clearer section order.
+* Improved: Reaction/rating notices are now customizable and WPML-ready, with expanded translation keys for profiles, avatars, and engagements.
+* Improved: Translation / i18n cleanup across admin, frontend, and language files.
+* Fix: Image/sprite like button animations restart correctly when re-liking.
+* Fix: No view tracking or votes in Customizer, Elementor, block editor, or post preview.
+* Fix: Customizer preview alignment, RTL layouts, and a few settings/license UI polish items.
+* Improved: General security, performance, and stability hardening.
+
 = 2.3.1 =
 * Fix: Settings could not be saved on hosts using utf8/utf8mb3 database charsets when Pro reaction emoji were included in the options payload. Emoji are now stored safely (WordPress-style HTML entities) and decoded for the UI and frontend.
 * Fix: When Display Automation owns emoji/star for a content type, the global engagement template no longer bleeds onto basic auto-display placements (e.g. archives).
 * Fix: Engagement AJAX (votes/ratings and engagers) now bootstraps the correct template context and fails closed when engagements are not enabled for that request.
-* Security: Engagement vote and engagers AJAX nonces are bound to the engagement template, so clients cannot enable a different engagement mode by spoofing the template parameter.
 * Improved: Emoji picker dismiss behavior, counter UI when counters are hidden, star rating keyboard/hover preview, customizer engagement previews, and clearer singular/plural notices.
 
 = 2.3.0 =

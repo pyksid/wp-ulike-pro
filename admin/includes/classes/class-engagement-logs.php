@@ -309,7 +309,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 					if ( null !== ( $user_info = get_userdata( $row->user_id ) ) ) {
 						$output[ $key ]->user_id = '@' . $user_info->user_login;
 					} else {
-						$output[ $key ]->user_id = '#' . esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN );
+						$output[ $key ]->user_id = '#' . esc_html__( 'Guest User', 'wp-ulike-pro' );
 					}
 				}
 
@@ -349,7 +349,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 		 */
 		private function format_status_label( $row ) {
 			if ( 'removed' === $row->status ) {
-				return esc_html__( 'Removed', WP_ULIKE_PRO_DOMAIN );
+				return esc_html__( 'Removed' );
 			}
 
 			if ( 'emoji' === $row->engagement_kind && class_exists( 'WP_Ulike_Pro_Engagement_Registry' ) ) {
@@ -362,7 +362,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 					if ( ! isset( $enabled[ $key ] ) ) {
 						return sprintf(
 							/* translators: %s: reaction label */
-							esc_html__( '%s (disabled)', WP_ULIKE_PRO_DOMAIN ),
+							esc_html__( '%s (disabled)', 'wp-ulike-pro' ),
 							$label
 						);
 					}
@@ -371,7 +371,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 			}
 
 			if ( 'star' === $row->engagement_kind && ! empty( $row->value ) ) {
-				return sprintf( esc_html__( '%d stars', WP_ULIKE_PRO_DOMAIN ), (int) $row->value );
+				return sprintf( esc_html__( '%d stars', 'wp-ulike-pro' ), (int) $row->value );
 			}
 
 			return sanitize_text_field( (string) $row->engagement_key );
@@ -420,8 +420,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 		private function append_comment_fields( $output, $comment_id ) {
 			$comment = get_comment( $comment_id );
 			if ( ! $comment ) {
-				$output->comment_author  = esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN );
-				$output->comment_content = esc_html__( 'Not found!', WP_ULIKE_PRO_DOMAIN );
+				$output->comment_author  = esc_html__( 'Not found!', 'wp-ulike-pro' );
+				$output->comment_content = esc_html__( 'Not found!', 'wp-ulike-pro' );
 				return;
 			}
 
@@ -440,7 +440,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Engagement_Logs' ) ) {
 		 */
 		private function append_activity_fields( $output, $activity_id ) {
 			$activity_link  = function_exists( 'bp_activity_get_permalink' ) ? bp_activity_get_permalink( $activity_id ) : '';
-			$activity_title = esc_html__( 'Activity Permalink', WP_ULIKE_PRO_DOMAIN );
+			$activity_title = esc_html__( 'Activity Permalink', 'wp-ulike-pro' );
 
 			if ( class_exists( 'BP_Activity_Activity' ) ) {
 				$activity_obj = new BP_Activity_Activity( $activity_id );

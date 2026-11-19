@@ -149,10 +149,10 @@ if ( ! class_exists( 'WP_Ulike_Pro_WooCommerce' ) ) {
 			}
 
 			return array(
-				'simple'   => esc_html__( 'Simple', WP_ULIKE_PRO_DOMAIN ),
-				'variable' => esc_html__( 'Variable', WP_ULIKE_PRO_DOMAIN ),
-				'grouped'  => esc_html__( 'Grouped', WP_ULIKE_PRO_DOMAIN ),
-				'external' => esc_html__( 'External/Affiliate', WP_ULIKE_PRO_DOMAIN ),
+				'simple'   => esc_html__( 'Simple', 'wp-ulike-pro' ),
+				'variable' => esc_html__( 'Variable', 'wp-ulike-pro' ),
+				'grouped'  => esc_html__( 'Grouped', 'wp-ulike-pro' ),
+				'external' => esc_html__( 'External/Affiliate', 'wp-ulike-pro' ),
 			);
 		}
 

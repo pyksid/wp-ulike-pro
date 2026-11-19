@@ -256,7 +256,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			$taxonomies           = get_object_taxonomies( $post_type, 'objects' );
 			$categories           = array();
 			$available_taxonomies = array();
-			$label                = esc_html__( 'Category', 'wp-ulike-pro' );
+			$label                = __( 'Category' );
 			$taxonomy             = '';
 
 			foreach ( $taxonomies as $tax ) {
@@ -376,7 +376,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 					'type'    => 'warning',
 					'message' => sprintf(
 						/* translators: %d: interaction count */
-						esc_html__( 'No interactions today — yesterday had %d.', 'wp-ulike-pro' ),
+						__( 'No interactions today — yesterday had %d.', 'wp-ulike-pro' ),
 						$overview['yesterday']
 					),
 				);
@@ -387,7 +387,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 					'type'    => 'positive',
 					'message' => sprintf(
 						/* translators: %s: growth percentage */
-						esc_html__( 'Engagement is up %s%% compared to last week.', 'wp-ulike-pro' ),
+						__( 'Engagement is up %s%% compared to last week.', 'wp-ulike-pro' ),
 						number_format_i18n( $overview['week_growth'], 1 )
 					),
 				);
@@ -396,7 +396,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 					'type'    => 'warning',
 					'message' => sprintf(
 						/* translators: %s: decline percentage */
-						esc_html__( 'Engagement dropped %s%% this week — review recent content.', 'wp-ulike-pro' ),
+						__( 'Engagement dropped %s%% this week — review recent content.', 'wp-ulike-pro' ),
 						number_format_i18n( abs( $overview['week_growth'] ), 1 )
 					),
 				);
@@ -420,7 +420,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 					'type'    => 'info',
 					'message' => sprintf(
 						/* translators: 1: content type, 2: growth percentage */
-						esc_html__( '%1$s leads this week with %2$s%% growth.', 'wp-ulike-pro' ),
+						__( '%1$s leads this week with %2$s%% growth.', 'wp-ulike-pro' ),
 						ucfirst( $best_type ),
 						number_format_i18n( $best_growth, 1 )
 					),
@@ -430,7 +430,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_V2' ) ) {
 			if ( empty( $tips ) && $overview['total'] > 0 ) {
 				$tips[] = array(
 					'type'    => 'info',
-					'message' => esc_html__( 'Open Reports in the sidebar to explore engagement by content type, geography, and device.', 'wp-ulike-pro' ),
+					'message' => __( 'Open Reports in the sidebar to explore engagement by content type, geography, and device.', 'wp-ulike-pro' ),
 				);
 			}
 

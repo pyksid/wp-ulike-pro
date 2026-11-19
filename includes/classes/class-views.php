@@ -329,11 +329,22 @@ if ( ! class_exists( 'WP_Ulike_Pro_Views' ) ) {
          * @return bool True if enabled, false otherwise
          */
         public function is_tracking_enabled( $type ) {
+            // Views exist only to compute engagement rate in the reports. With
+            // Statistics switched off nothing reads them, so stop recording.
+            if ( function_exists( 'wp_ulike_should_record_analytics_meta' ) ) {
+                if ( ! wp_ulike_should_record_analytics_meta() ) {
+                    return false;
+                }
+            } elseif ( function_exists( 'wp_ulike_pro_feature_enabled' ) && ! wp_ulike_pro_feature_enabled( 'statistics' ) ) {
+                return false;
+            }
+
             $enabled_types = wp_ulike_get_option( 'view_tracking_enabled_types', array( 'post' ) );
 
-            // Default to all enabled if option not set
-            if ( empty( $enabled_types ) || ! is_array( $enabled_types ) ) {
-                return true;
+            // Unset / corrupt option → default to posts. Empty array means the
+            // site unchecked every type and wants none.
+            if ( ! is_array( $enabled_types ) ) {
+                $enabled_types = array( 'post' );
             }
 
             return in_array( $type, $enabled_types, true );
@@ -345,6 +356,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Views' ) ) {
          * @return void
          */
         public function ajax_track_view() {
+            // Customizer / builder preview must never record views.
+            if ( class_exists( 'WP_Ulike_Pro' ) && WP_Ulike_Pro::is_preview_mode() ) {
+                wp_send_json_error();
+            }
+
             // Verify nonce
             if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], WP_ULIKE_PRO_DOMAIN ) ) {
                 wp_send_json_error();
@@ -382,6 +398,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Views' ) ) {
          * @return void
          */
         public function ajax_track_view_batch() {
+            // Customizer / builder preview must never record views.
+            if ( class_exists( 'WP_Ulike_Pro' ) && WP_Ulike_Pro::is_preview_mode() ) {
+                wp_send_json_error();
+            }
+
             // Verify nonce
             if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], WP_ULIKE_PRO_DOMAIN ) ) {
                 wp_send_json_error();
@@ -463,7 +484,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Views' ) ) {
                 return array(
                     'success' => true,
                     'rows_affected' => (int) $count,
-                    'message' => sprintf( esc_html__( 'Successfully deleted %d view records for %s.', WP_ULIKE_PRO_DOMAIN ), $count, $type )
+                    'message' => sprintf( __( 'Successfully deleted %d view records for %s.', 'wp-ulike-pro' ), $count, $type )
                 );
             }
 

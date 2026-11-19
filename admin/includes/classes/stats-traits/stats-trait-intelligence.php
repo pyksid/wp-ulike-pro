@@ -182,7 +182,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 			if ( class_exists( 'WooCommerce' ) && $this->has_post_type_engagement( 'product' ) ) {
 				$segments[] = array(
 					'taxonomy'   => 'product_cat',
-					'label'      => esc_html__( 'Product categories', 'wp-ulike-pro' ),
+					'label'      => __( 'Product categories', 'wp-ulike-pro' ),
 					'post_types' => array( 'product' ),
 				);
 			}
@@ -190,7 +190,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 			if ( function_exists( 'edd_get_download' ) && $this->has_post_type_engagement( 'download' ) ) {
 				$segments[] = array(
 					'taxonomy'   => 'download_category',
-					'label'      => esc_html__( 'Download categories', 'wp-ulike-pro' ),
+					'label'      => __( 'Download categories', 'wp-ulike-pro' ),
 					'post_types' => array( 'download' ),
 				);
 			}
@@ -247,11 +247,11 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 			$commerce_types = array();
 
 			if ( class_exists( 'WooCommerce' ) && $this->has_post_type_engagement( 'product' ) ) {
-				$commerce_types['product'] = esc_html__( 'Products', 'wp-ulike-pro' );
+				$commerce_types['product'] = __( 'Products', 'wp-ulike-pro' );
 			}
 
 			if ( function_exists( 'edd_get_download' ) && $this->has_post_type_engagement( 'download' ) ) {
-				$commerce_types['download'] = esc_html__( 'Downloads', 'wp-ulike-pro' );
+				$commerce_types['download'] = __( 'Downloads', 'wp-ulike-pro' );
 			}
 
 			if ( empty( $commerce_types ) ) {
@@ -310,20 +310,20 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 						'type'    => 'positive',
 						'message' => sprintf(
 							/* translators: %s: engagement rate percentage */
-							esc_html__( 'Engagement rate rose to %s%% — your content is converting better.', 'wp-ulike-pro' ),
+							__( 'Engagement rate rose to %s%% — your content is converting better.', 'wp-ulike-pro' ),
 							number_format_i18n( $intelligence['engagement_rate'], 1 )
 						),
 					);
 				} elseif ( $intelligence['engagement_rate'] < 2 && $intelligence['total_views'] > 50 ) {
 					$tips[] = array(
 						'type'    => 'warning',
-						'message' => esc_html__( 'Engagement rate is low — test button placement or stronger calls-to-action.', 'wp-ulike-pro' ),
+						'message' => __( 'Engagement rate is low — test button placement or stronger calls-to-action.', 'wp-ulike-pro' ),
 					);
 				}
 			} elseif ( empty( $intelligence['views_tracking_enabled'] ) ) {
 				$tips[] = array(
 					'type'    => 'info',
-					'message' => esc_html__( 'Enable view tracking in Pro settings to measure engagement rate and conversion.', 'wp-ulike-pro' ),
+					'message' => __( 'Enable view tracking in Pro settings to measure engagement rate and conversion.', 'wp-ulike-pro' ),
 				);
 			}
 
@@ -336,7 +336,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 					'type'    => 'info',
 					'message' => sprintf(
 						/* translators: %s: time label e.g. 2 PM */
-						esc_html__( 'Peak engagement happens around %s — schedule posts and campaigns then.', 'wp-ulike-pro' ),
+						__( 'Peak engagement happens around %s — schedule posts and campaigns then.', 'wp-ulike-pro' ),
 						$peak['label']
 					),
 				);
@@ -351,7 +351,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 					'type'    => 'positive',
 					'message' => sprintf(
 						/* translators: 1: category name, 2: engagement count */
-						esc_html__( '%1$s is your top category with %2$s engagements this month.', 'wp-ulike-pro' ),
+						__( '%1$s is your top category with %2$s engagements this month.', 'wp-ulike-pro' ),
 						$categories[0]['name'],
 						number_format_i18n( $categories[0]['count'] ?? 0 )
 					),
@@ -367,7 +367,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 					'type'    => 'info',
 					'message' => sprintf(
 						/* translators: 1: item type label, 2: product title */
-						esc_html__( 'Top %1$s: %2$s — double down on similar offers.', 'wp-ulike-pro' ),
+						__( 'Top %1$s: %2$s — double down on similar offers.', 'wp-ulike-pro' ),
 						strtolower( $commerce['label'] ?? '' ),
 						$commerce['items'][0]['title']
 					),
@@ -377,7 +377,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 			if ( ! empty( $intelligence['sentiment']['dislikes_available'] ) && ! empty( $intelligence['sentiment']['like_ratio'] ) && $intelligence['sentiment']['like_ratio'] < 70 && $intelligence['sentiment']['total'] > 20 ) {
 				$tips[] = array(
 					'type'    => 'warning',
-					'message' => esc_html__( 'Negative sentiment is rising — review content that receives negative reactions.', 'wp-ulike-pro' ),
+					'message' => __( 'Negative sentiment is rising — review content that receives negative reactions.', 'wp-ulike-pro' ),
 				);
 			}
 
@@ -848,7 +848,7 @@ trait WP_Ulike_Pro_Stats_Trait_Intelligence {
 			$object = get_taxonomy( $taxonomy );
 			return $object && ! empty( $object->labels->name )
 				? $object->labels->name
-				: esc_html__( 'Categories', 'wp-ulike-pro' );
+				: __( 'Categories' );
 		}
 
 		/**

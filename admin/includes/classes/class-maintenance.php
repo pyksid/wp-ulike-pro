@@ -64,7 +64,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 					$total,
 					sprintf(
 						/* translators: %d: number of items updated */
-						esc_html__( 'Synced counters for %d items across all content types.', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'Synced counters for %d items across all content types.', 'wp-ulike-pro' ),
 						$total
 					)
 				);
@@ -84,13 +84,13 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 
 			$message = sprintf(
 				/* translators: 1: number of items, 2: content type */
-				esc_html__( 'Synced counters for %1$d %2$s items.', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( 'Synced counters for %1$d %2$s items.', 'wp-ulike-pro' ),
 				$total,
 				ucfirst( $type )
 			);
 
 			if ( $partial ) {
-				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Please run again if needed.', WP_ULIKE_PRO_DOMAIN );
+				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Please run again if needed.', 'wp-ulike-pro' );
 			}
 
 			return self::result( true, $total, $message );
@@ -119,7 +119,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 					true,
 					0,
 					sprintf(
-						esc_html__( 'No invalid or duplicate records found for %s.', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'No invalid or duplicate records found for %s.', 'wp-ulike-pro' ),
 						ucfirst( $type )
 					)
 				);
@@ -129,7 +129,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				true,
 				$total,
 				sprintf(
-					esc_html__( 'Repaired %d invalid or duplicate records for %s.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Repaired %d invalid or duplicate records for %s.', 'wp-ulike-pro' ),
 					$total,
 					ucfirst( $type )
 				)
@@ -184,7 +184,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				'count'         => $count,
 				'message'       => sprintf(
 					/* translators: %d: matching row count */
-					esc_html__( '%d matching Pulse log row(s).', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( '%d matching Pulse log row(s).', 'wp-ulike-pro' ),
 					$count
 				),
 			);
@@ -215,7 +215,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 					return self::result(
 						false,
 						0,
-						esc_html__( 'Purging Pulse logs is only available after the storage upgrade has fully completed. While old and new storage are both in use, these rows are the only copy of recent votes. Finish the upgrade in WP ULike → Storage Upgrade first.', WP_ULIKE_PRO_DOMAIN )
+						esc_html__( 'Purging Pulse logs is only available after the storage upgrade has fully completed. While old and new storage are both in use, these rows are the only copy of recent votes. Finish the upgrade in WP ULike → Storage Upgrade first.', 'wp-ulike-pro' )
 					);
 				}
 
@@ -223,7 +223,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 					return self::result(
 						false,
 						0,
-						esc_html__( 'A storage migration is currently running. Wait for it to finish before purging Pulse logs.', WP_ULIKE_PRO_DOMAIN )
+						esc_html__( 'A storage migration is currently running. Wait for it to finish before purging Pulse logs.', 'wp-ulike-pro' )
 					);
 				}
 			}
@@ -309,16 +309,16 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			}
 
 			$age_label = 0 === $parsed['older_than']
-				? esc_html__( 'all time', WP_ULIKE_PRO_DOMAIN )
+				? esc_html__( 'All time', 'wp-ulike-pro' )
 				: sprintf(
 					/* translators: %d: number of days */
-					esc_html__( 'older than %d days', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'older than %d days', 'wp-ulike-pro' ),
 					$parsed['older_than']
 				);
 
 			$message = sprintf(
 				/* translators: 1: deleted rows, 2: content type, 3: kind label, 4: age label */
-				esc_html__( 'Permanently removed %1$d Pulse log row(s) for %2$s (%3$s, %4$s).', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( 'Permanently removed %1$d Pulse log row(s) for %2$s (%3$s, %4$s).', 'wp-ulike-pro' ),
 				$total_deleted,
 				ucfirst( $type ),
 				$parsed['kind_label'],
@@ -326,11 +326,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			);
 
 			if ( ( ! self::can_continue_operation( $start_time ) || $counter_partial ) && $total_deleted > 0 ) {
-				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Run Sync Counters from Tools → Maintenance if counts need updating.', WP_ULIKE_PRO_DOMAIN );
+				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Run Sync Counters from Tools → Maintenance if counts need updating.', 'wp-ulike-pro' );
 			} elseif ( 0 === $total_deleted ) {
 				$message = sprintf(
 					/* translators: %s: content type */
-					esc_html__( 'No matching Pulse log rows found for %s.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'No matching Pulse log rows found for %s.', 'wp-ulike-pro' ),
 					ucfirst( $type )
 				);
 			}
@@ -358,9 +358,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			}
 
 			$labels = array(
-				'vote'        => esc_html__( 'votes', WP_ULIKE_PRO_DOMAIN ),
-				'engagement'  => esc_html__( 'emoji & star', WP_ULIKE_PRO_DOMAIN ),
-				'all'         => esc_html__( 'all kinds', WP_ULIKE_PRO_DOMAIN ),
+				'vote'        => esc_html__( 'Votes', 'wp-ulike-pro' ),
+				'engagement'  => esc_html__( 'emoji & star', 'wp-ulike-pro' ),
+				'all'         => esc_html__( 'all kinds', 'wp-ulike-pro' ),
 			);
 
 			return array(
@@ -432,14 +432,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			}
 
 			$label = 'user' === $group_name
-				? esc_html__( 'User Status', WP_ULIKE_PRO_DOMAIN )
-				: esc_html__( 'Statistics', WP_ULIKE_PRO_DOMAIN );
+				? esc_html__( 'User Status', 'wp-ulike-pro' )
+				: esc_html__( 'Statistics', 'wp-ulike-pro' );
 
 			return self::result(
 				true,
 				$count,
 				sprintf(
-					esc_html__( 'Successfully deleted %1$d cached entries for %2$s.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully deleted %1$d cached entries for %2$s.', 'wp-ulike-pro' ),
 					$count,
 					$label
 				)
@@ -486,7 +486,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				true,
 				$count,
 				sprintf(
-					esc_html__( 'Successfully deleted %d empty post meta rows.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully deleted %d empty post meta rows.', 'wp-ulike-pro' ),
 					$count
 				)
 			);
@@ -515,7 +515,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 					true,
 					$count,
 					sprintf(
-						esc_html__( 'Successfully created %d default pages.', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'Successfully created %d default pages.', 'wp-ulike-pro' ),
 						$count
 					)
 				);
@@ -546,7 +546,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				true,
 				$count,
 				sprintf(
-					esc_html__( 'Successfully deleted %d default pages.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully deleted %d default pages.', 'wp-ulike-pro' ),
 					$count
 				)
 			);
@@ -594,7 +594,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			return self::result(
 				true,
 				0,
-				esc_html__( 'Successfully cleared all plugin caches.', WP_ULIKE_PRO_DOMAIN ) . $plugin_list
+				esc_html__( 'Successfully cleared all plugin caches.', 'wp-ulike-pro' ) . $plugin_list
 			);
 		}
 
@@ -641,7 +641,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				true,
 				$count,
 				sprintf(
-					esc_html__( 'Successfully cleared %d transient entries.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully cleared %d transient entries.', 'wp-ulike-pro' ),
 					$count
 				)
 			);
@@ -673,7 +673,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				true,
 				$count,
 				sprintf(
-					esc_html__( 'Successfully cleaned up %d expired sessions.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully cleaned up %d expired sessions.', 'wp-ulike-pro' ),
 					$count
 				)
 			);
@@ -821,14 +821,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			}
 
 			$message = sprintf(
-				esc_html__( 'Successfully removed %d record(s) for %d user(s): %s.', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( 'Successfully removed %d record(s) for %d user(s): %s.', 'wp-ulike-pro' ),
 				$total_deleted,
 				count( $user_ids ),
 				implode( ', ', $user_names )
 			);
 
 			if ( ( ! self::can_continue_operation( $start_time ) || $counter_partial ) && $total_deleted > 0 ) {
-				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Run Sync Counters from Tools → Maintenance if counts need updating.', WP_ULIKE_PRO_DOMAIN );
+				$message .= ' ' . esc_html__( 'Operation was partially completed due to time limits. Run Sync Counters from Tools → Maintenance if counts need updating.', 'wp-ulike-pro' );
 			}
 
 			return array(
@@ -841,7 +841,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 		}
 
 		public static function repair_tables( $type = '' ) {
-			return self::run_table_operation( 'REPAIR TABLE', esc_html__( 'repaired', WP_ULIKE_PRO_DOMAIN ) );
+			return self::run_table_operation( 'REPAIR TABLE', esc_html__( 'repaired', 'wp-ulike-pro' ) );
 		}
 
 		/**
@@ -849,7 +849,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 		 * @return array|false
 		 */
 		public static function analyze_tables( $type = '' ) {
-			return self::run_table_operation( 'ANALYZE TABLE', esc_html__( 'analyzed', WP_ULIKE_PRO_DOMAIN ) );
+			return self::run_table_operation( 'ANALYZE TABLE', esc_html__( 'analyzed', 'wp-ulike-pro' ) );
 		}
 
 		/**
@@ -906,7 +906,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 
 				if ( ! empty( $wpdb->last_error ) ) {
 					$errors[] = sprintf(
-						esc_html__( 'Failed to get columns for table %s: %s', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'Failed to get columns for table %s: %s', 'wp-ulike-pro' ),
 						$table,
 						$wpdb->last_error
 					);
@@ -926,7 +926,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 
 				if ( ! empty( $wpdb->last_error ) ) {
 					$errors[] = sprintf(
-						esc_html__( 'Failed to get indexes for table %s: %s', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'Failed to get indexes for table %s: %s', 'wp-ulike-pro' ),
 						$table,
 						$wpdb->last_error
 					);
@@ -991,7 +991,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 
 						if ( ! $is_duplicate ) {
 							$errors[] = sprintf(
-								esc_html__( 'Failed to add index %1$s to table %2$s: %3$s', WP_ULIKE_PRO_DOMAIN ),
+								esc_html__( 'Failed to add index %1$s to table %2$s: %3$s', 'wp-ulike-pro' ),
 								$index_name,
 								$table,
 								$error_msg
@@ -1007,19 +1007,19 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 
 			if ( $indexes_added > 0 ) {
 				$message = sprintf(
-					esc_html__( 'Successfully synced indexes for %1$d tables. Added %2$d new indexes.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully synced indexes for %1$d tables. Added %2$d new indexes.', 'wp-ulike-pro' ),
 					$synced_count,
 					$indexes_added
 				);
 			} else {
-				$message = esc_html__( 'All indexes are already in sync. No changes were needed.', WP_ULIKE_PRO_DOMAIN );
+				$message = esc_html__( 'All indexes are already in sync. No changes were needed.', 'wp-ulike-pro' );
 			}
 
 			if ( ! empty( $errors ) ) {
-				$message = esc_html__( 'Index sync completed with errors:', WP_ULIKE_PRO_DOMAIN ) . ' ' . implode( '; ', $errors );
+				$message = esc_html__( 'Index sync completed with errors:', 'wp-ulike-pro' ) . ' ' . implode( '; ', $errors );
 				if ( $indexes_added > 0 ) {
 					$message .= ' ' . sprintf(
-						esc_html__( 'However, %d indexes were successfully added.', WP_ULIKE_PRO_DOMAIN ),
+						esc_html__( 'However, %d indexes were successfully added.', 'wp-ulike-pro' ),
 						$indexes_added
 					);
 				}
@@ -1086,14 +1086,14 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 			self::bump_query_cache();
 
 			$method_label = 'meta' === $method
-				? esc_html__( 'Meta Counter Data', WP_ULIKE_PRO_DOMAIN )
-				: esc_html__( 'Likes Logs', WP_ULIKE_PRO_DOMAIN );
+				? esc_html__( 'Meta Counter Data', 'wp-ulike-pro' )
+				: esc_html__( 'Likes Logs', 'wp-ulike-pro' );
 
 			return self::result(
 				true,
 				(int) $deleted,
 				sprintf(
-					esc_html__( 'Successfully removed %1$d %2$s record(s) for post ID %3$d.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully removed %1$d %2$s record(s) for post ID %3$d.', 'wp-ulike-pro' ),
 					(int) $deleted,
 					$method_label,
 					$post_id
@@ -1425,7 +1425,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Maintenance' ) ) {
 				$count,
 				sprintf(
 					/* translators: 1: number of tables, 2: operation verb */
-					esc_html__( 'Successfully %2$s %1$d database tables.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Successfully %2$s %1$d database tables.', 'wp-ulike-pro' ),
 					$count,
 					$verb
 				)

@@ -195,7 +195,7 @@ class WP_Ulike_Pro_Engagement_Engagers {
 			data-ulpmodal="<?php echo esc_url( $ajax_url ); ?>"
 			tabindex="0"
 			role="button"
-			aria-label="<?php esc_attr_e( 'View all engagers', WP_ULIKE_PRO_DOMAIN ); ?>">
+			aria-label="<?php echo esc_attr( 'View all engagers' ); ?>">
 			<?php echo self::render_pile_avatars( $engagers, $kind ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php
@@ -278,7 +278,7 @@ class WP_Ulike_Pro_Engagement_Engagers {
 			data-ulpmodal="<?php echo esc_url( $ajax_url ); ?>"
 			tabindex="0"
 			role="button"
-			aria-label="<?php esc_attr_e( 'View all engagers', WP_ULIKE_PRO_DOMAIN ); ?>">
+			aria-label="<?php echo esc_attr( 'View all engagers' ); ?>">
 			<div class="wp_ulike_likers_wrapper wp_<?php echo esc_attr( $item_type ); ?>_engagers_<?php echo (int) $item_id; ?>">
 				<div class="wp-ulike-likers-list"><?php echo $list; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo $more; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 			</div>
@@ -369,7 +369,7 @@ class WP_Ulike_Pro_Engagement_Engagers {
 
 		$title = class_exists( 'WP_Ulike_Pro_Options' )
 			? WP_Ulike_Pro_Options::getLikersModalTitle( $item_type )
-			: esc_html__( 'Likers', WP_ULIKE_PRO_DOMAIN );
+			: esc_html__( 'Likers', 'wp-ulike-pro' );
 
 		return sprintf(
 			'<div class="ulpmodal-ajax-wrapper ulp-engagement-engagers-modal"><h3 class="ulpmodal-title">%1$s</h3><div class="ulp-modal-likers-list ulp-engagement-engagers-list">%2$s</div></div>',
@@ -387,10 +387,12 @@ class WP_Ulike_Pro_Engagement_Engagers {
 	 */
 	private static function get_engager_meta_label( $engager, $kind ) {
 		if ( 'star' === $kind && ! empty( $engager['value'] ) ) {
+			$value = (int) $engager['value'];
+
 			return sprintf(
 				/* translators: %d: star value */
-				esc_html__( '%d stars', WP_ULIKE_PRO_DOMAIN ),
-				(int) $engager['value']
+				_n( '%d star', '%d stars', $value, 'wp-ulike-pro' ),
+				$value
 			);
 		}
 

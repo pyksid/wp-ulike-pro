@@ -7,9 +7,33 @@
 
 .ulp-customizer-engagement-preview {
 	width: 100%;
-	padding: 1.5rem 1.25rem 6.5rem;
+	padding: 0.85rem 0.75rem 1.5rem;
 	text-align: center;
 	overflow: visible;
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-engagement-block {
+	width: 100%;
+	box-sizing: border-box;
+	overflow: visible;
+}
+
+.ulp-customizer-engagement-block .ulp-customizer-preview-label {
+	position: relative;
+	z-index: 2;
+	margin-bottom: 0.85rem;
+}
+
+/*
+ * Keep the "Hover" label above the open picker: reserve space between the
+ * label and the trigger (not padding-top on the whole block, which buried the label).
+ */
+.ulp-customizer-engagement-block.is-hover-preview .ulp-customizer-preview-label {
+	margin-bottom: calc(var(--ulp-eng-reaction-size, 36px) + 1.75rem);
 }
 
 .ulp-customizer-engagement-preview .wpulike,
@@ -23,15 +47,18 @@
 .ulp-customizer-engagement-preview .wpulike {
 	padding: 0;
 	margin: 0;
-	display: inline-flex;
+	width: 100%;
+	max-width: 100%;
+	display: flex;
 	align-items: center;
+	/* Fallback center; Customizer emoji_align / star_align overrides with !important. */
 	justify-content: center;
+	text-align: center;
 }
 
 .ulp-customizer-engagement-preview .wp_ulike_general_class {
 	display: inline-flex;
 	align-items: center;
-	justify-content: center;
 }
 
 .ulp-customizer-engagement-preview .ulp-engagement-engagers,
@@ -40,25 +67,33 @@
 }
 
 /*
- * Hover picker: pin open below the trigger so it stays in the short iframe.
- * Appearance (border / background / padding) comes from frontend + Customizer.
+ * Hover picker: match frontend (absolute, above trigger, full reaction row).
+ * Only force open + keep width unconstrained for the preview stage.
  */
+.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-anchor {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-picker {
 	position: absolute !important;
-	top: calc(100% + 8px) !important;
-	bottom: auto !important;
+	top: auto !important;
+	bottom: calc(100% + 8px) !important;
 	left: 50% !important;
 	right: auto !important;
 	display: flex !important;
 	align-items: center !important;
 	width: max-content !important;
 	max-width: calc(100vw - 24px) !important;
+	margin: 0 !important;
 	overflow-x: auto !important;
 	overflow-y: hidden !important;
 	opacity: 1 !important;
 	visibility: visible !important;
 	pointer-events: auto !important;
-	transform: translateX(-50%) translateY(0) !important;
+	transform: translateX(-50%) !important;
 }
 
 .ulp-customizer-engagement-preview .wpulike-engagements-star .ulp-engagement-stars {
@@ -73,39 +108,16 @@
 	min-width: 0;
 }
 
-/* Keep chips circular in the flyout; size/border still follow Customizer vars. */
-.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-reaction {
-	width: var(--ulp-eng-reaction-size, 36px);
-	height: var(--ulp-eng-reaction-size, 36px);
-	min-width: var(--ulp-eng-reaction-size, 36px);
-	min-height: var(--ulp-eng-reaction-size, 36px);
-	padding: 0;
-	border-radius: 50%;
-	box-sizing: border-box;
-}
-
-.ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-hover .ulp-engagement-count {
-	display: none !important;
-}
-
-/*
- * Inline mode in the (often narrow) customizer iframe — wrap for visibility.
- * Do not force gap/size vars (Customizer owns those).
- */
 .ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline {
-	width: 100%;
 	max-width: 100%;
-	justify-content: center;
 }
 
 .ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-main {
-	width: 100%;
-	justify-content: center;
+	max-width: 100%;
 }
 
 .ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-inline-bar {
 	display: block;
-	width: 100%;
 	max-width: 100%;
 	overflow: visible;
 }
@@ -113,13 +125,229 @@
 .ulp-customizer-engagement-preview .wpulike-engagements-emoji.ulp-picker-style-inline .ulp-engagement-reactions {
 	display: flex;
 	flex-wrap: wrap;
+	/* Fallback center; Customizer emoji_align overrides with !important. */
 	justify-content: center;
 	align-items: center;
-	width: 100%;
 	min-width: 0;
 }
 
 .ulp-customizer-engagement-preview .wpulike-engagements-star[data-ulp-hide-zero="1"] .ulp-engagement-rating-summary.is-zero {
 	display: none !important;
+}
+
+/* —— Likers Pile preview card —— */
+.ulp-customizer-likers-pile .wpulike {
+	flex-direction: column;
+}
+
+.ulp-customizer-likers-pile .wp_ulike_likers_wrapper {
+	display: block !important;
+	width: auto;
+	max-width: 100%;
+	flex: 0 0 auto;
+	margin: 0.75rem auto 0;
+	text-align: center;
+	/* Pile has no box chrome on the frontend; win over Likers General styles. */
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+	box-shadow: none !important;
+}
+
+.ulp-customizer-likers-pile .ulp-pile-list {
+	justify-content: center;
+	pointer-events: none;
+}
+
+/* —— Profile / Forms / Social —— */
+.ulp-customizer-profile-preview,
+.ulp-customizer-forms-preview,
+.ulp-customizer-social-preview {
+	width: 100%;
+	max-width: 40rem;
+	margin: 0 auto;
+	padding: 0.85rem 0.75rem 1.25rem;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-profile-preview .wp-ulike-pro-section-profile {
+	width: 100%;
+}
+
+.ulp-customizer-profile-preview .fileuploader-theme-avatar {
+	display: block;
+	max-width: 100%;
+	line-height: 0;
+}
+
+.ulp-customizer-profile-preview .fileuploader-theme-avatar img,
+.ulp-customizer-profile-preview .wp-ulike-pro-profile-user-avatar img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+.ulp-customizer-profile-preview .tab_nav .nav_item {
+	text-decoration: none;
+}
+
+.ulp-customizer-forms-preview .ulp-form {
+	width: 100%;
+	margin: 0 auto;
+}
+
+.ulp-customizer-forms-preview .ulp-customizer-forms-focus .ulp-floating-input + .ulp-floating-label::before {
+	color: inherit;
+}
+
+.ulp-customizer-forms-preview .ulp-customizer-forms-focus .ulp-floating-input {
+	outline: none;
+}
+
+.ulp-customizer-profile-side-tabs {
+	margin-top: 1.25rem;
+}
+
+.ulp-customizer-social-preview {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.ulp-customizer-social-block {
+	width: 100%;
+	padding: 0.85rem 0.75rem;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.ulp-customizer-social-block .ulp-customizer-preview-label {
+	text-align: center;
+	margin-bottom: 0.75rem;
+}
+
+.ulp-customizer-social-preview .ulp-social-wrapper,
+.ulp-customizer-social-preview .ulp-social-login-wrapper {
+	width: 100%;
+	max-width: 22rem;
+	margin: 0 auto;
+}
+
+/* Share: inline chips. Login: keep frontend flex-column layout untouched. */
+.ulp-customizer-social-preview .ulp-social-share {
+	width: auto;
+	max-width: 100%;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.ulp-customizer-social-preview .ulp-social-share .ulp-social-item {
+	display: inline-block;
+	margin: 0 0.35rem 0.35rem 0;
+	vertical-align: top;
+	text-align: left;
+	float: none;
+}
+
+.ulp-customizer-social-preview .ulp-social-share .ulp-share-btn {
+	cursor: default;
+	min-width: 7.25rem;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-social-preview .ulp-social-share .ulp-share-btn-text {
+	flex-grow: 0;
+}
+
+.ulp-customizer-social-preview .ulp-social-login {
+	width: 100%;
+	text-align: left;
+}
+
+.ulp-customizer-social-preview .ulp-social-login .ulp-share-btn {
+	cursor: default;
+}
+
+/* —— Modals (static shell; not position:fixed) —— */
+.ulp-customizer-modals-preview {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	width: 100%;
+	max-width: 40rem;
+	margin: 0 auto;
+	padding: 0.85rem 0.75rem 1.25rem;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-modal-block {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.ulp-customizer-modal-block .ulp-customizer-preview-label {
+	text-align: center;
+	margin-bottom: 0.75rem;
+}
+
+.ulp-customizer-modals-preview .ulpmodal {
+	position: relative !important;
+	inset: auto !important;
+	display: flex !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 12rem;
+	padding: 1.25rem 1rem;
+	z-index: 1;
+	overflow: hidden;
+	cursor: default;
+}
+
+.ulp-customizer-modals-preview .ulpmodal .ulpmodal-content {
+	position: relative;
+	transform: none !important;
+	opacity: 1 !important;
+	max-height: none;
+	margin: 0 auto;
+	pointer-events: none;
+}
+
+.ulp-customizer-modals-preview .ulpmodal .ulpmodal-inner {
+	overflow: visible;
+}
+
+.ulp-customizer-modals-preview .ulp-modal-likers-list {
+	max-height: 14rem;
+	overflow: auto;
+	pointer-events: none;
+}
+
+.ulp-customizer-license-gate {
+	max-width: 26rem;
+	margin: 3rem auto;
+	padding: 1.5rem 1.25rem;
+	text-align: center;
+	font: 13px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	color: #1e1e1e;
+}
+
+.ulp-customizer-license-gate p {
+	margin: 0 0 0.75rem;
+}
+
+.ulp-customizer-license-gate .button {
+	display: inline-block;
+	margin-top: 0.25rem;
+	padding: 0 12px;
+	line-height: 2;
+	text-decoration: none;
+	border-radius: 3px;
+	border: 1px solid #2271b1;
+	background: #2271b1;
+	color: #fff;
 }
 

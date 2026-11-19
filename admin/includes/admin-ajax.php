@@ -28,7 +28,7 @@ function wp_ulike_pro_generate_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Something wrong happened!', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -60,7 +60,7 @@ function wp_ulike_pro_generate_api_key() {
 	wp_send_json_success( array(
 		'success' => 1,
 		'status'  => 'success',
-		'message' => esc_html__( 'API key successfully generated.', WP_ULIKE_PRO_DOMAIN ),
+		'message' => __( 'API key successfully generated.', 'wp-ulike-pro' ),
 		'key'     => array(
 			'token' => $token, // Exact token from variable, not from array
 			'date'  => $date
@@ -81,7 +81,7 @@ function wp_ulike_pro_delete_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Something wrong happened!', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -89,7 +89,7 @@ function wp_ulike_pro_delete_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'Token is required.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Token is required.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -100,7 +100,7 @@ function wp_ulike_pro_delete_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'Token is required.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Token is required.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -110,7 +110,7 @@ function wp_ulike_pro_delete_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'No API keys found.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'No API keys found.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -141,7 +141,7 @@ function wp_ulike_pro_delete_api_key() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> esc_html__( 'API key not found.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'API key not found.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -150,7 +150,7 @@ function wp_ulike_pro_delete_api_key() {
 	wp_send_json_success( array(
 		'success' => 1,
 		'status'  => 'success',
-		'message' => esc_html__( 'API key successfully deleted.', WP_ULIKE_PRO_DOMAIN ),
+		'message' => __( 'API key successfully deleted.', 'wp-ulike-pro' ),
 	) );
 
 }
@@ -165,13 +165,13 @@ function wp_ulike_pro_search_users() {
 	// Check nonce for security
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_search_users' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Security check failed.' ),
 		) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -211,13 +211,13 @@ add_action( 'wp_ajax_wp_ulike_pro_search_users', 'wp_ulike_pro_search_users' );
 function wp_ulike_pro_remove_user_votes_ajax() {
 	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_ulike_pro_remove_user_votes' ) || ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
 	if( empty( $_POST['user_ids'] ) ){
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Please select at least one user.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Please select at least one user.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -230,7 +230,7 @@ function wp_ulike_pro_remove_user_votes_ajax() {
 
 	if( ! is_array( $user_ids ) || empty( $user_ids ) ){
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid user IDs provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid user IDs provided.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -245,7 +245,7 @@ function wp_ulike_pro_remove_user_votes_ajax() {
 		) );
 	} else {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Failed to remove user votes. Please try again.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Failed to remove user votes. Please try again.', 'wp-ulike-pro' ),
 		) );
 	}
 }
@@ -260,13 +260,13 @@ function wp_ulike_pro_search_posts() {
 	// Check nonce
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_search_posts' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Security check failed.' ),
 		) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -335,11 +335,11 @@ add_action( 'wp_ajax_wp_ulike_pro_search_posts', 'wp_ulike_pro_search_posts' );
  */
 function wp_ulike_pro_schema_search_posts() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_search' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Security check failed.' ) ) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'You do not have access.', 'wp-ulike-pro' ) ) );
 	}
 
 	$result = WP_Ulike_Pro_Schema_Generator_Tool::search_posts(
@@ -362,18 +362,18 @@ add_action( 'wp_ajax_wp_ulike_pro_schema_search_posts', 'wp_ulike_pro_schema_sea
  */
 function wp_ulike_pro_schema_load_post() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_load' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Security check failed.' ) ) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'You do not have access.', 'wp-ulike-pro' ) ) );
 	}
 
 	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 	$post    = $post_id ? get_post( $post_id ) : null;
 
 	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Post not found.', 'wp-ulike-pro' ) ) );
 	}
 
 	$type_obj = get_post_type_object( $post->post_type );
@@ -401,18 +401,18 @@ add_action( 'wp_ajax_wp_ulike_pro_schema_load_post', 'wp_ulike_pro_schema_load_p
  */
 function wp_ulike_pro_schema_rating_preview() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_schema_preview' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Security check failed.' ) ) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'You do not have access.', 'wp-ulike-pro' ) ) );
 	}
 
 	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 	$post    = $post_id ? get_post( $post_id ) : null;
 
 	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Post not found.', 'wp-ulike-pro' ) ) );
 	}
 
 	$raw = array();
@@ -435,18 +435,18 @@ add_action( 'wp_ajax_wp_ulike_pro_schema_rating_preview', 'wp_ulike_pro_schema_r
  */
 function wp_ulike_pro_schema_save_post() {
 	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wp_ulike_pro_schema_save' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Security check failed.' ) ) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) || ! WP_Ulike_Pro_API::has_permission() ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'You do not have access.', 'wp-ulike-pro' ) ) );
 	}
 
 	$post_id = isset( $_POST['schema_post_id'] ) ? absint( $_POST['schema_post_id'] ) : 0;
 	$post    = $post_id ? get_post( $post_id ) : null;
 
 	if ( ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Post not found.', WP_ULIKE_PRO_DOMAIN ) ) );
+		wp_send_json_error( array( 'message' => __( 'Post not found.', 'wp-ulike-pro' ) ) );
 	}
 
 	$raw    = isset( $_POST['schema'] ) && is_array( $_POST['schema'] ) ? wp_unslash( $_POST['schema'] ) : array();
@@ -464,7 +464,7 @@ function wp_ulike_pro_schema_save_post() {
 	WP_Ulike_Pro_Schema_Generator_Tool::save_post_schema_data( $post_id, $raw );
 
 	$response = array(
-		'message'        => esc_html__( 'Schema settings saved.', WP_ULIKE_PRO_DOMAIN ),
+		'message'        => __( 'Schema settings saved.', 'wp-ulike-pro' ),
 		'rating_preview' => WP_Ulike_Pro_Schema_Generator_Tool::get_rating_preview_for_post( $post_id, $raw ),
 	);
 
@@ -484,13 +484,13 @@ add_action( 'wp_ajax_wp_ulike_pro_schema_save_post', 'wp_ulike_pro_schema_save_p
 function wp_ulike_pro_bulk_add_likes_ajax() {
 	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_ulike_pro_bulk_add_likes' ) || ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
 	if ( empty( $_POST['post_ids'] ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Please select at least one post.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Please select at least one post.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -503,7 +503,7 @@ function wp_ulike_pro_bulk_add_likes_ajax() {
 
 	if ( ! is_array( $post_ids ) || empty( $post_ids ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid post IDs provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid post IDs provided.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -512,7 +512,7 @@ function wp_ulike_pro_bulk_add_likes_ajax() {
 
 	if ( $likes === 0 && $dislikes === 0 ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Please enter at least one like or dislike count.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Please enter at least one like or dislike count.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -525,7 +525,7 @@ function wp_ulike_pro_bulk_add_likes_ajax() {
 		) );
 	} else {
 		wp_send_json_error( array(
-			'message' => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Failed to add likes/dislikes. Please try again.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => isset( $result['message'] ) ? $result['message'] : __( 'Failed to add likes/dislikes. Please try again.', 'wp-ulike-pro' ),
 		) );
 	}
 }
@@ -539,13 +539,13 @@ add_action( 'wp_ajax_wp_ulike_pro_bulk_add_likes', 'wp_ulike_pro_bulk_add_likes_
 function wp_ulike_pro_get_post_counts() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_get_post_counts' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Security check failed.' ),
 		) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -554,7 +554,7 @@ function wp_ulike_pro_get_post_counts() {
 
 	if ( $post_id <= 0 ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid item ID.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid item ID.' ),
 		) );
 	}
 
@@ -562,7 +562,7 @@ function wp_ulike_pro_get_post_counts() {
 	$allowed_types = array( 'post', 'comment', 'activity', 'topic' );
 	if ( ! in_array( $item_type, $allowed_types, true ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid item type.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid item type.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -580,13 +580,13 @@ add_action( 'wp_ajax_wp_ulike_pro_get_post_counts', 'wp_ulike_pro_get_post_count
 function wp_ulike_pro_bulk_update_likes_ajax() {
 	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_ulike_pro_bulk_update_likes' ) || ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
 	if ( empty( $_POST['posts'] ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'No posts provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'No posts provided.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -599,7 +599,7 @@ function wp_ulike_pro_bulk_update_likes_ajax() {
 
 	if ( ! is_array( $posts_data ) || empty( $posts_data ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid posts data provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid posts data provided.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -612,7 +612,7 @@ function wp_ulike_pro_bulk_update_likes_ajax() {
 		) );
 	} else {
 		wp_send_json_error( array(
-			'message' => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Failed to update counters. Please try again.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => isset( $result['message'] ) ? $result['message'] : __( 'Failed to update counters. Please try again.', 'wp-ulike-pro' ),
 		) );
 	}
 }
@@ -626,13 +626,13 @@ add_action( 'wp_ajax_wp_ulike_pro_bulk_update_likes', 'wp_ulike_pro_bulk_update_
 function wp_ulike_pro_get_categories() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_get_categories' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Security check failed.' ),
 		) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -641,7 +641,7 @@ function wp_ulike_pro_get_categories() {
 
 	$categories = array();
 	$available_taxonomies = array();
-	$selected_taxonomy_label = esc_html__( 'Category', WP_ULIKE_PRO_DOMAIN );
+	$selected_taxonomy_label = __( 'Category' );
 	$selected_taxonomy_name = '';
 
 	if ( ! empty( $post_type ) ) {
@@ -727,13 +727,13 @@ add_action( 'wp_ajax_wp_ulike_pro_get_categories', 'wp_ulike_pro_get_categories'
 function wp_ulike_pro_search_by_item_id() {
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wp_ulike_pro_search_by_item_id' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Security check failed.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Security check failed.' ),
 		) );
 	}
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -743,7 +743,7 @@ function wp_ulike_pro_search_by_item_id() {
 	// Validate: at least type or item IDs must be provided
 	if ( empty( $item_type ) && empty( $item_ids_input ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Please select a type or enter at least one item ID.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Please select a type or enter at least one item ID.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -751,7 +751,7 @@ function wp_ulike_pro_search_by_item_id() {
 	$allowed_types = array( 'post', 'comment', 'activity', 'topic' );
 	if ( ! empty( $item_type ) && ! in_array( $item_type, $allowed_types, true ) ) {
 		wp_send_json_error( array(
-			'message' => esc_html__( 'Invalid type provided.', WP_ULIKE_PRO_DOMAIN ),
+			'message' => __( 'Invalid type provided.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -831,21 +831,21 @@ function wp_ulike_pro_search_by_item_id() {
 			if ( $post ) {
 				$title = get_the_title( $item_id );
 			} else {
-				$title = sprintf( esc_html__( 'Custom Post #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+				$title = sprintf( __( 'Custom Post #%d', 'wp-ulike-pro' ), $item_id );
 			}
 		} elseif ( $meta_group === 'comment' ) {
 			$comment = get_comment( $item_id );
 			if ( $comment ) {
-				$title = sprintf( esc_html__( 'Comment #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+				$title = sprintf( __( 'Comment #%d', 'wp-ulike-pro' ), $item_id );
 			} else {
-				$title = sprintf( esc_html__( 'Custom Comment #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+				$title = sprintf( __( 'Custom Comment #%d', 'wp-ulike-pro' ), $item_id );
 			}
 		} elseif ( $meta_group === 'activity' ) {
-			$title = sprintf( esc_html__( 'Activity #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+			$title = sprintf( __( 'Activity #%d', 'wp-ulike-pro' ), $item_id );
 		} elseif ( $meta_group === 'topic' ) {
-			$title = sprintf( esc_html__( 'Topic #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+			$title = sprintf( __( 'Topic #%d', 'wp-ulike-pro' ), $item_id );
 		} else {
-			$title = sprintf( esc_html__( 'Custom Item #%d', WP_ULIKE_PRO_DOMAIN ), $item_id );
+			$title = sprintf( __( 'Custom Item #%d', 'wp-ulike-pro' ), $item_id );
 		}
 
 		$items[] = array(
@@ -880,7 +880,7 @@ function wp_ulike_pro_ajax_button_field() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'security',
-			'message' 	=> esc_html__( 'You do not have access.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'You do not have access.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -888,7 +888,7 @@ function wp_ulike_pro_ajax_button_field() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'empty',
-			'message' 	=> esc_html__( 'Please enter required fields', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Please enter required fields', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -951,7 +951,7 @@ function wp_ulike_pro_ajax_button_field() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'empty',
-			'message' 	=> esc_html__( 'Item does not exist.', WP_ULIKE_PRO_DOMAIN ),
+			'message' 	=> __( 'Item does not exist.', 'wp-ulike-pro' ),
 		) );
 	}
 
@@ -959,7 +959,7 @@ function wp_ulike_pro_ajax_button_field() {
 		wp_send_json_error( array(
 			'success' 	=> 0,
 			'status'    => 'error',
-			'message' 	=> sprintf( esc_html__( 'PHP Error: %s', WP_ULIKE_PRO_DOMAIN ), esc_html( $php_error ) ),
+			'message' 	=> sprintf( __( 'PHP Error: %s', 'wp-ulike-pro' ), esc_html( $php_error ) ),
 		) );
 	}
 
@@ -970,7 +970,7 @@ function wp_ulike_pro_ajax_button_field() {
 				$payload = array(
 					'success'       => 1,
 					'status'        => 'success',
-					'message'       => isset( $result['message'] ) ? $result['message'] : esc_html__( 'Operation completed successfully.', WP_ULIKE_PRO_DOMAIN ),
+					'message'       => isset( $result['message'] ) ? $result['message'] : __( 'Operation completed successfully.', 'wp-ulike-pro' ),
 					'rows_affected' => isset( $result['rows_affected'] ) ? $result['rows_affected'] : 0,
 				);
 
@@ -984,7 +984,7 @@ function wp_ulike_pro_ajax_button_field() {
 				wp_send_json_error( array(
 					'success' 	=> 0,
 					'status'    => 'error',
-					'message' 	=> isset( $result['message'] ) ? $result['message'] : esc_html__( 'Operation failed.', WP_ULIKE_PRO_DOMAIN ),
+					'message' 	=> isset( $result['message'] ) ? $result['message'] : __( 'Operation failed.', 'wp-ulike-pro' ),
 				) );
 			}
 		} elseif( $result === true ){
@@ -992,7 +992,7 @@ function wp_ulike_pro_ajax_button_field() {
 			wp_send_json_success( array(
 				'success' => 1,
 				'status'  => 'success',
-				'message' => esc_html__( 'Operation completed successfully.', WP_ULIKE_PRO_DOMAIN ),
+				'message' => __( 'Operation completed successfully.', 'wp-ulike-pro' ),
 				'rows_affected' => 0
 			) );
 		}
@@ -1002,7 +1002,7 @@ function wp_ulike_pro_ajax_button_field() {
 	wp_send_json_error( array(
 		'success' 	=> 0,
 		'status'    => 'error',
-		'message' 	=> esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ),
+		'message' 	=> __( 'Something wrong happened!', 'wp-ulike-pro' ),
 	) );
 
 }
@@ -1016,17 +1016,17 @@ add_action( 'wp_ajax_wp_ulike_ajax_button_field', 'wp_ulike_pro_ajax_button_fiel
 function wp_ulike_pro_install_core_pages() {
 
 	if ( ! isset( $_POST['id'] ) ||  ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], '_notice_nonce' ) || ! current_user_can( 'manage_options' )  ) {
-		wp_send_json_error(  esc_html__( 'Token Error.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error(  __( 'Token Error.', 'wp-ulike-pro' ) );
 	}
 
 	$status = WP_Ulike_Pro_Core_Pages::install();
 
 	if( $status ){
 		wp_ulike_set_transient( 'wp-ulike-notice-' . $_POST['id'], 1, 10 * YEAR_IN_SECONDS );
-		wp_send_json_success( esc_html__( 'Done.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_success( __( 'Done' ) );
 	}
 
-	wp_send_json_error(  esc_html__( 'Something wrong happened!', WP_ULIKE_PRO_DOMAIN ) );
+	wp_send_json_error(  __( 'Something wrong happened!', 'wp-ulike-pro' ) );
 
 }
 add_action( 'wp_ajax_wp_ulike_pro_install_core_pages', 'wp_ulike_pro_install_core_pages' );
@@ -1038,7 +1038,7 @@ add_action( 'wp_ajax_wp_ulike_pro_install_core_pages', 'wp_ulike_pro_install_cor
  */
 function wp_ulike_pro_history_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN )  ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$type    = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : 'post';
@@ -1137,7 +1137,7 @@ add_action('wp_ajax_wp_ulike_pro_history_api','wp_ulike_pro_history_api');
  */
 function wp_ulike_pro_custom_datasets_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	// Sanitize status - can be array or string
@@ -1169,7 +1169,7 @@ add_action('wp_ajax_wp_ulike_pro_custom_datasets_api','wp_ulike_pro_custom_datas
  */
 function wp_ulike_pro_custom_country_codes_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	// Sanitize status array
@@ -1210,7 +1210,7 @@ add_action('wp_ajax_wp_ulike_pro_custom_country_codes_api','wp_ulike_pro_custom_
  */
 function wp_ulike_pro_tops_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	// Sanitize types array
@@ -1305,7 +1305,7 @@ add_action('wp_ajax_wp_ulike_pro_tops_api','wp_ulike_pro_tops_api');
  */
 function wp_ulike_pro_engaged_users_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$item_id = isset( $_GET['item_id'] ) ? absint( $_GET['item_id'] ) : 0;
@@ -1379,7 +1379,7 @@ add_action( 'wp_ajax_wp_ulike_pro_engaged_users_api', 'wp_ulike_pro_engaged_user
  */
 function wp_ulike_pro_post_filters_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post';
@@ -1399,7 +1399,7 @@ add_action( 'wp_ajax_wp_ulike_pro_post_filters_api', 'wp_ulike_pro_post_filters_
  */
 function wp_ulike_pro_stats_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN )  ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
     $stats = WP_Ulike_Pro_Stats_V2::get_instance()->get_api_data();
@@ -1414,7 +1414,7 @@ add_action('wp_ajax_wp_ulike_pro_stats_api','wp_ulike_pro_stats_api');
  */
 function wp_ulike_pro_overview_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$stats = WP_Ulike_Pro_Stats_V2::get_instance()->get_overview_api_data();
@@ -1429,7 +1429,7 @@ add_action( 'wp_ajax_wp_ulike_pro_overview_api', 'wp_ulike_pro_overview_api' );
  */
 function wp_ulike_pro_intelligence_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$start_date = isset( $_GET['start_date'] ) ? sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) : null;
@@ -1447,14 +1447,14 @@ add_action( 'wp_ajax_wp_ulike_pro_intelligence_api', 'wp_ulike_pro_intelligence_
  */
 function wp_ulike_pro_engagement_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
     $data = WP_Ulike_Pro_Stats_V2::get_instance()->get_engagement_api_data( $type );
 
     if ( null === $data ) {
-        wp_send_json_error( esc_html__( 'Invalid content type.', WP_ULIKE_PRO_DOMAIN ) );
+        wp_send_json_error( __( 'Invalid content type.', 'wp-ulike-pro' ) );
     }
 
     return wp_send_json( $data );
@@ -1468,7 +1468,7 @@ add_action( 'wp_ajax_wp_ulike_pro_engagement_api', 'wp_ulike_pro_engagement_api'
  */
 function wp_ulike_pro_devices_api(){
 	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ){
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$type     = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : 'device';
@@ -1500,7 +1500,7 @@ add_action('wp_ajax_wp_ulike_pro_devices_api','wp_ulike_pro_devices_api');
  */
 function wp_ulike_pro_woocommerce_api() {
 	if ( ! current_user_can( wp_ulike_get_user_access_capability( 'stats' ) ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_PRO_DOMAIN ) ) {
-		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', WP_ULIKE_PRO_DOMAIN ) );
+		wp_send_json_error( __( 'Error: You do not have permission to do that.', 'wp-ulike-pro' ) );
 	}
 
 	$start_date = isset( $_GET['start_date'] ) ? sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) : null;

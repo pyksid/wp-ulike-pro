@@ -80,7 +80,7 @@ class WP_Ulike_Pro_Engagement_Display {
 		$first_reaction   = reset( $reactions );
 		$default_emoji    = $first_reaction ? $first_reaction['emoji'] : '😊';
 		$trigger_emoji    = $default_emoji;
-		$trigger_label    = esc_attr__( 'Add reaction', WP_ULIKE_PRO_DOMAIN );
+		$trigger_label    = __( 'Add' );
 		$trigger_reacted  = false;
 
 		if ( $active_key && isset( $reactions[ $active_key ] ) ) {
@@ -88,7 +88,7 @@ class WP_Ulike_Pro_Engagement_Display {
 			$trigger_reacted = true;
 			$trigger_label   = sprintf(
 				/* translators: %s: reaction label */
-				__( 'You reacted with %s', WP_ULIKE_PRO_DOMAIN ),
+				__( 'You reacted with %s', 'wp-ulike-pro' ),
 				wp_strip_all_tags( $reactions[ $active_key ]['label'] )
 			);
 		}
@@ -109,7 +109,7 @@ class WP_Ulike_Pro_Engagement_Display {
 			<?php echo WP_Ulike_Pro_Engagement_Settings::hide_zero_counters( $item_type ) ? ' data-ulp-hide-zero="1"' : ''; ?>>
 			<div class="ulp-engagement-main"<?php echo ( $show_users && 'popover' === $likers_style ) ? ' data-ulp-engagers-popover-trigger="1"' : ''; ?>>
 			<?php if ( 'inline' === $picker_style ) : ?>
-				<div class="ulp-engagement-inline-bar" role="group" aria-label="<?php esc_attr_e( 'Pick a reaction', WP_ULIKE_PRO_DOMAIN ); ?>">
+				<div class="ulp-engagement-inline-bar" role="group" aria-label="<?php echo esc_attr( 'Pick a reaction' ); ?>">
 					<div class="ulp-engagement-reactions">
 						<?php echo $reactions_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
@@ -123,7 +123,7 @@ class WP_Ulike_Pro_Engagement_Display {
 						<?php endif; ?>
 					</button>
 					<div class="ulp-engagement-picker">
-						<div class="ulp-engagement-reactions" role="group" aria-label="<?php esc_attr_e( 'Pick a reaction', WP_ULIKE_PRO_DOMAIN ); ?>">
+						<div class="ulp-engagement-reactions" role="group" aria-label="<?php echo esc_attr( 'Pick a reaction' ); ?>">
 							<?php echo $reactions_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 					</div>
@@ -180,7 +180,7 @@ class WP_Ulike_Pro_Engagement_Display {
 			if ( $show_counts && $count > 0 ) {
 				$aria_label = sprintf(
 					/* translators: 1: reaction label, 2: count */
-					__( '%1$s, %2$s reactions', WP_ULIKE_PRO_DOMAIN ),
+					__( '%1$s, %2$s reactions', 'wp-ulike-pro' ),
 					wp_strip_all_tags( $reaction['label'] ),
 					wp_ulike_pro_format_engagement_count( $count )
 				);
@@ -230,12 +230,11 @@ class WP_Ulike_Pro_Engagement_Display {
 		$root_class   = 'wpulike-engagements wpulike-engagements-star';
 		$live_status  = $user_value > 0
 			? sprintf(
-				/* translators: 1: user rating value, 2: max stars */
-				__( 'Your rating: %1$d of %2$d', WP_ULIKE_PRO_DOMAIN ),
+				wp_ulike_get_option( 'engagement_rating_status', __( 'Your rating: %1$d of %2$d', 'wp-ulike-pro' ) ),
 				$user_value,
 				$max
 			)
-			: __( 'No rating', WP_ULIKE_PRO_DOMAIN );
+			: wp_ulike_get_option( 'engagement_no_rating', __( 'No rating', 'wp-ulike-pro' ) );
 
 		// Match emoji: expose counter availability for CSS/JS (hide-zero, Elementor, automation).
 		if ( $counters_on ) {
@@ -262,7 +261,7 @@ class WP_Ulike_Pro_Engagement_Display {
 			<?php echo $counters_on ? ' data-ulp-show-counters="1"' : ''; ?>
 			<?php echo WP_Ulike_Pro_Engagement_Settings::hide_zero_counters( $item_type ) ? ' data-ulp-hide-zero="1"' : ''; ?>>
 			<div class="ulp-engagement-main"<?php echo ( $show_users && 'popover' === $likers_style ) ? ' data-ulp-engagers-popover-trigger="1"' : ''; ?>>
-			<div class="ulp-engagement-stars" role="radiogroup" aria-label="<?php esc_attr_e( 'Rate this item', WP_ULIKE_PRO_DOMAIN ); ?>">
+			<div class="ulp-engagement-stars" role="radiogroup" aria-label="<?php echo esc_attr( 'Rate this item' ); ?>">
 				<?php
 				// Soft rounded star path (shared across slots).
 				$star_path = 'M12 2.85c.42 0 .8.25.97.64l2.12 5.05 5.45.5a1.05 1.05 0 0 1 .6 1.84l-4.15 3.6 1.27 5.3a1.05 1.05 0 0 1-1.57 1.14L12 18.1l-4.69 2.82a1.05 1.05 0 0 1-1.57-1.14l1.27-5.3-4.15-3.6a1.05 1.05 0 0 1 .6-1.84l5.45-.5 2.12-5.05c.17-.39.55-.64.97-.64z';
@@ -278,7 +277,7 @@ class WP_Ulike_Pro_Engagement_Display {
 						data-ulp-engagement-value="<?php echo esc_attr( $i ); ?>"
 						aria-checked="<?php echo $selected ? 'true' : 'false'; ?>"
 						tabindex="<?php echo esc_attr( $tabindex ); ?>"
-						aria-label="<?php echo esc_attr( sprintf( _n( '%d star', '%d stars', $i, WP_ULIKE_PRO_DOMAIN ), $i ) ); ?>">
+						aria-label="<?php echo esc_attr( sprintf( ( ( $i ) == 1 ? '%d star' : '%d stars' ), $i ) ); ?>">
 						<span class="ulp-star-icon" aria-hidden="true">
 							<span class="ulp-star-dot"></span>
 							<svg class="ulp-star-shape" viewBox="0 0 24 24" focusable="false">

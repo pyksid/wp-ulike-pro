@@ -754,10 +754,10 @@ function wp_ulike_pro_plugin_missing_notice( $args ){
     ?>
 <div class="elementor-alert elementor-alert-danger" role="alert">
     <span class="elementor-alert-title">
-        <?php echo sprintf( esc_html__( '"%s" Plugin is Not Activated!', WP_ULIKE_PRO_DOMAIN ), $args['plugin_name'] ); ?>
+        <?php echo sprintf( esc_html__( '"%s" Plugin is Not Activated!', 'wp-ulike-pro' ), $args['plugin_name'] ); ?>
     </span>
     <span class="elementor-alert-description">
-        <?php esc_html_e( 'In order to use this element, you need to install and activate this plugin.', WP_ULIKE_PRO_DOMAIN ); ?>
+        <?php esc_html_e( 'In order to use this element, you need to install and activate this plugin.', 'wp-ulike-pro' ); ?>
     </span>
 </div>
 <?php
@@ -2958,26 +2958,26 @@ function wp_ulike_pro_get_two_factor_field() {
 ?>
 <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
     <h3 class="ulp-form-title" id="ulp-2fa-title">
-        <?php echo wp_ulike_get_option( 'two_factor_field_title', esc_html__( 'Enter the six-digit code from the application', WP_ULIKE_PRO_DOMAIN ) ); ?>
+        <?php echo wp_ulike_get_option( 'two_factor_field_title', __( 'Enter the six-digit code from the application', 'wp-ulike-pro' ) ); ?>
     </h3>
 </div>
 <div class="ulp-flex-col-xl-12 ulp-flex-col-md-12 ulp-flex-col-xs-12">
     <div id="ulp-2fa-code" class="ulp-flex ulp-flex-center-xs" role="group" aria-labelledby="ulp-2fa-title" aria-describedby="ulp-2fa-description">
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-1-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'First digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'First digit of verification code' ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-2-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Second digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'Second digit of verification code' ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-3-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Third digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'Third digit of verification code' ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-4-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Fourth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'Fourth digit of verification code' ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-5-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Fifth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'Fifth digit of verification code' ); ?>" />
         <input class="ulp-digit-input" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" id="ulp-6-digit"
-            name="otp[]" autocomplete="one-time-code" aria-label="<?php esc_attr_e( 'Sixth digit of verification code', WP_ULIKE_PRO_DOMAIN ); ?>" />
+            name="otp[]" autocomplete="one-time-code" aria-label="<?php echo esc_attr( 'Sixth digit of verification code' ); ?>" />
     </div>
     <div id="ulp-2fa-description" class="ulp-screen-reader-text">
-        <?php esc_html_e( 'Enter the 6-digit verification code from your authenticator app', WP_ULIKE_PRO_DOMAIN ); ?>
+        <?php echo esc_html( 'Enter the 6-digit verification code from your authenticator app' ); ?>
     </div>
 </div>
 <?php
@@ -3863,13 +3863,12 @@ function wp_ulike_pro_check_rate_limit( $action, $max_attempts = 5, $time_window
 		$remaining_time = max( 0, $expiration - time() );
 		$minutes = max( 1, ceil( $remaining_time / 60 ) );
 
-		if ( empty( $error_message ) ) {
-			$error_message = sprintf( esc_html__( 'Too many attempts. Please try again in %d minute(s).', WP_ULIKE_PRO_DOMAIN ), $minutes );
-		} else {
-			$error_message = sprintf( $error_message, $minutes );
-		}
+		$default = ! empty( $error_message )
+			? $error_message
+			: __( 'Too many attempts. Please try again in %d minute(s).', 'wp-ulike-pro' );
+		$format  = WP_Ulike_Pro_Options::getNoticeMessage( 'rate_limit_exceeded', $default );
 
-		throw new \Exception( WP_Ulike_Pro_Options::getNoticeMessage( 'rate_limit_exceeded', $error_message ) );
+		throw new \Exception( sprintf( $format, $minutes ) );
 	}
 
 	// Increment attempts - WordPress handles expiration automatically
@@ -5022,7 +5021,7 @@ function wp_ulike_pro_build_tops_engaged_users_list( $item_id, $item_type, $mode
 			'id'       => $user_id,
 			'name'     => esc_attr( $user_info->display_name ),
 			'avatar'   => get_avatar_url( $user_info->user_email, array( 'size' => 48 ) ),
-			'role'     => translate_user_role( $user_info->roles[0] ?? esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN ) ),
+			'role'     => translate_user_role( $user_info->roles[0] ?? __( 'Guest User', 'wp-ulike-pro' ) ),
 			// Activity labels are expensive (per-user queries). Skip on the tops
 			// list; Engaged Users page passes $include_activity = true.
 			'activity' => $include_activity

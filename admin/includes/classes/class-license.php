@@ -26,30 +26,30 @@ class WP_Ulike_Pro_License {
 
 		return [
 			WP_Ulike_Pro_API::STATUS_EXPIRED => [
-				'title'         => esc_html__( 'Your license has expired', WP_ULIKE_PRO_DOMAIN ),
-				'description'   => esc_html__( 'Renew your subscription to restore automatic updates, support, and Pro features on this site.', WP_ULIKE_PRO_DOMAIN ),
-				'button_text'   => esc_html__( 'Renew license', WP_ULIKE_PRO_DOMAIN ),
+				'title'         => esc_html__( 'Your license has expired', 'wp-ulike-pro' ),
+				'description'   => esc_html__( 'Renew your subscription to restore automatic updates, support, and Pro features on this site.', 'wp-ulike-pro' ),
+				'button_text'   => esc_html__( 'Renew License', 'wp-ulike-pro' ),
 				'button_url'    => $renew_url,
 				'button_target' => '_blank',
 			],
 			WP_Ulike_Pro_API::STATUS_DISABLED => [
-				'title'         => esc_html__( 'License cancelled', WP_ULIKE_PRO_DOMAIN ),
-				'description'   => esc_html__( 'This license was cancelled (for example after a refund) and cannot be used again. Purchase a new license, then enter the new key on the License page. Contact support if you believe this is a mistake.', WP_ULIKE_PRO_DOMAIN ),
-				'button_text'   => esc_html__( 'Get a new license', WP_ULIKE_PRO_DOMAIN ),
+				'title'         => esc_html__( 'License cancelled', 'wp-ulike-pro' ),
+				'description'   => esc_html__( 'This license was cancelled (for example after a refund) and cannot be used again. Purchase a new license, then enter the new key on the License page. Contact support if you believe this is a mistake.', 'wp-ulike-pro' ),
+				'button_text'   => esc_html__( 'Get License', 'wp-ulike-pro' ),
 				'button_url'    => $pricing_url,
 				'button_target' => '_blank',
 			],
 			WP_Ulike_Pro_API::STATUS_INVALID => [
-				'title'         => esc_html__( 'License does not match this site', WP_ULIKE_PRO_DOMAIN ),
-				'description'   => esc_html__( 'The saved key is not valid for this website address (common after a domain change or HTTPS migration). Open the License page and click Reactivate for this site — you do not need a new purchase.', WP_ULIKE_PRO_DOMAIN ),
-				'button_text'   => esc_html__( 'Open License page', WP_ULIKE_PRO_DOMAIN ),
+				'title'         => esc_html__( 'License does not match this site', 'wp-ulike-pro' ),
+				'description'   => esc_html__( 'The saved key is not valid for this website address (common after a domain change or HTTPS migration). Open the License page and click Reactivate for this site — you do not need a new purchase.', 'wp-ulike-pro' ),
+				'button_text'   => esc_html__( 'Open License page', 'wp-ulike-pro' ),
 				'button_url'    => $license_page,
 				'button_target' => '_self',
 			],
 			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE => [
-				'title'         => esc_html__( 'License not active on this site', WP_ULIKE_PRO_DOMAIN ),
-				'description'   => esc_html__( 'Your key is valid but not activated for this website address. Open the License page and click Reactivate for this site.', WP_ULIKE_PRO_DOMAIN ),
-				'button_text'   => esc_html__( 'Open License page', WP_ULIKE_PRO_DOMAIN ),
+				'title'         => esc_html__( 'License not active on this site', 'wp-ulike-pro' ),
+				'description'   => esc_html__( 'Your key is valid but not activated for this website address. Open the License page and click Reactivate for this site.', 'wp-ulike-pro' ),
+				'button_text'   => esc_html__( 'Open License page', 'wp-ulike-pro' ),
 				'button_url'    => $license_page,
 				'button_target' => '_self',
 			],
@@ -110,14 +110,14 @@ class WP_Ulike_Pro_License {
 		if ( '' === $license_key ) {
 			return new WP_Error(
 				'empty_key',
-				esc_html__( 'Please paste your license key first.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'Please paste your license key first.', 'wp-ulike-pro' )
 			);
 		}
 
 		if ( strlen( $license_key ) < 10 ) {
 			return new WP_Error(
 				'invalid_format',
-				esc_html__( 'That key looks too short. Copy the full key from your WP ULike account.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'That key looks too short. Copy the full key from your WP ULike account.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -151,7 +151,7 @@ class WP_Ulike_Pro_License {
 		if ( ! self::get_license_key() ) {
 			return new WP_Error(
 				'no_license',
-				esc_html__( 'No license is stored on this site.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'No license is stored on this site.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -212,7 +212,7 @@ class WP_Ulike_Pro_License {
 
 		if ( is_string( $raw ) && false !== strpos( $raw, '<' ) ) {
 			return array(
-				'message' => esc_html__( 'Could not reach the WP ULike license server. Copy “Details for support” below and contact us if this continues.', WP_ULIKE_PRO_DOMAIN ),
+				'message' => esc_html__( 'Could not reach the WP ULike license server. Copy “Details for support” below and contact us if this continues.', 'wp-ulike-pro' ),
 			);
 		}
 
@@ -242,21 +242,21 @@ class WP_Ulike_Pro_License {
 		if ( ! wp_doing_ajax() ) {
 			return new WP_Error(
 				'invalid_request',
-				esc_html__( 'Invalid request.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'Invalid request.', 'wp-ulike-pro' )
 			);
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error(
 				'forbidden',
-				esc_html__( 'You do not have permission to manage the license.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'You do not have permission to manage the license.', 'wp-ulike-pro' )
 			);
 		}
 
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp-ulike-pro-license' ) ) {
 			return new WP_Error(
 				'invalid_nonce',
-				esc_html__( 'Security check failed. Please refresh the page and try again.', WP_ULIKE_PRO_DOMAIN )
+				esc_html__( 'Security check failed. Please refresh the page and try again.', 'wp-ulike-pro' )
 			);
 		}
 
@@ -299,7 +299,7 @@ class WP_Ulike_Pro_License {
 
 		wp_send_json_success(
 			array(
-				'message'    => esc_html__( 'License activated successfully. Updates and Pro features are now enabled on this site.', WP_ULIKE_PRO_DOMAIN ),
+				'message'    => esc_html__( 'License activated successfully. Updates and Pro features are now enabled on this site.', 'wp-ulike-pro' ),
 				'panel_html' => self::get_panel_html(),
 				'lead'       => self::get_lead_text( true ),
 			)
@@ -323,7 +323,7 @@ class WP_Ulike_Pro_License {
 
 		wp_send_json_success(
 			array(
-				'message'    => esc_html__( 'License removed from this site. You can activate it again here or on another site.', WP_ULIKE_PRO_DOMAIN ),
+				'message'    => esc_html__( 'License removed from this site. You can activate it again here or on another site.', 'wp-ulike-pro' ),
 				'panel_html' => self::get_panel_html(),
 				'lead'       => self::get_lead_text( false ),
 			)
@@ -342,7 +342,7 @@ class WP_Ulike_Pro_License {
 		if ( ! self::get_license_key() ) {
 			wp_send_json_error(
 				array(
-					'message' => esc_html__( 'Add a license key before refreshing status.', WP_ULIKE_PRO_DOMAIN ),
+					'message' => esc_html__( 'Add a license key before refreshing status.', 'wp-ulike-pro' ),
 				)
 			);
 		}
@@ -354,7 +354,7 @@ class WP_Ulike_Pro_License {
 		if ( is_array( $license_data ) && isset( $license_data['license'] ) && WP_Ulike_Pro_API::STATUS_HTTP_ERROR === $license_data['license'] ) {
 			wp_send_json_error(
 				array(
-					'message'     => esc_html__( 'Could not refresh license status from the server. Your previous cached status may still be shown.', WP_ULIKE_PRO_DOMAIN ),
+					'message'     => esc_html__( 'Could not refresh license status from the server. Your previous cached status may still be shown.', 'wp-ulike-pro' ),
 					'panel_html'  => self::get_panel_html( array( 'force_refresh' => true ) ),
 				)
 			);
@@ -362,7 +362,7 @@ class WP_Ulike_Pro_License {
 
 		wp_send_json_success(
 			array(
-				'message'    => esc_html__( 'License status updated from WP ULike.', WP_ULIKE_PRO_DOMAIN ),
+				'message'    => esc_html__( 'License status updated from WP ULike.', 'wp-ulike-pro' ),
 				'panel_html' => self::get_panel_html( array( 'force_refresh' => true ) ),
 				'lead'       => self::get_lead_text( true ),
 			)
@@ -371,7 +371,7 @@ class WP_Ulike_Pro_License {
 
 	public function action_activate_license() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', WP_ULIKE_PRO_DOMAIN ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-ulike-pro' ), esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ), [
 				'back_link' => true,
 				'response'  => 403,
 			] );
@@ -383,7 +383,7 @@ class WP_Ulike_Pro_License {
 		$result      = self::process_activate( $license_key );
 
 		if ( is_wp_error( $result ) ) {
-			wp_die( wp_kses_post( $result->get_error_message() ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+			wp_die( wp_kses_post( $result->get_error_message() ), esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ), [
 				'back_link' => true,
 			] );
 		}
@@ -411,7 +411,7 @@ class WP_Ulike_Pro_License {
 	public function action_deactivate_license() {
 		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', WP_ULIKE_PRO_DOMAIN ), esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ), [
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-ulike-pro' ), esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ), [
 				'back_link' => true,
 				'response'  => 403,
 			] );
@@ -439,10 +439,10 @@ class WP_Ulike_Pro_License {
 	 */
 	public static function get_lead_text( $has_license ) {
 		if ( $has_license ) {
-			return esc_html__( 'Status and actions for this website only. Your license key is not removed unless you expand “Moving to another domain?”.', WP_ULIKE_PRO_DOMAIN );
+			return esc_html__( 'Status and actions for this website only. Your license key is not removed unless you expand “Moving to another domain?”.', 'wp-ulike-pro' );
 		}
 
-		return esc_html__( 'Paste your license key once to unlock updates, support, and all Pro features. Takes less than a minute.', WP_ULIKE_PRO_DOMAIN );
+		return esc_html__( 'Paste your license key once to unlock updates, support, and all Pro features. Takes less than a minute.', 'wp-ulike-pro' );
 	}
 
 	/**
@@ -481,32 +481,32 @@ class WP_Ulike_Pro_License {
 		if ( empty( $data['has_license'] ) ) {
 			return array(
 				'type'    => 'info',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'Paste your license key in the form below, then click Activate license.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'Paste your license key in the form below, then click Activate license.', 'wp-ulike-pro' ),
 			);
 		}
 
 		if ( ! empty( $data['is_expired'] ) ) {
 			return array(
 				'type'    => 'warn',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'Your license has expired. Click Renew license to restore updates and support.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'Your license has expired. Click Renew license to restore updates and support.', 'wp-ulike-pro' ),
 			);
 		}
 
 		if ( ! empty( $data['needs_reactivate'] ) ) {
 			return array(
 				'type'    => 'warn',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'This site’s address changed. Click Reactivate for this site — you do not need a new key.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'This site’s address changed. Click Reactivate for this site — you do not need a new key.', 'wp-ulike-pro' ),
 			);
 		}
 
 		if ( WP_Ulike_Pro_API::STATUS_DISABLED === ( $data['status'] ?? '' ) ) {
 			return array(
 				'type'    => 'warn',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'Purchase a new license, then enter your new key below. You can remove the cancelled key first if you prefer.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'Purchase a new license, then enter your new key below. You can remove the cancelled key first if you prefer.', 'wp-ulike-pro' ),
 			);
 		}
 
@@ -514,38 +514,38 @@ class WP_Ulike_Pro_License {
 			if ( ! empty( $data['license_has_auto_renewal'] ) ) {
 				return array(
 					'type'    => 'good',
-					'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-					'message' => esc_html__( 'Your license is still active. With an active subscription at wpulike.com, renewal is usually automatic—check the expiry notice below only if you cancelled billing.', WP_ULIKE_PRO_DOMAIN ),
+					'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+					'message' => esc_html__( 'Your license is still active. With an active subscription at wpulike.com, renewal is usually automatic—check the expiry notice below only if you cancelled billing.', 'wp-ulike-pro' ),
 				);
 			}
 
 			return array(
 				'type'    => 'warn',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'Your license expires soon. Renew before the date below to keep updates and support.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'Your license expires soon. Renew before the date below to keep updates and support.', 'wp-ulike-pro' ),
 			);
 		}
 
 		if ( ! empty( $data['is_valid'] ) ) {
 			return array(
 				'type'    => 'good',
-				'title'   => esc_html__( 'You\'re all set', WP_ULIKE_PRO_DOMAIN ),
-				'message' => esc_html__( 'No action needed. To use this key on another website, open “Moving to another domain?” on this page.', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'You\'re all set', 'wp-ulike-pro' ),
+				'message' => esc_html__( 'No action needed. To use this key on another website, open “Moving to another domain?” on this page.', 'wp-ulike-pro' ),
 			);
 		}
 
 		if ( ! empty( $data['error_detail']['description'] ) ) {
 			return array(
 				'type'    => 'warn',
-				'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
+				'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
 				'message' => wp_strip_all_tags( $data['error_detail']['description'] ),
 			);
 		}
 
 		return array(
 			'type'    => 'neutral',
-			'title'   => esc_html__( 'What to do now', WP_ULIKE_PRO_DOMAIN ),
-			'message' => esc_html__( 'Click Refresh status. If the problem continues, copy the support details below and contact us.', WP_ULIKE_PRO_DOMAIN ),
+			'title'   => esc_html__( 'What to do now', 'wp-ulike-pro' ),
+			'message' => esc_html__( 'Click Refresh. If the problem continues, copy the support details below and contact us.', 'wp-ulike-pro' ),
 		);
 	}
 
@@ -692,11 +692,11 @@ class WP_Ulike_Pro_License {
 		}
 
 		if ( defined( 'WP_HTTP_BLOCK_EXTERNAL' ) && WP_HTTP_BLOCK_EXTERNAL ) {
-			$hints[] = esc_html__( 'Outbound HTTP blocked (WP_HTTP_BLOCK_EXTERNAL)', WP_ULIKE_PRO_DOMAIN );
+			$hints[] = esc_html__( 'Outbound HTTP blocked (WP_HTTP_BLOCK_EXTERNAL)', 'wp-ulike-pro' );
 		}
 
 		if ( ! ini_get( 'allow_url_fopen' ) && ! function_exists( 'curl_init' ) ) {
-			$hints[] = esc_html__( 'No allow_url_fopen or cURL (license API may fail)', WP_ULIKE_PRO_DOMAIN );
+			$hints[] = esc_html__( 'No allow_url_fopen or cURL (license API may fail)', 'wp-ulike-pro' );
 		}
 
 		return $hints;
@@ -712,24 +712,24 @@ class WP_Ulike_Pro_License {
 
 		$security_plugins = self::detect_active_security_plugins();
 		$rows[]           = array(
-			'label' => esc_html__( 'Security plugins', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Security plugins', 'wp-ulike-pro' ),
 			'value' => ! empty( $security_plugins )
 				? implode( ', ', $security_plugins )
-				: esc_html__( 'None detected', WP_ULIKE_PRO_DOMAIN ),
+				: esc_html__( 'None detected', 'wp-ulike-pro' ),
 		);
 
 		$waf_signals = self::detect_waf_and_proxy_signals();
 		$rows[]      = array(
-			'label' => esc_html__( 'WAF / CDN / proxy', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'WAF / CDN / proxy', 'wp-ulike-pro' ),
 			'value' => ! empty( $waf_signals )
 				? implode( ', ', $waf_signals )
-				: esc_html__( 'None detected from headers', WP_ULIKE_PRO_DOMAIN ),
+				: esc_html__( 'None detected from headers', 'wp-ulike-pro' ),
 		);
 
 		$host_hints = self::detect_hosting_and_http_hints();
 		if ( ! empty( $host_hints ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Hosting / HTTP notes', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Hosting / HTTP notes', 'wp-ulike-pro' ),
 				'value' => implode( '; ', $host_hints ),
 			);
 		}
@@ -737,7 +737,7 @@ class WP_Ulike_Pro_License {
 		$server_software = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
 		if ( $server_software && preg_match( '/apache|nginx|litespeed|iis/i', $server_software ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Web server', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Web server' ),
 				'value' => $server_software,
 			);
 		}
@@ -760,26 +760,26 @@ class WP_Ulike_Pro_License {
 				$curl_label .= ' (SSL: ' . $curl_version['ssl_version'] . ')';
 			}
 			$rows[] = array(
-				'label' => esc_html__( 'cURL', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'cURL', 'wp-ulike-pro' ),
 				'value' => $curl_label,
 			);
 		}
 
 		if ( defined( 'OPENSSL_VERSION_TEXT' ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'OpenSSL', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'OpenSSL', 'wp-ulike-pro' ),
 				'value' => OPENSSL_VERSION_TEXT,
 			);
 		}
 
 		$rows[] = array(
-			'label' => esc_html__( 'allow_url_fopen', WP_ULIKE_PRO_DOMAIN ),
-			'value' => ini_get( 'allow_url_fopen' ) ? esc_html__( 'Enabled', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'Disabled', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'allow_url_fopen', 'wp-ulike-pro' ),
+			'value' => ini_get( 'allow_url_fopen' ) ? esc_html__( 'Enabled' ) : esc_html__( 'Disabled' ),
 		);
 
 		$theme = wp_get_theme();
 		$rows[] = array(
-			'label' => esc_html__( 'Theme', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Theme' ),
 			'value' => trim( $theme->get( 'Name' ) . ( $theme->get( 'Version' ) ? ' ' . $theme->get( 'Version' ) : '' ) ),
 		);
 
@@ -792,7 +792,7 @@ class WP_Ulike_Pro_License {
 				$debug_flags[] = 'WP_DEBUG_DISPLAY';
 			}
 			$rows[] = array(
-				'label' => esc_html__( 'WordPress debug', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'WordPress debug', 'wp-ulike-pro' ),
 				'value' => implode( ', ', $debug_flags ),
 			);
 		}
@@ -819,13 +819,13 @@ class WP_Ulike_Pro_License {
 
 		if ( ! empty( $last['http_code'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'License API HTTP status', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'License API HTTP status', 'wp-ulike-pro' ),
 				'value' => (string) (int) $last['http_code'],
 				'mono'  => true,
 			);
 		} elseif ( ! empty( $last['connection'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'License API connection', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'License API connection', 'wp-ulike-pro' ),
 				'value' => (string) $last['connection'],
 				'mono'  => true,
 			);
@@ -833,14 +833,14 @@ class WP_Ulike_Pro_License {
 
 		if ( ! empty( $last['http_message'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'License API message', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'License API message', 'wp-ulike-pro' ),
 				'value' => (string) $last['http_message'],
 			);
 		}
 
 		if ( ! empty( $last['body_excerpt'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'License API response excerpt', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'License API response excerpt', 'wp-ulike-pro' ),
 				'value' => (string) $last['body_excerpt'],
 				'mono'  => true,
 			);
@@ -848,7 +848,7 @@ class WP_Ulike_Pro_License {
 
 		if ( ! empty( $last['time'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Last license API error at', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Last license API error at', 'wp-ulike-pro' ),
 				'value' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), (int) $last['time'] ),
 			);
 		}
@@ -867,13 +867,13 @@ class WP_Ulike_Pro_License {
 		$site_url = site_url();
 
 		$rows[] = array(
-			'label' => esc_html__( 'License site URL (home)', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'License site URL (home)', 'wp-ulike-pro' ),
 			'value' => $home_url,
 		);
 
 		if ( untrailingslashit( $home_url ) !== untrailingslashit( $site_url ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'WordPress URL (site)', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'WordPress URL (site)', 'wp-ulike-pro' ),
 				'value' => $site_url,
 			);
 		}
@@ -887,27 +887,27 @@ class WP_Ulike_Pro_License {
 	 * @return array<int, array{label: string, value: string, mono?: bool}>
 	 */
 	private static function get_environment_hosting_rows() {
-		$public_ip = esc_html__( 'Unavailable', WP_ULIKE_PRO_DOMAIN );
+		$public_ip = esc_html__( 'Unavailable', 'wp-ulike-pro' );
 		if ( class_exists( 'WP_Ulike_Pro_API' ) && method_exists( 'WP_Ulike_Pro_API', 'get_public_server_ip' ) ) {
 			$public_ip = WP_Ulike_Pro_API::get_public_server_ip();
 		}
 
 		return array(
 			array(
-				'label' => esc_html__( 'Server public IP', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Server public IP', 'wp-ulike-pro' ),
 				'value' => $public_ip,
 				'mono'  => true,
 			),
 			array(
-				'label' => esc_html__( 'HTTPS', WP_ULIKE_PRO_DOMAIN ),
-				'value' => is_ssl() ? esc_html__( 'Yes', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'No', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'HTTPS', 'wp-ulike-pro' ),
+				'value' => is_ssl() ? esc_html__( 'Yes' ) : esc_html__( 'No' ),
 			),
 			array(
-				'label' => esc_html__( 'Multisite', WP_ULIKE_PRO_DOMAIN ),
-				'value' => is_multisite() ? esc_html__( 'Yes', WP_ULIKE_PRO_DOMAIN ) : esc_html__( 'No', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Multisite', 'wp-ulike-pro' ),
+				'value' => is_multisite() ? esc_html__( 'Yes' ) : esc_html__( 'No' ),
 			),
 			array(
-				'label' => esc_html__( 'Timezone', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Timezone' ),
 				'value' => wp_timezone_string(),
 			),
 		);
@@ -932,49 +932,49 @@ class WP_Ulike_Pro_License {
 	private static function get_support_summary_rows( $data ) {
 		$rows = array(
 			array(
-				'label' => esc_html__( 'WP ULike Pro', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'WP ULike Pro', 'wp-ulike-pro' ),
 				'value' => $data['pro_version'] ?? '',
 			),
 		);
 
 		if ( defined( 'WP_ULIKE_VERSION' ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'WP ULike (free)', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'WP ULike (free)', 'wp-ulike-pro' ),
 				'value' => WP_ULIKE_VERSION,
 			);
 		}
 
 		$rows[] = array(
-			'label' => esc_html__( 'WordPress', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'WordPress' ),
 			'value' => get_bloginfo( 'version' ),
 		);
 		$rows[] = array(
-			'label' => esc_html__( 'PHP', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'PHP', 'wp-ulike-pro' ),
 			'value' => PHP_VERSION,
 		);
 
 		if ( empty( $data['has_license'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'License on this site', WP_ULIKE_PRO_DOMAIN ),
-				'value' => esc_html__( 'Not activated', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'License on this site', 'wp-ulike-pro' ),
+				'value' => esc_html__( 'Not activated', 'wp-ulike-pro' ),
 			);
 
 			return array_merge( $rows, self::get_environment_url_rows() );
 		}
 
 		$rows[] = array(
-			'label' => esc_html__( 'License key (masked)', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'License key (masked)', 'wp-ulike-pro' ),
 			'value' => $data['hidden_key'] ?? '',
 			'mono'  => true,
 		);
 		$rows[] = array(
-			'label' => esc_html__( 'Status', WP_ULIKE_PRO_DOMAIN ),
+			'label' => esc_html__( 'Status' ),
 			'value' => $data['status_label'] ?? '',
 		);
 
 		if ( ! empty( $data['expires_label'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Expires', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Expires', 'wp-ulike-pro' ),
 				'value' => $data['expires_label'] . ( ! empty( $data['expires_hint'] ) ? ' — ' . $data['expires_hint'] : '' ),
 			);
 		}
@@ -984,14 +984,14 @@ class WP_Ulike_Pro_License {
 			if ( isset( $data['activations_left'] ) && is_int( $data['activations_left'] ) ) {
 				$value .= ' (' . sprintf(
 					/* translators: %d: activations remaining */
-					esc_html__( '%d activations left', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( '%d activations left', 'wp-ulike-pro' ),
 					$data['activations_left']
 				) . ')';
 			} elseif ( isset( $data['activations_left'] ) && 'unlimited' === $data['activations_left'] ) {
-				$value .= ' (' . esc_html__( 'unlimited activations', WP_ULIKE_PRO_DOMAIN ) . ')';
+				$value .= ' (' . esc_html__( 'unlimited activations', 'wp-ulike-pro' ) . ')';
 			}
 			$rows[] = array(
-				'label' => esc_html__( 'Sites on license', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Sites on license', 'wp-ulike-pro' ),
 				'value' => $value,
 			);
 		}
@@ -999,14 +999,14 @@ class WP_Ulike_Pro_License {
 		$license_data = $data['license_data'] ?? array();
 		if ( ! empty( $license_data['payment_id'] ) && '0' !== (string) $license_data['payment_id'] ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Order number', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Order number', 'wp-ulike-pro' ),
 				'value' => '#' . $license_data['payment_id'],
 			);
 		}
 
 		if ( ! empty( $license_data['renewal_discount'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Renewal discount', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Renewal discount', 'wp-ulike-pro' ),
 				'value' => $license_data['renewal_discount'] . '%',
 			);
 		}
@@ -1030,7 +1030,7 @@ class WP_Ulike_Pro_License {
 
 		if ( ! empty( $data['status'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Server status code', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Server status code', 'wp-ulike-pro' ),
 				'value' => (string) $data['status'],
 				'mono'  => true,
 			);
@@ -1039,7 +1039,7 @@ class WP_Ulike_Pro_License {
 		$cache = get_option( 'wp_ulike_pro_license_data' );
 		if ( is_array( $cache ) && ! empty( $cache['timeout'] ) ) {
 			$rows[] = array(
-				'label' => esc_html__( 'Cached status valid until', WP_ULIKE_PRO_DOMAIN ),
+				'label' => esc_html__( 'Cached status valid until', 'wp-ulike-pro' ),
 				'value' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), (int) $cache['timeout'] ),
 			);
 		}
@@ -1157,10 +1157,10 @@ class WP_Ulike_Pro_License {
 
 		if ( $args['include_url_notices'] ) {
 			if ( isset( $_GET['activated'] ) && '1' === sanitize_key( wp_unslash( $_GET['activated'] ) ) ) {
-				$data['notice']      = esc_html__( 'Your license has been activated successfully.', WP_ULIKE_PRO_DOMAIN );
+				$data['notice']      = esc_html__( 'Your license has been activated successfully.', 'wp-ulike-pro' );
 				$data['notice_type'] = 'success';
 			} elseif ( isset( $_GET['deactivated'] ) && '1' === sanitize_key( wp_unslash( $_GET['deactivated'] ) ) ) {
-				$data['notice']      = esc_html__( 'Your license has been deactivated on this site.', WP_ULIKE_PRO_DOMAIN );
+				$data['notice']      = esc_html__( 'Your license has been deactivated on this site.', 'wp-ulike-pro' );
 				$data['notice_type'] = 'info';
 			}
 		}
@@ -1216,7 +1216,7 @@ class WP_Ulike_Pro_License {
 
 		if ( $data['is_valid'] && ! empty( $license_data['expires'] ) ) {
 			if ( 'lifetime' === $license_data['expires'] ) {
-				$data['expires_label'] = esc_html__( 'Lifetime', WP_ULIKE_PRO_DOMAIN );
+				$data['expires_label'] = esc_html__( 'Lifetime', 'wp-ulike-pro' );
 				$data['expires_hint']  = '';
 			} else {
 				$expires_ts = strtotime( $license_data['expires'] );
@@ -1225,11 +1225,11 @@ class WP_Ulike_Pro_License {
 					if ( $expires_ts > current_time( 'timestamp' ) ) {
 						$data['expires_hint'] = sprintf(
 							/* translators: %s: human-readable time until expiry */
-							esc_html__( 'Renews in %s', WP_ULIKE_PRO_DOMAIN ),
+							esc_html__( 'Renews in %s', 'wp-ulike-pro' ),
 							human_time_diff( current_time( 'timestamp' ), $expires_ts )
 						);
 					} else {
-						$data['expires_hint'] = esc_html__( 'Past expiry date', WP_ULIKE_PRO_DOMAIN );
+						$data['expires_hint'] = esc_html__( 'Past expiry date', 'wp-ulike-pro' );
 					}
 				}
 			}
@@ -1244,7 +1244,7 @@ class WP_Ulike_Pro_License {
 
 			$data['sites_label'] = sprintf(
 				/* translators: 1: sites in use, 2: license limit */
-				esc_html__( '%1$s of %2$s', WP_ULIKE_PRO_DOMAIN ),
+				esc_html__( '%1$s of %2$s' ),
 				number_format_i18n( $site_count ),
 				number_format_i18n( $license_limit )
 			);
@@ -1279,26 +1279,26 @@ class WP_Ulike_Pro_License {
 	 */
 	public static function get_status_label( $license_data ) {
 		$license_errors = array(
-			WP_Ulike_Pro_API::STATUS_EXPIRED        => esc_html__( 'Expired', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE  => esc_html__( 'Mismatch', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_INVALID        => esc_html__( 'Invalid', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_DISABLED       => esc_html__( 'Cancelled', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_HTTP_ERROR     => esc_html__( 'Connection error', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_MISSING        => esc_html__( 'Missing', WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_REQUEST_LOCKED => esc_html__( 'Checking…', WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_EXPIRED        => esc_html__( 'Expired', 'wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE  => esc_html__( 'Mismatch' ),
+			WP_Ulike_Pro_API::STATUS_INVALID        => esc_html__( 'Invalid' ),
+			WP_Ulike_Pro_API::STATUS_DISABLED       => esc_html__( 'Cancelled', 'wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_HTTP_ERROR     => esc_html__( 'Connection error', 'wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_MISSING        => esc_html__( 'Missing', 'wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_REQUEST_LOCKED => esc_html__( 'Checking…', 'wp-ulike-pro' ),
 		);
 
 		$status = $license_data['license'] ?? '';
 
 		if ( WP_Ulike_Pro_API::STATUS_VALID === $status ) {
-			return esc_html__( 'Active', WP_ULIKE_PRO_DOMAIN );
+			return esc_html__( 'Active' );
 		}
 
 		if ( isset( $license_errors[ $status ] ) ) {
 			return $license_errors[ $status ];
 		}
 
-		return esc_html__( 'Unknown', WP_ULIKE_PRO_DOMAIN );
+		return esc_html__( 'Unknown' );
 	}
 
 	/**
@@ -1326,24 +1326,24 @@ class WP_Ulike_Pro_License {
 
 	public static function render_part_license_status_header( $license_data ) {
 		$license_errors = [
-			WP_Ulike_Pro_API::STATUS_EXPIRED        => esc_html__( 'Expired',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE  => esc_html__( 'Mismatch',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_INVALID        => esc_html__( 'Invalid',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_DISABLED       => esc_html__( 'Cancelled',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_HTTP_ERROR     => esc_html__( 'HTTP Error',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_MISSING        => esc_html__( 'Missing',WP_ULIKE_PRO_DOMAIN ),
-			WP_Ulike_Pro_API::STATUS_REQUEST_LOCKED => esc_html__( 'Request Locked',WP_ULIKE_PRO_DOMAIN ),
+			WP_Ulike_Pro_API::STATUS_EXPIRED        => esc_html__( 'Expired','wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_SITE_INACTIVE  => esc_html__( 'Mismatch' ),
+			WP_Ulike_Pro_API::STATUS_INVALID        => esc_html__( 'Invalid' ),
+			WP_Ulike_Pro_API::STATUS_DISABLED       => esc_html__( 'Cancelled','wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_HTTP_ERROR     => esc_html__( 'HTTP Error','wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_MISSING        => esc_html__( 'Missing','wp-ulike-pro' ),
+			WP_Ulike_Pro_API::STATUS_REQUEST_LOCKED => esc_html__( 'Request Locked','wp-ulike-pro' ),
 		];
 
-		echo esc_html__( 'Status',WP_ULIKE_PRO_DOMAIN ); ?>:
+		echo esc_html__( 'Status' ); ?>:
 		<?php if ( $license_data['license'] === WP_Ulike_Pro_API::STATUS_VALID ) : ?>
-			<span style="color: #008000; font-style: italic;"><?php echo esc_html__( 'Active',WP_ULIKE_PRO_DOMAIN ); ?></span>
+			<span style="color: #008000; font-style: italic;"><?php echo esc_html__( 'Active' ); ?></span>
 		<?php else : ?>
 			<span style="color: #ff0000; font-style: italic;">
 				<?php
 				echo isset( $license_data['license'], $license_errors[ $license_data['license'] ] )
 					? esc_html( $license_errors[ $license_data['license'] ] )
-					: esc_html__( 'Unknown',WP_ULIKE_PRO_DOMAIN ) . ' (' . esc_html( $license_data['license'] ) . ')';
+					: esc_html__( 'Unknown' ) . ' (' . esc_html( $license_data['license'] ) . ')';
 				?>
 			</span>
 		<?php endif;
@@ -1377,13 +1377,13 @@ class WP_Ulike_Pro_License {
 		if ( empty( $license_key ) ) {
 			echo wp_ulike_get_notice_render([
 				'id'          => 'wp_ulike_license_activate',
-				'title'       => esc_html__( 'Welcome to WP ULike PRO!', WP_ULIKE_PRO_DOMAIN ),
-				'description' => esc_html__( 'Please activate your license to get automatic updates, premium support, and unlimited access to our pro features.' , WP_ULIKE_PRO_DOMAIN ),
+				'title'       => esc_html__( 'Welcome to WP ULike PRO!', 'wp-ulike-pro' ),
+				'description' => esc_html__( 'Please activate your license to get automatic updates, premium support, and unlimited access to our pro features.' , 'wp-ulike-pro' ),
 				'skin'        => 'error',
 				'has_close'   => false,
 				'buttons'     => array(
 					array(
-						'label'      => esc_html__( 'Activate License', WP_ULIKE_PRO_DOMAIN ),
+						'label'      => esc_html__( 'Activate' ),
 						'link'       => self_admin_url( 'admin.php?page=wp-ulike-pro-license' ),
 						'target'     => '_self'
 					)
@@ -1427,7 +1427,7 @@ class WP_Ulike_Pro_License {
 						'target'     => ! empty( $error_data['button_target'] ) ? $error_data['button_target'] : '_self',
 					),
 					array(
-						'label'      => esc_html__('Remind Me Later', WP_ULIKE_PRO_DOMAIN),
+						'label'      => esc_html__( 'Remind me later' ),
 						'type'       => 'skip',
 						'color_name' => 'info',
 						'expiration' => DAY_IN_SECONDS * 3
@@ -1440,13 +1440,13 @@ class WP_Ulike_Pro_License {
 		if ( WP_Ulike_Pro_API::is_license_active() && WP_Ulike_Pro_API::is_license_about_to_expire() ) {
 			$renew_url = WP_Ulike_Pro_API::get_renew_url( $license_key, 'renew-license', 'license-page' );
 
-			$title       = sprintf( esc_html__( 'Your License Will Expire in %s.', WP_ULIKE_PRO_DOMAIN ), human_time_diff( current_time( 'timestamp' ), strtotime( $license_data['expires'] ) ) );
-			$description = esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get updates, support, Pro templates for another year.', WP_ULIKE_PRO_DOMAIN );
+			$title       = sprintf( esc_html__( 'Your License Will Expire in %s.', 'wp-ulike-pro' ), human_time_diff( current_time( 'timestamp' ), strtotime( $license_data['expires'] ) ) );
+			$description = esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get updates, support, Pro templates for another year.', 'wp-ulike-pro' );
 
 			if ( isset( $license_data['renewal_discount'] ) && 0 < $license_data['renewal_discount'] ) {
 				$description = sprintf(
 					/* translators: %s: Renewal discount. */
-					esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get an exclusive, time-limited %s discount.', WP_ULIKE_PRO_DOMAIN ),
+					esc_html__( 'Your WP ULike Pro license is about to expire. Renew now and get an exclusive, time-limited %s discount.', 'wp-ulike-pro' ),
 					$license_data['renewal_discount'] . '&#37;'
 				);
 			}
@@ -1458,12 +1458,12 @@ class WP_Ulike_Pro_License {
 				'has_close'   => false,
 				'buttons'     => array(
 					array(
-						'label'      => esc_html__( 'Renew License', WP_ULIKE_PRO_DOMAIN ),
+						'label'      => esc_html__( 'Renew License', 'wp-ulike-pro' ),
 						'link'       => $renew_url,
 						'target'     => '_self'
 					),
 					array(
-						'label'      => esc_html__('Remind Me Later', WP_ULIKE_PRO_DOMAIN),
+						'label'      => esc_html__( 'Remind me later' ),
 						'type'       => 'skip',
 						'color_name' => 'info',
 						'expiration' => DAY_IN_SECONDS * 3
@@ -1477,7 +1477,7 @@ class WP_Ulike_Pro_License {
 		$license_key = self::get_license_key();
 
 		if ( empty( $license_key ) ) {
-			$links['active_license'] = sprintf( '<a href="%s" class="wp-ulike-plugins-gopro">%s</a>', self::get_url(), esc_html__( 'Activate License', WP_ULIKE_PRO_DOMAIN ) );
+			$links['active_license'] = sprintf( '<a href="%s" class="wp-ulike-plugins-gopro">%s</a>', self::get_url(), esc_html__( 'Activate' ) );
 		}
 
 		return $links;
@@ -1485,7 +1485,7 @@ class WP_Ulike_Pro_License {
 
 	public function register_page( $submenus ) {
 		$license_submenu_page = array( 'license' => array(
-			'title'       => esc_html__( 'License', WP_ULIKE_PRO_DOMAIN ),
+			'title'       => esc_html__( 'License', 'wp-ulike-pro' ),
 			'parent_slug' => 'wp-ulike-settings',
 			'capability'  => 'manage_options',
 			'path'        => WP_ULIKE_PRO_ADMIN_DIR . '/includes/templates/license.php',

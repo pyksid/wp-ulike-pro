@@ -153,9 +153,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 					'display' => true,
 					'text'    => sprintf(
 						'%s %s %s %s',
-						esc_html__( 'Growth ratings chart from', WP_ULIKE_PRO_DOMAIN ),
+						__( 'Growth ratings chart from', 'wp-ulike-pro' ),
 						$this->date_range['start'],
-						esc_html__( 'To', WP_ULIKE_PRO_DOMAIN ),
+						__( 'To', 'wp-ulike-pro' ),
 						$this->date_range['end']
 					),
 				),
@@ -510,11 +510,11 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 		 */
 		private function chart_series_options( $name ) {
 			$palette = array(
-				'all'       => array( '#888add', esc_html__( 'All', WP_ULIKE_PRO_DOMAIN ) ),
-				'like'      => array( '#12b89b', esc_html__( 'Like', WP_ULIKE_PRO_DOMAIN ) ),
-				'dislike'   => array( '#e24f4e', esc_html__( 'Dislike', WP_ULIKE_PRO_DOMAIN ) ),
-				'unlike'    => array( '#f18e2d', esc_html__( 'Un-Like', WP_ULIKE_PRO_DOMAIN ) ),
-				'undislike' => array( '#4a5ca4', esc_html__( 'Un-Dislike', WP_ULIKE_PRO_DOMAIN ) ),
+				'all'       => array( '#888add', __( 'All' ) ),
+				'like'      => array( '#12b89b', __( 'Like', 'wp-ulike-pro' ) ),
+				'dislike'   => array( '#e24f4e', __( 'Dislike', 'wp-ulike-pro' ) ),
+				'unlike'    => array( '#f18e2d', __( 'Un-Like', 'wp-ulike-pro' ) ),
+				'undislike' => array( '#4a5ca4', __( 'Un-Dislike', 'wp-ulike-pro' ) ),
 			);
 
 			$color = $palette[ $name ][0] ?? '#888add';
@@ -584,7 +584,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 				$html .= sprintf(
 					'<li><span class="comment-info"><span class="comment-author-link">%s</span> %s <a href="%s">%s</a></span><span class="wp_ulike_item_counter">%s%s</span></li>',
 					esc_html( stripslashes( $comment->comment_author ) ),
-					esc_html__( 'on', WP_ULIKE_PRO_DOMAIN ),
+					__( 'On', 'wp-ulike-pro' ),
 					esc_url( get_comment_link( $comment->comment_ID ) ),
 					esc_html( get_the_title( $comment->comment_post_ID ) ),
 					$this->vote_count_html( $like_count, 'up' ),
@@ -602,8 +602,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 		private function render_top_activities( $period ) {
 			if ( ! defined( 'BP_VERSION' ) ) {
 				return '<li>' . sprintf(
-					esc_html__( '%s is Not Activated!', WP_ULIKE_PRO_DOMAIN ),
-					esc_html__( 'BuddyPress', WP_ULIKE_PRO_DOMAIN )
+					__( '%s is Not Activated!', 'wp-ulike-pro' ),
+					__( 'BuddyPress', 'wp-ulike-pro' )
 				) . '</li>';
 			}
 
@@ -643,8 +643,8 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 		private function render_top_topics( $period ) {
 			if ( ! function_exists( 'is_bbpress' ) ) {
 				return '<li>' . sprintf(
-					esc_html__( '%s is Not Activated!', WP_ULIKE_PRO_DOMAIN ),
-					esc_html__( 'bbPress', WP_ULIKE_PRO_DOMAIN )
+					__( '%s is Not Activated!', 'wp-ulike-pro' ),
+					__( 'bbPress', 'wp-ulike-pro' )
 				) . '</li>';
 			}
 
@@ -687,7 +687,7 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 			$counter = 1;
 			foreach ( $top_likers as $user ) {
 				$userdata = get_userdata( (int) $user->user_id );
-				$name     = empty( $userdata ) ? esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN ) : esc_html( $userdata->display_name );
+				$name     = empty( $userdata ) ? __( 'Guest User', 'wp-ulike-pro' ) : esc_html( $userdata->display_name );
 
 				$html .= sprintf(
 					'<div class="wp-ulike-flex wp-ulike-users-list"><div class="wp-ulike-counter"><i class="wp-ulike-icons-trophy"></i><span class="wp-ulike-counter">%1$dth</span></div><div class="wp-ulike-info"><i class="wp-ulike-icons-profile-male"></i><span class="wp-ulike-user-name">%2$s</span></div><div class="wp-ulike-total"><i class="wp-ulike-icons-heart"></i><span class="wp-ulike-user-name">%3$s</span></div></div>',
@@ -709,9 +709,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Rest' ) ) {
 			$period_info = is_array( $period ) ? implode( ' - ', $period ) : $period;
 			$message     = sprintf(
 				'%s "%s" %s',
-				esc_html__( 'No results were found in', WP_ULIKE_PRO_DOMAIN ),
+				__( 'No results were found in', 'wp-ulike-pro' ),
 				esc_html( (string) $period_info ),
-				esc_html__( 'period', WP_ULIKE_PRO_DOMAIN )
+				__( 'period', 'wp-ulike-pro' )
 			);
 
 			return $flex

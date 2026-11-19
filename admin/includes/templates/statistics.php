@@ -22,26 +22,26 @@
 			</div>
 
 			<h1 class="wp-ulike-pro-license-empty-title">
-				<?php esc_html_e( 'License Not Found!', WP_ULIKE_PRO_DOMAIN ); ?>
+				<?php esc_html_e( 'License Not Found!', 'wp-ulike-pro' ); ?>
 			</h1>
 
 			<p class="wp-ulike-pro-license-empty-message">
-				<?php esc_html_e( 'The license you provided is invalid or could not be found. Please verify your license key or purchase a new license to continue using the pro features.', WP_ULIKE_PRO_DOMAIN ); ?>
+				<?php esc_html_e( 'The license you provided is invalid or could not be found. Please verify your license key or purchase a new license to continue using the pro features.', 'wp-ulike-pro' ); ?>
 			</p>
 
 			<div class="wp-ulike-pro-license-empty-actions">
 				<a href="<?php echo esc_url( self_admin_url( 'admin.php?page=wp-ulike-pro-license' ) ); ?>" class="button button-primary">
 					<span class="dashicons dashicons-admin-network" aria-hidden="true"></span>
-					<?php esc_html_e( 'Activate License', WP_ULIKE_PRO_DOMAIN ); ?>
+					<?php esc_html_e( 'Activate' ); ?>
 				</a>
 				<a href="<?php echo esc_url( WP_Ulike_Pro_API::get_pricing_url( 'get-license', 'statistics' ) ); ?>" target="_blank" rel="noopener noreferrer" class="button button-secondary">
 					<span class="dashicons dashicons-cart" aria-hidden="true"></span>
-					<?php esc_html_e( 'Get License', WP_ULIKE_PRO_DOMAIN ); ?>
+					<?php esc_html_e( 'Get License', 'wp-ulike-pro' ); ?>
 				</a>
 			</div>
 
 			<p class="wp-ulike-pro-license-empty-help">
-				<?php esc_html_e( 'If you believe this is an error, please contact support or try refreshing the page.', WP_ULIKE_PRO_DOMAIN ); ?>
+				<?php esc_html_e( 'If you believe this is an error, please contact support or try refreshing the page.', 'wp-ulike-pro' ); ?>
 			</p>
 		</div>
 	</div>

@@ -574,7 +574,7 @@ trait WP_Ulike_Pro_Stats_Trait_Tops {
 					// Build meta_data array conditionally
 					$meta_data = [
 						'Published'  => wp_ulike_date_i18n( $activity->date_recorded ),
-						'By'         => $author ? esc_attr( $author->display_name ) : esc_html__( 'Guest User', WP_ULIKE_PRO_DOMAIN ),
+						'By'         => $author ? esc_attr( $author->display_name ) : __( 'Guest User', 'wp-ulike-pro' ),
 					];
 
 					// Only include Views if it has a value
@@ -650,7 +650,7 @@ trait WP_Ulike_Pro_Stats_Trait_Tops {
 				foreach ( $top_likers as $user ) {
 					$user_ID         = stripslashes( $user->user_id );
 					$userdata        = get_userdata( $user_ID );
-					$username        = empty( $userdata ) ? esc_html__('Guest User', WP_ULIKE_PRO_DOMAIN) : esc_attr( $userdata->display_name );
+					$username        = empty( $userdata ) ? __('Guest User', 'wp-ulike-pro') : esc_attr( $userdata->display_name );
 					$latest_activity = wp_ulike_pro_get_latest_user_activity_date( $user_ID );
 
 					$row = [

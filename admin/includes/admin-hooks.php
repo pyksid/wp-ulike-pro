@@ -46,7 +46,7 @@ function wp_ulike_pro_manage_posts_columns( $columns, $current_post_type ){
     } );
 
     return array_merge( $columns,
-    array( 'wp-ulike-thumbs-down' => '<i class="dashicons dashicons-thumbs-down"></i> ' . esc_html__('Dislike',WP_ULIKE_PRO_DOMAIN) ) );
+    array( 'wp-ulike-thumbs-down' => '<i class="dashicons dashicons-thumbs-down"></i> ' . esc_html__('Dislike','wp-ulike-pro') ) );
 }
 add_action( 'wp_ulike_manage_posts_columns', 'wp_ulike_pro_manage_posts_columns', 10, 2 );
 
@@ -172,7 +172,7 @@ function wp_ulike_pro_add_export_button_for_post_types( $which ) {
     // SECURITY: Sanitize and validate orderby parameter
     $orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : '';
     if ( 'top' === $which && ! empty( $orderby ) && in_array( $orderby, array( 'likes', 'dislikes' ), true ) ) {
-        echo sprintf( '<input type="submit" name="ulp_export_post_type" class="button button-primary" value="%s" />', esc_html__('Export Logs',WP_ULIKE_PRO_DOMAIN) );
+        echo sprintf( '<input type="submit" name="ulp_export_post_type" class="button button-primary" value="%s" />', esc_html__( 'Export Logs', 'wp-ulike-pro' ) );
     }
 }
 add_action( 'manage_posts_extra_tablenav', 'wp_ulike_pro_add_export_button_for_post_types', 20, 1 );
@@ -186,7 +186,7 @@ add_action( 'manage_posts_extra_tablenav', 'wp_ulike_pro_add_export_button_for_p
  */
 function wp_ulike_pro_comment_columns( $columns ) {
     if( wp_ulike_get_option( 'comments_group|enable_admin_columns', false ) ){
-	    $columns['wp-ulike-thumbs-down'] = '<i class="dashicons dashicons-thumbs-down"></i> ' . esc_html__('Dislike',WP_ULIKE_PRO_DOMAIN);
+	    $columns['wp-ulike-thumbs-down'] = '<i class="dashicons dashicons-thumbs-down"></i> ' . esc_html__('Dislike','wp-ulike-pro');
     }
 
 	return $columns;
@@ -258,19 +258,19 @@ function wp_ulike_pro_admin_notices( $notice_list ){
         if( WP_Ulike_Pro_API::has_permission() ){
             $notice_list[ 'wp_ulike_install_core_pages' ] = new wp_ulike_notices([
                 'id'          => 'wp_ulike_install_core_pages',
-                'title'       => esc_html__( 'Install Core Pages', WP_ULIKE_SLUG ),
-                'description' => esc_html__( "WP ULike Pro needs to create several pages (User Profiles, Edit Account, Registration, Login, Password Reset) to function correctly." , WP_ULIKE_SLUG ),
+                'title'       => esc_html__( 'Install Core Pages', 'wp-ulike-pro' ),
+                'description' => esc_html__( "WP ULike Pro needs to create several pages (User Profiles, Edit Account, Registration, Login, Password Reset) to function correctly.", 'wp-ulike-pro' ),
                 'skin'        => 'default',
                 'has_close'   => true,
                 'buttons'     => array(
                     array(
-                        'label'        => esc_html__( "Create Pages", WP_ULIKE_SLUG ),
+                        'label'        => esc_html__( 'Create Pages', 'wp-ulike-pro' ),
                         'ajax_request' => array(
                             'action' => 'wp_ulike_pro_install_core_pages'
                         )
                     ),
                     array(
-                        'label'      => esc_html__('No thanks and never ask me again', WP_ULIKE_SLUG),
+                        'label'      => esc_html__( 'No thanks and never ask me again', 'wp-ulike-pro' ),
                         'type'       => 'skip',
                         'color_name' => 'error',
                         'expiration' => YEAR_IN_SECONDS * 10

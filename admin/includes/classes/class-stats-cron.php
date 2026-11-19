@@ -14,6 +14,9 @@ if ( ! class_exists( 'WP_Ulike_Pro_Stats_Cron' ) ) {
 
 	/**
 	 * Weekly reconciliation of ulike_meta engagement counters from ulike_pulse.
+	 *
+	 * Independent of the Statistics feature switch — this keeps engagement
+	 * totals honest, not the analytics reports.
 	 */
 	final class WP_Ulike_Pro_Stats_Cron {
 
